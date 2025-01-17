@@ -1,0 +1,41 @@
+.homeActionButton {
+    height: var(--space-14);
+    width: var(--space-14);
+    background-color: var(--color-theme-component-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-2);
+    box-shadow: var(--shadow-md);
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    overflow: hidden;
+    border: none;
+    font-size: inherit;
+    color: inherit;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.homeActionButton:hover{
+    background-color: var(--color-theme-component-hover-bg);
+    color: var(--color-theme-component-hover-text);
+}
+
+.iconContainer {
+    background-color: var(--default-color-bg);
+    width: var(--space-11);
+    height: 100%;
+    box-shadow: var(--shadow-inset);
+    border-radius: var(--rounded-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.centerContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}

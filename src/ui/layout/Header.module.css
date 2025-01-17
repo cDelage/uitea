@@ -1,0 +1,16 @@
+.header{
+  display: flex;
+  justify-content: space-between;
+  height: var(--space-7);
+  user-select: none;
+  padding: var(--space-0);
+  margin: var(--space-0);
+  align-items: baseline;
+  -webkit-app-region: drag;
+}
+
+.buttons {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+

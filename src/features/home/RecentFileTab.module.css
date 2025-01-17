@@ -1,0 +1,5 @@
+.recentFileTab{
+    background-color: var(--color-theme-component-bg);
+    width: 100%;
+    padding: 16px;
+}

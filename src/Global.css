@@ -1,0 +1,281 @@
+:root {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  --color-secondary-50: #fff7ed;
+  --color-secondary-100: #ffedd5;
+  --color-secondary-200: #fed7aa;
+  --color-secondary-300: #fdba74;
+  --color-secondary-400: #fb923c;
+  --color-secondary-500: #f97316;
+  --color-secondary-600: #ea580c;
+  --color-secondary-700: #c2410c;
+  --color-secondary-800: #9a3412;
+  --color-secondary-900: #7c2d12;
+  --color-secondary-950: #431407;
+
+  --color-positive-50: #f0fdf4;
+  --color-positive-100: #dcfce7;
+  --color-positive-200: #bbf7d0;
+  --color-positive-300: #86efac;
+  --color-positive-400: #4ade80;
+  --color-positive-500: #22c55e;
+  --color-positive-600: #16a34a;
+  --color-positive-700: #15803d;
+  --color-positive-800: #166534;
+  --color-positive-900: #14532d;
+  --color-positive-950: #052e16;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning-950: #451a03;
+
+  --color-negative-50: #fff1f2;
+  --color-negative-100: #ffe4e6;
+  --color-negative-200: #fecdd3;
+  --color-negative-300: #fda4af;
+  --color-negative-400: #fb7185;
+  --color-negative-500: #f43f5e;
+  --color-negative-600: #e11d48;
+  --color-negative-700: #be123c;
+  --color-negative-800: #9f1239;
+  --color-negative-900: #881337;
+  --color-negative-950: #4c0519;
+
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f5;
+  --color-gray-200: #e4e4e7;
+  --color-gray-300: #d4d4d8;
+  --color-gray-400: #a1a1aa;
+  --color-gray-500: #71717a;
+  --color-gray-600: #52525b;
+  --color-gray-700: #3f3f46;
+  --color-gray-800: #27272a;
+  --color-gray-900: #18181b;
+  --color-gray-950: #09090b;
+
+  --color-info-50: #f0fdfa;
+  --color-info-100: #ccfbf1;
+  --color-info-200: #99f6e4;
+  --color-info-300: #5eead4;
+  --color-info-400: #2dd4bf;
+  --color-info-500: #14b8a6;
+  --color-info-600: #0d9488;
+  --color-info-700: #0f766e;
+  --color-info-800: #115e59;
+  --color-info-900: #134e4a;
+  --color-info-950: #042f2e;
+
+  --color-single-white: #ffffff;
+  --color-single-black-transparent: rgb(24, 24, 27, 70%);
+
+  --default-color-bg: var(--color-primary-50);
+  --default-color-text-light: var(--color-gray-500);
+  --default-color-text: var(--color-gray-700);
+  --default-color-text-dark: var(--color-gray-900);
+
+  --color-theme-window-buttons-hover-bg: var(--color-primary-200);
+
+  --color-theme-alert-bg: var(--color-negative-700);
+  --color-theme-alert-text: var(--color-negative-50);
+
+  --color-theme-component-bg: var(--color-single-white);
+  --color-theme-component-text: var(--color-gray-700);
+  --color-theme-component-hover-bg: var(--color-gray-100);
+  --color-theme-component-hover-text: var(--color-gray-900);
+
+  --color-theme-modal-bg: var(--color-single-black-transparent);
+
+  --space-0: 0px;
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 20px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 40px;
+  --space-10: 52px;
+  --space-11: 64px;
+  --space-12: 80px;
+  --space-13: 100px;
+  --space-14: 120px;
+
+  --shadow-md: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  --shadow-lg: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
+    rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+  --shadow-inset: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;
+
+  --rounded-md: 2px;
+}
+
+body {
+  background-color: var(--default-color-bg);
+  color: var(--default-color-text);
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  padding: var(--space-0);
+  margin: var(--space-0);
+}
+
+h1 {
+  font-size: 52px;
+  line-height: 56px;
+  margin: 0px;
+}
+
+.row {
+  display: flex;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Gap classes */
+.gap-0 {
+  gap: var(--space-0);
+}
+.gap-1 {
+  gap: var(--space-1);
+}
+.gap-2 {
+  gap: var(--space-2);
+}
+.gap-3 {
+  gap: var(--space-3);
+}
+.gap-4 {
+  gap: var(--space-4);
+}
+.gap-5 {
+  gap: var(--space-5);
+}
+.gap-6 {
+  gap: var(--space-6);
+}
+.gap-7 {
+  gap: var(--space-7);
+}
+.gap-8 {
+  gap: var(--space-8);
+}
+.gap-9 {
+  gap: var(--space-9);
+}
+.gap-10 {
+  gap: var(--space-10);
+}
+
+/* Padding classes */
+.p-0 {
+  padding: var(--space-0);
+}
+.p-1 {
+  padding: var(--space-1);
+}
+.p-2 {
+  padding: var(--space-2);
+}
+.p-3 {
+  padding: var(--space-3);
+}
+.p-4 {
+  padding: var(--space-4);
+}
+.p-5 {
+  padding: var(--space-5);
+}
+.p-6 {
+  padding: var(--space-6);
+}
+.p-7 {
+  padding: var(--space-7);
+}
+.p-8 {
+  padding: var(--space-8);
+}
+.p-9 {
+  padding: var(--space-9);
+}
+.p-10 {
+  padding: var(--space-10);
+}
+
+/* Margin classes */
+.m-0 {
+  margin: var(--space-0);
+}
+.m-1 {
+  margin: var(--space-1);
+}
+.m-2 {
+  margin: var(--space-2);
+}
+.m-3 {
+  margin: var(--space-3);
+}
+.m-4 {
+  margin: var(--space-4);
+}
+.m-5 {
+  margin: var(--space-5);
+}
+.m-6 {
+  margin: var(--space-6);
+}
+.m-7 {
+  margin: var(--space-7);
+}
+.m-8 {
+  margin: var(--space-8);
+}
+.m-9 {
+  margin: var(--space-9);
+}
+.m-10 {
+  margin: var(--space-10);
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-inset {
+  box-shadow: var(--shadow-inset);
+}
+
+@media (prefers-color-scheme: dark) {
+}
