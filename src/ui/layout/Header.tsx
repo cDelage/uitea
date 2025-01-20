@@ -7,7 +7,7 @@ import {
   VscChromeRestore,
 } from "react-icons/vsc";
 import { useEffect, useState } from "react";
-import { CloseButton, GhostButton, WindowButtons } from "../kit/buttons";
+import { CloseButton, GhostButton, WindowButtons } from "../kit/Buttons";
 import { ICON_SIZE_MD } from "../UiConstants";
 import { useNavigate } from "react-router-dom";
 

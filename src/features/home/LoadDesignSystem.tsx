@@ -3,10 +3,11 @@ import { ICON_SIZE_XL } from "../../ui/UiConstants";
 import styles from "./homeActionButtons.module.css";
 import { MdUploadFile } from "react-icons/md";
 import { useInsertRecentFile } from "./HomeQueries";
+import toast from "react-hot-toast";
 
 function LoadDesignSystem() {
   const { insertRecentFile } = useInsertRecentFile();
-  const handlePickFolder = async () => {
+  async function handlePickFolder() {
     try {
       const folder = (await open({
         directory: true, // Permet de sélectionner uniquement les dossiers
@@ -19,7 +20,7 @@ function LoadDesignSystem() {
         insertRecentFile(folder);
       }
     } catch (error) {
-      console.error("Erreur lors de la sélection du dossier :", error);
+      toast.error(`Error while selecting the folder : ${error}`);
     }
   };
 

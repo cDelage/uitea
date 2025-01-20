@@ -5,17 +5,19 @@ import HomePage from "./features/home/Home";
 import Layout from "./ui/layout/Layout";
 import DesignSystemPage from "./features/design-system/DesignSystemPage";
 import { Toaster } from "react-hot-toast";
+import ErrorFallback from "./ui/layout/ErrorFallback";
 
 const router = createBrowserRouter([
   {
     element: <Layout />,
+    errorElement: <ErrorFallback />,
     children: [
       {
         path: "/",
         element: <HomePage />,
       },
       {
-        path: "/design-system",
+        path: "/design-system/:designSystemPath",
         element: <DesignSystemPage />,
       },
     ],

@@ -1,13 +1,30 @@
-import { useInsertRecentFile } from "./HomeQueries";
+import { Table } from "../../ui/kit/Table";
+import Loader from "../../ui/kit/Loader";
+import { useFindAllRecentFiles } from "./HomeQueries";
+import RecentFileTab from "./RecentFileTab";
 
 function RecentFiles() {
-  const { insertRecentFile } = useInsertRecentFile();
+  const { recentFiles, isLoadingRecentFiles } = useFindAllRecentFiles();
+
+  if (isLoadingRecentFiles) return <Loader />;
 
   return (
-    <div>
-      Empty
-      <button onClick={() => insertRecentFile("other")}>Click</button>
-    </div>
+    <Table>
+      <thead>
+        <tr>
+          <td>Design system</td>
+          <td>Actions</td>
+        </tr>
+      </thead>
+      <tbody>
+        {recentFiles?.map((recentFile) => (
+          <RecentFileTab
+            key={recentFile.designSystemId}
+            designSystemMetadata={recentFile}
+          />
+        ))}
+      </tbody>
+    </Table>
   );
 }
 

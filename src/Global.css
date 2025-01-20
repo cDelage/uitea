@@ -96,10 +96,28 @@
   --color-theme-alert-bg: var(--color-negative-700);
   --color-theme-alert-text: var(--color-negative-50);
 
+  --color-theme-alert-outline-bg: var(--color-negative-50);
+  --color-theme-alert-outline-text: var(--color-negative-700);
+
   --color-theme-component-bg: var(--color-single-white);
   --color-theme-component-text: var(--color-gray-700);
+  --color-theme-component-border: var(--color-gray-300);
   --color-theme-component-hover-bg: var(--color-gray-100);
   --color-theme-component-hover-text: var(--color-gray-900);
+
+  --color-theme-primary-bg: var(--color-primary-600);
+  --color-theme-primary-text: var(--color-primary-50);
+  --color-theme-primary-border: var(--color-primary-800);
+  --color-theme-primary-hover-bg: var(--color-primary-800);
+  --color-theme-primary-hover-text: var(--color-primary-50);
+  --color-theme-primary-hover-border: var(--color-primary-950);
+
+  --color-theme-tertiary-bg: var(--color-gray-200);
+  --color-theme-tertiary-text: var(--color-gray-600);
+  --color-theme-tertiary-border: var(--color-gray-300);
+  --color-theme-tertiary-hover-bg: var(--color-gray-300);
+  --color-theme-tertiary-hover-text: var(--color-gray-700);
+  --color-theme-tertiary-hover-border: var(--color-gray-400);
 
   --color-theme-modal-bg: var(--color-single-black-transparent);
 
@@ -118,14 +136,26 @@
   --space-12: 80px;
   --space-13: 100px;
   --space-14: 120px;
+  --space-15: 160px;
+  --space-16: 200px;
+  --space-17: 240px;
+  --space-18: 280px;
+  --space-19: 320px;
+  --space-20: 360px;
 
+  --shadow-sm: rgba(0, 0, 0, 0.1) 0px 1px 1px 0px;
   --shadow-md: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
   --shadow-lg: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
     rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
   --shadow-inset: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;
 
-  --rounded-md: 2px;
+  --font-weight-light: 400;
+  --font-weight-default: 500;
+  --font-weight-bold: 700;
+
+  --rounded-md: 4px;
+  --rounded-lg: 8px;
 }
 
 body {
@@ -135,12 +165,65 @@ body {
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   padding: var(--space-0);
   margin: var(--space-0);
+  font-size: 16px;
+  line-height: 20px;
+}
+
+main {
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 h1 {
   font-size: 52px;
   line-height: 56px;
   margin: 0px;
+  font-weight: var(--font-weight-bold);
+  user-select: none;
+}
+
+h2 {
+  font-size: 32px;
+  line-height: 36px;
+  margin: 0px;
+  font-weight: var(--font-weight-bold);
+  user-select: none;
+}
+
+h3 {
+  font-size: 24px;
+  line-height: 28px;
+  margin: 0px;
+  font-weight: var(--font-weight-bold);
+  user-select: none;
+}
+
+small {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+label {
+  color: var(--default-color-text-light);
+  font-weight: var(--font-weight-bold);
+}
+
+button {
+  font-size: 14px;
+  line-height: 16px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2);
+  gap: var(--space-2);
+  font-weight: 600;
+  width: fit-content;
+}
+
+p {
+  font-size: 16px;
+  line-height: 20px;
 }
 
 .row {
@@ -275,6 +358,14 @@ h1 {
 
 .shadow-inset {
   box-shadow: var(--shadow-inset);
+}
+
+.align-center {
+  align-items: center;
+}
+
+.text-color-light {
+  color: var(--default-color-text-light);
 }
 
 @media (prefers-color-scheme: dark) {
