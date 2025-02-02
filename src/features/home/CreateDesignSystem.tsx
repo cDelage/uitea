@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
+import { ICON_SIZE_MD, ICON_SIZE_XXL } from "../../ui/UiConstants";
 import styles from "./HomeActionButtons.module.css";
 import { MdOutlineFolder, MdSquareFoot } from "react-icons/md";
 import Modal from "../../ui/kit/Modal";
@@ -58,7 +58,7 @@ function CreateDesignSystem() {
         >
           <div className={styles.centerContainer}>
             <div className={styles.iconContainer}>
-              <MdSquareFoot size={ICON_SIZE_XL} />
+              <MdSquareFoot size={ICON_SIZE_XXL} />
             </div>
           </div>
           <div>new design system</div>

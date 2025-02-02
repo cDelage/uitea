@@ -1,0 +1,33 @@
+.shade {
+  padding: var(--space-3) 6px var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  border-right: transparent 2px solid;
+  border-radius: var(--rounded-md);
+}
+
+.elevateColor {
+  transform: translateY(-10px);
+}
+
+.removeColor {
+  background-color: var(--color-theme-remove-bg);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+.addColor {
+  border-right: var(--color-theme-add-border) 2px solid;
+  cursor: pointer;
+  border-radius: 0px;
+}
+
+.colorPreview {
+  width: 100%;
+  height: var(--space-10);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
+}

@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
 
 export type ModalContextType = {
-  openId: string | null;
-  open: (id: string) => void;
-  close: () => void;
+  openModalId: string | null;
+  openModal: (id: string) => void;
+  closeModal: () => void;
 };
 
 export const ModalContext = createContext<null | ModalContextType>(null);

@@ -1,0 +1,13 @@
+.tab {
+  padding: var(--space-3) var(--space-5);
+  color: var(--color-theme-component-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.tab:hover {
+  background-color: var(--color-theme-component-hover-bg);
+  color: var(--color-theme-component-hover-text);
+}

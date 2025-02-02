@@ -1,6 +1,6 @@
 import { appWindow } from "@tauri-apps/api/window";
 import styles from "./header.module.css";
-import { IoHomeSharp, IoRemove } from "react-icons/io5";
+import { IoHomeOutline, IoHomeSharp, IoRemove } from "react-icons/io5";
 import {
   VscChromeClose,
   VscChromeMaximize,
@@ -9,11 +9,19 @@ import {
 import { useEffect, useState } from "react";
 import { CloseButton, GhostButton, WindowButtons } from "../kit/Buttons";
 import { ICON_SIZE_MD } from "../UiConstants";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCurrentDesignSystem } from "../../features/design-system/DesignSystemQueries";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
   const navigate = useNavigate();
+  const { designSystem } = useCurrentDesignSystem();
+  const { pathname } = useLocation();
+  const isHomepageActive: boolean = pathname === "/";
+  const headerName: string = isHomepageActive
+    ? "Home"
+    : designSystem?.metadata.designSystemName ?? "undefined";
+  const isTmp: boolean | undefined = designSystem?.metadata.isTmp;
 
   useEffect(() => {
     const updateMaximizedState = async () => {
@@ -33,9 +41,13 @@ function Header() {
   return (
     <header data-tauri-drag-region={true} className={styles.header}>
       <GhostButton onClick={() => navigate("/")}>
-        <IoHomeSharp size={ICON_SIZE_MD} />
+        {isHomepageActive ? (
+          <IoHomeSharp size={ICON_SIZE_MD} />
+        ) : (
+          <IoHomeOutline size={ICON_SIZE_MD} />
+        )}
       </GhostButton>
-      <strong>Home</strong>
+      {isTmp && !isHomepageActive ? <strong>{headerName}*</strong> : <p>{headerName}</p>}
       <div className={styles.buttons}>
         <WindowButtons onClick={() => appWindow.minimize()}>
           <IoRemove size={ICON_SIZE_MD} />

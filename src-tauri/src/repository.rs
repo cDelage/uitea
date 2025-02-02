@@ -12,6 +12,36 @@ pub mod home_repository;
 pub mod design_system_repository;
 
 const DESIGN_SYSTEM_METADATA_PATH: &str = "design_system_metadata.yaml";
+const TMP_PATH : &str = "tmp";
+
+struct FetchPath {
+    original_pathbuf: PathBuf,
+    //Used for tmp save (when fetch, if there is a tmp folder)
+    fetch_pathbuf: PathBuf
+}
+
+fn filename_equals(path: &PathBuf, filename: &str) -> bool {
+    // `file_name()` renvoie un `Option<&OsStr>`
+    // On utilise `and_then` pour convertir en `Option<&str>`
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .map(|name_str| name_str == filename)
+        .unwrap_or(false)
+}
+
+fn compute_fetch_pathbuf(original_pathbuf: &PathBuf) -> FetchPath {
+    let tmp_path: PathBuf = original_pathbuf.clone().join(TMP_PATH);
+    let fetch_pathbuf: PathBuf = if tmp_path.is_dir() {
+        tmp_path
+    } else{
+        original_pathbuf.clone()
+    };
+
+    FetchPath {
+        fetch_pathbuf,
+        original_pathbuf: original_pathbuf.clone()
+    }
+}
 
 pub fn compute_path(directory: &PathBuf, filename: &str) -> PathBuf {
     let mut file_path = directory.join(filename.replace(" ", "-"));
@@ -22,6 +52,26 @@ pub fn compute_path(directory: &PathBuf, filename: &str) -> PathBuf {
             i += 1;
         }
         file_path = PathBuf::from(format!("{} ({})", file_path.display(), i));
+    }
+
+    file_path
+}
+
+pub fn compute_path_with_extension(directory: &PathBuf, filename: &str, extension: &str) -> PathBuf {
+    let mut file_path = directory.join(filename.replace(" ", "-"));
+
+    // Ajouter l'extension
+    let file_path_with_extension = file_path.with_extension(extension);
+
+    if file_path_with_extension.exists() {
+        let mut i = 1;
+        // Trouver un nom unique en ajoutant "(i)" avant l'extension
+        while Path::new(&format!("{}-{}{}", file_path.display(), i, extension)).exists() {
+            i += 1;
+        }
+        file_path = PathBuf::from(format!("{}-{}{}", file_path.display(), i, extension));
+    } else {
+        file_path = file_path_with_extension;
     }
 
     file_path

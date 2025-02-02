@@ -1,5 +1,5 @@
 import { open } from "@tauri-apps/api/dialog";
-import { ICON_SIZE_XL } from "../../ui/UiConstants";
+import { ICON_SIZE_XXL } from "../../ui/UiConstants";
 import styles from "./homeActionButtons.module.css";
 import { MdUploadFile } from "react-icons/md";
 import { useInsertRecentFile } from "./HomeQueries";
@@ -31,7 +31,7 @@ function LoadDesignSystem() {
     >
       <div className={styles.centerContainer}>
         <div className={styles.iconContainer}>
-          <MdUploadFile size={ICON_SIZE_XL} />
+          <MdUploadFile size={ICON_SIZE_XXL} />
         </div>
       </div>
       <div>load design system </div>

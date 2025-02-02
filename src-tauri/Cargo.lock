@@ -79,6 +79,7 @@ dependencies = [
  "anyhow",
  "anyhow-tauri",
  "env_logger",
+ "indexmap 1.9.3",
  "log",
  "pickledb",
  "serde",

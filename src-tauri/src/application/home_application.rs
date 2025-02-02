@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{
     domain::home_domain::{RecentFiles, RemoveRecentFilesPayload},
     repository::{design_system_repository, home_repository},
@@ -15,16 +17,20 @@ pub fn find_all_recent_files(state: State<AppState>) -> Result<Vec<RecentFiles>>
     let paths: Vec<String> = home_repository::find_all_recent_files(state);
     Ok(paths
         .into_iter()
-        .map(
-            |path: String| match design_system_repository::find_design_system_metadata(&path) {
+        .map(|path: String| {
+            let design_system_pathbuf: PathBuf = PathBuf::from(&path);
+            match design_system_repository::find_design_system_metadata(&design_system_pathbuf) {
                 Ok(design_system) => RecentFiles::DesignSystem(design_system),
                 Err(_) => RecentFiles::Unknown(path),
-            },
-        )
+            }
+        })
         .collect::<Vec<RecentFiles>>())
 }
 
 /// Supprime un chemin de fichier spécifique
-pub fn remove_recent_file(state: State<AppState>, remove_payload: RemoveRecentFilesPayload) -> Result<String> {
+pub fn remove_recent_file(
+    state: State<AppState>,
+    remove_payload: RemoveRecentFilesPayload,
+) -> Result<String> {
     home_repository::remove_recent_file(state, &remove_payload)
 }

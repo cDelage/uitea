@@ -1,0 +1,31 @@
+.headerDesignSystem {
+  height: 280px;
+  min-height: 280px;
+  max-height: 280px;
+  background-color: var(--color-primary-300);
+  box-shadow: var(--shadow-inset);
+  overflow: hidden;
+  position: relative;
+}
+
+.shadowTitleContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    359deg,
+    #171717 0.78%,
+    rgba(23, 23, 23, 0) 56.97%
+  );
+  display: flex;
+  height: 100%;
+  align-items: end;
+  padding: var(--space-8);
+  box-sizing: border-box;
+}
+
+.titleDesignSystem {
+  color: white;
+}

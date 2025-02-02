@@ -1,0 +1,12 @@
+.bodyDesignSystem {
+  overflow: auto;
+  background-color: var(--color-theme-component-bg);
+  box-shadow: var(--shadow-md);
+  box-sizing: border-box;
+  margin: var(--space-0) var(--space-3) var(--space-3) var(--space-0);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-bottom: var(--space-12);
+}

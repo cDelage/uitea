@@ -7,7 +7,7 @@ import {
   useContext,
   useState,
 } from "react";
-import { useDivClickOutside } from "../../util/useDivClickOutside";
+import { useDivClickOutside } from "../../util/DivClickOutside";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import {
@@ -28,15 +28,15 @@ function Modal({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ModalContext.Provider value={{ openId, open, close }}>
+    <ModalContext.Provider value={{ openModalId: openId, openModal: open, closeModal: close }}>
       {children}
     </ModalContext.Provider>
   );
 }
 
 function Toggle({ children, id }: { children: ReactNode; id: string }) {
-  const { open } = useContext(ModalContext) as ModalContextType;
-
+  const { openModal: open } = useContext(ModalContext) as ModalContextType;
+  
   return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
     onClick: () => open(id),
   });
@@ -50,7 +50,7 @@ function Body({
   id: string;
   isFull?: boolean;
 }): JSX.Element | null {
-  const { openId, close } = useContext(ModalContext) as ModalContextType;
+  const { openModalId: openId, closeModal: close } = useContext(ModalContext) as ModalContextType;
   const RefModalBody = useDivClickOutside(close);
   if (id !== openId) return null;
 
@@ -77,7 +77,7 @@ function Footer({ children }: { children: ReactNode }) {
 }
 
 function Close({ children }: { children: ReactNode }) {
-  const { close } = useModalContext();
+  const { closeModal: close } = useModalContext();
   return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
     onClick: () => close(),
   });

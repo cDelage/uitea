@@ -10,13 +10,11 @@ import { DesignSystemMetadata } from "../../domain/DesignSystemDomain";
  */
 export function useFindAllRecentFiles() {
   const { removeFile } = useRemoveRecentFile();
-  const isClient = typeof window !== "undefined";
 
   const { data: recentFiles, isLoading: isLoadingRecentFiles } = useQuery({
     queryKey: ["recentFiles"],
     queryFn: async () => {
       const files = await invoke<RecentFile[]>("find_all_recent_files");
-      console.log(files);
 
       files
         .filter((recentFile) => "Unknown" in recentFile)
@@ -36,7 +34,6 @@ export function useFindAllRecentFiles() {
           (designSystem) => designSystem.DesignSystem
         ) as DesignSystemMetadata[];
     },
-    enabled: isClient,
   });
 
   return { recentFiles, isLoadingRecentFiles };
@@ -58,7 +55,6 @@ export function useInsertRecentFile() {
     onSuccess: (res) => {
       // Mettre à jour le cache après une insertion réussie
       queryClient.invalidateQueries({ queryKey: ["recentFiles"] });
-      console.log(res);
       navigate(`/design-system/${encodeURIComponent(res)}`);
     },
     onError: (err) => {

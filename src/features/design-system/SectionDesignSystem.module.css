@@ -1,0 +1,39 @@
+.dsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-9);
+}
+
+.sectionTitle {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  color: var(--default-color-text-dark);
+  
+}
+
+.subSectionHeader {
+  display: flex;
+  padding: var(--space-0) var(--space-7);
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.subSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.subSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
