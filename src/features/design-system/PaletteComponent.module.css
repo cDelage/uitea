@@ -2,19 +2,20 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-6) var(--space-6) 18px var(--space-6);
+  padding: 18px var(--space-6) 18px var(--space-6);
   box-sizing: border-box;
   border-bottom: transparent 2px solid;
   border-radius: var(--rounded-md);
+  border-top: transparent 2px solid;
 }
 
 .colorPalette.add:hover {
-  border-bottom: var(--color-theme-add-border) 2px solid;
+  border-bottom: var(--theme-add-border) 2px solid;
   cursor: pointer;
 }
 
 .colorPalette.remove:hover {
-  background-color: var(--color-theme-remove-bg);
+  background-color: var(--theme-remove-bg);
   cursor: pointer;
 }
 
@@ -24,7 +25,7 @@
   gap: var(--space-8);
   padding: var(--space-0) var(--space-3);
   justify-content: space-between;
-  color: var(--default-color-text-light);
+  color: var(--base-text-light);
 }
 
 .actions {
@@ -43,4 +44,20 @@
   justify-content: center;
   align-content: center;
   padding: var(--space-3);
+}
+
+.draggable {
+  background-color: var(--theme-drag-bg);
+  cursor: pointer;
+}
+
+.dragHover {
+  border-top: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+}
+
+.readOnly {
+  padding: var(--space-1) var(--space-0);
+  margin: 0;
+  border-bottom: transparent 1px solid;
 }

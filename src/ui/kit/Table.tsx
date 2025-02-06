@@ -17,7 +17,7 @@ export const Table = styled.table`
       font-size: 14px;
       line-height: 20px;
       font-weight: var(--font-weight-bold);
-      color: var(--default-color-text-light);
+      color: var(--base-text-light);
 
       td {
         padding: var(--space-3);
@@ -27,15 +27,15 @@ export const Table = styled.table`
   }
 
   tbody {
-    background-color: var(--color-theme-component-bg);
+    background-color: var(--theme-component-bg);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
 
     tr {
       cursor: pointer;
       &:hover {
-        background-color: var(--color-theme-component-hover-bg);
-        color: var(--color-theme-component-hover-text);
+        background-color: var(--theme-component-hover-bg);
+        color: var(--theme-component-hover-text);
       }
 
       td {

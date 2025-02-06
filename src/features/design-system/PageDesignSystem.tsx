@@ -2,13 +2,14 @@ import { useCurrentDesignSystem } from "./DesignSystemQueries";
 import Loader from "../../ui/kit/Loader";
 import SidebarDesignSystem from "./SidebarDesignSystem";
 import BodyDesignSystem from "./BodyDesignSystem";
-import styles from "./DesignSystemPage.module.css";
+import styles from "./PageDesignSystem.module.css";
 import {
   ActiveComponent,
   ComponentMode,
   DesignSystemContext,
 } from "./DesignSystemContext";
 import { useState } from "react";
+import { DesignToken } from "../../domain/DesignSystemDomain";
 
 function DesignSystemPage() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
@@ -44,6 +45,31 @@ function DesignSystemPage() {
     return buttonClassName;
   }
 
+  const colorTokens: DesignToken[] | undefined = designSystem?.palettes.flatMap(
+    (palette) => {
+      return palette.shades.map((shade) => {
+        return {
+          label: `palette-${palette.paletteName}-${shade.label}`,
+          value: shade.color,
+        } as DesignToken;
+      });
+    }
+  );
+
+  function findDesignSystemColor({
+    label,
+    defaultValue,
+  }: {
+    label: string;
+    defaultValue?: string;
+  }) {
+    return (
+      colorTokens?.find((token) => token.label === label)?.value ??
+      defaultValue ??
+      label
+    );
+  }
+
   if (isLoadingDesignSystem) return <Loader />;
   if (!designSystem) return null;
 
@@ -53,6 +79,8 @@ function DesignSystemPage() {
         activeComponent,
         setActiveComponent: handleSetActiveComponent,
         getActionButtonClassName,
+        findDesignSystemColor,
+        designSystem
       }}
     >
       <div className={styles.designSystemPage}>

@@ -9,15 +9,15 @@ import {
 import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { PositionAbsolute, PositionPayload } from "./PositionAbsolute.type";
-import { getRectPosition } from "./PositionUtil";
+import { getRectPosition } from "../../util/PositionUtil";
 import { useDivClickOutside } from "../../util/DivClickOutside";
 import { PopoverContext, usePopoverContext } from "./PopoverContext";
 import styles from "./Popover.module.css";
 
 const BodyDefault = styled.div<{ position: PositionAbsolute; width?: number }>`
-  background-color: var(--color-theme-component-bg);
+  background-color: var(--theme-component-bg);
   border-radius: var(--rounded-md);
-  border: 1px solid var(--color-theme-component-border);
+  border: 1px solid var(--theme-component-border);
   box-shadow: var(--shadow-md);
   position: absolute;
   z-index: 10;

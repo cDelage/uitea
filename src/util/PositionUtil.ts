@@ -1,4 +1,4 @@
-import { PositionAbsolute, PositionPayload } from "./PositionAbsolute.type";
+import { PositionAbsolute, PositionPayload } from "../ui/kit/PositionAbsolute.type";
 
 export function getRectPosition(
   position: PositionPayload,

@@ -1,5 +1,5 @@
 .recentFileArray {
-  background-color: var(--color-single-white);
+  background-color: var(--palette-single-white);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;

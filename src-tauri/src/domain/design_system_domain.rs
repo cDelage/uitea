@@ -6,7 +6,8 @@ use std::path::PathBuf;
 #[serde(rename_all = "camelCase")]
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
-    pub color_palettes: Vec<ColorPalette>,
+    pub palettes: Vec<Palette>,
+    pub base: BaseDarkable,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,10 +73,55 @@ impl DesignSystemMetadata {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ColorPalette {
+pub struct Palette {
     pub palette_name: String,
     pub palette_path: Option<PathBuf>,
     pub shades: Vec<Shade>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BaseDarkable {
+    pub default: Base,
+    pub dark: Option<Base>,
+}
+
+impl BaseDarkable {
+    pub fn new(dark_mode: &bool) -> BaseDarkable {
+        let dark = if *dark_mode { Some(Base::new()) } else { None };
+        BaseDarkable {
+            default: Base::new(),
+            dark,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Base {
+    pub background: String,
+    pub border: String,
+    pub text_light: String,
+    pub text_default: String,
+    pub text_dark: String,
+    pub background_disabled: String,
+    pub text_disabled: String,
+    pub border_disabled: String,
+}
+
+impl Base {
+    pub fn new() -> Base {
+        Base {
+            background: String::new(),
+            border: String::new(),
+            text_dark: String::new(),
+            text_default: String::new(),
+            text_light: String::new(),
+            background_disabled: String::new(),
+            border_disabled: String::new(),
+            text_disabled: String::new(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -57,12 +57,13 @@ function ActionButton({
     <button
       type={type ? type : "button"}
       className={getActionButtonClassName(mode, componentId, activeComponent)}
-      onClick={() =>
+      onClick={(e) => {
+        e.stopPropagation();
         setActiveComponent({
           componentId,
           mode,
-        })
-      }
+        });
+      }}
     >
       {children}
     </button>

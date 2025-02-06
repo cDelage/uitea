@@ -9,7 +9,7 @@
   gap: var(--space-3);
   align-items: center;
   padding: var(--space-3) var(--space-6);
-  color: var(--default-color-text-dark);
+  color: var(--base-text-dark);
   
 }
 

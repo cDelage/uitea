@@ -1,6 +1,13 @@
 import { createContext, useContext } from "react";
+import { DesignSystem } from "../../domain/DesignSystemDomain";
 
-export type ComponentMode = "add" | "edit" | "remove" | "delete" | "drag" | "default";
+export type ComponentMode =
+  | "add"
+  | "edit"
+  | "remove"
+  | "delete"
+  | "drag"
+  | "default";
 
 export type ActiveComponent = {
   componentId: string;
@@ -15,6 +22,11 @@ export type DesignSystemContextType = {
     componentId: string,
     activeComponent: ActiveComponent | undefined
   ) => string;
+  findDesignSystemColor: (props: {
+    label: string;
+    defaultValue?: string;
+  }) => string;
+  designSystem: DesignSystem;
 };
 
 export const DesignSystemContext =

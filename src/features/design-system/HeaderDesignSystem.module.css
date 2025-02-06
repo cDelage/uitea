@@ -2,7 +2,7 @@
   height: 280px;
   min-height: 280px;
   max-height: 280px;
-  background-color: var(--color-primary-300);
+  background-color: var(--palette-primary-300);
   box-shadow: var(--shadow-inset);
   overflow: hidden;
   position: relative;

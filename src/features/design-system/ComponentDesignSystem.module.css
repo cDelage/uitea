@@ -1,0 +1,32 @@
+.componentDesignSystem {
+  display: flex;
+  padding: var(--space-6) var(--space-0);
+}
+
+.sideSettings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 400px;
+  box-sizing: border-box;
+}
+
+.sideSettingsTitle {
+  color: var(--base-text-light);
+  padding: var(--space-0) var(--space-7);
+}
+
+.previewContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: auto;
+  border-radius: var(--rounded-md);
+}
+
+.previewElement {
+  flex: 1;
+  height: 100%;
+  box-shadow: var(--shadow-inset);
+}
+

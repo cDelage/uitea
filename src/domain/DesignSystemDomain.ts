@@ -1,28 +1,51 @@
-export type DesignSystemCreationPayload = {
+export interface DesignSystemCreationPayload {
   name: string;
   folderPath: string;
-};
+}
 
-export type DesignSystemMetadata = {
+export interface DesignSystemMetadata {
   designSystemId: string;
   designSystemName: string;
   darkMode: boolean;
   designSystemPath: string;
   isTmp: boolean;
-};
+}
 
-export type DesignSystem = {
+export interface DesignSystem {
   metadata: DesignSystemMetadata;
-  colorPalettes: ColorPalette[];
-};
+  palettes: Palette[];
+  base: ThemeDarkable<Base>;
+}
 
-export type ColorPalette = {
+export interface Palette {
   paletteName: string;
   palettePath?: string;
   shades: Shade[];
-};
+}
 
-export type Shade = {
+export interface Shade {
   label: string;
   color: string;
-};
+}
+
+//Used when a darkmode can exist
+export interface ThemeDarkable<T> {
+  default: T;
+  dark?: T;
+}
+
+export interface Base {
+  background: string;
+  border: string;
+  textLight: string;
+  textDefault: string;
+  textDark: string;
+  backgroundDisabled: string;
+  borderDisabled: string;
+  textDisabled: string;
+}
+
+export interface DesignToken {
+  label: string;
+  value: string;
+}

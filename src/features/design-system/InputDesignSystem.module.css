@@ -1,0 +1,22 @@
+.inputDesignSystem {
+  display: flex;
+  padding: var(--space-6) var(--space-3) var(--space-6) var(--space-0);
+  box-sizing: border-box;
+  height: var(--space-10);
+}
+
+.copyContainer {
+  display: flex;
+  justify-content: center;
+  width: var(--space-7);
+  align-items: center;
+  height: 100%;
+}
+
+.keyValueContainer {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  align-items: center;
+  height: 100%;
+}

@@ -4,8 +4,8 @@ use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        ColorPalette, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Shade,
-        ShadesFile,
+        BaseDarkable, Palette, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile,
+        Shade, ShadesFile,
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -16,7 +16,8 @@ use super::{load_yaml_from_pathbuf, save_to_yaml_file, DESIGN_SYSTEM_METADATA_PA
 
 const PALETTES_PATH: &str = "palettes";
 const PRIMARY_COLOR_PATH: &str = "primary.yaml";
-const PALETTE_ORDER_PATH: &str = "palette-order.yaml";
+const PALETTE_ORDER_PATH: &str = "palette_order.yaml";
+const BASE_PATH: &str = "base_colors.yaml";
 
 pub fn create_design_system(design_system_metadata: &DesignSystemMetadata) -> Result<()> {
     println!(
@@ -60,7 +61,7 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
     ))
 }
 
-pub fn fetch_color_palettes(design_system_path: &PathBuf) -> Result<Vec<ColorPalette>> {
+pub fn fetch_color_palettes(design_system_path: &PathBuf) -> Result<Vec<Palette>> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let palettes_path: PathBuf = fetch_pathbuf.join(PALETTES_PATH);
     if !&palettes_path.is_dir() {
@@ -70,7 +71,7 @@ pub fn fetch_color_palettes(design_system_path: &PathBuf) -> Result<Vec<ColorPal
 
     let read_dir = fs::read_dir(&palettes_path)?;
 
-    let mut color_palettes: Vec<ColorPalette> = read_dir
+    let mut color_palettes: Vec<Palette> = read_dir
         .into_iter()
         .filter_map(|dir_entry| {
             let dir: fs::DirEntry = dir_entry.ok()?;
@@ -88,13 +89,13 @@ pub fn fetch_color_palettes(design_system_path: &PathBuf) -> Result<Vec<ColorPal
 
             let file_name: &str = path.file_stem().and_then(|name| name.to_str())?;
             let shades_file: ShadesFile = load_yaml_from_pathbuf::<ShadesFile>(path).ok()?;
-            Some(ColorPalette {
+            Some(Palette {
                 palette_name: String::from(file_name),
                 palette_path: Some(path.into()),
                 shades: ShadesFile::to(&shades_file),
             })
         })
-        .collect::<Vec<ColorPalette>>();
+        .collect::<Vec<Palette>>();
 
     let order: PathBuf = palettes_path.join(PALETTE_ORDER_PATH);
 
@@ -205,7 +206,7 @@ pub fn save_design_system(design_system: DesignSystem, is_tmp: bool) -> Result<(
     fs::create_dir_all(&palettes_path)?;
 
     //Palettes
-    for color_palette in &design_system.color_palettes {
+    for color_palette in &design_system.palettes {
         let color_palette_pathbuf: PathBuf =
             compute_path_with_extension(&palettes_path, &color_palette.palette_name, &"yaml");
         println!("save color palette {:?}", &color_palette.palette_name);
@@ -214,7 +215,7 @@ pub fn save_design_system(design_system: DesignSystem, is_tmp: bool) -> Result<(
     }
 
     let palette_order: Vec<String> = design_system
-        .color_palettes
+        .palettes
         .into_iter()
         .map(|palette| return palette.palette_name)
         .collect::<Vec<String>>();
@@ -233,4 +234,17 @@ pub fn save_design_system(design_system: DesignSystem, is_tmp: bool) -> Result<(
     }
 
     Ok(())
+}
+
+pub fn fetch_base_colors(design_system_path: &PathBuf) -> Result<BaseDarkable> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let base_pathbuf: PathBuf = fetch_pathbuf.join(BASE_PATH);
+    load_yaml_from_pathbuf::<BaseDarkable>(&base_pathbuf)
+}
+
+pub fn init_base_colors(design_system_path: &PathBuf, dark_mode: &bool) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let base_pathbuf: PathBuf = fetch_pathbuf.join(BASE_PATH);
+    let base_file = BaseDarkable::new(dark_mode);
+    save_to_yaml_file(base_pathbuf, &base_file)
 }

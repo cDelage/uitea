@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./features/home/Home";
 import Layout from "./ui/layout/Layout";
-import DesignSystemPage from "./features/design-system/DesignSystemPage";
+import DesignSystemPage from "./features/design-system/PageDesignSystem";
 import { Toaster } from "react-hot-toast";
 import ErrorFallback from "./ui/layout/ErrorFallback";
 
@@ -49,8 +49,8 @@ function App() {
             fontSize: "16px",
             maxWidth: "500px",
             padding: "16px 24px",
-            backgroundColor: "var(--color-theme-component-bg)",
-            color: "--default-color-text",
+            backgroundColor: "var(--theme-component-bg)",
+            color: "--base-text",
           },
         }}
       />
