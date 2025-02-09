@@ -1,9 +1,8 @@
 import { MdDelete } from "react-icons/md";
 import Modal from "../../ui/kit/Modal";
 import Popover from "../../ui/kit/Popover";
-import { useModalContext } from "../../ui/kit/useModalContext";
+import { useModalContext } from "../../ui/kit/ModalContext";
 import { useState } from "react";
-import { Checkbox } from "../../ui/kit/Checkbox";
 import { ButtonAlert, ButtonTertiary } from "../../ui/kit/Buttons";
 import { useRemoveRecentFile } from "./HomeQueries";
 import { usePopoverContext } from "../../ui/kit/PopoverContext";
@@ -49,8 +48,8 @@ function ModalRemoveRecentFile({ recentFilePath }: { recentFilePath: string }) {
             <div>
               Are you sure to want to remove the file from recent file ?
             </div>
-            <div className="row align-center gap-2 text-color-light">
-              <Checkbox
+            <div className="checkbox-container">
+              <input
                 type="checkbox"
                 checked={isDeleteFromComputer}
                 onChange={() => setIsDeleteFromComputer((value) => !value)}

@@ -1,16 +1,16 @@
 .inputDesignSystem {
   display: flex;
-  padding: var(--space-6) var(--space-3) var(--space-6) var(--space-0);
-  box-sizing: border-box;
-  height: var(--space-10);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-0);
 }
 
-.copyContainer {
+.sideContainer {
   display: flex;
   justify-content: center;
-  width: var(--space-7);
+  align-items: center;
+  width: var(--space-9);
   align-items: center;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .keyValueContainer {
@@ -19,4 +19,28 @@
   flex: 1;
   align-items: center;
   height: 100%;
+}
+
+.titlePadding{
+  margin-bottom: 2px;
+}
+
+.colorPreviewContainer {
+  width: var(--space-5);
+  min-width: var(--space-5);
+  max-width: var(--space-5);
+  height: var(--space-5);
+  min-height: var(--space-5);
+  max-height: var(--space-5);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+  border: var(--base-border) 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+}
+
+.colorPreviewContainerHover {
+  transform: translateX(-4px) scale(1.2);
 }

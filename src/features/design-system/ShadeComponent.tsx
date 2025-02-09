@@ -1,11 +1,9 @@
 import { useRef, useState } from "react";
 import styles from "./ShadeComponent.module.css";
-import { ComponentMode } from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
-import { ButtonSignifiantAction } from "../../ui/kit/Buttons";
-import { getRectPosition } from "../../util/PositionUtil";
-import { ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
-import { MdAdd, MdContentCopy, MdDeleteOutline } from "react-icons/md";
+import { ICON_SIZE_SM } from "../../ui/UiConstants";
+import { MdContentCopy } from "react-icons/md";
 import { Palette, Shade } from "../../domain/DesignSystemDomain";
 import {
   UseFieldArrayInsert,
@@ -19,8 +17,6 @@ import Popover from "../../ui/kit/Popover";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
 
 function ShadeComponent({
-  paletteMode,
-  isAllColorPalettesActive,
   index,
   register,
   insert,
@@ -31,9 +27,7 @@ function ShadeComponent({
   error,
   paletteName,
 }: {
-  paletteMode: ComponentMode;
   paletteName: string;
-  isAllColorPalettesActive: boolean;
   index: number;
   register: UseFormRegister<Palette>;
   insert: UseFieldArrayInsert<Palette, "shades">;
@@ -44,10 +38,11 @@ function ShadeComponent({
   error?: string;
 }) {
   const [isHover, setIsHover] = useState(false);
+  const { shadesMode, palettesMode } = useDesignSystemContext();
 
   const colorPreviewClassname = classNames(styles.colorPreview, {
     [styles.elevateColor]:
-      paletteMode === "default" && isHover && !isAllColorPalettesActive,
+      shadesMode === "default" && isHover && palettesMode === "default",
   });
   const shadeRef = useRef<HTMLDivElement>(null);
   const { dragIndex, hoverIndex, setDragIndex, setHoverIndex } =
@@ -60,19 +55,19 @@ function ShadeComponent({
   const shadeClassname = classNames(
     styles.shade,
     {
-      [styles.addColor]: paletteMode === "add" && isHover,
+      [styles.addColor]: shadesMode === "add" && isHover,
     },
     {
-      [styles.removeColor]: paletteMode === "remove" && isHover,
+      [styles.removeColor]: shadesMode === "remove" && isHover,
     },
     {
       [styles.draggable]:
-        (paletteMode === "drag" && isHover && dragIndex === undefined) ||
+        (shadesMode === "drag" && isHover && dragIndex === undefined) ||
         dragIndex === index,
     },
     {
       [styles.dragHover]:
-        paletteMode === "drag" && hoverIndex === index && dragIndex !== index,
+        shadesMode === "drag" && hoverIndex === index && dragIndex !== index,
     }
   );
 
@@ -82,10 +77,10 @@ function ShadeComponent({
 
   function handleClickEvent() {
     //Remove palette
-    if (paletteMode === "remove") {
+    if (shadesMode === "remove") {
       remove(index);
       submitEvent();
-    } else if (paletteMode === "add") {
+    } else if (shadesMode === "add") {
       insert(index + 1, {
         label: generateUniqueShadeKey(shades, `${(index + 1) * 100}`),
         color: "#DDDDDD",
@@ -96,13 +91,13 @@ function ShadeComponent({
 
   function handleHoverEvent() {
     setIsHover(true);
-    if (paletteMode === "drag" && dragIndex !== undefined) {
+    if (shadesMode === "drag" && dragIndex !== undefined) {
       setHoverIndex(index);
     }
   }
 
   function handleMouseDown() {
-    if (paletteMode === "drag") {
+    if (shadesMode === "drag") {
       setDragIndex(index);
     }
   }
@@ -119,32 +114,6 @@ function ShadeComponent({
       onMouseLeave={() => setIsHover(false)}
       onClick={handleClickEvent}
     >
-      {paletteMode === "remove" && isHover && (
-        <ButtonSignifiantAction
-          theme="remove"
-          type="button"
-          position={getRectPosition(
-            "top-right",
-            shadeRef.current?.getBoundingClientRect(),
-            "translate(50%, -50%)"
-          )}
-        >
-          <MdDeleteOutline size={ICON_SIZE_MD} />
-        </ButtonSignifiantAction>
-      )}
-      {paletteMode === "add" && isHover && (
-        <ButtonSignifiantAction
-          theme="add"
-          type="button"
-          position={getRectPosition(
-            "top-right",
-            shadeRef.current?.getBoundingClientRect(),
-            "translate(50%, -50%)"
-          )}
-        >
-          <MdAdd size={ICON_SIZE_MD} />
-        </ButtonSignifiantAction>
-      )}
       <div
         className={colorPreviewClassname}
         style={{
@@ -152,9 +121,9 @@ function ShadeComponent({
         }}
       />
       <div className="row space-between">
-        <div className="column gap-1">
+        <div className="column">
           <strong className={strongClassname}>
-            {paletteMode === "edit" ? (
+            {shadesMode === "edit" ? (
               <input
                 {...register(`shades.${index}.label`, {
                   required: true,
@@ -171,36 +140,36 @@ function ShadeComponent({
                 className="inherit-input"
                 type="text"
                 onFocus={(e) => e.target.select()}
-                disabled={paletteMode !== "edit"}
+                disabled={shadesMode !== "edit"}
                 autoComplete="off"
                 onBlur={submitEvent}
               />
             ) : (
-              <div className={styles.readOnly}>
+              <div className={"inherit-input-placeholder"}>
                 {getValues(`shades.${index}.label`)}
               </div>
             )}
           </strong>
 
           <small className="text-color-light">
-            {paletteMode === "edit" ? (
+            {shadesMode === "edit" ? (
               <input
                 {...register(`shades.${index}.color`)}
                 type="text"
                 className="inherit-input"
                 onFocus={(e) => e.target.select()}
-                disabled={paletteMode !== "edit"}
+                disabled={shadesMode !== "edit"}
                 autoComplete="off"
                 onBlur={submitEvent}
               />
             ) : (
-              <div className={styles.readOnly}>
+              <div className="inherit-input-placeholder">
                 {getValues(`shades.${index}.color`)}
               </div>
             )}
           </small>
         </div>
-        {isHover && paletteMode === "default" && (
+        {isHover && shadesMode === "default" && (
           <Popover>
             <Popover.Toggle id="copy-shade" positionPayload="top-right">
               <button className="action-button">
@@ -208,7 +177,7 @@ function ShadeComponent({
               </button>
             </Popover.Toggle>
             <Popover.Body id="copy-shade">
-              <div className="column gap-3 p-3 justify-end">
+              <div className="popover-body">
                 <CopyableLabel copyable={shadeToken} />
                 <CopyableLabel copyable={getValues(`shades.${index}.color`)} />
               </div>

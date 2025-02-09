@@ -1,6 +1,32 @@
-.componentDesignSystem {
+.componentDesignSystemColumn {
+  scroll-margin-top: 36px !important;
   display: flex;
-  padding: var(--space-6) var(--space-0);
+  flex-direction: column;
+  gap: var(--space-6);
+  box-sizing: border-box;
+  padding: 18px var(--space-1) 18px var(--space-0);
+  border-bottom: transparent 2px solid;
+  border-top: transparent 2px solid;
+  user-select: none;
+}
+
+.componentDesignSystem {
+  scroll-margin-top: 36px;
+  display: flex;
+  padding: var(--space-6) var(--space-1) var(--space-6) var(--space-0);
+  box-sizing: border-box;
+}
+
+.mediumHeight {
+  min-height: 360px;
+  height: 360px;
+  max-height: 360px;
+}
+
+.componentHead {
+  display: flex;
+  padding: var(--space-0) var(--space-7);
+  color: var(--base-text-light);
 }
 
 .sideSettings {
@@ -11,22 +37,96 @@
   box-sizing: border-box;
 }
 
+.scrollableSettings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  overflow: auto;
+}
+
+.rowHidden {
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+}
+
 .sideSettingsTitle {
   color: var(--base-text-light);
-  padding: var(--space-0) var(--space-7);
+  padding-left: var(--space-7);
+  padding-right: var(--space-7);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .previewContainer {
   width: 100%;
   height: 100%;
   display: flex;
-  overflow: auto;
+  overflow: hidden;
   border-radius: var(--rounded-md);
+  box-sizing: border-box;
+  border: var(--base-border) 1px solid;
 }
 
 .previewElement {
   flex: 1;
   height: 100%;
   box-shadow: var(--shadow-inset);
+  padding: var(--space-7);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.previewElementWrap {
+  flex: 1;
+  height: 100%;
+  box-shadow: var(--shadow-inset);
+  padding: var(--space-7);
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.previewRectWrap {
+  width: calc(50% - 8px);
+  height: calc(50% - 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewRect {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+}
+
+.add:hover {
+  border-bottom: var(--theme-add-border) 2px solid;
+  cursor: pointer;
+}
+
+.remove:hover {
+  background-color: var(--theme-remove-bg);
+  cursor: pointer;
+}
+
+.draggable:hover {
+  background-color: var(--theme-drag-bg);
+  cursor: pointer;
+}
+
+.dragHover:hover {
+  border-top: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
 }
 

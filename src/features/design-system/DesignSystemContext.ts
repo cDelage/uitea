@@ -23,10 +23,13 @@ export type DesignSystemContextType = {
     activeComponent: ActiveComponent | undefined
   ) => string;
   findDesignSystemColor: (props: {
-    label: string;
+    label?: string;
     defaultValue?: string;
-  }) => string;
+  }) => string | undefined;
   designSystem: DesignSystem;
+  palettesMode: ComponentMode;
+  shadesMode: ComponentMode;
+  themesMode: ComponentMode;
 };
 
 export const DesignSystemContext =

@@ -1,0 +1,4 @@
+.sidebarSettings {
+  width: 300px;
+  gap: var(--space-6);
+}

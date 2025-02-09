@@ -1,0 +1,24 @@
+.sidebarSection {
+  display: flex;
+  padding: var(--space-3) var(--space-5);
+  gap: var(--space-3);
+  box-sizing: border-box;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.sidebarSection:hover {
+  background-color: var(--base-bg-hover);
+}
+
+.fileUnderFolder{
+  padding-left: var(--space-8);
+}
+
+.iconChevronContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  transition: transform 300ms linear;
+}

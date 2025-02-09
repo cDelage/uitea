@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { RecentFile, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
-import { DesignSystemMetadata } from "../../domain/DesignSystemDomain";
+import { RecentFiles, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
+import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
 
 /**
  * Hook pour récupérer tous les fichiers récents
@@ -12,9 +12,9 @@ export function useFindAllRecentFiles() {
   const { removeFile } = useRemoveRecentFile();
 
   const { data: recentFiles, isLoading: isLoadingRecentFiles } = useQuery({
-    queryKey: ["recentFiles"],
+    queryKey: ["recent-files"],
     queryFn: async () => {
-      const files = await invoke<RecentFile[]>("find_all_recent_files");
+      const files = await invoke<RecentFiles[]>("find_all_recent_files");
 
       files
         .filter((recentFile) => "Unknown" in recentFile)
@@ -32,7 +32,7 @@ export function useFindAllRecentFiles() {
         .filter((recentFile) => "DesignSystem" in recentFile)
         .map(
           (designSystem) => designSystem.DesignSystem
-        ) as DesignSystemMetadata[];
+        ) as DesignSystemMetadataHome[];
     },
   });
 

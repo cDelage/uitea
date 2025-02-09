@@ -10,14 +10,31 @@
   align-items: center;
   padding: var(--space-3) var(--space-6);
   color: var(--base-text-dark);
-  
 }
 
 .subSectionHeader {
   display: flex;
-  padding: var(--space-0) var(--space-7);
+  padding: var(--space-3) var(--space-7);
   align-items: center;
-  gap: var(--space-6);
+  justify-content: space-between;
+  gap: var(--space-4);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.3),
+    30%,
+    #FFFFFF
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.subSectionHeaderRight {
+  display: flex;
+  gap: var(--space-10);
 }
 
 .subSectionTitle {
@@ -29,11 +46,11 @@
 .subSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-0);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }

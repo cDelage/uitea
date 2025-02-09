@@ -1,4 +1,13 @@
-import { Palette, Shade } from "../domain/DesignSystemDomain";
+import {
+  Base,
+  Palette,
+  Shade,
+  ThemeColor,
+  ThemeItem,
+  ThemeStateCategory,
+} from "../domain/DesignSystemDomain";
+import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
+import { DEFAULT_BASE } from "../ui/UiConstants";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
@@ -31,7 +40,7 @@ export const generateUniqueColorPaletteKey = (
   let counter = 1;
 
   while (colorPalettes.find((palette) => palette.paletteName === uniqueKey)) {
-    uniqueKey = `${baseKey}-${counter})`;
+    uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
 
@@ -46,16 +55,137 @@ export function objectToMap(obj: Map<string, string>): Map<string, string> {
  * Vérifie si la chaîne `value` est interprétée comme un code couleur ou un gradient CSS valide
  * par le navigateur.
  */
-export function isValidCssColorOrGradient(value: string): boolean {
-  if (!value) return false;
-  
+export function isValidCssColorOrGradient(value?: string): string | undefined {
+  if (!value) return undefined;
+
   // On crée un élément DOM fictif
-  const element = document.createElement('div');
+  const element = document.createElement("div");
 
   // On tente de lui attribuer 'value' en background
   element.style.background = value;
 
   // Si après l'attribution, la propriété `background` n'est plus vide,
   // c'est que le navigateur a reconnu la syntaxe comme valide.
-  return element.style.background.length > 0;
+  return element.style.background.length > 0 ? value : undefined;
+}
+
+export const getDefaultTheme = (themeName: string): ThemeColor => {
+  return {
+    default: {
+      background: {
+        default: "#f4f4f5",
+        dark: "#18181b",
+      },
+      border: {
+        default: "#d4d4d8",
+        dark: "#3f3f46",
+      },
+      text: {
+        default: "#27272a",
+        dark: "#e4e4e7",
+      },
+    },
+    themeName,
+  };
+};
+
+export const generateUniqueThemesKey = (
+  themes: ThemeColor[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (themes.find((theme) => theme.themeName === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+export function getThemeToken({
+  themeName,
+  themeStateCategory,
+  themeItem,
+}: {
+  themeStateCategory: ThemeStateCategory;
+  themeName: string;
+  themeItem: ThemeItem;
+}): string | undefined {
+  if (!themeName) return undefined;
+  return (
+    `theme-${themeName.toLowerCase()}` +
+    (themeStateCategory !== "default" ? `-${themeStateCategory}-` : "-") +
+    themeItem
+  );
+}
+
+export function getClosestToPercentage<T>({
+  array,
+  defaultValue,
+  percentage,
+}: {
+  array: T[];
+  defaultValue: T;
+  percentage: number;
+}): T {
+  if (array.length === 0) return defaultValue;
+
+  // Calculer l'index cible basé sur le pourcentage
+  const targetIndex = Math.round((array.length - 1) * percentage);
+
+  // Retourner l'élément correspondant
+  return array[targetIndex];
+}
+
+export function useBaseColors() {
+  const {
+    designSystem: { base },
+    findDesignSystemColor,
+  } = useDesignSystemContext();
+
+  const background = findDesignSystemColor({
+    label: base.background.default,
+    defaultValue: DEFAULT_BASE.background.default,
+  });
+  const border = findDesignSystemColor({
+    label: base.border.default,
+    defaultValue: DEFAULT_BASE.border.default,
+  });
+  const textLight = findDesignSystemColor({
+    label: base.textLight.default,
+    defaultValue: DEFAULT_BASE.textLight.default,
+  });
+  const textDefault = findDesignSystemColor({
+    label: base.textDefault.default,
+    defaultValue: DEFAULT_BASE.textDefault.default,
+  });
+  const textDark = findDesignSystemColor({
+    label: base.textDark.default,
+    defaultValue: DEFAULT_BASE.textDark.default,
+  });
+
+  const computedBase: Base = {
+    background: {
+      default: background,
+    },
+    border: {
+      default: border,
+    },
+    textDefault: {
+      default: textDefault,
+    },
+    textLight: {
+      default: textLight,
+    },
+    textDark: {
+      default: textDark,
+    },
+    backgroundDisabled: {},
+    borderDisabled: {},
+    textDisabled: {},
+  };
+
+  return computedBase;
 }

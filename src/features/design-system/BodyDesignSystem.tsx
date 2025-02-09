@@ -3,42 +3,15 @@ import Section from "./SectionDesignSystem";
 import HeaderDesignSystem from "./HeaderDesignSystem";
 import IconColors from "../../ui/icons/IconColors";
 import { ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
-import { useSaveDesignSystem } from "./DesignSystemQueries";
 import PaletteComponent from "./PaletteComponent";
 import { MdAdd, MdDragIndicator, MdEdit, MdRemove } from "react-icons/md";
-import {
-  ParentDraggableContext,
-  useDraggableFeatures,
-} from "../../util/DraggableContext";
 import BaseComponent from "./BaseComponent";
 import { useDesignSystemContext } from "./DesignSystemContext";
-import { useParams } from "react-router-dom";
+import ThemeComponent from "./ThemeComponent";
+import DraggableList from "./DraggableList";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
-  const { designSystemPath } = useParams();
-  const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const { draggableFeatures } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (
-        dragIndex === undefined ||
-        hoverIndex === undefined ||
-        !designSystem ||
-        dragIndex === hoverIndex
-      )
-        return;
-      const newPalettes = [...designSystem.palettes];
-      const dragElement = newPalettes.splice(dragIndex, 1);
-      newPalettes.splice(hoverIndex, 0, dragElement[0]);
-      saveDesignSystem({
-        designSystem: {
-          ...designSystem,
-          palettes: newPalettes,
-        },
-        isTmp: true,
-      });
-    }
-  );
 
   return (
     <div
@@ -57,19 +30,37 @@ function BodyDesignSystem() {
           subSectionName="Palettes"
           actions={
             <>
-              <Section.ActionButton componentId="color-palettes" mode="remove">
-                <MdRemove size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="color-palettes" mode="drag">
-                <MdDragIndicator size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="color-palettes" mode="add">
-                <MdAdd size={ICON_SIZE_MD} />
-              </Section.ActionButton>
+              <Section.Actions>
+                Palettes
+                <Section.ActionButton componentId="palettes" mode="remove">
+                  <MdRemove size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="palettes" mode="drag">
+                  <MdDragIndicator size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="palettes" mode="add">
+                  <MdAdd size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+              </Section.Actions>
+              <Section.Actions>
+                Shades
+                <Section.ActionButton componentId="shades" mode="remove">
+                  <MdRemove size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="shades" mode="drag">
+                  <MdDragIndicator size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="shades" mode="edit">
+                  <MdEdit size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="shades" mode="add">
+                  <MdAdd size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+              </Section.Actions>
             </>
           }
         >
-          <ParentDraggableContext value={draggableFeatures}>
+          <DraggableList keyList="palettes">
             {designSystem.palettes.map((colorPalette, index) => (
               <PaletteComponent
                 key={colorPalette.paletteName}
@@ -77,7 +68,7 @@ function BodyDesignSystem() {
                 index={index}
               />
             ))}
-          </ParentDraggableContext>
+          </DraggableList>
         </Section.Subsection>
         <Section.Subsection
           subSectionName="Base"
@@ -90,6 +81,37 @@ function BodyDesignSystem() {
           }
         >
           <BaseComponent />
+        </Section.Subsection>
+        <Section.Subsection
+          subSectionName="Themes"
+          actions={
+            <>
+              <Section.Actions>
+                <Section.ActionButton componentId="themes" mode="remove">
+                  <MdRemove size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="themes" mode="drag">
+                  <MdDragIndicator size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="themes" mode="edit">
+                  <MdEdit size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="themes" mode="add">
+                  <MdAdd size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+              </Section.Actions>
+            </>
+          }
+        >
+          <DraggableList keyList="themes">
+            {designSystem.themes.map((theme, index) => (
+              <ThemeComponent
+                key={theme.themeName}
+                theme={theme}
+                index={index}
+              />
+            ))}
+          </DraggableList>
         </Section.Subsection>
       </Section>
     </div>

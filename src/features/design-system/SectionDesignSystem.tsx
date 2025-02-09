@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import styles from "./SectionDesignSystem.module.css";
 import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
+import { useSearchParams } from "react-router-dom";
 
 function Section({
   sectionTitle,
@@ -26,13 +27,21 @@ function SubSection({
   actions?: ReactNode;
   children: ReactNode;
 }) {
+  const refSubsection = useRef(null);
+  const [searchParams] = useSearchParams();
+  const isEditMode: boolean = JSON.parse(
+    searchParams.get("editMode") || "false"
+  ) as boolean;
+
   return (
-    <div className={styles.subSection}>
+    <div ref={refSubsection} className={styles.subSection}>
       <div className={styles.subSectionHeader}>
         <div className={styles.subSectionTitle}>
           <h3>{subSectionName}</h3>
         </div>
-        {actions && <div className={styles.actions}>{actions}</div>}
+        {isEditMode && (
+          <div className={styles.subSectionHeaderRight}>{actions}</div>
+        )}
       </div>
       {children}
     </div>

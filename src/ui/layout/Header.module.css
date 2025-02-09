@@ -1,6 +1,5 @@
 .header{
   display: flex;
-  justify-content: space-between;
   height: var(--space-7);
   user-select: none;
   padding: var(--space-0);
@@ -12,5 +11,6 @@
 .buttons {
   display: flex;
   -webkit-app-region: no-drag;
+  justify-content: end;
 }
 

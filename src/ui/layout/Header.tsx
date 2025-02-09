@@ -40,15 +40,23 @@ function Header() {
 
   return (
     <header data-tauri-drag-region={true} className={styles.header}>
-      <GhostButton onClick={() => navigate("/")}>
-        {isHomepageActive ? (
-          <IoHomeSharp size={ICON_SIZE_MD} />
+      <div className="container-start" data-tauri-drag-region={true}>
+        <GhostButton onClick={() => navigate("/")}>
+          {isHomepageActive ? (
+            <IoHomeSharp size={ICON_SIZE_MD} />
+          ) : (
+            <IoHomeOutline size={ICON_SIZE_MD} />
+          )}
+        </GhostButton>
+      </div>
+      <div className="container-center" data-tauri-drag-region={true}>
+        {isTmp && !isHomepageActive ? (
+          <strong>{headerName}*</strong>
         ) : (
-          <IoHomeOutline size={ICON_SIZE_MD} />
+          <>{headerName}</>
         )}
-      </GhostButton>
-      {isTmp && !isHomepageActive ? <strong>{headerName}*</strong> : <p>{headerName}</p>}
-      <div className={styles.buttons}>
+      </div>
+      <div className={styles.buttons} data-tauri-drag-region={true}>
         <WindowButtons onClick={() => appWindow.minimize()}>
           <IoRemove size={ICON_SIZE_MD} />
         </WindowButtons>

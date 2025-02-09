@@ -80,6 +80,12 @@ function CreateDesignSystem() {
                 {folderPath || "No location selected"}
               </div>
             </FormComponent>
+            <FormComponent label="Dark mode" error={errors.darkMode?.message}>
+              <div className="checkbox-container">
+                <input type="checkbox" {...register("darkMode")} />
+                Dark mode
+              </div>
+            </FormComponent>
           </Modal.Md>
           <Modal.Footer>
             <ButtonPrimary>Create</ButtonPrimary>

@@ -4,7 +4,7 @@
 use std::sync::Mutex;
 
 use exposition::design_system_exposition::{create_design_system, find_design_system, save_design_system};
-use exposition::home_exposition::{find_all_recent_files, insert_recent_file, remove_recent_file};
+use exposition::home_exposition::{find_all_recent_files, insert_recent_file, remove_recent_file, update_recent_file};
 use pickledb::{PickleDb, PickleDbDumpPolicy, SerializationMethod};
 
 mod application;
@@ -45,7 +45,8 @@ fn main() {
             remove_recent_file,
             find_design_system,
             create_design_system,
-            save_design_system
+            save_design_system,
+            update_recent_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

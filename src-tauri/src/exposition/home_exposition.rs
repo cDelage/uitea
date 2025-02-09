@@ -1,7 +1,7 @@
 use anyhow_tauri::{self, IntoTAResult};
 use tauri::State;
 
-use crate::{application::home_application, domain::home_domain::{RecentFiles, RemoveRecentFilesPayload}, AppState};
+use crate::{application::home_application, domain::home_domain::{RecentFile, RecentFiles, RemoveRecentFilesPayload}, AppState};
 
 #[tauri::command]
 pub fn insert_recent_file(
@@ -25,3 +25,10 @@ pub fn remove_recent_file(
 ) -> anyhow_tauri::TAResult<String> {
     home_application::remove_recent_file(state, remove_payload).into_ta_result()
 }
+
+/// Supprime un chemin de fichier spécifique
+#[tauri::command]
+pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> anyhow_tauri::TAResult<()> {
+    home_application::update_recent_file(state, updated_file).into_ta_result()
+}
+

@@ -1,4 +1,7 @@
-import { useCurrentDesignSystem } from "./DesignSystemQueries";
+import {
+  useCurrentDesignSystem,
+  useSaveDesignSystem,
+} from "./DesignSystemQueries";
 import Loader from "../../ui/kit/Loader";
 import SidebarDesignSystem from "./SidebarDesignSystem";
 import BodyDesignSystem from "./BodyDesignSystem";
@@ -8,11 +11,15 @@ import {
   ComponentMode,
   DesignSystemContext,
 } from "./DesignSystemContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DesignToken } from "../../domain/DesignSystemDomain";
+import { isValidCssColorOrGradient } from "../../util/DesignSystemUtils";
+import { useParams } from "react-router-dom";
 
 function DesignSystemPage() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
+  const { designSystemPath } = useParams();
+  const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [activeComponent, setActiveComponent] = useState<
     ActiveComponent | undefined
   >(undefined);
@@ -60,15 +67,50 @@ function DesignSystemPage() {
     label,
     defaultValue,
   }: {
-    label: string;
+    label?: string;
     defaultValue?: string;
   }) {
     return (
       colorTokens?.find((token) => token.label === label)?.value ??
-      defaultValue ??
-      label
+      isValidCssColorOrGradient(label) ??
+      defaultValue
     );
   }
+
+  const shadesMode: ComponentMode =
+    activeComponent?.componentId === "shades"
+      ? activeComponent.mode
+      : "default";
+
+  const palettesMode: ComponentMode =
+    activeComponent?.componentId === "palettes"
+      ? activeComponent.mode
+      : "default";
+
+  const themesMode: ComponentMode =
+    activeComponent?.componentId === "themes"
+      ? activeComponent.mode
+      : "default";
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault();
+        if (designSystem?.metadata.isTmp) {
+          saveDesignSystem({
+            designSystem,
+            isTmp: false,
+          });
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [designSystem, saveDesignSystem]);
 
   if (isLoadingDesignSystem) return <Loader />;
   if (!designSystem) return null;
@@ -80,7 +122,10 @@ function DesignSystemPage() {
         setActiveComponent: handleSetActiveComponent,
         getActionButtonClassName,
         findDesignSystemColor,
-        designSystem
+        designSystem,
+        palettesMode,
+        shadesMode,
+        themesMode,
       }}
     >
       <div className={styles.designSystemPage}>

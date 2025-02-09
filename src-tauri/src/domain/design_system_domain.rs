@@ -7,7 +7,8 @@ use std::path::PathBuf;
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
     pub palettes: Vec<Palette>,
-    pub base: BaseDarkable,
+    pub base: Base,
+    pub themes: Vec<ThemeColor>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,6 +16,39 @@ pub struct DesignSystem {
 pub struct DesignSystemCreationPayload {
     pub name: String,
     pub folder_path: String,
+    pub dark_mode: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DesignSystemMetadataHome {
+    pub design_system_id: String,
+    pub design_system_name: String,
+    pub dark_mode: bool,
+    pub design_system_path: PathBuf,
+    pub is_tmp: bool,
+    pub edit_mode: Option<bool>,
+}
+
+impl DesignSystemMetadataHome {
+    pub fn from(metadata: DesignSystemMetadata, edit_mode: Option<bool>) -> DesignSystemMetadataHome {
+        let DesignSystemMetadata {
+            dark_mode,
+            design_system_id,
+            design_system_name,
+            design_system_path,
+            is_tmp,
+        } = metadata;
+
+        DesignSystemMetadataHome {
+            dark_mode,
+            design_system_id,
+            design_system_name,
+            design_system_path,
+            edit_mode,
+            is_tmp,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -80,51 +114,64 @@ pub struct Palette {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BaseDarkable {
-    pub default: Base,
-    pub dark: Option<Base>,
-}
-
-impl BaseDarkable {
-    pub fn new(dark_mode: &bool) -> BaseDarkable {
-        let dark = if *dark_mode { Some(Base::new()) } else { None };
-        BaseDarkable {
-            default: Base::new(),
-            dark,
-        }
-    }
+pub struct PalettesMetadataFile {
+    pub palettes_order: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Base {
-    pub background: String,
-    pub border: String,
-    pub text_light: String,
-    pub text_default: String,
-    pub text_dark: String,
-    pub background_disabled: String,
-    pub text_disabled: String,
-    pub border_disabled: String,
+    pub background: ColorDarkable,
+    pub border: ColorDarkable,
+    pub text_light: ColorDarkable,
+    pub text_default: ColorDarkable,
+    pub text_dark: ColorDarkable,
+    pub background_disabled: ColorDarkable,
+    pub text_disabled: ColorDarkable,
+    pub border_disabled: ColorDarkable,
 }
 
 impl Base {
     pub fn new() -> Base {
         Base {
-            background: String::new(),
-            border: String::new(),
-            text_dark: String::new(),
-            text_default: String::new(),
-            text_light: String::new(),
-            background_disabled: String::new(),
-            border_disabled: String::new(),
-            text_disabled: String::new(),
+            background: ColorDarkable {
+                default: Some(String::from("palette-neutral-50")),
+                dark: Some(String::from("palette-neutral-950")),
+            },
+            border: ColorDarkable {
+                default: Some(String::from("palette-neutral-300")),
+                dark: Some(String::from("palette-neutral-700")),
+            },
+            text_dark: ColorDarkable {
+                default: Some(String::from("palette-neutral-900")),
+                dark: Some(String::from("palette-neutral-100")),
+            },
+            text_default: ColorDarkable {
+                default: Some(String::from("palette-neutral-700")),
+                dark: Some(String::from("palette-neutral-300")),
+            },
+            text_light: ColorDarkable {
+                default: Some(String::from("palette-neutral-500")),
+                dark: Some(String::from("palette-neutral-500")),
+            },
+            background_disabled: ColorDarkable {
+                default: Some(String::from("palette-neutral-200")),
+                dark: Some(String::from("palette-neutral-700")),
+            },
+            border_disabled: ColorDarkable {
+                default: Some(String::from("palette-neutral-300")),
+                dark: Some(String::from("palette-neutral-600")),
+            },
+            text_disabled: ColorDarkable {
+                default: Some(String::from("palette-neutral-500")),
+                dark: Some(String::from("palette-neutral-500")),
+            },
         }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Shade {
     pub label: String,
     pub color: String,
@@ -145,6 +192,57 @@ impl ShadesFile {
         ShadesFile(map)
     }
 
+    pub fn new() -> ShadesFile {
+        let neutral_palette: Vec<Shade> = vec![
+            Shade {
+                label: "50".to_string(),
+                color: "#FAFAFA".to_string(),
+            },
+            Shade {
+                label: "100".to_string(),
+                color: "#F5F5F5".to_string(),
+            },
+            Shade {
+                label: "200".to_string(),
+                color: "#E5E5E5".to_string(),
+            },
+            Shade {
+                label: "300".to_string(),
+                color: "#D4D4D4".to_string(),
+            },
+            Shade {
+                label: "400".to_string(),
+                color: "#A3A3A3".to_string(),
+            },
+            Shade {
+                label: "500".to_string(),
+                color: "#737373".to_string(),
+            },
+            Shade {
+                label: "600".to_string(),
+                color: "#525252".to_string(),
+            },
+            Shade {
+                label: "700".to_string(),
+                color: "#404040".to_string(),
+            },
+            Shade {
+                label: "800".to_string(),
+                color: "#262626".to_string(),
+            },
+            Shade {
+                label: "900".to_string(),
+                color: "#171717".to_string(),
+            },
+            Shade {
+                label: "950".to_string(),
+                color: "#0A0A0A".to_string(),
+            },
+        ];
+
+        ShadesFile::from(&neutral_palette)
+    }
+
     pub fn to(shades_file: &ShadesFile) -> Vec<Shade> {
         shades_file
             .0
@@ -155,4 +253,115 @@ impl ShadesFile {
             })
             .collect::<Vec<Shade>>()
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThemesMetadataFile {
+    pub themes_order: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeColor {
+    pub theme_name: String,
+    pub default: ThemeColorSet,
+    pub hover: Option<ThemeColorSet>,
+    pub active: Option<ThemeColorSet>,
+    pub focus: Option<ThemeColorSet>,
+}
+
+impl ThemeColor {
+    pub fn new() -> ThemeColor {
+        ThemeColor {
+            theme_name: String::from("neutral"),
+            default: ThemeColorSet {
+                background: ColorDarkable {
+                    default: Some(String::from("palette-neutral-50")),
+                    dark: Some(String::from("palette-neutral-950")),
+                },
+                border: ColorDarkable {
+                    default: Some(String::from("palette-neutral-300")),
+                    dark: Some(String::from("palette-neutral-700")),
+                },
+                text: ColorDarkable {
+                    default: Some(String::from("palette-neutral-700")),
+                    dark: Some(String::from("palette-neutral-300")),
+                },
+            },
+            hover: Some(ThemeColorSet {
+                background: ColorDarkable {
+                    default: Some(String::from("palette-neutral-200")),
+                    dark: Some(String::from("palette-neutral-800")),
+                },
+                border: ColorDarkable {
+                    default: Some(String::from("palette-neutral-300")),
+                    dark: Some(String::from("palette-neutral-700")),
+                },
+                text: ColorDarkable {
+                    default: Some(String::from("palette-neutral-700")),
+                    dark: Some(String::from("palette-neutral-100")),
+                },
+            }),
+            active: None,
+            focus: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeColorFile {
+    pub default_state: ThemeColorSet,
+    pub hover: Option<ThemeColorSet>,
+    pub active: Option<ThemeColorSet>,
+    pub focus: Option<ThemeColorSet>,
+}
+
+impl ThemeColorFile {
+    pub fn from(theme_color: &ThemeColor) -> ThemeColorFile {
+        let ThemeColor {
+            default: default_state,
+            hover,
+            active,
+            focus,
+            ..
+        } = theme_color;
+        ThemeColorFile {
+            default_state: default_state.to_owned(),
+            hover: hover.to_owned(),
+            active: active.to_owned(),
+            focus: focus.to_owned(),
+        }
+    }
+
+    pub fn to(theme_file: &ThemeColorFile, theme_name: &str) -> ThemeColor {
+        let ThemeColorFile {
+            default_state,
+            hover,
+            active,
+            focus,
+        } = theme_file;
+        ThemeColor {
+            default: default_state.to_owned(),
+            hover: hover.to_owned(),
+            active: active.to_owned(),
+            focus: focus.to_owned(),
+            theme_name: String::from(theme_name),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeColorSet {
+    pub background: ColorDarkable,
+    pub border: ColorDarkable,
+    pub text: ColorDarkable,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ColorDarkable {
+    pub default: Option<String>,
+    pub dark: Option<String>,
 }

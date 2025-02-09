@@ -1,5 +1,5 @@
 import { MdMoreHoriz, MdOpenInNew } from "react-icons/md";
-import { DesignSystemMetadata } from "../../domain/DesignSystemDomain";
+import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
 import { GhostButton } from "../../ui/kit/Buttons";
 import { ICON_SIZE_MD } from "../../ui/UiConstants";
 import { useNavigate } from "react-router-dom";
@@ -8,18 +8,20 @@ import Modal from "../../ui/kit/Modal";
 import ModalRemoveRecentFile from "./ModalRemoveRecentFile";
 
 function RecentFileTab({
-  designSystemMetadata: { designSystemName, designSystemPath },
+  designSystemMetadata: { designSystemName, designSystemPath, editMode },
 }: {
-  designSystemMetadata: DesignSystemMetadata;
+  designSystemMetadata: DesignSystemMetadataHome;
 }) {
   const navigate = useNavigate();
 
+  function getPath() {
+    return `/design-system/${encodeURIComponent(designSystemPath)}?editMode=${
+      editMode ? "true" : "false"
+    }`;
+  }
+
   return (
-    <tr
-      onClick={() =>
-        navigate(`/design-system/${encodeURIComponent(designSystemPath)}`)
-      }
-    >
+    <tr onClick={() => navigate(getPath())}>
       <td className="column expand">
         <strong>{designSystemName}</strong>
         <small className="text-color-light">{designSystemPath}</small>
@@ -33,13 +35,7 @@ function RecentFileTab({
           </Popover.Toggle>
           <Popover.Body id="file-actions">
             <Popover.Actions>
-              <Popover.Tab
-                clickEvent={() =>
-                  navigate(
-                    `/design-system/${encodeURIComponent(designSystemPath)}`
-                  )
-                }
-              >
+              <Popover.Tab clickEvent={() => navigate(getPath())}>
                 <MdOpenInNew /> Open
               </Popover.Tab>
               <Modal>

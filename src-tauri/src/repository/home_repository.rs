@@ -6,11 +6,10 @@ use std::{
 use tauri::State;
 
 use crate::{
-    domain::home_domain::RemoveRecentFilesPayload, repository::DESIGN_SYSTEM_METADATA_PATH,
+    domain::home_domain::{RecentFile, RemoveRecentFilesPayload}, repository::DESIGN_SYSTEM_METADATA_PATH,
     AppState,
 };
-
-pub fn insert_recent_file(state: State<AppState>, file_path: String) -> Result<String> {
+pub fn insert_recent_file(state: State<AppState>, file_path: String, edit_mode: Option<bool>) -> Result<String> {
     let folder_path = Path::new(&file_path);
     let design_system_metadata_path = PathBuf::from(&folder_path).join(DESIGN_SYSTEM_METADATA_PATH);
 
@@ -22,22 +21,21 @@ pub fn insert_recent_file(state: State<AppState>, file_path: String) -> Result<S
 
     let mut db = state.db.lock().unwrap();
     // Récupérer la liste existante ou en créer une nouvelle
-    let mut file_paths: Vec<String> = db.get("recentFiles").unwrap_or_default();
+    let mut recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
 
-    // Ajouter le nouveau chemin si pas déjà présent
-    if !file_paths.contains(&file_path) {
-        file_paths.push(file_path.clone());
-        db.set("recentFiles", &file_paths)
+    // Vérifier si le fichier est déjà dans la liste
+    if !recent_files.iter().any(|rf| rf.file_path == file_path) {
+        recent_files.push(RecentFile { file_path: file_path.clone(), edit_mode });
+        db.set("recentFiles", &recent_files)
             .map_err(|e| anyhow!(e.to_string()))?;
     }
 
     Ok(file_path)
 }
 
-pub fn find_all_recent_files(state: State<AppState>) -> Vec<String> {
-    println!("Fetch all recents files");
+pub fn find_all_recent_files(state: State<AppState>) -> Vec<RecentFile> {
+    println!("Fetch all recent files");
     let db = state.db.lock().unwrap();
-
     db.get("recentFiles").unwrap_or_default()
 }
 
@@ -49,24 +47,40 @@ pub fn remove_recent_file(
     let mut db = state.db.lock().unwrap();
 
     // Récupérer la liste existante
-    let file_paths: Vec<String> = db.get("recentFiles").unwrap_or_default();
+    let recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
 
-    let file_paths_filtered: Vec<String> = file_paths
+    let recent_files_filtered: Vec<RecentFile> = recent_files
         .into_iter()
-        .filter(|path| path != &remove_payload.file_path)
-        .collect::<Vec<String>>();
+        .filter(|rf| rf.file_path != remove_payload.file_path)
+        .collect();
 
-    println!("new recents files : {:?}", &file_paths_filtered);
-    db.set("recentFiles", &file_paths_filtered)
+    db.set("recentFiles", &recent_files_filtered)
         .or(Err(anyhow!("Impossible to remove recent files from list")))?;
 
     if remove_payload.is_delete_from_computer {
         println!("Try to remove file from computer");
         fs::remove_dir_all(&remove_payload.file_path).or(Err(anyhow!(
-            "Recent file successfuly removed, but fail to remove from computer"
+            "Recent file successfully removed, but failed to remove from computer"
         )))?;
     }
 
     println!("Succeed remove operation");
     Ok(String::new())
+}
+
+pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> Result<()> {
+    let mut db = state.db.lock().unwrap();
+    println!("update_recent_file : {:?}", updated_file);
+
+    let mut recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
+
+    if let Some(existing_file) = recent_files.iter_mut().find(|rf| rf.file_path == updated_file.file_path) {
+        existing_file.edit_mode = updated_file.edit_mode;
+        db.set("recentFiles", &recent_files)
+            .map_err(|e| anyhow!(e.to_string()))?;
+        println!("Recent file updated successfully");
+        Ok(())
+    } else {
+        Err(anyhow!("File not found in recent files"))
+    }
 }

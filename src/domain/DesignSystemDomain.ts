@@ -1,7 +1,12 @@
 export interface DesignSystemCreationPayload {
   name: string;
   folderPath: string;
+  darkMode: boolean;
 }
+
+export type DesignSystemMetadataHome = DesignSystemMetadata & {
+  editMode: boolean;
+};
 
 export interface DesignSystemMetadata {
   designSystemId: string;
@@ -14,7 +19,8 @@ export interface DesignSystemMetadata {
 export interface DesignSystem {
   metadata: DesignSystemMetadata;
   palettes: Palette[];
-  base: ThemeDarkable<Base>;
+  base: Base;
+  themes: ThemeColor[];
 }
 
 export interface Palette {
@@ -28,24 +34,43 @@ export interface Shade {
   color: string;
 }
 
-//Used when a darkmode can exist
-export interface ThemeDarkable<T> {
-  default: T;
-  dark?: T;
-}
-
 export interface Base {
-  background: string;
-  border: string;
-  textLight: string;
-  textDefault: string;
-  textDark: string;
-  backgroundDisabled: string;
-  borderDisabled: string;
-  textDisabled: string;
+  background: ColorDarkable;
+  border: ColorDarkable;
+  textLight: ColorDarkable;
+  textDefault: ColorDarkable;
+  textDark: ColorDarkable;
+  backgroundDisabled: ColorDarkable;
+  borderDisabled: ColorDarkable;
+  textDisabled: ColorDarkable;
 }
 
 export interface DesignToken {
   label: string;
   value: string;
 }
+
+export interface ThemeColor {
+  themeName: string;
+  default: ThemeColorState;
+  hover?: ThemeColorState;
+  active?: ThemeColorState;
+  focus?: ThemeColorState;
+}
+
+export type ThemeStateCategory = "default" | "hover" | "active" | "focus";
+
+export interface ThemeColorState {
+  background: ColorDarkable;
+  border: ColorDarkable;
+  text: ColorDarkable;
+}
+
+export type ThemeItem = "background" | "border" | "text";
+
+export interface ColorDarkable {
+  default?: string;
+  dark?: string;
+}
+
+export type DarkableCategory = "default" | "dark";

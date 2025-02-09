@@ -1,4 +1,32 @@
 .sidebarDesignSystem {
   width: 280px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-0);
+  box-sizing: border-box;
+}
+
+.topContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.topMenu {
+  display: flex;
+  padding: var(--space-3);
+  gap: var(--space-3);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: end;
+}
+
+.bottomContainer {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--base-border);
+  padding: var(--space-4);
+  gap: var(--space-3);
 }

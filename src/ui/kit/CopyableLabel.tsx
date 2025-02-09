@@ -3,10 +3,13 @@ import toast from "react-hot-toast";
 import { MdCheck, MdContentCopy } from "react-icons/md";
 import { ICON_SIZE_SM } from "../UiConstants";
 
-function CopyableLabel({ copyable }: { copyable: string }) {
+function CopyableLabel({ copyable }: { copyable?: string }) {
   const [isCopied, setIsCopied] = useState(false);
 
+  if (!copyable) return null;
+
   function copy() {
+    if(!copyable) return;
     navigator.clipboard
       .writeText(copyable)
       .then(() => {

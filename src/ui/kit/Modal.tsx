@@ -14,7 +14,7 @@ import {
   ModalContext,
   ModalContextType,
   useModalContext,
-} from "./useModalContext";
+} from "./ModalContext";
 
 function Modal({ children }: { children: ReactNode }) {
   const [openId, setOpenId] = useState<string | null>(null);
