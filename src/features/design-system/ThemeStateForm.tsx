@@ -35,7 +35,6 @@ function ThemeStateForm({
   const themeUndefined = watch(themeStateCategory) == undefined;
 
   function handleCheck(checked: boolean) {
-    console.log("handle", checked);
     if (checked) {
       setValue(themeStateCategory, {
         background: {},

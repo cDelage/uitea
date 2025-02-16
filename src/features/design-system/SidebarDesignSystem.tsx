@@ -6,7 +6,14 @@ import IconColors from "../../ui/icons/IconColors";
 import SidebarFolder from "./SidebarFolder";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import SidebarFile from "./SidebarFile";
-import { MdEdit, MdSave, MdSettings, MdVisibility } from "react-icons/md";
+import {
+  MdAbc,
+  MdEdit,
+  MdSave,
+  MdSettings,
+  MdTextFields,
+  MdVisibility,
+} from "react-icons/md";
 import { ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
 import Popover from "../../ui/kit/Popover";
 import SidebarSettings from "./SidebarSettings";
@@ -18,6 +25,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import PaletteIcon from "../../ui/icons/PaletteIcon";
 import BaseIcon from "../../ui/icons/BaseIcon";
 import { useBaseColors } from "../../util/DesignSystemUtils";
+import ThemeIcon from "../../ui/icons/ThemeIcon";
+import FontIcon from "../../ui/icons/FontIcon";
 
 function SidebarDesignSystem() {
   const { designSystem, setActiveComponent } = useDesignSystemContext();
@@ -38,7 +47,7 @@ function SidebarDesignSystem() {
   const VisibilityIcon = editMode ? MdEdit : MdVisibility;
 
   function toggleSearchParams() {
-    const newEditMode = !editMode
+    const newEditMode = !editMode;
     searchParams.set("editMode", String(newEditMode));
     setSearchParams(searchParams);
     //isEditMode is active when we toggle => then switch to read only
@@ -72,7 +81,7 @@ function SidebarDesignSystem() {
         <div className={styles.topMenu}>
           <Popover>
             <Popover.Toggle id="settings">
-              <button className="action-button">
+              <button className="action-ghost-button">
                 <MdSettings size={ICON_SIZE_MD} />
               </button>
             </Popover.Toggle>
@@ -81,40 +90,67 @@ function SidebarDesignSystem() {
             </Popover.Body>
           </Popover>
           <button
-            className="action-button"
+            className="action-ghost-button"
             onClick={handleSave}
             disabled={!designSystem.metadata.isTmp}
           >
             <MdSave size={ICON_SIZE_MD} />
           </button>
         </div>
-        <SidebarSection SectionIcon={IconColors} name="Colors" />
-        <SidebarFolder name="Palettes">
-          {designSystem?.palettes.map((palette) => (
+        <SidebarSection
+          SectionIcon={IconColors}
+          name="Colors"
+          scrollName="colors"
+        >
+          <>
+            <SidebarFolder name="Palettes">
+              {designSystem?.palettes.map((palette) => (
+                <SidebarFile
+                  key={palette.paletteName}
+                  filename={palette.paletteName}
+                  underFolder={true}
+                  id={`palette-${palette.paletteName}`}
+                  icon={<PaletteIcon palette={palette} size={ICON_SIZE_SM} />}
+                />
+              ))}
+            </SidebarFolder>
+            <SidebarFolder name="Base">
+              <SidebarFile
+                filename="Base"
+                id="base"
+                underFolder={true}
+                icon={<BaseIcon base={base} size={ICON_SIZE_SM} />}
+              />
+            </SidebarFolder>
+            <SidebarFolder name="Themes">
+              {designSystem?.themes.map((theme) => (
+                <SidebarFile
+                  key={theme.themeName}
+                  filename={theme.themeName}
+                  underFolder={true}
+                  id={`theme-${theme.themeName}`}
+                  icon={<ThemeIcon size={ICON_SIZE_SM} theme={theme} />}
+                />
+              ))}
+            </SidebarFolder>
+          </>
+        </SidebarSection>
+        <SidebarSection SectionIcon={FontIcon} name="Texts" scrollName="texts">
+          <>
             <SidebarFile
-              key={palette.paletteName}
-              filename={palette.paletteName}
+              filename="Fonts"
+              id="fonts"
               underFolder={true}
-              id={`palette-${palette.paletteName}`}
-              icon={<>
-                <PaletteIcon palette={palette} size={ICON_SIZE_SM}/>
-              </>}
+              icon={<MdAbc size={ICON_SIZE_SM} />}
             />
-          ))}
-        </SidebarFolder>
-        <SidebarFile filename="Base" id="base" icon={<>
-            <BaseIcon base={base} size={ICON_SIZE_SM}/>
-          </>}/>
-        <SidebarFolder name="Themes">
-          {designSystem?.themes.map((theme) => (
             <SidebarFile
-              key={theme.themeName}
-              filename={theme.themeName}
+              filename={"Typography"}
               underFolder={true}
-              id={`theme-${theme.themeName}`}
+              id={"typography"}
+              icon={<MdTextFields size={ICON_SIZE_SM} />}
             />
-          ))}
-        </SidebarFolder>
+          </>
+        </SidebarSection>
       </div>
       <div className={styles.bottomContainer}>
         <div className="row align-center gap-2">

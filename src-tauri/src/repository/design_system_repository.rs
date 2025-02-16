@@ -4,8 +4,9 @@ use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Palette,
+        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Fonts, Palette,
         PalettesMetadataFile, ShadesFile, ThemeColor, ThemeColorFile, ThemesMetadataFile,
+        Typography,
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -18,6 +19,8 @@ const PALETTES_PATH: &str = "palettes";
 const NEUTRAL_PALETTE_PATH: &str = "neutral.yaml";
 const PALETTES_METADATA_PATH: &str = "palettes_metadata.yaml";
 const BASE_PATH: &str = "base_colors.yaml";
+const FONTS_PATH: &str = "fonts.yaml";
+const TYPOGRAPHY_PATH: &str = "typography.yaml";
 const THEMES_PATH: &str = "themes";
 const THEMES_METADATA_PATH: &str = "themes_metadata.yaml";
 const NEUTRAL_THEME_PATH: &str = "neutral.yaml";
@@ -43,11 +46,6 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
 
     let design_system_metadata_pathbuf: PathBuf = fetch_pathbuf.join(DESIGN_SYSTEM_METADATA_PATH);
 
-    println!(
-        "Fetch design_system_metadata start: {:?}",
-        design_system_metadata_pathbuf
-    );
-
     if !design_system_metadata_pathbuf.is_file() {
         println!(
             "Design system not found : {:?} (to remove)",
@@ -56,7 +54,6 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
     }
     let file: DesignSystemMetadataFile =
         load_yaml_from_pathbuf::<DesignSystemMetadataFile>(&design_system_metadata_pathbuf)?;
-    println!("Succeed to read file : {:?}", file);
     Ok(DesignSystemMetadata::from(
         &file,
         &original_pathbuf,
@@ -82,7 +79,6 @@ pub fn fetch_palettes(design_system_path: &PathBuf) -> Result<Vec<Palette>> {
             if filename_equals(path, PALETTES_METADATA_PATH) {
                 return None;
             }
-            println!("Try to read color palettes {:?}", path);
             let extension: &str = path
                 .extension()
                 .and_then(|ext: &std::ffi::OsStr| ext.to_str())?;
@@ -111,7 +107,6 @@ pub fn fetch_palettes(design_system_path: &PathBuf) -> Result<Vec<Palette>> {
             .enumerate()
             .map(|(i, name)| (name.clone(), i))
             .collect();
-        println!("{:?}", order_map);
         color_palettes
             .sort_by_key(|item| *order_map.get(&item.palette_name).unwrap_or(&usize::MAX));
     }
@@ -127,7 +122,7 @@ pub fn init_palettes(design_system_path: &PathBuf) -> Result<()> {
     save_to_yaml_file(primary_palette_path, &shade_file)
 }
 
-pub fn save_design_system(design_system: DesignSystem, is_tmp: bool) -> Result<()> {
+pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<()> {
     //Define the path (if the save is tmp or not)
     let design_system_path: PathBuf = if is_tmp {
         let tmp_pathbuf: PathBuf = design_system
@@ -162,6 +157,12 @@ pub fn save_design_system(design_system: DesignSystem, is_tmp: bool) -> Result<(
 
     save_themes(&design_system, &design_system_path)?;
 
+    let fonts_pathbuf: PathBuf = design_system_path.join(FONTS_PATH);
+    save_to_yaml_file(fonts_pathbuf, &design_system.fonts)?;
+
+    let typography_pathbuf: PathBuf = design_system_path.join(TYPOGRAPHY_PATH);
+    save_to_yaml_file(typography_pathbuf, &design_system.typography)?;
+
     //Once the save is complete (when is not a tmp save) -> remove the tmp copy
     if !is_tmp {
         let tmp_pathbuf: PathBuf = design_system
@@ -189,7 +190,6 @@ pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf)
     for color_palette in &design_system.palettes {
         let color_palette_pathbuf: PathBuf =
             compute_path_with_extension(&palettes_path, &color_palette.palette_name, &"yaml");
-        println!("save color palette {:?}", &color_palette.palette_name);
         let shades_file: ShadesFile = ShadesFile::from(&color_palette.shades);
         save_to_yaml_file(color_palette_pathbuf, &shades_file)?;
     }
@@ -219,7 +219,6 @@ pub fn save_themes(design_system: &DesignSystem, design_system_path: &PathBuf) -
     for theme in &design_system.themes {
         let theme_pathbuf: PathBuf =
             compute_path_with_extension(&themes_path, &theme.theme_name, &"yaml");
-        println!("save color palette {:?}", &theme.theme_name);
         let theme_file: ThemeColorFile = ThemeColorFile::from(&theme);
         save_to_yaml_file(&theme_pathbuf, &theme_file)?;
     }
@@ -265,7 +264,6 @@ pub fn fetch_themes(design_system_path: &PathBuf) -> Result<Vec<ThemeColor>> {
             if filename_equals(path, THEMES_METADATA_PATH) {
                 return None;
             }
-            println!("Try to read color themes {:?}", path);
             let extension: &str = path
                 .extension()
                 .and_then(|ext: &std::ffi::OsStr| ext.to_str())?;
@@ -290,7 +288,6 @@ pub fn fetch_themes(design_system_path: &PathBuf) -> Result<Vec<ThemeColor>> {
             .enumerate()
             .map(|(i, name)| (name.clone(), i))
             .collect();
-        println!("{:?}", order_map);
         themes.sort_by_key(|item| *order_map.get(&item.theme_name).unwrap_or(&usize::MAX));
     }
 
@@ -308,4 +305,30 @@ pub fn init_themes(design_system_path: &PathBuf) -> Result<()> {
 
     let theme_file = ThemeColorFile::from(&theme_neutral);
     save_to_yaml_file(theme_neutral_path, &theme_file)
+}
+
+pub fn fetch_fonts(design_system_path: &PathBuf) -> Result<Fonts> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let typo_pathbuf: PathBuf = fetch_pathbuf.join(FONTS_PATH);
+    load_yaml_from_pathbuf::<Fonts>(&typo_pathbuf)
+}
+
+pub fn init_fonts(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let typo_pathbuf: PathBuf = fetch_pathbuf.join(FONTS_PATH);
+    let typo_file = Fonts::new();
+    save_to_yaml_file(typo_pathbuf, &typo_file)
+}
+
+pub fn fetch_typography(design_system_path: &PathBuf) -> Result<Typography> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let typo_pathbuf: PathBuf = fetch_pathbuf.join(TYPOGRAPHY_PATH);
+    load_yaml_from_pathbuf::<Typography>(&typo_pathbuf)
+}
+
+pub fn init_typography(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let typo_pathbuf: PathBuf = fetch_pathbuf.join(TYPOGRAPHY_PATH);
+    let typo_file = Typography::new();
+    save_to_yaml_file(typo_pathbuf, &typo_file)
 }

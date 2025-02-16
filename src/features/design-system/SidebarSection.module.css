@@ -6,10 +6,11 @@
   align-items: center;
   user-select: none;
   cursor: pointer;
+  border-radius: var(--rounded-md);
 }
 
 .sidebarSection:hover {
-  background-color: var(--base-bg-hover);
+  background-color: var(--theme-base-button-hover-bg);
 }
 
 .fileUnderFolder{

@@ -129,6 +129,7 @@
 
   --theme-add-border: var(--palette-primary-400);
   --theme-remove-bg: var(--palette-negative-200);
+  --theme-locked-bg: var(--palette-gray-200);
   --theme-drag-bg: var(--palette-primary-200);
 
   --theme-tertiary-bg: var(--palette-gray-100);
@@ -138,16 +139,17 @@
   --theme-tertiary-hover-text: var(--palette-gray-700);
   --theme-tertiary-hover-border: var(--palette-gray-400);
 
-  --theme-action-button-tertiary-bg: var(--palette-gray-50);
-  --theme-action-button-tertiary-text: var(--palette-gray-500);
-  --theme-action-button-tertiary-hover-text: var(--palette-gray-700);
-  --theme-action-button-tertiary-hover-border: var(--palette-gray-400);
-  --theme-action-button-tertiary-active-bg: var(--palette-primary-700);
-  --theme-action-button-tertiary-active-text: var(--palette-primary-50);
-  --theme-action-button-tertiary-active-hover-bg: var(--palette-primary-500);
-  --theme-action-button-tertiary-negative-bg: var(--palette-negative-700);
-  --theme-action-button-tertiary-negative-text: var(--palette-negative-50);
-  --theme-action-button-tertiary-negative-hover-bg: var(--palette-negative-500);
+  --theme-base-button-hover-bg: rgb(212, 212, 216, 0.3);
+  --theme-action-button-bg: var(--palette-gray-50);
+  --theme-action-button-text: var(--palette-gray-500);
+  --theme-action-button-hover-text: var(--palette-gray-700);
+  --theme-action-button-hover-border: var(--palette-gray-400);
+  --theme-action-button-active-bg: var(--palette-primary-700);
+  --theme-action-button-active-text: var(--palette-primary-50);
+  --theme-action-button-active-hover-bg: var(--palette-primary-500);
+  --theme-action-button-negative-bg: var(--palette-negative-700);
+  --theme-action-button-negative-text: var(--palette-negative-50);
+  --theme-action-button-negative-hover-bg: var(--palette-negative-500);
 
   --theme-modal-bg: var(--palette-single-black-transparent);
 
@@ -278,6 +280,14 @@ h4 {
 h5 {
   font-size: 18px;
   line-height: 20px;
+  margin: 0px;
+  font-weight: var(--font-weight-sm-bold);
+  user-select: none;
+}
+
+h6 {
+  font-size: 16px;
+  line-height: 18px;
   margin: 0px;
   font-weight: var(--font-weight-sm-bold);
   user-select: none;
@@ -470,7 +480,7 @@ p {
   align-items: center;
 }
 
-.space-between {
+.justify-space-between {
   justify-content: space-between;
 }
 
@@ -491,16 +501,35 @@ p {
 }
 
 .action-button {
-  background-color: var(--theme-action-button-tertiary-bg);
-  color: var(--theme-action-button-tertiary-text);
+  background-color: var(--theme-action-button-bg);
+  color: var(--theme-action-button-text);
   padding: var(--space-2);
   border-radius: var(--rounded-md);
   height: fit-content;
 }
 
 .action-button:hover {
-  color: var(--theme-action-button-tertiary-hover-text);
+  color: var(--theme-action-button-hover-text);
   box-shadow: var(--shadow-button);
+}
+
+.action-ghost-button {
+  background-color: transparent;
+  color: var(--theme-action-button-text);
+  padding: var(--space-2);
+  border-radius: var(--rounded-md);
+  height: fit-content;
+}
+
+.action-ghost-button:hover {
+  background-color: var(--theme-base-button-hover-bg);
+  color: var(--theme-action-button-hover-text);
+}
+
+.action-ghost-button:disabled {
+  color: var(--base-bg-disabled);
+  box-shadow: var(--base-bg-text);
+  cursor: default;
 }
 
 .action-button:disabled {
@@ -510,23 +539,23 @@ p {
 }
 
 .action-button.active {
-  background-color: var(--theme-action-button-tertiary-active-bg);
-  color: var(--theme-action-button-tertiary-active-text);
+  background-color: var(--theme-action-button-active-bg);
+  color: var(--theme-action-button-active-text);
   box-shadow: var(--shadow-button);
 }
 
 .action-button.active:hover {
-  background-color: var(--theme-action-button-tertiary-active-hover-bg);
+  background-color: var(--theme-action-button-active-hover-bg);
 }
 
 .action-button.negative {
-  background-color: var(--theme-action-button-tertiary-negative-bg);
-  color: var(--theme-action-button-tertiary-negative-text);
+  background-color: var(--theme-action-button-negative-bg);
+  color: var(--theme-action-button-negative-text);
   box-shadow: var(--shadow-button);
 }
 
 .action-button.negative:hover {
-  background-color: var(--theme-action-button-tertiary-negative-hover-bg);
+  background-color: var(--theme-action-button-negative-hover-bg);
 }
 
 .inherit-input {
@@ -546,10 +575,16 @@ p {
   border-bottom: transparent 1px solid;
 }
 
+.inherit-input-size {
+  height: 32px;
+  padding-left: 4px;
+}
+
 .inherit-input-placeholder {
   padding: var(--space-1) var(--space-0);
   margin: 0;
   border-bottom: transparent 1px solid;
+  user-select: none;
 }
 
 .inherit-input:hover {
@@ -564,6 +599,19 @@ p {
 
 input {
   accent-color: var(--palette-primary-500);
+}
+
+select {
+  padding: 0px;
+  margin: 0px;
+  height: 32px;
+}
+
+select:disabled {
+  appearance: none;
+  padding: 0px;
+  padding-left: 4px;
+  margin: 0px;
 }
 
 .error {
@@ -624,6 +672,44 @@ input {
   flex: 1;
   justify-content: end;
   align-items: center;
+}
+
+.add:hover {
+  border-bottom: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
+}
+
+.locked:hover {
+  background-color: var(--theme-locked-bg);
+}
+
+.add-right:hover {
+  border-right: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
+}
+
+.remove:hover {
+  background-color: var(--theme-remove-bg);
+  cursor: pointer;
+}
+
+.draggable:hover {
+  background-color: var(--theme-drag-bg);
+  cursor: pointer;
+}
+
+.drag-hover-top:hover {
+  border-top: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
+}
+
+.drag-hover-left:hover {
+  border-left: var(--theme-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
 }
 
 @media (prefers-color-scheme: dark) {

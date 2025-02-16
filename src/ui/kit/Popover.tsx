@@ -4,6 +4,8 @@ import {
   ReactElement,
   ReactNode,
   cloneElement,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import styled from "styled-components";
@@ -29,11 +31,13 @@ const BodyDefault = styled.div<{ position: PositionAbsolute; width?: number }>`
   transform: ${(props) => props.position.transform};
 `;
 
-type MenuProps = {
+function Popover({
+  children,
+  onClose,
+}: {
   children: ReactNode;
-};
-
-function Popover({ children }: MenuProps): JSX.Element {
+  onClose?: () => void;
+}): JSX.Element {
   const [position, setPosition] = useState<PositionAbsolute | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -43,12 +47,21 @@ function Popover({ children }: MenuProps): JSX.Element {
   }
 
   function close() {
+    onClose?.();
     setPosition(null);
     setOpenId(null);
   }
 
   return (
-    <PopoverContext.Provider value={{ position, openPopover: open, closePopover: close, openPopoverId: openId }}>
+    <PopoverContext.Provider
+      value={{
+        position,
+        openPopover: open,
+        closePopover: close,
+        openPopoverId: openId,
+        setPosition,
+      }}
+    >
       {children}
     </PopoverContext.Provider>
   );
@@ -64,7 +77,11 @@ function Body({
   children: ReactNode;
   id: string;
 }): JSX.Element | null {
-  const { position, closePopover: close, openPopoverId: openId } = usePopoverContext();
+  const {
+    position,
+    closePopover: close,
+    openPopoverId: openId,
+  } = usePopoverContext();
   const ref = useDivClickOutside(close, false);
   if (position === null || openId !== id) return null;
 
@@ -87,16 +104,24 @@ function Toggle({
   children: ReactNode;
   id: string;
   positionPayload?: PositionPayload;
+  scrollListener?: string[];
 }): JSX.Element {
-  const { openPopover: open, closePopover: close, openPopoverId: openId } = usePopoverContext();
+  const {
+    openPopover: open,
+    closePopover: close,
+    openPopoverId: openId,
+    setPosition,
+  } = usePopoverContext();
 
-  function handleClick(e: MouseEvent) {
-    e.stopPropagation();
-    const rect = (e.target as HTMLElement)
-      .closest("button")
-      ?.getBoundingClientRect();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  function handleClick() {
+    const rect = toggleRef.current?.getBoundingClientRect();
     if (rect) {
-      const menuPosition = getRectPosition(positionPayload || "bottom-left", rect);
+      const menuPosition = getRectPosition(
+        positionPayload || "bottom-left",
+        rect
+      );
       if (openId === "" || openId !== id) {
         open(menuPosition, id);
       } else {
@@ -104,9 +129,30 @@ function Toggle({
       }
     }
   }
+
+  useEffect(() => {
+    function handleSetPosition() {
+      const rect = toggleRef.current?.getBoundingClientRect();
+      const menuPosition = getRectPosition(
+        positionPayload || "bottom-left",
+        rect
+      );
+      setPosition(menuPosition);
+    }
+
+    document.addEventListener("refresh-scroll", handleSetPosition);
+    return () => {
+      document.removeEventListener("refresh-scroll", handleSetPosition);
+    };
+  }, [toggleRef, setPosition, positionPayload]);
+
   return cloneElement(
-    children as ReactElement<{ onClick?: (e: MouseEvent) => void }>,
-    { onClick: handleClick }
+    children as ReactElement<
+      { onClick?: (e: MouseEvent) => void } & {
+        ref?: React.Ref<HTMLButtonElement>;
+      }
+    >,
+    { onClick: handleClick, ref: toggleRef }
   );
 }
 

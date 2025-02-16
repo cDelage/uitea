@@ -10,6 +10,7 @@ use std::io::Write;
 
 pub mod home_repository;
 pub mod design_system_repository;
+pub mod undo_repository;
 
 const DESIGN_SYSTEM_METADATA_PATH: &str = "design_system_metadata.yaml";
 const TMP_PATH : &str = "tmp";

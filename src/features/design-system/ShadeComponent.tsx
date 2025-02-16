@@ -55,18 +55,18 @@ function ShadeComponent({
   const shadeClassname = classNames(
     styles.shade,
     {
-      [styles.addColor]: shadesMode === "add" && isHover,
+      "add-right": shadesMode === "add" && isHover,
     },
     {
-      [styles.removeColor]: shadesMode === "remove" && isHover,
+      remove: shadesMode === "remove" && isHover,
     },
     {
-      [styles.draggable]:
+      draggable:
         (shadesMode === "drag" && isHover && dragIndex === undefined) ||
         dragIndex === index,
     },
     {
-      [styles.dragHover]:
+      "drag-hover-left":
         shadesMode === "drag" && hoverIndex === index && dragIndex !== index,
     }
   );
@@ -120,7 +120,7 @@ function ShadeComponent({
           background: getValues(`shades.${index}.color`),
         }}
       />
-      <div className="row space-between">
+      <div className="row justify-space-between">
         <div className="column">
           <strong className={strongClassname}>
             {shadesMode === "edit" ? (
@@ -172,7 +172,7 @@ function ShadeComponent({
         {isHover && shadesMode === "default" && (
           <Popover>
             <Popover.Toggle id="copy-shade" positionPayload="top-right">
-              <button className="action-button">
+              <button type="button" className="action-button">
                 <MdContentCopy size={ICON_SIZE_SM} />
               </button>
             </Popover.Toggle>

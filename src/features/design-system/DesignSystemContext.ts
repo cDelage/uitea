@@ -9,6 +9,13 @@ export type ComponentMode =
   | "drag"
   | "default";
 
+export const ModificationsMode: ComponentMode[] = [
+  "edit",
+  "add",
+  "remove",
+  "drag",
+];
+
 export type ActiveComponent = {
   componentId: string;
   mode: ComponentMode;
@@ -30,6 +37,9 @@ export type DesignSystemContextType = {
   palettesMode: ComponentMode;
   shadesMode: ComponentMode;
   themesMode: ComponentMode;
+  baseMode: ComponentMode;
+  fontsMode: ComponentMode;
+  typographyMode: ComponentMode;
 };
 
 export const DesignSystemContext =

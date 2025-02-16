@@ -17,6 +17,7 @@ import {
 } from "../../util/DesignSystemUtils";
 import { useRef } from "react";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
+import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 
 function ThemeComponent({
   theme,
@@ -31,7 +32,7 @@ function ThemeComponent({
     metadata: { darkMode },
     themes,
   } = designSystem;
-  const { register, handleSubmit, watch, setValue } = useForm({
+  const { register, handleSubmit, watch, setValue, reset } = useForm({
     defaultValues: theme,
   });
   const { designSystemPath } = useParams();
@@ -43,6 +44,10 @@ function ThemeComponent({
   useTriggerScroll({
     ref: themeRef,
     triggerId: `theme-${theme.themeName}`,
+  });
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: theme,
   });
 
   function handleMouseDown() {
@@ -72,15 +77,15 @@ function ThemeComponent({
   const formClassNames = classNames(
     styles.componentDesignSystemColumn,
     styles.mediumHeight,
-    { [styles.add]: themesMode === "add" },
-    { [styles.remove]: themesMode === "remove" },
+    { "add": themesMode === "add" },
+    { "remove": themesMode === "remove" },
     {
-      [styles.draggable]:
+      "draggable":
         (themesMode === "drag" && dragIndex === undefined) ||
         dragIndex === index,
     },
     {
-      [styles.dragHover]:
+      "drag-hover-top":
         themesMode === "drag" &&
         dragIndex !== undefined &&
         dragIndex !== index &&
@@ -210,7 +215,7 @@ function ThemeComponent({
             />
           )}
         </div>
-        {darkMode && (
+        {darkMode ? (
           <div className={styles.sideSettings}>
             <div className={styles.sideSettingsTitle}>
               <h5 className={styles.titlePadding}>Dark</h5>
@@ -254,6 +259,8 @@ function ThemeComponent({
               />
             </div>
           </div>
+        ) : (
+          <div className={styles.darkPreviewPlaceholder} />
         )}
       </div>
     </form>

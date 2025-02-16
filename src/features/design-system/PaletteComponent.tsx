@@ -1,5 +1,5 @@
 import { Palette, DesignSystem } from "../../domain/DesignSystemDomain";
-import styles from "./PaletteComponent.module.css";
+import styles from "./ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
 import { useRef, useState } from "react";
@@ -15,6 +15,8 @@ import {
 } from "../../util/DraggableContext";
 import { getAllErrorMessages } from "../../util/HookFormUtils";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
+import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import Section from "./SectionDesignSystem";
 
 function PaletteComponent({
   colorPalette,
@@ -31,10 +33,6 @@ function PaletteComponent({
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { setDragIndex, dragIndex, setHoverIndex, hoverIndex } =
     useParentDraggableContext();
-  useTriggerScroll({
-    ref: colorPaletteRef,
-    triggerId: `palette-${paletteName}`,
-  });
 
   //Form
   const {
@@ -42,6 +40,7 @@ function PaletteComponent({
     register,
     getValues,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: colorPalette,
@@ -52,12 +51,21 @@ function PaletteComponent({
     insert,
     remove,
     move,
+    append,
   } = useFieldArray({
     control,
     name: "shades",
   });
+  useTriggerScroll({
+    ref: colorPaletteRef,
+    triggerId: `palette-${paletteName}`,
+  });
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: colorPalette,
+  });
 
-  const { draggableFeatures } = useDraggableFeatures(
+  const { draggableTools: draggableFeatures } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: number) => {
       if (
         dragIndex !== undefined &&
@@ -71,18 +79,18 @@ function PaletteComponent({
   );
 
   const colorPalettesClass = classNames(
-    styles.colorPalette,
-    { [styles.add]: palettesMode === "add" },
+    styles.componentDesignSystemColumn,
+    { "add": palettesMode === "add" },
     {
-      [styles.remove]: palettesMode === "remove",
+      "remove": palettesMode === "remove",
     },
     {
-      [styles.draggable]:
+      "draggable":
         (palettesMode === "drag" && isHover && dragIndex === undefined) ||
         dragIndex === index,
     },
     {
-      [styles.dragHover]:
+      "drag-hover-top":
         palettesMode === "drag" &&
         dragIndex !== undefined &&
         dragIndex !== index &&
@@ -162,6 +170,14 @@ function PaletteComponent({
     });
   }
 
+  function createFirstShade() {
+    append({
+      label: "50",
+      color: "#DDDDDD",
+    });
+    handleSubmit(submitPalette)();
+  }
+
   return (
     <form
       className={colorPalettesClass}
@@ -173,8 +189,8 @@ function PaletteComponent({
       onMouseDown={handleMouseDown}
       onSubmit={handleSubmit(submitPalette)}
     >
-      <div className={styles.paletteHeader}>
-        <h4 className={styles.paletteTitle}>
+      <div className={styles.componentHead}>
+        <h4>
           {shadesMode === "edit" ? (
             <input
               className="inherit-input"
@@ -219,6 +235,13 @@ function PaletteComponent({
               paletteName={paletteName}
             />
           ))}
+          <Section.EmptySection
+            itemToInsert="shade"
+            onInsert={createFirstShade}
+            sectionLength={shadesArray.length}
+            sectionName="palette"
+            mediumHeight={true}
+          />
         </div>
       </DraggableContext.Provider>
       {getAllErrorMessages(errors).map((error) => (

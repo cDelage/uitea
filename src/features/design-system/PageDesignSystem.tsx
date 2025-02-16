@@ -77,25 +77,32 @@ function DesignSystemPage() {
     );
   }
 
-  const shadesMode: ComponentMode =
-    activeComponent?.componentId === "shades"
-      ? activeComponent.mode
-      : "default";
+  function getMode(componentId: string): ComponentMode {
+    if (
+      activeComponent?.componentId === componentId ||
+      activeComponent?.componentId === "all"
+    ) {
+      return activeComponent.mode;
+    } else {
+      return "default";
+    }
+  }
 
-  const palettesMode: ComponentMode =
-    activeComponent?.componentId === "palettes"
-      ? activeComponent.mode
-      : "default";
+  const shadesMode: ComponentMode = getMode("shades");
 
-  const themesMode: ComponentMode =
-    activeComponent?.componentId === "themes"
-      ? activeComponent.mode
-      : "default";
+  const palettesMode: ComponentMode = getMode("palettes");
+
+  const themesMode: ComponentMode = getMode("themes");
+
+  const baseMode: ComponentMode = getMode("base");
+
+  const fontsMode: ComponentMode = getMode("fonts");
+
+  const typographyMode: ComponentMode = getMode("typography");
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-        event.preventDefault();
         if (designSystem?.metadata.isTmp) {
           saveDesignSystem({
             designSystem,
@@ -126,6 +133,9 @@ function DesignSystemPage() {
         palettesMode,
         shadesMode,
         themesMode,
+        baseMode,
+        fontsMode,
+        typographyMode,
       }}
     >
       <div className={styles.designSystemPage}>

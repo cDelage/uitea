@@ -5,6 +5,8 @@ import {
   ThemeColor,
   ThemeItem,
   ThemeStateCategory,
+  AdditionalFont,
+  AdditionalTypographyScale,
 } from "../domain/DesignSystemDomain";
 import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
 import { DEFAULT_BASE } from "../ui/UiConstants";
@@ -104,6 +106,36 @@ export const generateUniqueThemesKey = (
   return uniqueKey;
 };
 
+export const generateUniqueFontKey = (
+  fonts: AdditionalFont[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (fonts.find((typo) => typo.fontName === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+export const generateUniqueTypographyKey = (
+  fonts: AdditionalTypographyScale[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (fonts.find((typo) => typo.scaleName === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
 export function getThemeToken({
   themeName,
   themeStateCategory,
@@ -188,4 +220,38 @@ export function useBaseColors() {
   };
 
   return computedBase;
+}
+
+export function useThemeColors({ theme }: { theme: ThemeColor }) {
+  const { findDesignSystemColor } = useDesignSystemContext();
+
+  const background = findDesignSystemColor({
+    label: theme.default.background.default,
+    defaultValue: DEFAULT_BASE.background.default,
+  });
+  const border = findDesignSystemColor({
+    label: theme.default.border.default,
+    defaultValue: DEFAULT_BASE.border.default,
+  });
+  const text = findDesignSystemColor({
+    label: theme.default.text.default,
+    defaultValue: DEFAULT_BASE.textLight.default,
+  });
+
+  const computedTheme: ThemeColor = {
+    default: {
+      background: {
+        default: background,
+      },
+      border: {
+        default: border,
+      },
+      text: {
+        default: text,
+      },
+    },
+    themeName: theme.themeName,
+  };
+
+  return computedTheme;
 }

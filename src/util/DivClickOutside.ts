@@ -1,11 +1,11 @@
-import { useEffect, useRef, MutableRefObject } from "react";
+import { useEffect, useRef, RefObject } from "react";
 
 type OutsideClickHandler = () => void;
 
 export function useDivClickOutside(
   handler: OutsideClickHandler,
   listenCapturing = true
-): MutableRefObject<HTMLDivElement | null> {
+): RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function useDivClickOutside(
         if (
           target &&
           target.className &&
-          target.className.includes("menu-button")
+          !target.className.includes
         ) {
           // Si l'élément cliqué a la classe "menu-button", ne rien faire
           return;

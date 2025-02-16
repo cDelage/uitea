@@ -1,6 +1,8 @@
 .inputDesignSystem {
   display: flex;
-  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-0);
+  padding: 6px var(--space-3) 6px var(--space-0);
+  border-top: transparent 2px solid;
+  border-bottom: transparent 2px solid;
 }
 
 .sideContainer {

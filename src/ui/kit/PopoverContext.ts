@@ -6,6 +6,7 @@ export type PopoverContextType = {
   openPopover: (pos: PositionAbsolute, id: string) => void;
   closePopover: () => void;
   openPopoverId: string | null;
+  setPosition: (pos: PositionAbsolute) => void;
 };
 
 export const PopoverContext = createContext<PopoverContextType | null>(null);
@@ -16,3 +17,4 @@ export function usePopoverContext() {
     throw new Error("Popover context was used outside of his scope");
   return context;
 }
+

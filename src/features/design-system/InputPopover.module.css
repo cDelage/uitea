@@ -1,0 +1,80 @@
+.inputPopover {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.previewContainer {
+  height: 100px;
+  background-color: var(--theme-tertiary-bg);
+  color: var(--theme-tertiary-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.previewText{
+  padding: var(--space-4);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.popoverHeader {
+  display: flex;
+  padding: var(--space-3);
+  gap: var(--space-2);
+  border-bottom: var(--base-border) 1px solid;
+  align-items: center;
+}
+
+.popoverBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
+.importantValuesContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: var(--base-border) 1px solid;
+  padding: var(--space-4);
+  gap: var(--space-6);
+}
+
+.keyValueImportant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.minorValuesContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  row-gap: var(--space-1);
+  padding: var(--space-0) var(--space-3);
+  height: 150px;
+  grid-auto-rows: fit-content;
+}
+
+.tabsContainer {
+  display: flex;
+  padding: var(--space-5) var(--space-3);
+  gap: var(--space-3);
+}
+
+.tab {
+  background-color: transparent;
+  color: var(--base-text-light);
+  font-weight: var(--font-weight-bold);
+  padding: 0px;
+  margin: 0px;
+}
+
+.tab[data-active="true"] {
+  color: var(--base-text-dark);
+}

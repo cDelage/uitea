@@ -1,18 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-export type DraggableContextType = {
+export type DraggableTools = {
   dragIndex?: number;
   hoverIndex?: number;
   setDragIndex: (dragId: number | undefined) => void;
   setHoverIndex: (dragId: number | undefined) => void;
 };
 
-export const DraggableContext = createContext<DraggableContextType | null>(
+export const DraggableContext = createContext<DraggableTools | null>(null);
+
+export const ParentDraggableContext = createContext<DraggableTools | null>(
   null
 );
-
-export const ParentDraggableContext =
-  createContext<DraggableContextType | null>(null);
 
 export function useDraggableContext() {
   const context = useContext(DraggableContext);
@@ -31,7 +30,7 @@ export function useDraggableFeatures(
 ) {
   const [dragIndex, setDragIndex] = useState<number | undefined>(undefined);
   const [hoverIndex, setHoverIndex] = useState<number | undefined>(undefined);
-  const draggableFeatures: DraggableContextType = {
+  const draggableTools: DraggableTools = {
     dragIndex,
     hoverIndex,
     setDragIndex,
@@ -45,7 +44,7 @@ export function useDraggableFeatures(
       setDragIndex(undefined);
       setHoverIndex(undefined);
     }
-
+    console.log("effect drag index", dragIndex);
     if (dragIndex !== undefined) {
       window.addEventListener("mouseup", handleDragEvent);
     } else {
@@ -56,5 +55,5 @@ export function useDraggableFeatures(
       window.removeEventListener("mouseup", handleDragEvent);
     };
   }, [dragIndex, dragEvent, hoverIndex]);
-  return { draggableFeatures };
+  return { draggableTools };
 }

@@ -1,11 +1,9 @@
-import { useCurrentDesignSystem } from "./DesignSystemQueries";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./HeaderDesignSystem.module.css";
 
 function HeaderDesignSystem() {
-  const { designSystem } = useCurrentDesignSystem();
-
+  const { designSystem } = useDesignSystemContext();
   if (!designSystem) return null;
-
   return (
     <div className={styles.headerDesignSystem}>
       <div className={styles.shadowTitleContainer}>

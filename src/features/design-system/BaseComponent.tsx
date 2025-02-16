@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import styles from "./ComponentDesignSystem.module.css";
 import InputDesignSystem from "./InputDesignSystem";
-import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { Base } from "../../domain/DesignSystemDomain";
@@ -11,27 +11,31 @@ import { useParams } from "react-router-dom";
 import { MdDarkMode, MdSunny } from "react-icons/md";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRef } from "react";
+import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 
 function BaseComponent() {
-  const { activeComponent, designSystem, findDesignSystemColor } =
+  const { designSystem, findDesignSystemColor, baseMode } =
     useDesignSystemContext();
   const {
     metadata: { darkMode },
     base,
   } = designSystem;
 
-  const { register, watch, handleSubmit } = useForm({
+  const { register, watch, handleSubmit, reset } = useForm({
     defaultValues: base,
     mode: "onBlur",
   });
-  const mode: ComponentMode =
-    activeComponent?.componentId === "base" ? activeComponent.mode : "default";
+
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const baseRef = useRef<HTMLFormElement | null>(null);
   useTriggerScroll({
     ref: baseRef,
     triggerId: `base`,
+  });
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: base,
   });
 
   function submitBase(newBase: Base) {
@@ -59,7 +63,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="background"
             value={watch("background.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("background.default")}
             popoverCopy={
               <div className="popover-body">
@@ -75,7 +79,7 @@ function BaseComponent() {
           />
           <InputDesignSystem
             label="border"
-            mode={mode}
+            mode={baseMode}
             value={watch("border.default")}
             register={register("border.default")}
             popoverCopy={
@@ -93,7 +97,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="text-light"
             value={watch("textLight.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("textLight.default")}
             popoverCopy={
               <div className="popover-body">
@@ -110,7 +114,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="text-default"
             value={watch("textDefault.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("textDefault.default")}
             popoverCopy={
               <div className="popover-body">
@@ -127,7 +131,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="text-dark"
             value={watch("textDark.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("textDark.default")}
             popoverCopy={
               <div className="popover-body">
@@ -144,7 +148,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="background-disabled"
             value={watch("backgroundDisabled.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("backgroundDisabled.default")}
             popoverCopy={
               <div className="popover-body">
@@ -161,7 +165,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="border-disabled"
             value={watch("borderDisabled.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("borderDisabled.default")}
             popoverCopy={
               <div className="popover-body">
@@ -178,7 +182,7 @@ function BaseComponent() {
           <InputDesignSystem
             label="text-disabled"
             value={watch("textDisabled.default")}
-            mode={mode}
+            mode={baseMode}
             register={register("textDisabled.default")}
             popoverCopy={
               <div className="popover-body">
@@ -208,7 +212,7 @@ function BaseComponent() {
           />
         )}
       </div>
-      {darkMode && (
+      {darkMode ? (
         <div className={styles.sideSettings}>
           <div className={styles.sideSettingsTitle}>
             <h5 className={styles.titlePadding}>Dark</h5>
@@ -218,7 +222,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="background"
               value={watch("background.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("background.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -235,7 +239,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="border"
               value={watch("border.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("border.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -252,7 +256,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="text-light"
               value={watch("textLight.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("textLight.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -269,7 +273,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="text-default"
               value={watch("textDefault.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("textDefault.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -286,7 +290,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="text-dark"
               value={watch("textDark.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("textDark.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -303,7 +307,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="background-disabled"
               value={watch("backgroundDisabled.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("backgroundDisabled.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -320,7 +324,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="border-disabled"
               value={watch("borderDisabled.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("borderDisabled.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -337,7 +341,7 @@ function BaseComponent() {
             <InputDesignSystem
               label="text-disabled"
               value={watch("textDisabled.dark")}
-              mode={mode}
+              mode={baseMode}
               register={register("textDisabled.dark")}
               popoverCopy={
                 <div className="popover-body">
@@ -353,6 +357,8 @@ function BaseComponent() {
             />
           </div>
         </div>
+      ) : (
+        <div className={styles.darkPreviewPlaceholder} />
       )}
     </form>
   );

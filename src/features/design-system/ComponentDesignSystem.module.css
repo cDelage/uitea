@@ -17,10 +17,12 @@
   box-sizing: border-box;
 }
 
+
 .mediumHeight {
-  min-height: 360px;
-  height: 360px;
-  max-height: 360px;
+  min-height: 400px;
+  height: 400px;
+  max-height: 400px;
+  overflow: hidden;
 }
 
 .componentHead {
@@ -33,7 +35,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  width: 400px;
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
   box-sizing: border-box;
 }
 
@@ -78,6 +82,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  overflow: auto;
 }
 
 .previewElementWrap {
@@ -109,24 +114,25 @@
   padding: var(--space-3);
 }
 
-.add:hover {
-  border-bottom: var(--theme-add-border) 2px solid;
-  cursor: pointer;
+.shadesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  justify-content: center;
+  align-content: center;
+  padding: var(--space-0) var(--space-7);
+  gap: var(--space-2);
+  height: 110px;
 }
 
-.remove:hover {
-  background-color: var(--theme-remove-bg);
-  cursor: pointer;
+.empty{
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
 }
 
-.draggable:hover {
-  background-color: var(--theme-drag-bg);
-  cursor: pointer;
+.darkPreviewPlaceholder{
+  width: var(--space-9);
 }
-
-.dragHover:hover {
-  border-top: var(--theme-add-border) 2px solid;
-  border-radius: 0px;
-  cursor: pointer;
-}
-

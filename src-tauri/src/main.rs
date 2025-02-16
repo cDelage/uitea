@@ -3,8 +3,13 @@
 
 use std::sync::Mutex;
 
-use exposition::design_system_exposition::{create_design_system, find_design_system, save_design_system};
-use exposition::home_exposition::{find_all_recent_files, insert_recent_file, remove_recent_file, update_recent_file};
+use application::undo_application::remove_undo_repository;
+use exposition::design_system_exposition::{
+    create_design_system, find_design_system, save_design_system, undo_design_system, redo_design_system
+};
+use exposition::home_exposition::{
+    find_all_recent_files, insert_recent_file, remove_recent_file, update_recent_file,
+};
 use pickledb::{PickleDb, PickleDbDumpPolicy, SerializationMethod};
 
 mod application;
@@ -15,6 +20,7 @@ mod utils;
 
 struct AppState {
     db: Mutex<PickleDb>,
+    undo_db: Mutex<PickleDb>,
 }
 
 fn main() {
@@ -37,8 +43,19 @@ fn main() {
         }
     };
 
+    remove_undo_repository().ok();
+
+    let undo_db: PickleDb = PickleDb::new(
+        "../db/undo-redo.db",
+        PickleDbDumpPolicy::AutoDump,
+        SerializationMethod::Json,
+    );
+
     tauri::Builder::default()
-        .manage(AppState { db: Mutex::new(db) })
+        .manage(AppState {
+            db: Mutex::new(db),
+            undo_db: Mutex::new(undo_db),
+        })
         .invoke_handler(tauri::generate_handler![
             insert_recent_file,
             find_all_recent_files,
@@ -46,7 +63,9 @@ fn main() {
             find_design_system,
             create_design_system,
             save_design_system,
-            update_recent_file
+            update_recent_file,
+            undo_design_system,
+            redo_design_system
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

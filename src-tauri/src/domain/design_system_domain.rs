@@ -2,13 +2,15 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
     pub palettes: Vec<Palette>,
     pub base: Base,
     pub themes: Vec<ThemeColor>,
+    pub fonts: Fonts,
+    pub typography: Typography
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -28,16 +30,23 @@ pub struct DesignSystemMetadataHome {
     pub design_system_path: PathBuf,
     pub is_tmp: bool,
     pub edit_mode: Option<bool>,
+    pub can_undo: bool,
+    pub can_redo: bool,
 }
 
 impl DesignSystemMetadataHome {
-    pub fn from(metadata: DesignSystemMetadata, edit_mode: Option<bool>) -> DesignSystemMetadataHome {
+    pub fn from(
+        metadata: DesignSystemMetadata,
+        edit_mode: Option<bool>,
+    ) -> DesignSystemMetadataHome {
         let DesignSystemMetadata {
             dark_mode,
             design_system_id,
             design_system_name,
             design_system_path,
             is_tmp,
+            can_redo,
+            can_undo,
         } = metadata;
 
         DesignSystemMetadataHome {
@@ -47,6 +56,8 @@ impl DesignSystemMetadataHome {
             design_system_path,
             edit_mode,
             is_tmp,
+            can_redo,
+            can_undo,
         }
     }
 }
@@ -59,9 +70,11 @@ pub struct DesignSystemMetadata {
     pub dark_mode: bool,
     pub design_system_path: PathBuf,
     pub is_tmp: bool,
+    pub can_undo: bool,
+    pub can_redo: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DesignSystemMetadataFile {
     pub design_system_id: String,
     pub design_system_name: String,
@@ -101,6 +114,8 @@ impl DesignSystemMetadata {
             design_system_name: design_system_name.to_string(),
             design_system_path: path.to_owned(),
             is_tmp,
+            can_redo: false,
+            can_undo: false,
         }
     }
 }
@@ -365,3 +380,267 @@ pub struct ColorDarkable {
     pub default: Option<String>,
     pub dark: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Fonts {
+    pub default: String,
+    pub additionals: Vec<AdditionalFont>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AdditionalFont {
+    pub font_name: String,
+    pub value: String,
+}
+
+impl Fonts {
+    pub fn new() -> Fonts {
+        Fonts {
+            default: String::from("'Helvetica', 'Arial', sans-serif"),
+            additionals: vec![],
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Typography {
+    paragraph: TypographyScale,
+    h1: TypographyScale,
+    h2: TypographyScale,
+    h3: TypographyScale,
+    h4: TypographyScale,
+    h5: TypographyScale,
+    h6: TypographyScale,
+    small: TypographyScale,
+    strong: TypographyScale,
+    additionals_scales: Vec<AdditionalTypographyScale>
+}
+
+impl Typography {
+    pub fn new() -> Typography {
+        Typography {
+            h1: TypographyScale {
+                font_size: "32px".to_string(),
+                line_height: "40px".to_string(),
+                font_weight: FontWeight::Seven,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            h2: TypographyScale {
+                font_size: "28px".to_string(),
+                line_height: "36px".to_string(),
+                font_weight: FontWeight::Six,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            h3: TypographyScale {
+                font_size: "24px".to_string(),
+                line_height: "32px".to_string(),
+                font_weight: FontWeight::Five,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            h4: TypographyScale {
+                font_size: "20px".to_string(),
+                line_height: "28px".to_string(),
+                font_weight: FontWeight::Five,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            h5: TypographyScale {
+                font_size: "18px".to_string(),
+                line_height: "24px".to_string(),
+                font_weight: FontWeight::Five,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            h6: TypographyScale {
+                font_size: "16px".to_string(),
+                line_height: "22px".to_string(),
+                font_weight: FontWeight::Five,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            paragraph: TypographyScale {
+                font_size: "14px".to_string(),
+                line_height: "20px".to_string(),
+                font_weight: FontWeight::Four,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            small: TypographyScale {
+                font_size: "12px".to_string(),
+                line_height: "16px".to_string(),
+                font_weight: FontWeight::Four,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            strong: TypographyScale {
+                font_size: "14px".to_string(),
+                line_height: "20px".to_string(),
+                font_weight: FontWeight::Seven,
+                letter_spacing: TypographySpacing::Zero,
+                word_spacing: TypographySpacing::Zero,
+                font_style: FontStyle::Normal,
+                text_transform: TextTransform::None,
+                text_decoration: TextDecoration::None,
+                padding: "0".to_string(),
+                margin: "0".to_string(),
+            },
+            additionals_scales: vec![],
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AdditionalTypographyScale {
+    scale_name: String,
+    scale: TypographyScale
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AdditionalFontWeight {
+    weight_name: String,
+    font_weight: FontWeight
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TypographyScale {
+    font_size: String,
+    line_height: String,
+    font_weight: FontWeight,
+    letter_spacing: TypographySpacing,
+    word_spacing: TypographySpacing,
+    font_style: FontStyle,
+    text_transform: TextTransform,
+    text_decoration: TextDecoration,
+    padding: String,
+    margin: String
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum FontStyle {
+    #[serde(rename = "normal")]
+    Normal,
+    #[serde(rename = "italic")]
+    Italic,
+    #[serde(rename = "oblique")]
+    Oblique,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum TextTransform {
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "uppercase")]
+    Uppercase,
+    #[serde(rename = "lowercase")]
+    Lowercase,
+    #[serde(rename = "capitalize")]
+    Capitalize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum TextDecoration {
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "underline")]
+    Underline,
+    #[serde(rename = "overline")]
+    Overline,
+    #[serde(rename = "line-through")]
+    LineThrough,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[repr(u16)]
+pub enum FontWeight {
+    #[serde(rename = "100")]
+    One = 100,
+    #[serde(rename = "200")]
+    Two = 200,
+    #[serde(rename = "300")]
+    Three = 300,
+    #[serde(rename = "400")]
+    Four = 400,
+    #[serde(rename = "500")]
+    Five = 500,
+    #[serde(rename = "600")]
+    Six = 600,
+    #[serde(rename = "700")]
+    Seven = 700,
+    #[serde(rename = "800")]
+    Eight = 800,
+    #[serde(rename = "900")]
+    Nine = 900,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[repr(u16)]
+pub enum TypographySpacing {
+    #[serde(rename = "-0.05em")]
+    MinusTwo,
+    #[serde(rename = "-0.02em")]
+    MinusOne,
+    #[serde(rename = "0em")]
+    Zero,
+    #[serde(rename = "0.1em")]
+    One,
+    #[serde(rename = "0.2em")]
+    Two,
+    #[serde(rename = "0.3em")]
+    Three,
+}
+

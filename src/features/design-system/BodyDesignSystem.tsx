@@ -2,24 +2,62 @@ import styles from "./BodyDesignSystem.module.css";
 import Section from "./SectionDesignSystem";
 import HeaderDesignSystem from "./HeaderDesignSystem";
 import IconColors from "../../ui/icons/IconColors";
-import { ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
+import {
+  DEFAULT_PALETTE,
+  DEFAULT_THEME,
+  ICON_SIZE_MD,
+  ICON_SIZE_XL,
+} from "../../ui/UiConstants";
 import PaletteComponent from "./PaletteComponent";
 import { MdAdd, MdDragIndicator, MdEdit, MdRemove } from "react-icons/md";
 import BaseComponent from "./BaseComponent";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import ThemeComponent from "./ThemeComponent";
 import DraggableList from "./DraggableList";
+import FontIcon from "../../ui/icons/FontIcon";
+import { useSaveDesignSystem } from "./DesignSystemQueries";
+import { useParams } from "react-router-dom";
+import FontsComponent from "./FontsComponent";
+import TypographyComponent from "./TypographyComponent";
+import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
+import SpacesIcon from "../../ui/icons/SpacesIcon";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
+  const { designSystemPath } = useParams();
+  const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
+  const { scrollRef } = useScrollTriggerRefresh();
+
+  function initPalette() {
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        palettes: [...designSystem.palettes, DEFAULT_PALETTE],
+      },
+      isTmp: true,
+    });
+  }
+
+  function initTheme() {
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        themes: [...designSystem.themes, DEFAULT_THEME],
+      },
+      isTmp: true,
+    });
+  }
 
   return (
     <div
       className={styles.bodyDesignSystem}
+      id="body-design-system"
       key={designSystem.metadata.designSystemId}
+      ref={scrollRef}
     >
       <HeaderDesignSystem />
       <Section
+        sectionName="colors"
         sectionTitle={
           <>
             <IconColors size={ICON_SIZE_XL} /> Colors
@@ -50,7 +88,7 @@ function BodyDesignSystem() {
                 <Section.ActionButton componentId="shades" mode="drag">
                   <MdDragIndicator size={ICON_SIZE_MD} />
                 </Section.ActionButton>
-                <Section.ActionButton componentId="shades" mode="edit">
+                <Section.ActionButton componentId="all" mode="edit">
                   <MdEdit size={ICON_SIZE_MD} />
                 </Section.ActionButton>
                 <Section.ActionButton componentId="shades" mode="add">
@@ -60,21 +98,30 @@ function BodyDesignSystem() {
             </>
           }
         >
-          <DraggableList keyList="palettes">
-            {designSystem.palettes.map((colorPalette, index) => (
-              <PaletteComponent
-                key={colorPalette.paletteName}
-                colorPalette={colorPalette}
-                index={index}
-              />
-            ))}
-          </DraggableList>
+          <>
+            <Section.EmptySection
+              sectionName="palettes"
+              itemToInsert="palette"
+              onInsert={initPalette}
+              sectionLength={designSystem.palettes.length}
+              mediumHeight={true}
+            />
+            <DraggableList keyList="palettes">
+              {designSystem.palettes.map((colorPalette, index) => (
+                <PaletteComponent
+                  key={colorPalette.paletteName}
+                  colorPalette={colorPalette}
+                  index={index}
+                />
+              ))}
+            </DraggableList>
+          </>
         </Section.Subsection>
         <Section.Subsection
           subSectionName="Base"
           actions={
             <>
-              <Section.ActionButton componentId="base" mode="edit">
+              <Section.ActionButton componentId="all" mode="edit">
                 <MdEdit size={ICON_SIZE_MD} />
               </Section.ActionButton>
             </>
@@ -93,7 +140,7 @@ function BodyDesignSystem() {
                 <Section.ActionButton componentId="themes" mode="drag">
                   <MdDragIndicator size={ICON_SIZE_MD} />
                 </Section.ActionButton>
-                <Section.ActionButton componentId="themes" mode="edit">
+                <Section.ActionButton componentId="all" mode="edit">
                   <MdEdit size={ICON_SIZE_MD} />
                 </Section.ActionButton>
                 <Section.ActionButton componentId="themes" mode="add">
@@ -103,16 +150,92 @@ function BodyDesignSystem() {
             </>
           }
         >
-          <DraggableList keyList="themes">
-            {designSystem.themes.map((theme, index) => (
-              <ThemeComponent
-                key={theme.themeName}
-                theme={theme}
-                index={index}
-              />
-            ))}
-          </DraggableList>
+          <>
+            <Section.EmptySection
+              sectionName="themes"
+              itemToInsert="theme"
+              onInsert={initTheme}
+              sectionLength={designSystem.themes.length}
+              mediumHeight={true}
+            />
+            <DraggableList keyList="themes">
+              {designSystem.themes.map((theme, index) => (
+                <ThemeComponent
+                  key={theme.themeName}
+                  theme={theme}
+                  index={index}
+                />
+              ))}
+            </DraggableList>
+          </>
         </Section.Subsection>
+      </Section>
+      <Section
+        sectionName="texts"
+        sectionTitle={
+          <>
+            <FontIcon size={ICON_SIZE_XL} /> Texts
+          </>
+        }
+      >
+        <Section.Subsection
+          subSectionName="Fonts"
+          actions={
+            <>
+              <Section.Actions>
+                All
+                <Section.ActionButton componentId="all" mode="edit">
+                  <MdEdit size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+              </Section.Actions>
+              <Section.Actions>
+                Additionals
+                <Section.ActionButton componentId="fonts" mode="remove">
+                  <MdRemove size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="fonts" mode="drag">
+                  <MdDragIndicator size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+                <Section.ActionButton componentId="fonts" mode="add">
+                  <MdAdd size={ICON_SIZE_MD} />
+                </Section.ActionButton>
+              </Section.Actions>
+            </>
+          }
+        >
+          <FontsComponent />
+        </Section.Subsection>
+        <Section.Subsection
+          subSectionName="Typography"
+          actions={
+            <Section.Actions>
+              <Section.ActionButton componentId="typography" mode="remove">
+                <MdRemove size={ICON_SIZE_MD} />
+              </Section.ActionButton>
+              <Section.ActionButton componentId="typography" mode="drag">
+                <MdDragIndicator size={ICON_SIZE_MD} />
+              </Section.ActionButton>
+              <Section.ActionButton componentId="all" mode="edit">
+                <MdEdit size={ICON_SIZE_MD} />
+              </Section.ActionButton>
+              <Section.ActionButton componentId="typography" mode="add">
+                <MdAdd size={ICON_SIZE_MD} />
+              </Section.ActionButton>
+            </Section.Actions>
+          }
+        >
+          <TypographyComponent />
+        </Section.Subsection>
+      </Section>
+      <Section
+        sectionName="layout"
+        sectionTitle={
+          <>
+            <SpacesIcon size={ICON_SIZE_XL} /> Layout
+          </>
+        }
+      >
+        
       </Section>
     </div>
   );

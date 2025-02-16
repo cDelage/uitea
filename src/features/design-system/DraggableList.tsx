@@ -17,7 +17,7 @@ function DraggableList({
   const { designSystem } = useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const { draggableFeatures } = useDraggableFeatures(
+  const { draggableTools: draggableFeatures } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: number) => {
       if (
         dragIndex === undefined ||

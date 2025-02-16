@@ -14,6 +14,8 @@ export interface DesignSystemMetadata {
   darkMode: boolean;
   designSystemPath: string;
   isTmp: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 export interface DesignSystem {
@@ -21,6 +23,8 @@ export interface DesignSystem {
   palettes: Palette[];
   base: Base;
   themes: ThemeColor[];
+  fonts: Fonts;
+  typography: Typography;
 }
 
 export interface Palette {
@@ -74,3 +78,71 @@ export interface ColorDarkable {
 }
 
 export type DarkableCategory = "default" | "dark";
+
+export interface Fonts {
+  default: string;
+  additionals: AdditionalFont[];
+}
+
+export interface AdditionalFont {
+  fontName: string;
+  value: string;
+}
+
+export interface Typography {
+  paragraph: TypographyScale;
+  h1: TypographyScale;
+  h2: TypographyScale;
+  h3: TypographyScale;
+  h4: TypographyScale;
+  h5: TypographyScale;
+  h6: TypographyScale;
+  small: TypographyScale;
+  strong: TypographyScale;
+  additionalsScales: AdditionalTypographyScale[];
+}
+
+export interface AdditionalTypographyScale {
+  scaleName: string;
+  scale: TypographyScale;
+}
+
+export interface TypographyScale {
+  fontSize: string;
+  lineHeight: string;
+  fontWeight: FontWeight;
+  letterSpacing: TypographySpacing;
+  wordSpacing: TypographySpacing;
+  fontStyle: FontStyle;
+  textTransform: TextTransform;
+  textDecoration: TextDecoration;
+  padding: string;
+  margin: string;
+}
+
+export type DefaultTypography =
+  | "paragraph"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "small"
+  | "strong";
+
+export type TypographyScaleFieldPath =
+  | DefaultTypography
+  | `additionalsScales.${number}.scale`;
+
+export type FontStyle = "normal" | "italic" | "oblique";
+export type TextTransform = "none" | "uppercase" | "lowercase" | "capitalize";
+export type TextDecoration = "none" | "underline" | "overline" | "line-through";
+export type FontWeight = "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
+export type TypographySpacing =
+  | "-0.05em"
+  | "-0.02em"
+  | "0em"
+  | "0.1em"
+  | "0.2em"
+  | "0.3em";
