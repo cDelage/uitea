@@ -76,6 +76,7 @@ function TypographyComponent() {
       scaleName: key,
     };
     insert(index + 1, newScale);
+    handleSubmit(submitTypography);
   }
 
   function submitTypography(newTypo: Typography) {
@@ -112,6 +113,7 @@ function TypographyComponent() {
         <div className="column">
           {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
             <InputDesignSystem
+              key={typoScale}
               label={typoScale}
               mode={typographyMode}
               handleSubmit={handleSubmit(submitTypography)}
@@ -120,9 +122,9 @@ function TypographyComponent() {
               )}`}
               popoverCopy={
                 <div className="popover-body">
-                  <CopyableLabel copyable={`font-size-${typoScale}`}/>
-                  <CopyableLabel copyable={`font-weight-${typoScale}`}/>
-                  <CopyableLabel copyable={`line-height-${typoScale}`}/>
+                  <CopyableLabel copyable={`font-size-${typoScale}`} />
+                  <CopyableLabel copyable={`font-weight-${typoScale}`} />
+                  <CopyableLabel copyable={`line-height-${typoScale}`} />
                 </div>
               }
               popoverEdit={
@@ -194,6 +196,7 @@ function TypographyComponent() {
         >
           {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
             <TypographyPreview
+              key={typoScale}
               keyScale={typoScale}
               typographyScale={typography[typoScale]}
             />

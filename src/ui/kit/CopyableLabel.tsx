@@ -9,7 +9,7 @@ function CopyableLabel({ copyable }: { copyable?: string }) {
   if (!copyable) return null;
 
   function copy() {
-    if(!copyable) return;
+    if (!copyable) return;
     navigator.clipboard
       .writeText(copyable)
       .then(() => {
@@ -25,12 +25,14 @@ function CopyableLabel({ copyable }: { copyable?: string }) {
   }
   return (
     <div onClick={copy} className="copyable-label">
-      {copyable}
-      {isCopied ? (
-        <MdCheck size={ICON_SIZE_SM} />
-      ) : (
-        <MdContentCopy size={ICON_SIZE_SM} />
-      )}
+      <div className="nowrap">{copyable}</div>
+      <div>
+        {isCopied ? (
+          <MdCheck size={ICON_SIZE_SM} />
+        ) : (
+          <MdContentCopy size={ICON_SIZE_SM} />
+        )}
+      </div>
     </div>
   );
 }

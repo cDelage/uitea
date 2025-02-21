@@ -1,3 +1,15 @@
+export interface DesignSystem {
+  metadata: DesignSystemMetadata;
+  palettes: Palette[];
+  base: Base;
+  themes: ThemeColor[];
+  fonts: Fonts;
+  typography: Typography;
+  spaces: Space[];
+  radius: Radius;
+  effects: Effect[]
+}
+
 export interface DesignSystemCreationPayload {
   name: string;
   folderPath: string;
@@ -16,15 +28,6 @@ export interface DesignSystemMetadata {
   isTmp: boolean;
   canUndo: boolean;
   canRedo: boolean;
-}
-
-export interface DesignSystem {
-  metadata: DesignSystemMetadata;
-  palettes: Palette[];
-  base: Base;
-  themes: ThemeColor[];
-  fonts: Fonts;
-  typography: Typography;
 }
 
 export interface Palette {
@@ -138,7 +141,16 @@ export type TypographyScaleFieldPath =
 export type FontStyle = "normal" | "italic" | "oblique";
 export type TextTransform = "none" | "uppercase" | "lowercase" | "capitalize";
 export type TextDecoration = "none" | "underline" | "overline" | "line-through";
-export type FontWeight = "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
+export type FontWeight =
+  | "100"
+  | "200"
+  | "300"
+  | "400"
+  | "500"
+  | "600"
+  | "700"
+  | "800"
+  | "900";
 export type TypographySpacing =
   | "-0.05em"
   | "-0.02em"
@@ -146,3 +158,33 @@ export type TypographySpacing =
   | "0.1em"
   | "0.2em"
   | "0.3em";
+
+export interface Space {
+  spaceKey: string;
+  spaceValue: string;
+}
+
+export interface Radius {
+  default: string;
+  additionalsRadius: RadiusItem[];
+}
+
+export interface RadiusItem {
+  radiusKey: string;
+  radiusValue: string;
+}
+
+export interface Effect {
+  effectName: string;
+  items: EffectItem[];
+  bg?: string;
+}
+
+export interface EffectItem {
+  effectType: EffectType;
+  effectValue : string;
+}
+
+export type EffectType = "BoxShadow" | "Blur" | "BackdropFilter";
+
+

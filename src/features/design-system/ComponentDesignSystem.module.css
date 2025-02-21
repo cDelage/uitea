@@ -1,5 +1,6 @@
 .componentDesignSystemColumn {
   scroll-margin-top: 36px !important;
+  scroll-snap-align: start; 
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -11,7 +12,7 @@
 }
 
 .componentDesignSystem {
-  scroll-margin-top: 36px;
+  scroll-margin-top: 36px !important;
   display: flex;
   padding: var(--space-6) var(--space-1) var(--space-6) var(--space-0);
   box-sizing: border-box;
@@ -22,7 +23,6 @@
   min-height: 400px;
   height: 400px;
   max-height: 400px;
-  overflow: hidden;
 }
 
 .componentHead {
@@ -52,6 +52,7 @@
   display: flex;
   overflow: hidden;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .sideSettingsTitle {
@@ -92,14 +93,14 @@
   padding: var(--space-7);
   box-sizing: border-box;
   display: flex;
-  gap: 8px;
+  gap: 24px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .previewRectWrap {
-  width: calc(50% - 8px);
-  height: calc(50% - 8px);
+  width: calc(50% - 16px);
+  height: calc(50% - 16px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,4 +136,9 @@
 
 .darkPreviewPlaceholder{
   width: var(--space-9);
+}
+
+.primaryTheme {
+  background-color: var(--theme-primary-bg);
+  color: var(--theme-primary-text);
 }

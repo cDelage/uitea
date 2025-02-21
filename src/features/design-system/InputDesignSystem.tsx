@@ -25,6 +25,7 @@ function InputDesignSystem({
   popoverEdit,
   draggableTools,
   index,
+  onClosePopover
 }: {
   label: string;
   value: string | undefined;
@@ -41,6 +42,7 @@ function InputDesignSystem({
   onRemove?: () => void;
   draggableTools?: DraggableTools;
   index?: number;
+  onClosePopover?: () => void;
 }) {
   const [isHover, setIsHover] = useState(false);
 
@@ -96,12 +98,6 @@ function InputDesignSystem({
   }
 
   function handleMouseDown() {
-    console.log(
-      "handleMouseDown",
-      mode,
-      isAddRemoveDragAllowed,
-      draggableTools
-    );
     if (mode === "drag" && isAddRemoveDragAllowed && draggableTools) {
       draggableTools.setDragIndex(index);
     }
@@ -130,7 +126,7 @@ function InputDesignSystem({
           </Popover>
         )}
       </div>
-      <div className="column w-full gap-1">
+      <div className={styles.middleContainer}>
         <strong>
           {mode === "edit" && registerKey ? (
             <input
@@ -156,7 +152,9 @@ function InputDesignSystem({
             />
           )}
           {(mode !== "edit" || popoverEdit) && (
-            <div className="inherit-input-placeholder">{value ?? "empty"}</div>
+            <div className="inherit-input-placeholder nowrap">
+              {value ?? "empty"}
+            </div>
           )}
         </div>
       </div>
@@ -173,19 +171,16 @@ function InputDesignSystem({
             )}
           </div>
         )}
-        {popoverEdit && (
-          <Popover onClose={handleSubmit}>
+        {popoverEdit && (mode === "edit" || mode === "default") && (
+          <Popover onClose={onClosePopover ?? handleSubmit}>
             <InputDesignSystemPopover
               isHover={isHover}
               popoverBody={popoverEdit}
               openId="popover-edit"
             >
               <button type="button" className="action-button">
-                {mode === "edit" ? (
-                  <MdEdit size={ICON_SIZE_SM} />
-                ) : (
-                  <MdVisibility size={ICON_SIZE_SM} />
-                )}
+                {mode === "edit" && <MdEdit size={ICON_SIZE_SM} />}
+                {mode === "default" && <MdVisibility size={ICON_SIZE_SM} />}
               </button>
             </InputDesignSystemPopover>
           </Popover>

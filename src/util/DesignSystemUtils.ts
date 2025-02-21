@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import {
   Base,
   Palette,
@@ -7,6 +8,9 @@ import {
   ThemeStateCategory,
   AdditionalFont,
   AdditionalTypographyScale,
+  Space,
+  RadiusItem,
+  Effect,
 } from "../domain/DesignSystemDomain";
 import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
 import { DEFAULT_BASE } from "../ui/UiConstants";
@@ -27,6 +31,29 @@ export const generateUniqueShadeKey = (
   // Tant que la clé existe déjà (on compare avec le premier élément du tuple),
   // on incrémente le "counter" pour générer une nouvelle clé.
   while (shades.filter((shade) => shade.label === uniqueKey).length) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+/**
+ * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
+ * @param shades - Le tableau contenant les shades existants.
+ * @param baseKey - Le nom de la clé à insérer.
+ * @returns Un nom unique pour la clé.
+ */
+export const generateUniqueEffectsKey = (
+  shades: Effect[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  // Tant que la clé existe déjà (on compare avec le premier élément du tuple),
+  // on incrémente le "counter" pour générer une nouvelle clé.
+  while (shades.filter((shade) => shade.effectName === uniqueKey).length) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -129,6 +156,36 @@ export const generateUniqueTypographyKey = (
   let counter = 1;
 
   while (fonts.find((typo) => typo.scaleName === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+export const generateUniqueSpacesKey = (
+  spaces: Space[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (spaces.find((space) => space.spaceKey === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+export const generateUniqueRadiusKey = (
+  radius: RadiusItem[],
+  baseKey: string
+): string => {
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (radius.find((rad) => rad.radiusKey === uniqueKey)) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -254,4 +311,31 @@ export function useThemeColors({ theme }: { theme: ThemeColor }) {
   };
 
   return computedTheme;
+}
+
+export function getEffectCss(effect: Effect): CSSProperties {
+  const cssProps: CSSProperties = {};
+  const boxShadows = effect.items.filter(
+    (item) => item.effectType === "BoxShadow"
+  );
+  const backdropFilter = effect.items.filter(
+    (item) => item.effectType === "BackdropFilter"
+  );
+  const blur = effect.items.filter((item) => item.effectType === "Blur");
+
+  if (boxShadows.length) {
+    cssProps.boxShadow = boxShadows.map((e) => e.effectValue).join(",");
+  }
+  if (backdropFilter.length) {
+    cssProps.backdropFilter = `${backdropFilter[0].effectValue}`;
+  }
+  if (blur.length) {
+    cssProps.filter = `blur(${blur[0].effectValue})`;
+  }
+
+  if (effect.bg) {
+    cssProps.background = effect.bg;
+  }
+
+  return cssProps;
 }

@@ -10,7 +10,10 @@ pub struct DesignSystem {
     pub base: Base,
     pub themes: Vec<ThemeColor>,
     pub fonts: Fonts,
-    pub typography: Typography
+    pub typography: Typography,
+    pub spaces: Vec<Space>,
+    pub radius: Radius,
+    pub effects: Vec<Effect>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -416,7 +419,7 @@ pub struct Typography {
     h6: TypographyScale,
     small: TypographyScale,
     strong: TypographyScale,
-    additionals_scales: Vec<AdditionalTypographyScale>
+    additionals_scales: Vec<AdditionalTypographyScale>,
 }
 
 impl Typography {
@@ -535,19 +538,18 @@ impl Typography {
     }
 }
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AdditionalTypographyScale {
     scale_name: String,
-    scale: TypographyScale
+    scale: TypographyScale,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AdditionalFontWeight {
     weight_name: String,
-    font_weight: FontWeight
+    font_weight: FontWeight,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -562,7 +564,7 @@ pub struct TypographyScale {
     text_transform: TextTransform,
     text_decoration: TextDecoration,
     padding: String,
-    margin: String
+    margin: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -644,3 +646,169 @@ pub enum TypographySpacing {
     Three,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Space {
+    pub space_key: String,
+    pub space_value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpacesFile(pub IndexMap<String, String>);
+
+impl SpacesFile {
+    pub fn from(spaces: &Vec<Space>) -> SpacesFile {
+        let mut map = IndexMap::new();
+        for space in spaces {
+            map.insert(space.space_key.clone(), space.space_value.clone());
+        }
+        SpacesFile(map)
+    }
+
+    pub fn new() -> SpacesFile {
+        // Valeurs par défaut
+        let default_spaces: Vec<Space> = vec![
+            Space {
+                space_key: "0".to_string(),
+                space_value: "0px".to_string(),
+            },
+            Space {
+                space_key: "1".to_string(),
+                space_value: "2px".to_string(),
+            },
+            Space {
+                space_key: "2".to_string(),
+                space_value: "4px".to_string(),
+            },
+            Space {
+                space_key: "3".to_string(),
+                space_value: "8px".to_string(),
+            },
+            Space {
+                space_key: "4".to_string(),
+                space_value: "12px".to_string(),
+            },
+            Space {
+                space_key: "5".to_string(),
+                space_value: "16px".to_string(),
+            },
+            Space {
+                space_key: "6".to_string(),
+                space_value: "20px".to_string(),
+            },
+            Space {
+                space_key: "7".to_string(),
+                space_value: "28px".to_string(),
+            },
+            Space {
+                space_key: "8".to_string(),
+                space_value: "32px".to_string(),
+            },
+            Space {
+                space_key: "9".to_string(),
+                space_value: "40px".to_string(),
+            },
+            Space {
+                space_key: "10".to_string(),
+                space_value: "52px".to_string(),
+            },
+            Space {
+                space_key: "11".to_string(),
+                space_value: "64px".to_string(),
+            },
+            Space {
+                space_key: "12".to_string(),
+                space_value: "80px".to_string(),
+            },
+            Space {
+                space_key: "13".to_string(),
+                space_value: "100px".to_string(),
+            },
+            Space {
+                space_key: "14".to_string(),
+                space_value: "120px".to_string(),
+            },
+            Space {
+                space_key: "15".to_string(),
+                space_value: "160px".to_string(),
+            },
+        ];
+
+        SpacesFile::from(&default_spaces)
+    }
+
+    pub fn to(spaces_file: &SpacesFile) -> Vec<Space> {
+        spaces_file
+            .0
+            .iter()
+            .map(|(key, value)| Space {
+                space_key: key.clone(),
+                space_value: value.clone(),
+            })
+            .collect::<Vec<Space>>()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Radius {
+    default: String,
+    additionals_radius: Vec<RadiusItem>,
+}
+
+impl Radius {
+    pub fn new() -> Radius {
+        Radius {
+            default: "0px".to_string(),
+            additionals_radius: vec![],
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RadiusItem {
+    pub radius_key: String,
+    pub radius_value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Effect {
+    pub effect_name: String,
+    pub items: Vec<EffectItem>,
+    pub bg: Option<String>,
+}
+
+impl Effect {
+    pub fn new() -> Effect {
+        Effect {
+            effect_name: "shadow".to_string(),
+            bg: None,
+            items: vec![
+                EffectItem {
+                    effect_type: EffectType::BoxShadow,
+                    effect_value: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px".to_string(),
+                },
+                EffectItem {
+                    effect_type: EffectType::BoxShadow,
+                    effect_value: "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px".to_string(),
+                },
+            ],
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EffectItem {
+    pub effect_type: EffectType,
+    pub effect_value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum EffectType {
+    BoxShadow,
+    Blur,
+    BackdropFilter,
+}

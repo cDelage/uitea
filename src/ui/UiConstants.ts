@@ -2,9 +2,12 @@ import {
   AdditionalTypographyScale,
   Base,
   DefaultTypography,
+  Effect,
+  EffectType,
   FontStyle,
   FontWeight,
   Palette,
+  Space,
   TextDecoration,
   TextTransform,
   ThemeColor,
@@ -183,4 +186,37 @@ export const DEFAULT_TYPOGRAPHIES: DefaultTypography[] = [
   "h6",
   "strong",
   "small",
+];
+
+export const DEFAULT_SPACES: Space[] = [
+  { spaceKey: "1", spaceValue: "2px" },
+  { spaceKey: "2", spaceValue: "4px" },
+  { spaceKey: "3", spaceValue: "8px" },
+  { spaceKey: "4", spaceValue: "12px" },
+  { spaceKey: "5", spaceValue: "16px" },
+  { spaceKey: "6", spaceValue: "20px" },
+  { spaceKey: "7", spaceValue: "24px" },
+  { spaceKey: "8", spaceValue: "32px" },
+  { spaceKey: "9", spaceValue: "52px" },
+  { spaceKey: "10", spaceValue: "64px" },
+];
+
+export const DEFAULT_EFFECT: Effect = {
+  effectName: "shadow",
+  items: [
+    {
+      effectType: "BoxShadow",
+      effectValue: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px",
+    },
+    {
+      effectType: "BoxShadow",
+      effectValue: "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px",
+    },
+  ],
+};
+
+export const EFFECT_TYPES: EffectType[] = [
+  "BoxShadow",
+  "BackdropFilter",
+  "Blur",
 ];

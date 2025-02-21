@@ -44,7 +44,6 @@ export function useDraggableFeatures(
       setDragIndex(undefined);
       setHoverIndex(undefined);
     }
-    console.log("effect drag index", dragIndex);
     if (dragIndex !== undefined) {
       window.addEventListener("mouseup", handleDragEvent);
     } else {

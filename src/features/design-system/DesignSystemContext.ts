@@ -9,6 +9,9 @@ export type ComponentMode =
   | "drag"
   | "default";
 
+export type EffectsPopoverMode = "default" | "drag" | "remove";
+
+
 export const ModificationsMode: ComponentMode[] = [
   "edit",
   "add",
@@ -40,6 +43,9 @@ export type DesignSystemContextType = {
   baseMode: ComponentMode;
   fontsMode: ComponentMode;
   typographyMode: ComponentMode;
+  spacesMode: ComponentMode;
+  radiusMode: ComponentMode;
+  effectsMode: ComponentMode;
 };
 
 export const DesignSystemContext =

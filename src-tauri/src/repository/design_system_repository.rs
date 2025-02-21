@@ -4,9 +4,7 @@ use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Fonts, Palette,
-        PalettesMetadataFile, ShadesFile, ThemeColor, ThemeColorFile, ThemesMetadataFile,
-        Typography,
+        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette, PalettesMetadataFile, Radius, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile, ThemesMetadataFile, Typography
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -24,6 +22,9 @@ const TYPOGRAPHY_PATH: &str = "typography.yaml";
 const THEMES_PATH: &str = "themes";
 const THEMES_METADATA_PATH: &str = "themes_metadata.yaml";
 const NEUTRAL_THEME_PATH: &str = "neutral.yaml";
+const SPACES_PATH: &str = "spaces.yaml";
+const RADIUS_PATH: &str = "radius.yaml";
+const EFFECTS_PATH: &str = "effects.yaml";
 
 pub fn create_design_system(design_system_metadata: &DesignSystemMetadata) -> Result<()> {
     println!(
@@ -122,6 +123,37 @@ pub fn init_palettes(design_system_path: &PathBuf) -> Result<()> {
     save_to_yaml_file(primary_palette_path, &shade_file)
 }
 
+pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
+    //Save colors
+    let palettes_path: PathBuf = design_system_path.join(PALETTES_PATH);
+    if palettes_path.is_dir() {
+        fs::remove_dir_all(&palettes_path)?;
+    }
+    fs::create_dir_all(&palettes_path)?;
+
+    //Palettes
+    for color_palette in &design_system.palettes {
+        let color_palette_pathbuf: PathBuf =
+            compute_path_with_extension(&palettes_path, &color_palette.palette_name, &"yaml");
+        let shades_file: ShadesFile = ShadesFile::from(&color_palette.shades);
+        save_to_yaml_file(color_palette_pathbuf, &shades_file)?;
+    }
+
+    let palettes_order: Vec<String> = design_system
+        .palettes
+        .clone()
+        .into_iter()
+        .map(|palette| return palette.palette_name)
+        .collect::<Vec<String>>();
+
+    let palettes_metadata_file: PalettesMetadataFile = PalettesMetadataFile { palettes_order };
+    save_to_yaml_file(
+        palettes_path.join(PALETTES_METADATA_PATH),
+        &palettes_metadata_file,
+    )?;
+    Ok(())
+}
+
 pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<()> {
     //Define the path (if the save is tmp or not)
     let design_system_path: PathBuf = if is_tmp {
@@ -163,6 +195,14 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     let typography_pathbuf: PathBuf = design_system_path.join(TYPOGRAPHY_PATH);
     save_to_yaml_file(typography_pathbuf, &design_system.typography)?;
 
+    save_spaces(&design_system.spaces, &design_system_path)?;
+    
+    let radius_pathbuf: PathBuf = design_system_path.join(RADIUS_PATH);
+    save_to_yaml_file(radius_pathbuf, &design_system.radius)?;
+    
+    let effect_pathbuf: PathBuf = design_system_path.join(EFFECTS_PATH);
+    save_to_yaml_file(effect_pathbuf, &design_system.effects)?;
+
     //Once the save is complete (when is not a tmp save) -> remove the tmp copy
     if !is_tmp {
         let tmp_pathbuf: PathBuf = design_system
@@ -178,36 +218,6 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     Ok(())
 }
 
-pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
-    //Save colors
-    let palettes_path: PathBuf = design_system_path.join(PALETTES_PATH);
-    if palettes_path.is_dir() {
-        fs::remove_dir_all(&palettes_path)?;
-    }
-    fs::create_dir_all(&palettes_path)?;
-
-    //Palettes
-    for color_palette in &design_system.palettes {
-        let color_palette_pathbuf: PathBuf =
-            compute_path_with_extension(&palettes_path, &color_palette.palette_name, &"yaml");
-        let shades_file: ShadesFile = ShadesFile::from(&color_palette.shades);
-        save_to_yaml_file(color_palette_pathbuf, &shades_file)?;
-    }
-
-    let palettes_order: Vec<String> = design_system
-        .palettes
-        .clone()
-        .into_iter()
-        .map(|palette| return palette.palette_name)
-        .collect::<Vec<String>>();
-
-    let palettes_metadata_file: PalettesMetadataFile = PalettesMetadataFile { palettes_order };
-    save_to_yaml_file(
-        palettes_path.join(PALETTES_METADATA_PATH),
-        &palettes_metadata_file,
-    )?;
-    Ok(())
-}
 
 pub fn save_themes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
     let themes_path: PathBuf = design_system_path.join(THEMES_PATH);
@@ -331,4 +341,62 @@ pub fn init_typography(design_system_path: &PathBuf) -> Result<()> {
     let typo_pathbuf: PathBuf = fetch_pathbuf.join(TYPOGRAPHY_PATH);
     let typo_file = Typography::new();
     save_to_yaml_file(typo_pathbuf, &typo_file)
+}
+
+pub fn fetch_spaces(design_system_path: &PathBuf) -> Result<Vec<Space>> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let spaces_path = fetch_pathbuf.join(SPACES_PATH);
+    if !spaces_path.is_file() {
+        println!("Fail to fetch spaces file");
+        return Err(anyhow!("spaces.yaml is missing"));
+    }
+
+    let spaces_file: SpacesFile = load_yaml_from_pathbuf::<SpacesFile>(&spaces_path)?;
+
+    let spaces = SpacesFile::to(&spaces_file);
+    Ok(spaces)
+}
+
+pub fn init_spaces(design_system_path: &PathBuf) -> Result<()> {
+    fs::create_dir_all(&design_system_path)?;
+
+    let spaces_path: PathBuf = design_system_path.join(SPACES_PATH);
+    let spaces_file: SpacesFile = SpacesFile::new();
+
+    save_to_yaml_file(spaces_path, &spaces_file)?;
+
+    Ok(())
+}
+
+pub fn save_spaces(spaces: &Vec<Space>, design_system_path: &PathBuf) -> Result<()> {
+    let spaces_path: PathBuf = design_system_path.join(SPACES_PATH);
+    let spaces_file: SpacesFile = SpacesFile::from(spaces);
+    save_to_yaml_file(spaces_path, &spaces_file)?;
+    Ok(())
+}
+
+pub fn fetch_radius(design_system_path: &PathBuf) -> Result<Radius> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let radius_pathbuf: PathBuf = fetch_pathbuf.join(RADIUS_PATH);
+    load_yaml_from_pathbuf::<Radius>(&radius_pathbuf)
+}
+
+pub fn init_radius(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let radius_pathbuf: PathBuf = fetch_pathbuf.join(RADIUS_PATH);
+    let radius_file = Radius::new();
+    save_to_yaml_file(radius_pathbuf, &radius_file)
+}
+
+pub fn fetch_effects(design_system_path: &PathBuf) -> Result<Vec<Effect>> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let effects_pathbuf: PathBuf = fetch_pathbuf.join(EFFECTS_PATH);
+    load_yaml_from_pathbuf::<Vec<Effect>>(&effects_pathbuf)
+}
+
+pub fn init_effects(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let effect_pathbuf: PathBuf = fetch_pathbuf.join(EFFECTS_PATH);
+    let effect = Effect::new();
+    save_to_yaml_file(effect_pathbuf, &vec![effect])
 }

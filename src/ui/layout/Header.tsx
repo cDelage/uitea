@@ -43,12 +43,16 @@ function Header() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === "z") {
-        event.preventDefault(); // Empêche le comportement par défaut du navigateur
-        undoDesignSystem();
+        if (designSystem?.metadata.canUndo) {
+          event.preventDefault(); // Empêche le comportement par défaut du navigateur
+          undoDesignSystem();
+        }
       }
       if (event.ctrlKey && event.key === "y") {
-        event.preventDefault();
-        redoDesignSystem();
+        if (designSystem?.metadata.canRedo) {
+          event.preventDefault();
+          redoDesignSystem();
+        }
       }
     };
 
@@ -56,7 +60,7 @@ function Header() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [undoDesignSystem, redoDesignSystem]);
+  }, [undoDesignSystem, redoDesignSystem, designSystem]);
 
   useEffect(() => {
     const updateMaximizedState = async () => {

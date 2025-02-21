@@ -573,11 +573,13 @@ p {
   background-color: inherit;
   background: inherit;
   border-bottom: transparent 1px solid;
+  box-sizing: border-box;
 }
 
 .inherit-input-size {
   height: 32px;
   padding-left: 4px;
+  box-sizing: border-box;
 }
 
 .inherit-input-placeholder {
@@ -595,6 +597,15 @@ p {
   white-space: nowrap;
   text-overflow: ellipsis;
   border-bottom: transparent 1px solid;
+  user-select: none;
+}
+
+.nowrap {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-bottom: transparent 1px solid;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 input {
@@ -630,6 +641,8 @@ select:disabled {
   border-radius: var(--rounded-md);
   font-family: "Consolas";
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  max-width: 200px;
 }
 
 .copyable-label:hover {

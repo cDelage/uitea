@@ -115,7 +115,8 @@ function Toggle({
 
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  function handleClick() {
+  function handleClick(e: MouseEvent) {
+    e.stopPropagation();
     const rect = toggleRef.current?.getBoundingClientRect();
     if (rect) {
       const menuPosition = getRectPosition(

@@ -99,6 +99,12 @@ function DesignSystemPage() {
   const fontsMode: ComponentMode = getMode("fonts");
 
   const typographyMode: ComponentMode = getMode("typography");
+  
+  const spacesMode: ComponentMode = getMode("spaces");
+  
+  const radiusMode: ComponentMode = getMode("radius");
+  
+  const effectsMode: ComponentMode = getMode("effects");
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -136,6 +142,9 @@ function DesignSystemPage() {
         baseMode,
         fontsMode,
         typographyMode,
+        spacesMode,
+        radiusMode,
+        effectsMode
       }}
     >
       <div className={styles.designSystemPage}>

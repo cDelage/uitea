@@ -1,5 +1,5 @@
 .inputPopover {
-  width: 300px;
+  width: 350px;
   display: flex;
   flex-direction: column;
 }
@@ -15,7 +15,7 @@
   overflow: hidden;
 }
 
-.previewText{
+.previewText {
   padding: var(--space-4);
   overflow: hidden;
   white-space: nowrap;
@@ -58,7 +58,6 @@
   row-gap: var(--space-1);
   padding: var(--space-0) var(--space-3);
   height: 150px;
-  grid-auto-rows: fit-content;
 }
 
 .tabsContainer {
@@ -77,4 +76,46 @@
 
 .tab[data-active="true"] {
   color: var(--base-text-dark);
+}
+
+.bodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  box-sizing: border-box;
+}
+
+.bodyMenuContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-0) var(--space-3);
+  box-sizing: border-box;
+}
+
+.keyValueMenuContainer {
+  display: flex;
+  flex-direction: column;
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.tabEffectContainer {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  padding: var(--space-3) var(--space-3);
+  box-sizing: border-box;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+
+.rectPreview {
+  width: 60%;
+  height: 60%;
+  background-color: var(--palette-single-white);
+  border-radius: var(--rounded-md);
 }

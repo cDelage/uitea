@@ -8,7 +8,10 @@ import { useDesignSystemContext } from "./DesignSystemContext";
 import SidebarFile from "./SidebarFile";
 import {
   MdAbc,
+  MdContrast,
   MdEdit,
+  MdLineWeight,
+  MdRoundedCorner,
   MdSave,
   MdSettings,
   MdTextFields,
@@ -27,6 +30,7 @@ import BaseIcon from "../../ui/icons/BaseIcon";
 import { useBaseColors } from "../../util/DesignSystemUtils";
 import ThemeIcon from "../../ui/icons/ThemeIcon";
 import FontIcon from "../../ui/icons/FontIcon";
+import SpacesIcon from "../../ui/icons/SpacesIcon";
 
 function SidebarDesignSystem() {
   const { designSystem, setActiveComponent } = useDesignSystemContext();
@@ -148,6 +152,32 @@ function SidebarDesignSystem() {
               underFolder={true}
               id={"typography"}
               icon={<MdTextFields size={ICON_SIZE_SM} />}
+            />
+          </>
+        </SidebarSection>
+        <SidebarSection
+          SectionIcon={SpacesIcon}
+          name="Layout"
+          scrollName="layout"
+        >
+          <>
+            <SidebarFile
+              filename="Spaces"
+              id="spaces"
+              underFolder={true}
+              icon={<MdLineWeight size={ICON_SIZE_SM} />}
+            />
+            <SidebarFile
+              filename={"Radius"}
+              underFolder={true}
+              id={"radius"}
+              icon={<MdRoundedCorner size={ICON_SIZE_SM} />}
+            />
+            <SidebarFile
+              filename={"Effects"}
+              underFolder={true}
+              id={"effects"}
+              icon={<MdContrast size={ICON_SIZE_SM} />}
             />
           </>
         </SidebarSection>

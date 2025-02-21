@@ -100,7 +100,7 @@ pub fn redo<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
         undo_db.set(object_id, &historic)?;
         match undo_db.get::<Historic<T>>(object_id){
             None => {println!("fail to get")}
-            Some(res) => {println!("result : {:?}", res)}
+            Some(_) => {}
         };
         
         return Ok(next);
@@ -116,7 +116,6 @@ pub fn get_present<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
     println!("get_present - undo repo");
     let undo_db = state.undo_db.lock().unwrap();
     let historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
-    println!("historic: {:?}", &historic);
     let present_historic: T = historic.present.ok_or(anyhow!("fail to find present"))?;
     Ok(present_historic)
 }

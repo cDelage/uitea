@@ -1,0 +1,13 @@
+.spacePreviewItem {
+  display: flex;
+  align-items: center;
+  background-color: var(--theme-primary-bg);
+  color: var(--theme-primary-text);
+  overflow: show;
+  justify-content: center;
+}
+
+.textPreview {
+  background-color: var(--theme-primary-bg);
+  border-radius: var(--space-2);
+}

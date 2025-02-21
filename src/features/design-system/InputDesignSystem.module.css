@@ -1,15 +1,24 @@
 .inputDesignSystem {
   display: flex;
-  padding: 6px var(--space-3) 6px var(--space-0);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-0);
   border-top: transparent 2px solid;
   border-bottom: transparent 2px solid;
+}
+
+.middleContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .sideContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: var(--space-9);
+  width: var(--space-7);
   align-items: center;
   height: 100%;
   box-sizing: border-box;

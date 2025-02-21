@@ -5,8 +5,7 @@ use tauri::State;
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Fonts, Palette,
-        ThemeColor, Typography,
+        Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts, Palette, Radius, Space, ThemeColor, Typography
     },
     repository::{
         compute_path, design_system_repository,
@@ -84,7 +83,7 @@ pub fn find_design_system(
             design_system_repository::init_fonts(&design_system_pathbuf)?;
             design_system_repository::fetch_fonts(&design_system_pathbuf)
         }
-        Ok(typo) => Ok(typo),
+        Ok(font) => Ok(font),
     }?;
 
     let typography: Typography =
@@ -96,6 +95,30 @@ pub fn find_design_system(
             Ok(typo) => Ok(typo),
         }?;
 
+    let spaces: Vec<Space> = match design_system_repository::fetch_spaces(&design_system_pathbuf) {
+        Err(_) => {
+            design_system_repository::init_spaces(&design_system_pathbuf)?;
+            design_system_repository::fetch_spaces(&design_system_pathbuf)
+        }
+        Ok(space) => Ok(space),
+    }?;
+
+    let radius: Radius = match design_system_repository::fetch_radius(&design_system_pathbuf) {
+        Err(_) => {
+            design_system_repository::init_radius(&design_system_pathbuf)?;
+            design_system_repository::fetch_radius(&design_system_pathbuf)
+        }
+        Ok(radius) => Ok(radius),
+    }?;
+
+    let effects: Vec<Effect> = match design_system_repository::fetch_effects(&design_system_pathbuf) {
+        Err(_) => {
+            design_system_repository::init_effects(&design_system_pathbuf)?;
+            design_system_repository::fetch_effects(&design_system_pathbuf)
+        }
+        Ok(radius) => Ok(radius),
+    }?;
+
     Ok(DesignSystem {
         metadata,
         palettes,
@@ -103,6 +126,9 @@ pub fn find_design_system(
         themes,
         fonts,
         typography,
+        spaces,
+        radius,
+        effects
     })
 }
 
