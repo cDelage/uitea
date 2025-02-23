@@ -3,8 +3,16 @@ import { DesignSystem, ThemeColor } from "../../domain/DesignSystemDomain";
 import styles from "./ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import ThemePreview from "./ThemePreview";
-import { DEFAULT_BASE, ICON_SIZE_SM } from "../../ui/UiConstants";
-import { MdDarkMode, MdSunny } from "react-icons/md";
+import { DEFAULT_BASE, ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
+import {
+  MdArrowDownward,
+  MdArrowUpward,
+  MdDarkMode,
+  MdDelete,
+  MdDragIndicator,
+  MdMoreHoriz,
+  MdSunny,
+} from "react-icons/md";
 import ThemeStateForm from "./ThemeStateForm";
 import classNames from "classnames";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
@@ -18,6 +26,8 @@ import {
 import { useRef } from "react";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import { isEqual } from "lodash";
+import Popover from "../../ui/kit/Popover";
 
 function ThemeComponent({
   theme,
@@ -26,7 +36,7 @@ function ThemeComponent({
   theme: ThemeColor;
   index: number;
 }) {
-  const { designSystem, themesMode } = useDesignSystemContext();
+  const { designSystem, themesMode, editMode } = useDesignSystemContext();
   const {
     base,
     metadata: { darkMode },
@@ -51,18 +61,20 @@ function ThemeComponent({
   });
 
   function handleMouseDown() {
-    if (themesMode === "drag") {
+    if (editMode) {
       setDragIndex(index);
     }
   }
 
   function handleMouseEnter() {
-    if (themesMode === "drag" && dragIndex !== undefined) {
+    if (editMode && dragIndex !== undefined) {
       setHoverIndex(index);
     }
   }
 
   function submitTheme(newTheme: ThemeColor) {
+    if (isEqual(newTheme, theme)) return;
+
     const newThemes: ThemeColor[] = [...designSystem.themes];
     newThemes.splice(index, 1, newTheme);
     saveDesignSystem({
@@ -77,35 +89,20 @@ function ThemeComponent({
   const formClassNames = classNames(
     styles.componentDesignSystemColumn,
     styles.mediumHeight,
-    { "add": themesMode === "add" },
-    { "remove": themesMode === "remove" },
     {
-      "draggable":
-        (themesMode === "drag" && dragIndex === undefined) ||
-        dragIndex === index,
+      draggable: editMode && dragIndex === index,
     },
     {
       "drag-hover-top":
-        themesMode === "drag" &&
-        dragIndex !== undefined &&
-        dragIndex !== index &&
-        hoverIndex === index,
+        dragIndex !== undefined && dragIndex !== index && hoverIndex === index,
     }
   );
 
-  function handleClickEvent() {
-    if (themesMode === "add") {
-      handleAddTheme();
-    }
-    if (themesMode === "remove") {
-      handleRemoveTheme();
-    }
-  }
-
-  function handleAddTheme() {
-    const themeKey = generateUniqueThemesKey(themes, `theme-${index + 1}`);
+  function handleAddTheme(place: "before" | "after") {
+    const newIndex = place === "before" ? index : index + 1;
+    const themeKey = generateUniqueThemesKey(themes, `theme-${newIndex + 1}`);
     const newTheme: ThemeColor = getDefaultTheme(themeKey);
-    designSystem.themes.splice(index + 1, 0, newTheme);
+    designSystem.themes.splice(newIndex, 0, newTheme);
     const newDesignSystem: DesignSystem = {
       ...designSystem,
       themes: Array.from([...designSystem.themes]),
@@ -123,6 +120,7 @@ function ThemeComponent({
         (_theme, tmIndex) => index !== tmIndex
       ),
     };
+
     saveDesignSystem({
       designSystem: newDesignSystem,
       isTmp: true,
@@ -134,8 +132,6 @@ function ThemeComponent({
       className={formClassNames}
       onDragStart={(e) => e.preventDefault()}
       onMouseEnter={handleMouseEnter}
-      onMouseDown={handleMouseDown}
-      onClick={handleClickEvent}
       onSubmit={handleSubmit(submitTheme)}
       ref={themeRef}
     >
@@ -154,6 +150,46 @@ function ThemeComponent({
             </div>
           )}
         </h4>
+        {editMode && (
+          <div className="row gap-3 align-center">
+            <button
+              type="button"
+              className="action-ghost-button cursor-drag"
+              onMouseDown={handleMouseDown}
+            >
+              <MdDragIndicator size={ICON_SIZE_MD} />
+            </button>
+            <Popover>
+              <Popover.Toggle id="menu-palette" positionPayload="bottom-right">
+                <button type="button" className="action-ghost-button">
+                  <MdMoreHoriz size={ICON_SIZE_MD} />
+                </button>
+              </Popover.Toggle>
+              <Popover.Body id="menu-palette">
+                <Popover.Actions>
+                  <Popover.Tab clickEvent={() => handleAddTheme("before")}>
+                    <>
+                      <MdArrowUpward size={ICON_SIZE_MD} />
+                      Insert theme before
+                    </>
+                  </Popover.Tab>
+                  <Popover.Tab clickEvent={() => handleAddTheme("after")}>
+                    <>
+                      <MdArrowDownward size={ICON_SIZE_MD} />
+                      Insert theme after
+                    </>
+                  </Popover.Tab>
+                  <Popover.Tab clickEvent={() => handleRemoveTheme()}>
+                    <div className="remove-text-color row align-center gap-3">
+                      <MdDelete size={ICON_SIZE_MD} />
+                      Remove theme
+                    </div>
+                  </Popover.Tab>
+                </Popover.Actions>
+              </Popover.Body>
+            </Popover>
+          </div>
+        )}
       </div>
       <div className={styles.rowHidden}>
         <div className={styles.sideSettings}>

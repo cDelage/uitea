@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { DesignToken } from "../../domain/DesignSystemDomain";
 import { isValidCssColorOrGradient } from "../../util/DesignSystemUtils";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 function DesignSystemPage() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
@@ -23,6 +23,10 @@ function DesignSystemPage() {
   const [activeComponent, setActiveComponent] = useState<
     ActiveComponent | undefined
   >(undefined);
+  const [searchParams] = useSearchParams();
+  const editMode: boolean = JSON.parse(
+    searchParams.get("editMode") || "false"
+  ) as boolean;
 
   function handleSetActiveComponent(newActiveComponent?: ActiveComponent) {
     setActiveComponent((active) =>
@@ -99,11 +103,11 @@ function DesignSystemPage() {
   const fontsMode: ComponentMode = getMode("fonts");
 
   const typographyMode: ComponentMode = getMode("typography");
-  
+
   const spacesMode: ComponentMode = getMode("spaces");
-  
+
   const radiusMode: ComponentMode = getMode("radius");
-  
+
   const effectsMode: ComponentMode = getMode("effects");
 
   useEffect(() => {
@@ -144,7 +148,8 @@ function DesignSystemPage() {
         typographyMode,
         spacesMode,
         radiusMode,
-        effectsMode
+        effectsMode,
+        editMode,
       }}
     >
       <div className={styles.designSystemPage}>

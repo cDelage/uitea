@@ -15,11 +15,15 @@ import InputDesignSystem from "./InputDesignSystem";
 import EffectsPopover from "./EffectsPopover";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { generateUniqueEffectsKey } from "../../util/DesignSystemUtils";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRef } from "react";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import EffectsPreview from "./EffectsPreview";
+import { isEqual } from "lodash";
 
 function EffectsComponent() {
   const { designSystem, findDesignSystemColor, effectsMode } =
@@ -29,18 +33,10 @@ function EffectsComponent() {
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
 
-  const {
-    register,
-    watch,
-    control,
-    handleSubmit,
-    setValue,
-    getValues,
-    reset,
-    formState: { isDirty },
-  } = useForm({
-    defaultValues: { effects },
-  });
+  const { register, watch, control, handleSubmit, setValue, getValues, reset } =
+    useForm({
+      defaultValues: { effects },
+    });
   const {
     fields: effectsFields,
     append,
@@ -52,8 +48,13 @@ function EffectsComponent() {
     name: "effects",
   });
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );
@@ -68,7 +69,7 @@ function EffectsComponent() {
   });
 
   function submitEffects({ effects: newEffects }: { effects: Effect[] }) {
-    if (!isDirty) return;
+    if (isEqual(newEffects, effects)) return;
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -176,7 +177,9 @@ function EffectsComponent() {
             }),
           }}
         >
-          {watch(`effects`).map(effect => <EffectsPreview key={effect.effectName} effect={effect}/>)}
+          {watch(`effects`).map((effect) => (
+            <EffectsPreview key={effect.effectName} effect={effect} />
+          ))}
         </div>
       </div>
       <div className={styles.darkPreviewPlaceholder} />

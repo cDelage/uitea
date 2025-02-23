@@ -6,6 +6,7 @@
   justify-content: space-between;
   padding: var(--space-4) var(--space-0);
   box-sizing: border-box;
+  user-select: none; /* Empêche la sélection de texte */
 }
 
 .topContainer {
@@ -15,13 +16,14 @@
   gap: var(--space-3);
 }
 
+
 .topMenu {
   display: flex;
-  padding: var(--space-3);
+  padding: var(--space-4);
   gap: var(--space-3);
   box-sizing: border-box;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
 }
 
 .bottomContainer {

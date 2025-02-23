@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, MouseEvent } from "react";
 import {
   Base,
   Palette,
@@ -338,4 +338,13 @@ export function getEffectCss(effect: Effect): CSSProperties {
   }
 
   return cssProps;
+}
+
+
+export function stopPropagation(e: MouseEvent){
+  e.stopPropagation();
+}
+
+export function inputSelectDisabled(e: MouseEvent<HTMLInputElement>){
+  e.preventDefault();
 }

@@ -1,0 +1,46 @@
+.tooltipElement {
+  position: relative;
+}
+
+.tooltipElement .tooltipBody {
+  display: none;
+}
+
+.tooltipElement:hover .tooltipBody {
+  display: flex;
+}
+
+.tooltipBody {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  background-color: var(--theme-tooltip-bg);
+  color: var(--theme-tooltip-text);
+  border: none;
+  padding: var(--space-2);
+  box-sizing: border-box;
+  border-radius: var(--rounded-md);
+  z-index: 3;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+  gap: var(--space-2);
+}
+
+/* La flèche en tant qu'élément enfant */
+.tooltipArrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--theme-tooltip-bg);
+}
+
+.valueTextContainer {
+  width: fit-content;
+  white-space: nowrap;
+}

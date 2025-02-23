@@ -10,7 +10,10 @@ import {
 } from "./DesignSystemContext";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
 
 import Section from "./SectionDesignSystem";
@@ -22,6 +25,7 @@ import { generateUniqueSpacesKey } from "../../util/DesignSystemUtils";
 import { DEFAULT_BASE } from "../../ui/UiConstants";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import { isEqual } from "lodash";
 // import { DEFAULT_SPACES } from "../../domain/DesignSystemDomain"; // si tu veux les defaults
 
 function SpacesComponent() {
@@ -51,8 +55,13 @@ function SpacesComponent() {
   });
 
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );
@@ -70,6 +79,8 @@ function SpacesComponent() {
   });
 
   function submitSpaces(newSpaces: Pick<DesignSystem, "spaces">) {
+    if (isEqual(newSpaces, spaces)) return;
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,

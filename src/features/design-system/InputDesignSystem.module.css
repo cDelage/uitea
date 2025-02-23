@@ -3,6 +3,15 @@
   padding: var(--space-3) var(--space-3) var(--space-3) var(--space-0);
   border-top: transparent 2px solid;
   border-bottom: transparent 2px solid;
+  height: fit-content;
+}
+
+.inputDesignSystem .sideContainer {
+  opacity: 0;
+}
+
+.inputDesignSystem:hover .sideContainer {
+  opacity: 1;
 }
 
 .middleContainer {
@@ -12,15 +21,26 @@
   gap: var(--space-1);
   box-sizing: border-box;
   overflow: hidden;
+  padding: var(--space-1);
 }
 
 .sideContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: var(--space-7);
   align-items: center;
-  height: 100%;
+  box-sizing: border-box;
+}
+
+.sideContainerVisible {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: var(--space-7);
+  align-items: center;
   box-sizing: border-box;
 }
 
@@ -53,5 +73,5 @@
 }
 
 .colorPreviewContainerHover {
-  transform: translateX(-4px) scale(1.2);
+  transform: scale(1.2);
 }

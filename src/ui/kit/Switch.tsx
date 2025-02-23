@@ -14,6 +14,9 @@ function Switch({
         className={styles.input}
         checked={checked}
         onChange={onChange}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       />
       <span className={styles.switch}></span>
     </label>

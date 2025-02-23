@@ -32,6 +32,7 @@ function BodyDesignSystem() {
   const { scrollRef } = useScrollTriggerRefresh();
 
   function initPalette() {
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -42,6 +43,7 @@ function BodyDesignSystem() {
   }
 
   function initTheme() {
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -67,40 +69,7 @@ function BodyDesignSystem() {
           </>
         }
       >
-        <Section.Subsection
-          subSectionName="Palettes"
-          actions={
-            <>
-              <Section.Actions>
-                Palettes
-                <Section.ActionButton componentId="palettes" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="palettes" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="palettes" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-              <Section.Actions>
-                Shades
-                <Section.ActionButton componentId="shades" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="shades" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="all" mode="edit">
-                  <MdEdit size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="shades" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-            </>
-          }
-        >
+        <Section.Subsection subSectionName="Palettes">
           <>
             <Section.EmptySection
               sectionName="palettes"
@@ -122,36 +91,11 @@ function BodyDesignSystem() {
         </Section.Subsection>
         <Section.Subsection
           subSectionName="Base"
-          actions={
-            <>
-              <Section.ActionButton componentId="all" mode="edit">
-                <MdEdit size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-            </>
-          }
         >
           <BaseComponent />
         </Section.Subsection>
         <Section.Subsection
           subSectionName="Themes"
-          actions={
-            <>
-              <Section.Actions>
-                <Section.ActionButton componentId="themes" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="themes" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="all" mode="edit">
-                  <MdEdit size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="themes" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-            </>
-          }
         >
           <>
             <Section.EmptySection

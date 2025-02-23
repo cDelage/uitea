@@ -116,6 +116,9 @@
   --theme-component-hover-bg: var(--palette-gray-100);
   --theme-component-hover-text: var(--palette-gray-900);
 
+  --theme-tooltip-bg: rgb(23, 23, 23, 80%);
+  --theme-tooltip-text: var(--palette-single-white);
+
   --theme-primary-bg: var(--palette-primary-600);
   --theme-primary-text: var(--palette-primary-50);
   --theme-primary-border: var(--palette-primary-800);
@@ -127,8 +130,14 @@
   --theme-primary-outline-text: var(--palette-primary-800);
   --theme-primary-outline-border: var(--palette-primary-600);
 
+  --theme-add-bg: var(--palette-primary-200);
+  --theme-add-text: var(--palette-primary-700);
   --theme-add-border: var(--palette-primary-400);
+
   --theme-remove-bg: var(--palette-negative-200);
+  --theme-remove-border: var(--palette-negative-400);
+  --theme-remove-text: var(--palette-negative-700);
+
   --theme-locked-bg: var(--palette-gray-200);
   --theme-drag-bg: var(--palette-primary-200);
 
@@ -574,12 +583,8 @@ p {
   background: inherit;
   border-bottom: transparent 1px solid;
   box-sizing: border-box;
-}
-
-.inherit-input-size {
-  height: 32px;
-  padding-left: 4px;
-  box-sizing: border-box;
+  overflow: visible;
+  height: 100%;
 }
 
 .inherit-input-placeholder {
@@ -589,11 +594,17 @@ p {
   user-select: none;
 }
 
+.inherit-input-size {
+  height: 32px;
+  padding-left: 4px;
+  box-sizing: border-box;
+}
+
 .inherit-input:hover {
   border-bottom: var(--base-border) 1px solid;
 }
 
-.inherit-input:disabled {
+.inherit-input:read-only {
   white-space: nowrap;
   text-overflow: ellipsis;
   border-bottom: transparent 1px solid;
@@ -703,12 +714,12 @@ select:disabled {
   cursor: pointer;
 }
 
-.remove:hover {
+.remove {
   background-color: var(--theme-remove-bg);
   cursor: pointer;
 }
 
-.draggable:hover {
+.draggable {
   background-color: var(--theme-drag-bg);
   cursor: pointer;
 }
@@ -725,5 +736,15 @@ select:disabled {
   cursor: pointer;
 }
 
-@media (prefers-color-scheme: dark) {
+.remove-text-color {
+  color: var(--theme-remove-text);
 }
+
+.cursor-move {
+  cursor: move;
+}
+
+.cursor-drag:active {
+  cursor: n-resize;
+}
+

@@ -10,7 +10,10 @@ import {
 } from "./DesignSystemContext";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
 
 import Section from "./SectionDesignSystem";
@@ -22,6 +25,7 @@ import { generateUniqueRadiusKey } from "../../util/DesignSystemUtils";
 import { DEFAULT_BASE } from "../../ui/UiConstants";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import { isEqual } from "lodash";
 
 function RadiusComponent() {
   const { designSystem, findDesignSystemColor, radiusMode } =
@@ -46,8 +50,13 @@ function RadiusComponent() {
   });
 
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );
@@ -63,9 +72,10 @@ function RadiusComponent() {
     reset,
     originalValue: radius,
   });
-  
 
   function submitRadius(newRadius: Radius) {
+    if (isEqual(newRadius, radius)) return;
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,

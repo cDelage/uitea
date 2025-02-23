@@ -15,7 +15,11 @@ import Section from "./SectionDesignSystem";
 import { generateUniqueFontKey } from "../../util/DesignSystemUtils";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRef } from "react";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
+import { isEqual } from "lodash";
 
 function FontsComponent() {
   const { designSystem, findDesignSystemColor, fontsMode } =
@@ -43,8 +47,13 @@ function FontsComponent() {
     name: "additionals",
   });
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );
@@ -54,11 +63,13 @@ function FontsComponent() {
     styles.mediumHeight
   );
 
-  function submitFonts(typo: Fonts) {
+  function submitFonts(newFonts: Fonts) {
+    if (isEqual(newFonts, fonts)) return;
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,
-        fonts: typo,
+        fonts: newFonts,
       },
       isTmp: true,
     });
@@ -75,7 +86,10 @@ function FontsComponent() {
     });
   }
 
-  const sideSettingsClassNames = classNames(styles.sideSettings, styles.scrollableSettings)
+  const sideSettingsClassNames = classNames(
+    styles.sideSettings,
+    styles.scrollableSettings
+  );
 
   return (
     <form

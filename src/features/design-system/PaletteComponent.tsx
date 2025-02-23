@@ -1,22 +1,33 @@
-import { Palette, DesignSystem } from "../../domain/DesignSystemDomain";
+import { DesignSystem, Palette } from "../../domain/DesignSystemDomain";
 import styles from "./ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import ShadeComponent from "./ShadeComponent";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
-import { generateUniqueColorPaletteKey } from "../../util/DesignSystemUtils";
 import { useParams } from "react-router-dom";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
   DraggableContext,
+  RemovableIndex,
   useDraggableFeatures,
   useParentDraggableContext,
 } from "../../util/DraggableContext";
 import { getAllErrorMessages } from "../../util/HookFormUtils";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
-import Section from "./SectionDesignSystem";
+import ShadeAddRemove from "./ShadeAddRemove";
+import Popover from "../../ui/kit/Popover";
+import {
+  MdArrowDownward,
+  MdArrowUpward,
+  MdDelete,
+  MdDragIndicator,
+  MdMoreHoriz,
+} from "react-icons/md";
+import { ICON_SIZE_MD } from "../../ui/UiConstants";
+import { generateUniqueColorPaletteKey } from "../../util/DesignSystemUtils";
+import isEqual from "lodash/isEqual";
 
 function PaletteComponent({
   colorPalette,
@@ -25,9 +36,8 @@ function PaletteComponent({
   colorPalette: Palette;
   index: number;
 }) {
-  const { shadesMode, palettesMode, designSystem } = useDesignSystemContext();
-  const { paletteName, shades } = colorPalette;
-  const [isHover, setIsHover] = useState(false);
+  const { palettesMode, designSystem, editMode } = useDesignSystemContext();
+  const { paletteName } = colorPalette;
   const colorPaletteRef = useRef<HTMLFormElement>(null);
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
@@ -46,13 +56,7 @@ function PaletteComponent({
     defaultValues: colorPalette,
   });
 
-  const {
-    fields: shadesArray,
-    insert,
-    remove,
-    move,
-    append,
-  } = useFieldArray({
+  const shadesFieldArray = useFieldArray({
     control,
     name: "shades",
   });
@@ -65,14 +69,18 @@ function PaletteComponent({
     originalValue: colorPalette,
   });
 
-  const { draggableTools: draggableFeatures } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
+  const { draggableTools } = useDraggableFeatures(
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
       if (
         dragIndex !== undefined &&
         hoverIndex !== undefined &&
-        dragIndex !== hoverIndex
+        dragIndex !== hoverIndex &&
+        hoverIndex !== "remove"
       ) {
-        move(dragIndex, hoverIndex);
+        shadesFieldArray.move(dragIndex, hoverIndex);
+      }
+      if (dragIndex !== undefined && hoverIndex === "remove") {
+        shadesFieldArray.remove(dragIndex);
       }
       handleSubmit(submitPalette)();
     }
@@ -80,40 +88,27 @@ function PaletteComponent({
 
   const colorPalettesClass = classNames(
     styles.componentDesignSystemColumn,
-    { "add": palettesMode === "add" },
+    { add: palettesMode === "add" },
     {
-      "remove": palettesMode === "remove",
+      remove: palettesMode === "remove",
     },
     {
-      "draggable":
-        (palettesMode === "drag" && isHover && dragIndex === undefined) ||
-        dragIndex === index,
+      draggable: dragIndex === index,
     },
     {
       "drag-hover-top":
-        palettesMode === "drag" &&
-        dragIndex !== undefined &&
-        dragIndex !== index &&
-        hoverIndex === index,
+        dragIndex !== undefined && dragIndex !== index && hoverIndex === index,
     }
   );
 
-  function handleClickEvent() {
-    if (palettesMode === "add") {
-      handleAddPalette();
-    }
-    if (palettesMode === "remove") {
-      handleRemovePalette();
-    }
-  }
-
-  function handleAddPalette() {
+  function handleAddPalette(place: "before" | "after") {
+    const newIndex = place === "before" ? index : index + 1;
     const newPalette: Palette = {
       paletteName: generateUniqueColorPaletteKey(
         designSystem.palettes,
-        `palette-${index + 2}`
+        `palette-${newIndex + 1}`
       ),
-      shades: shades.map((shade) => {
+      shades: shadesFieldArray.fields.map((shade) => {
         return {
           ...shade,
           color: "#DDDDDD",
@@ -121,7 +116,7 @@ function PaletteComponent({
       }),
     };
 
-    designSystem.palettes.splice(index + 1, 0, newPalette);
+    designSystem.palettes.splice(newIndex, 0, newPalette);
     const newDesignSystem: DesignSystem = {
       ...designSystem,
       palettes: Array.from([...designSystem.palettes]),
@@ -146,21 +141,19 @@ function PaletteComponent({
   }
 
   function handleMouseDown() {
-    if (palettesMode === "drag") {
-      setDragIndex(index);
-    }
+    setDragIndex(index);
   }
 
   function handleMouseEnter() {
-    setIsHover(true);
-    if (palettesMode === "drag" && dragIndex !== undefined) {
+    if (dragIndex !== undefined) {
       setHoverIndex(index);
     }
   }
 
-  function submitPalette(palette: Palette) {
+  function submitPalette(newPalette: Palette) {
+    if (isEqual(newPalette, colorPalette)) return;
     const newColorPalettes: Palette[] = [...designSystem.palettes];
-    newColorPalettes.splice(index, 1, palette);
+    newColorPalettes.splice(index, 1, newPalette);
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -170,78 +163,102 @@ function PaletteComponent({
     });
   }
 
-  function createFirstShade() {
-    append({
-      label: "50",
-      color: "#DDDDDD",
-    });
-    handleSubmit(submitPalette)();
-  }
-
   return (
     <form
       className={colorPalettesClass}
       ref={colorPaletteRef}
-      onClick={handleClickEvent}
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => setIsHover(false)}
       onDragStart={(e) => e.preventDefault()}
-      onMouseDown={handleMouseDown}
       onSubmit={handleSubmit(submitPalette)}
     >
       <div className={styles.componentHead}>
         <h4>
-          {shadesMode === "edit" ? (
-            <input
-              className="inherit-input"
-              {...register("paletteName", {
-                required: true,
-                validate: (paletteNameValue: string) => {
-                  const duplicates = designSystem.palettes.filter(
-                    (_, i) =>
-                      i !== index &&
-                      designSystem.palettes[i].paletteName === paletteNameValue
-                  );
-                  return (
-                    duplicates.length === 0 ||
-                    "Palette name can't be duplicated"
-                  );
-                },
-              })}
-              onBlur={() => handleSubmit(submitPalette)()}
-            />
-          ) : (
-            <div className="inherit-input-placeholder">
-              {getValues(`paletteName`)}
-            </div>
-          )}
+          <input
+            className="inherit-input"
+            {...register("paletteName", {
+              required: true,
+              validate: (paletteNameValue: string) => {
+                const duplicates = designSystem.palettes.filter(
+                  (_, i) =>
+                    i !== index &&
+                    designSystem.palettes[i].paletteName === paletteNameValue
+                );
+                return (
+                  duplicates.length === 0 || "Palette name can't be duplicated"
+                );
+              },
+            })}
+            readOnly={!editMode}
+            onMouseDown={(e) => {
+              if (e.currentTarget.readOnly) {
+                e.preventDefault();
+              }
+            }}
+            onBlur={() => handleSubmit(submitPalette)()}
+          />
         </h4>
+        {editMode && (
+          <div className="row gap-3 align-center">
+            <button
+              type="button"
+              className="action-ghost-button cursor-drag"
+              onMouseDown={handleMouseDown}
+            >
+              <MdDragIndicator size={ICON_SIZE_MD} />
+            </button>
+            <Popover>
+              <Popover.Toggle id="menu-palette" positionPayload="bottom-right">
+                <button type="button" className="action-ghost-button">
+                  <MdMoreHoriz size={ICON_SIZE_MD} />
+                </button>
+              </Popover.Toggle>
+              <Popover.Body id="menu-palette">
+                <Popover.Actions>
+                  <Popover.Tab clickEvent={() => handleAddPalette("before")}>
+                    <>
+                      <MdArrowUpward size={ICON_SIZE_MD} />
+                      Insert palette before
+                    </>
+                  </Popover.Tab>
+                  <Popover.Tab clickEvent={() => handleAddPalette("after")}>
+                    <>
+                      <MdArrowDownward size={ICON_SIZE_MD} />
+                      Insert palette after
+                    </>
+                  </Popover.Tab>
+                  <Popover.Tab clickEvent={() => handleRemovePalette()}>
+                    <div className="remove-text-color row align-center gap-3">
+                      <MdDelete size={ICON_SIZE_MD} />
+                      Remove palette
+                    </div>
+                  </Popover.Tab>
+                </Popover.Actions>
+              </Popover.Body>
+            </Popover>
+          </div>
+        )}
       </div>
-      <DraggableContext.Provider value={draggableFeatures}>
+      <DraggableContext.Provider value={draggableTools}>
         <div className={styles.shadesContainer}>
-          {shadesArray.map((shade, index) => (
+          {shadesFieldArray.fields.map((shade, shadeIndex) => (
             <ShadeComponent
-              key={shade.label}
+              key={shade.id}
               getValues={getValues}
-              remove={remove}
-              index={index}
+              index={shadeIndex}
               register={register}
-              insert={insert}
-              shades={shadesArray}
-              submitEvent={() => {
-                handleSubmit(submitPalette)();
-              }}
+              shades={shadesFieldArray.fields}
+              submitEvent={handleSubmit(submitPalette)}
               error={errors.shades?.[index]?.label?.message}
               paletteName={paletteName}
             />
           ))}
-          <Section.EmptySection
-            itemToInsert="shade"
-            onInsert={createFirstShade}
-            sectionLength={shadesArray.length}
-            sectionName="palette"
-            mediumHeight={true}
-          />
+          {editMode && (
+            <ShadeAddRemove
+              draggableTools={draggableTools}
+              shadesFieldArray={shadesFieldArray}
+              handleSubmit={handleSubmit(submitPalette)}
+            />
+          )}
         </div>
       </DraggableContext.Provider>
       {getAllErrorMessages(errors).map((error) => (

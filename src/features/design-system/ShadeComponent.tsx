@@ -1,26 +1,16 @@
-import { useRef, useState } from "react";
+import { MouseEvent, useRef } from "react";
 import styles from "./ShadeComponent.module.css";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
-import { ICON_SIZE_SM } from "../../ui/UiConstants";
-import { MdContentCopy } from "react-icons/md";
 import { Palette, Shade } from "../../domain/DesignSystemDomain";
-import {
-  UseFieldArrayInsert,
-  UseFieldArrayRemove,
-  UseFormGetValues,
-  UseFormRegister,
-} from "react-hook-form";
+import { UseFormGetValues, UseFormRegister } from "react-hook-form";
 import { useDraggableContext } from "../../util/DraggableContext";
-import { generateUniqueShadeKey } from "../../util/DesignSystemUtils";
-import Popover from "../../ui/kit/Popover";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
+import { stopPropagation } from "../../util/DesignSystemUtils";
+import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
 
 function ShadeComponent({
   index,
   register,
-  insert,
-  remove,
   getValues,
   submitEvent,
   shades,
@@ -30,20 +20,13 @@ function ShadeComponent({
   paletteName: string;
   index: number;
   register: UseFormRegister<Palette>;
-  insert: UseFieldArrayInsert<Palette, "shades">;
-  remove: UseFieldArrayRemove;
   getValues: UseFormGetValues<Palette>;
   submitEvent: () => void;
   shades: Shade[];
   error?: string;
 }) {
-  const [isHover, setIsHover] = useState(false);
-  const { shadesMode, palettesMode } = useDesignSystemContext();
+  const { editMode } = useDesignSystemContext();
 
-  const colorPreviewClassname = classNames(styles.colorPreview, {
-    [styles.elevateColor]:
-      shadesMode === "default" && isHover && palettesMode === "default",
-  });
   const shadeRef = useRef<HTMLDivElement>(null);
   const { dragIndex, hoverIndex, setDragIndex, setHoverIndex } =
     useDraggableContext();
@@ -55,19 +38,13 @@ function ShadeComponent({
   const shadeClassname = classNames(
     styles.shade,
     {
-      "add-right": shadesMode === "add" && isHover,
+      draggable: dragIndex === index && hoverIndex !== "remove",
     },
     {
-      remove: shadesMode === "remove" && isHover,
+      remove: dragIndex === index && hoverIndex === "remove",
     },
     {
-      draggable:
-        (shadesMode === "drag" && isHover && dragIndex === undefined) ||
-        dragIndex === index,
-    },
-    {
-      "drag-hover-left":
-        shadesMode === "drag" && hoverIndex === index && dragIndex !== index,
+      "drag-hover-left": hoverIndex === index && dragIndex !== index,
     }
   );
 
@@ -75,117 +52,80 @@ function ShadeComponent({
     error: error,
   });
 
-  function handleClickEvent() {
-    //Remove palette
-    if (shadesMode === "remove") {
-      remove(index);
-      submitEvent();
-    } else if (shadesMode === "add") {
-      insert(index + 1, {
-        label: generateUniqueShadeKey(shades, `${(index + 1) * 100}`),
-        color: "#DDDDDD",
-      });
-      submitEvent();
-    }
-  }
+  const colorPreviewClassname = classNames(styles.colorPreview, "cursor-move");
 
   function handleHoverEvent() {
-    setIsHover(true);
-    if (shadesMode === "drag" && dragIndex !== undefined) {
+    if (dragIndex !== undefined) {
       setHoverIndex(index);
     }
   }
 
-  function handleMouseDown() {
-    if (shadesMode === "drag") {
-      setDragIndex(index);
-    }
+  function handleMouseDown(e: MouseEvent<HTMLInputElement>) {
+    e.stopPropagation();
+    setDragIndex(index);
   }
 
   return (
-    <div
-      className={shadeClassname}
-      ref={shadeRef}
-      onMouseEnter={handleHoverEvent}
-      onMouseDown={handleMouseDown}
-      onDragStart={(event) => {
-        event.preventDefault();
-      }}
-      onMouseLeave={() => setIsHover(false)}
-      onClick={handleClickEvent}
-    >
+    <CopyableTopTooltip tooltipValue={shadeToken}>
       <div
-        className={colorPreviewClassname}
-        style={{
-          background: getValues(`shades.${index}.color`),
+        className={shadeClassname}
+        ref={shadeRef}
+        onMouseEnter={handleHoverEvent}
+        onMouseDown={handleMouseDown}
+        onDragStart={(event) => {
+          event.preventDefault();
         }}
-      />
-      <div className="row justify-space-between">
-        <div className="column">
+      >
+        <div
+          className={colorPreviewClassname}
+          style={{
+            background: getValues(`shades.${index}.color`),
+          }}
+        />
+        <div className="column" onMouseDown={stopPropagation}>
           <strong className={strongClassname}>
-            {shadesMode === "edit" ? (
-              <input
-                {...register(`shades.${index}.label`, {
-                  required: true,
-                  validate: (label: string) => {
-                    const duplicates = shades.filter(
-                      (_, i) => i !== index && shades[i].label === label
-                    );
-                    return (
-                      duplicates.length === 0 ||
-                      "Shades key can't be duplicated"
-                    );
-                  },
-                })}
-                className="inherit-input"
-                type="text"
-                onFocus={(e) => e.target.select()}
-                disabled={shadesMode !== "edit"}
-                autoComplete="off"
-                onBlur={submitEvent}
-              />
-            ) : (
-              <div className={"inherit-input-placeholder"}>
-                {getValues(`shades.${index}.label`)}
-              </div>
-            )}
+            <input
+              {...register(`shades.${index}.label`, {
+                required: true,
+                validate: (label: string) => {
+                  const duplicates = shades.filter(
+                    (_, i) => i !== index && shades[i].label === label
+                  );
+                  return (
+                    duplicates.length === 0 || "Shades key can't be duplicated"
+                  );
+                },
+              })}
+              className="inherit-input"
+              type="text"
+              autoComplete="off"
+              onBlur={submitEvent}
+              readOnly={!editMode && !dragIndex}
+              onMouseDown={(e) => {
+                if (e.currentTarget.readOnly) {
+                  e.preventDefault();
+                }
+              }}
+            />
           </strong>
-
           <small className="text-color-light">
-            {shadesMode === "edit" ? (
-              <input
-                {...register(`shades.${index}.color`)}
-                type="text"
-                className="inherit-input"
-                onFocus={(e) => e.target.select()}
-                disabled={shadesMode !== "edit"}
-                autoComplete="off"
-                onBlur={submitEvent}
-              />
-            ) : (
-              <div className="inherit-input-placeholder">
-                {getValues(`shades.${index}.color`)}
-              </div>
-            )}
+            <input
+              {...register(`shades.${index}.color`)}
+              type="text"
+              className="inherit-input"
+              autoComplete="off"
+              onBlur={submitEvent}
+              readOnly={!editMode && !dragIndex}
+              onMouseDown={(e) => {
+                if (e.currentTarget.readOnly) {
+                  e.preventDefault();
+                }
+              }}
+            />
           </small>
         </div>
-        {isHover && shadesMode === "default" && (
-          <Popover>
-            <Popover.Toggle id="copy-shade" positionPayload="top-right">
-              <button type="button" className="action-button">
-                <MdContentCopy size={ICON_SIZE_SM} />
-              </button>
-            </Popover.Toggle>
-            <Popover.Body id="copy-shade">
-              <div className="popover-body">
-                <CopyableLabel copyable={shadeToken} />
-                <CopyableLabel copyable={getValues(`shades.${index}.color`)} />
-              </div>
-            </Popover.Body>
-          </Popover>
-        )}
       </div>
-    </div>
+    </CopyableTopTooltip>
   );
 }
 

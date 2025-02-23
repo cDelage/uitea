@@ -33,7 +33,8 @@ import FontIcon from "../../ui/icons/FontIcon";
 import SpacesIcon from "../../ui/icons/SpacesIcon";
 
 function SidebarDesignSystem() {
-  const { designSystem, setActiveComponent } = useDesignSystemContext();
+  const { designSystem, setActiveComponent, editMode } =
+    useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const queryClient = useQueryClient();
@@ -44,9 +45,6 @@ function SidebarDesignSystem() {
   const base = useBaseColors();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const editMode: boolean = JSON.parse(
-    searchParams.get("editMode") || "false"
-  ) as boolean;
 
   const VisibilityIcon = editMode ? MdEdit : MdVisibility;
 
@@ -60,6 +58,13 @@ function SidebarDesignSystem() {
         componentId: "",
         mode: "default",
       });
+    }
+
+    if (!newEditMode) {
+      if (window.getSelection) {
+        const selection: Selection | null = window.getSelection();
+        selection?.removeAllRanges();
+      }
     }
 
     if (!designSystemPath) return;
@@ -82,25 +87,35 @@ function SidebarDesignSystem() {
   return (
     <div className={styles.sidebarDesignSystem}>
       <div className={styles.topContainer}>
-        <div className={styles.topMenu}>
-          <Popover>
-            <Popover.Toggle id="settings">
-              <button className="action-ghost-button">
-                <MdSettings size={ICON_SIZE_MD} />
+        <div className="row align-center justify-space-between">
+          <div className={styles.topMenu}>
+            <Switch checked={editMode} onChange={toggleSearchParams} />
+            <VisibilityIcon size={ICON_SIZE_SM} />
+            {editMode ? <>Edit mode</> : <>Read only</>}
+          </div>
+          {editMode && (
+            <div className="row align-center gap-2">
+              <Popover>
+                <Popover.Toggle id="settings">
+                  <button className="action-ghost-button">
+                    <MdSettings size={ICON_SIZE_MD} />
+                  </button>
+                </Popover.Toggle>
+                <Popover.Body id="settings">
+                  <SidebarSettings />
+                </Popover.Body>
+              </Popover>
+              <button
+                className="action-ghost-button"
+                onClick={handleSave}
+                disabled={!designSystem.metadata.isTmp}
+              >
+                <MdSave size={ICON_SIZE_MD} />
               </button>
-            </Popover.Toggle>
-            <Popover.Body id="settings">
-              <SidebarSettings />
-            </Popover.Body>
-          </Popover>
-          <button
-            className="action-ghost-button"
-            onClick={handleSave}
-            disabled={!designSystem.metadata.isTmp}
-          >
-            <MdSave size={ICON_SIZE_MD} />
-          </button>
+            </div>
+          )}
         </div>
+
         <SidebarSection
           SectionIcon={IconColors}
           name="Colors"
@@ -182,12 +197,7 @@ function SidebarDesignSystem() {
           </>
         </SidebarSection>
       </div>
-      <div className={styles.bottomContainer}>
-        <div className="row align-center gap-2">
-          <Switch checked={editMode} onChange={toggleSearchParams} />
-          <VisibilityIcon size={ICON_SIZE_SM} />
-        </div>
-      </div>
+      <div className={styles.bottomContainer}></div>
     </div>
   );
 }

@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+export type RemovableIndex = number  | "remove";
+
 export type DraggableTools = {
   dragIndex?: number;
-  hoverIndex?: number;
+  hoverIndex?: RemovableIndex;
   setDragIndex: (dragId: number | undefined) => void;
-  setHoverIndex: (dragId: number | undefined) => void;
+  setHoverIndex: (dragId: number | undefined | "remove") => void;
 };
+
 
 export const DraggableContext = createContext<DraggableTools | null>(null);
 
@@ -26,10 +29,10 @@ export function useParentDraggableContext() {
 }
 
 export function useDraggableFeatures(
-  dragEvent: (dragIndex?: number, hoverIndex?: number) => void
+  dragEvent: (dragIndex?: number, hoverIndex?: RemovableIndex) => void
 ) {
   const [dragIndex, setDragIndex] = useState<number | undefined>(undefined);
-  const [hoverIndex, setHoverIndex] = useState<number | undefined>(undefined);
+  const [hoverIndex, setHoverIndex] = useState<RemovableIndex | undefined>(undefined);
   const draggableTools: DraggableTools = {
     dragIndex,
     hoverIndex,

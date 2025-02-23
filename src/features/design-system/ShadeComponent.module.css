@@ -1,22 +1,47 @@
 .shade {
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   box-sizing: border-box;
-  border-left: transparent 2px solid;
-  border-right: transparent 2px solid;
   border-radius: var(--rounded-md);
+  height: 110px;
+  min-height: 110px;
+  max-height: 110px;
+  border: solid 2px transparent;
+}
+
+.shadeAdd {
+  border: dashed 2px var(--theme-add-border);
+  box-sizing: border-box;
+  color: var(--theme-add-text);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.shadeRemove {
+  border: dashed 2px var(--theme-remove-border);
+  color: var(--theme-remove-text);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.shadeRemove:hover {
+  opacity: 1;
+}
+
+.shadeAdd:hover {
+  opacity: 1;
 }
 
 .elevateColor {
-  transform: translateY(-8px);
+  transform: translateY(-2px);
 }
-
 
 .colorPreview {
   width: 100%;
   height: var(--space-10);
+  min-height: var(--space-10);
   border-radius: var(--rounded-md);
   box-shadow: var(--shadow-md);
   transition: var(--transition-base);
@@ -32,4 +57,3 @@
   border-radius: 0px;
   cursor: pointer;
 }
-

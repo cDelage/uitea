@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import {
   ParentDraggableContext,
+  RemovableIndex,
   useDraggableFeatures,
 } from "../../util/DraggableContext";
 import { useDesignSystemContext } from "./DesignSystemContext";
@@ -18,12 +19,13 @@ function DraggableList({
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { draggableTools: draggableFeatures } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
         !designSystem ||
-        dragIndex === hoverIndex
+        dragIndex === hoverIndex ||
+        hoverIndex === "remove"
       )
         return;
       const newList = [...designSystem[keyList]];

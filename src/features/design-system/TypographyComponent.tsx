@@ -23,9 +23,13 @@ import { useParams } from "react-router-dom";
 import TypographyPreview from "./TypographyPreview";
 import { useRef } from "react";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
 import CopyableLabel from "../../ui/kit/CopyableLabel";
+import { isEqual } from "lodash";
 
 function TypographyComponent() {
   const { designSystem, findDesignSystemColor, typographyMode } =
@@ -35,13 +39,7 @@ function TypographyComponent() {
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
 
-  const {
-    register,
-    watch,
-    control,
-    handleSubmit,
-    formState: { isDirty },
-  } = useForm({
+  const { register, watch, control, handleSubmit } = useForm({
     defaultValues: typography,
   });
   const {
@@ -55,8 +53,13 @@ function TypographyComponent() {
     name: "additionalsScales",
   });
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );
@@ -80,7 +83,8 @@ function TypographyComponent() {
   }
 
   function submitTypography(newTypo: Typography) {
-    if (!isDirty) return;
+    if (isEqual(newTypo, typography)) return;
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,

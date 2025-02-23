@@ -1,8 +1,6 @@
 import { useForm } from "react-hook-form";
 import styles from "./ComponentDesignSystem.module.css";
-import InputDesignSystem from "./InputDesignSystem";
 import { useDesignSystemContext } from "./DesignSystemContext";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { Base } from "../../domain/DesignSystemDomain";
 import BasePreview from "./BasePreview";
@@ -12,19 +10,22 @@ import { MdDarkMode, MdSunny } from "react-icons/md";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRef } from "react";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import { isEqual } from "lodash";
+import BaseForm from "./BaseForm";
 
 function BaseComponent() {
-  const { designSystem, findDesignSystemColor, baseMode } =
-    useDesignSystemContext();
+  const { designSystem } = useDesignSystemContext();
   const {
     metadata: { darkMode },
     base,
   } = designSystem;
 
-  const { register, watch, handleSubmit, reset } = useForm({
+  const baseForm = useForm({
     defaultValues: base,
     mode: "onBlur",
   });
+
+  const { watch, handleSubmit, reset } = baseForm;
 
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
@@ -39,6 +40,8 @@ function BaseComponent() {
   });
 
   function submitBase(newBase: Base) {
+    if (isEqual(newBase, base)) return;
+
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -59,144 +62,11 @@ function BaseComponent() {
           <h5 className={styles.titlePadding}>Default</h5>
           <MdSunny size={ICON_SIZE_SM} />
         </div>
-        <div className="column">
-          <InputDesignSystem
-            label="background"
-            value={watch("background.default")}
-            mode={baseMode}
-            register={register("background.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-background" />
-                <CopyableLabel copyable={watch("background.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("background.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="border"
-            mode={baseMode}
-            value={watch("border.default")}
-            register={register("border.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-border" />
-                <CopyableLabel copyable={watch("border.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("border.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="text-light"
-            value={watch("textLight.default")}
-            mode={baseMode}
-            register={register("textLight.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-text-light" />
-                <CopyableLabel copyable={watch("textLight.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("textLight.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="text-default"
-            value={watch("textDefault.default")}
-            mode={baseMode}
-            register={register("textDefault.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-text" />
-                <CopyableLabel copyable={watch("textDefault.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("textDefault.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="text-dark"
-            value={watch("textDark.default")}
-            mode={baseMode}
-            register={register("textDark.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-text-dark" />
-                <CopyableLabel copyable={watch("textDark.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("textDark.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="background-disabled"
-            value={watch("backgroundDisabled.default")}
-            mode={baseMode}
-            register={register("backgroundDisabled.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-background-disabled" />
-                <CopyableLabel copyable={watch("backgroundDisabled.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("backgroundDisabled.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="border-disabled"
-            value={watch("borderDisabled.default")}
-            mode={baseMode}
-            register={register("borderDisabled.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-border-disabled" />
-                <CopyableLabel copyable={watch("borderDisabled.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("borderDisabled.default"),
-            })}
-          />
-          <InputDesignSystem
-            label="text-disabled"
-            value={watch("textDisabled.default")}
-            mode={baseMode}
-            register={register("textDisabled.default")}
-            popoverCopy={
-              <div className="popover-body">
-                <CopyableLabel copyable="base-text-disabled" />
-                <CopyableLabel copyable={watch("textDisabled.default")} />
-              </div>
-            }
-            handleSubmit={handleSubmit(submitBase)}
-            isColor={true}
-            computedColor={findDesignSystemColor({
-              label: watch("textDisabled.default"),
-            })}
-          />
-        </div>
+        <BaseForm
+          form={baseForm}
+          darkableCategory="default"
+          handleSubmit={handleSubmit(submitBase)}
+        />
       </div>
       <div className={styles.previewContainer}>
         <BasePreview
@@ -218,144 +88,11 @@ function BaseComponent() {
             <h5 className={styles.titlePadding}>Dark</h5>
             <MdDarkMode size={ICON_SIZE_SM} />
           </div>
-          <div className="column">
-            <InputDesignSystem
-              label="background"
-              value={watch("background.dark")}
-              mode={baseMode}
-              register={register("background.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-background" />
-                  <CopyableLabel copyable={watch("background.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("background.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="border"
-              value={watch("border.dark")}
-              mode={baseMode}
-              register={register("border.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-border" />
-                  <CopyableLabel copyable={watch("border.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("border.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="text-light"
-              value={watch("textLight.dark")}
-              mode={baseMode}
-              register={register("textLight.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-text-light" />
-                  <CopyableLabel copyable={watch("textLight.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("textLight.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="text-default"
-              value={watch("textDefault.dark")}
-              mode={baseMode}
-              register={register("textDefault.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-text" />
-                  <CopyableLabel copyable={watch("textDefault.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("textDefault.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="text-dark"
-              value={watch("textDark.dark")}
-              mode={baseMode}
-              register={register("textDark.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-text-dark" />
-                  <CopyableLabel copyable={watch("textDark.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("textDark.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="background-disabled"
-              value={watch("backgroundDisabled.dark")}
-              mode={baseMode}
-              register={register("backgroundDisabled.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-background-disabled" />
-                  <CopyableLabel copyable={watch("backgroundDisabled.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("backgroundDisabled.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="border-disabled"
-              value={watch("borderDisabled.dark")}
-              mode={baseMode}
-              register={register("borderDisabled.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-border-disabled" />
-                  <CopyableLabel copyable={watch("borderDisabled.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("borderDisabled.dark"),
-              })}
-            />
-            <InputDesignSystem
-              label="text-disabled"
-              value={watch("textDisabled.dark")}
-              mode={baseMode}
-              register={register("textDisabled.dark")}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable="base-text-disabled" />
-                  <CopyableLabel copyable={watch("textDisabled.dark")} />
-                </div>
-              }
-              handleSubmit={handleSubmit(submitBase)}
-              isColor={true}
-              computedColor={findDesignSystemColor({
-                label: watch("textDisabled.dark"),
-              })}
-            />
-          </div>
+          <BaseForm
+            form={baseForm}
+            darkableCategory="dark"
+            handleSubmit={handleSubmit(submitBase)}
+          />
         </div>
       ) : (
         <div className={styles.darkPreviewPlaceholder} />

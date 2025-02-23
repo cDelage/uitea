@@ -11,7 +11,6 @@ import {
   ThemeStateCategory,
 } from "../../domain/DesignSystemDomain";
 import styles from "./ThemeStateForm.module.css";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { getThemeToken } from "../../util/DesignSystemUtils";
 
 function ThemeStateForm({
@@ -83,24 +82,11 @@ function ThemeStateForm({
                 `${themeStateCategory}.background.${darkableCategory}`
               ),
             })}
-            popoverCopy={
-              <>
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={getThemeToken({
-                      themeItem: "background",
-                      themeName: watch("themeName"),
-                      themeStateCategory,
-                    })}
-                  />
-                  <CopyableLabel
-                    copyable={watch(
-                      `${themeStateCategory}.background.${darkableCategory}`
-                    )}
-                  />
-                </div>
-              </>
-            }
+            tooltipValue={getThemeToken({
+              themeItem: "background",
+              themeName: watch("themeName"),
+              themeStateCategory,
+            })}
           />
           <InputDesignSystem
             mode={themesMode}
@@ -114,24 +100,11 @@ function ThemeStateForm({
             computedColor={findDesignSystemColor({
               label: watch(`${themeStateCategory}.border.${darkableCategory}`),
             })}
-            popoverCopy={
-              <>
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={getThemeToken({
-                      themeItem: "border",
-                      themeName: watch("themeName"),
-                      themeStateCategory,
-                    })}
-                  />
-                  <CopyableLabel
-                    copyable={watch(
-                      `${themeStateCategory}.border.${darkableCategory}`
-                    )}
-                  />
-                </div>
-              </>
-            }
+            tooltipValue={getThemeToken({
+              themeItem: "border",
+              themeName: watch("themeName"),
+              themeStateCategory,
+            })}
           />
           <InputDesignSystem
             mode={themesMode}
@@ -145,24 +118,11 @@ function ThemeStateForm({
             computedColor={findDesignSystemColor({
               label: watch(`${themeStateCategory}.text.${darkableCategory}`),
             })}
-            popoverCopy={
-              <>
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={getThemeToken({
-                      themeItem: "text",
-                      themeName: watch("themeName"),
-                      themeStateCategory,
-                    })}
-                  />
-                  <CopyableLabel
-                    copyable={watch(
-                      `${themeStateCategory}.text.${darkableCategory}`
-                    )}
-                  />
-                </div>
-              </>
-            }
+            tooltipValue={getThemeToken({
+              themeItem: "text",
+              themeName: watch("themeName"),
+              themeStateCategory,
+            })}
           />
         </>
       )}

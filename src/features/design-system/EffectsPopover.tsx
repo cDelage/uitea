@@ -17,7 +17,10 @@ import {
 } from "./DesignSystemContext";
 import { ChangeEvent, useState } from "react";
 import classNames from "classnames";
-import { useDraggableFeatures } from "../../util/DraggableContext";
+import {
+  RemovableIndex,
+  useDraggableFeatures,
+} from "../../util/DraggableContext";
 import EffectsPopoverTab from "./EffectsPopoverTab";
 import { getEffectCss } from "../../util/DesignSystemUtils";
 
@@ -52,8 +55,13 @@ function EffectsPopover({
     name: `effects.${index}.items`,
   });
   const { draggableTools } = useDraggableFeatures(
-    (dragIndex?: number, hoverIndex?: number) => {
-      if (dragIndex === undefined || hoverIndex === undefined) return;
+    (dragIndex?: number, hoverIndex?: RemovableIndex) => {
+      if (
+        dragIndex === undefined ||
+        hoverIndex === undefined ||
+        hoverIndex === "remove"
+      )
+        return;
       move(dragIndex, hoverIndex);
     }
   );

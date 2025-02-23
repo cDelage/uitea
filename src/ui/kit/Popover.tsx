@@ -86,7 +86,11 @@ function Body({
   if (position === null || openId !== id) return null;
 
   return createPortal(
-    <BodyDefault position={position} ref={ref}>
+    <BodyDefault
+      position={position}
+      ref={ref}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       {children}
     </BodyDefault>,
     document.body
@@ -151,9 +155,13 @@ function Toggle({
     children as ReactElement<
       { onClick?: (e: MouseEvent) => void } & {
         ref?: React.Ref<HTMLButtonElement>;
-      }
+      } & { onMouseDown?: (e: MouseEvent) => void }
     >,
-    { onClick: handleClick, ref: toggleRef }
+    {
+      onClick: handleClick,
+      ref: toggleRef,
+      onMouseDown: (e) => e.stopPropagation(),
+    }
   );
 }
 
