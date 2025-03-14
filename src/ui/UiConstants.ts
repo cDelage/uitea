@@ -367,3 +367,13 @@ export const DEFAULT_PALETTE_BUILDER : MainPaletteBuilder = {
     },
   ],
 };
+
+export const PALETTE_BUILDER_DEFAULT_SETTINGS = {
+  startLuminance: 95,
+  endLuminance: 5,
+  minSaturation: 50,
+  maxSaturation: 100,
+  bezoldBruckeGap: 15,
+  bezoldBruckeActive: true,
+  steps: 11
+}

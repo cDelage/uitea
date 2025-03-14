@@ -1,7 +1,10 @@
 import { ChartData, ChartOptions } from "chart.js";
 import { formatHex, okhsl } from "culori";
 import { create } from "zustand";
-import { DEFAULT_PALETTE_BUILDER } from "../ui/UiConstants";
+import {
+  DEFAULT_PALETTE_BUILDER,
+  PALETTE_BUILDER_DEFAULT_SETTINGS,
+} from "../ui/UiConstants";
 import { getTintName, TintsNamingMode } from "./TintsNaming";
 
 export interface MainPaletteBuilder {
@@ -48,17 +51,23 @@ interface PaletteBuilderStore {
     lightness: ChartData<"line">;
     options: ChartOptions<"line">;
   };
+  toggleCorrectBezoldBrucke: () => void;
+  setBezoldBruckeGap: (value: number) => void;
+  resetLightness: () => void;
+  resetSaturation: () => void;
+  resetPalette: () => void;
+  resetBezoldBrucke: () => void;
 }
 
 export const usePaletteBuilderTwoStore = create<PaletteBuilderStore>(
   (set, get) => ({
     steps: 11,
-    startLuminance: 95,
-    endLuminance: 5,
-    minSaturation: 50,
-    maxSaturation: 100,
-    bezoldBruckeActive: true,
-    bezoldBruckeGap: 3,
+    startLuminance: PALETTE_BUILDER_DEFAULT_SETTINGS.startLuminance,
+    endLuminance: PALETTE_BUILDER_DEFAULT_SETTINGS.endLuminance,
+    minSaturation: PALETTE_BUILDER_DEFAULT_SETTINGS.minSaturation,
+    maxSaturation: PALETTE_BUILDER_DEFAULT_SETTINGS.maxSaturation,
+    bezoldBruckeActive: PALETTE_BUILDER_DEFAULT_SETTINGS.bezoldBruckeActive,
+    bezoldBruckeGap: PALETTE_BUILDER_DEFAULT_SETTINGS.bezoldBruckeGap,
     mainPalette: DEFAULT_PALETTE_BUILDER,
     tintNamingMode: "50,100,200...900,950",
     setSteps: (steps: number) => {
@@ -88,12 +97,20 @@ export const usePaletteBuilderTwoStore = create<PaletteBuilderStore>(
       get().updatePalettes();
     },
     updatePalettes: () => {
-      const { steps, mainPalette, getNormalizedValues, tintNamingMode } = get();
+      const {
+        steps,
+        mainPalette,
+        getNormalizedValues,
+        tintNamingMode,
+        bezoldBruckeActive,
+        bezoldBruckeGap,
+      } = get();
       const { endLuminance, maxSaturation, minSaturation, startLuminance } =
         getNormalizedValues();
 
       //MAIN PALETTE
-      const h = okhsl(mainPalette.hue)?.h ?? 0;
+      const hueTint = okhsl(mainPalette.hue)?.h ?? 0;
+
       //Calc tints
       const tints: TintBuilder[] = Array.from(
         { length: steps },
@@ -107,6 +124,9 @@ export const usePaletteBuilderTwoStore = create<PaletteBuilderStore>(
           existingName: existing?.name,
         });
         const l = linearValue(i, steps, startLuminance, endLuminance);
+        const h = bezoldBruckeActive
+          ? correctBezoldBrucke(hueTint, l, bezoldBruckeGap)
+          : hueTint;
         const s = parabolaValue(i, steps, minSaturation, maxSaturation);
         const tint: TintBuilder = {
           name,
@@ -195,6 +215,61 @@ export const usePaletteBuilderTwoStore = create<PaletteBuilderStore>(
       });
       get().updatePalettes();
     },
+    toggleCorrectBezoldBrucke: () => {
+      set((state) => {
+        return {
+          ...state,
+          bezoldBruckeActive: !state.bezoldBruckeActive,
+        };
+      });
+      get().updatePalettes();
+    },
+    setBezoldBruckeGap(value: number) {
+      set((state) => {
+        return { ...state, bezoldBruckeGap: Math.max(1, Math.min(359, value)) };
+      });
+      get().updatePalettes();
+    },
+    resetLightness() {
+      set((state) => {
+        return {
+          ...state,
+          startLuminance: PALETTE_BUILDER_DEFAULT_SETTINGS.startLuminance,
+          endLuminance: PALETTE_BUILDER_DEFAULT_SETTINGS.endLuminance,
+        };
+      });
+      get().updatePalettes();
+    },
+    resetSaturation() {
+      set((state) => {
+        return {
+          ...state,
+          minSaturation: PALETTE_BUILDER_DEFAULT_SETTINGS.minSaturation,
+          maxSaturation: PALETTE_BUILDER_DEFAULT_SETTINGS.maxSaturation,
+        };
+      });
+      get().updatePalettes();
+    },
+    resetPalette() {
+      set((state) => {
+        return {
+          ...state,
+          mainPalette: DEFAULT_PALETTE_BUILDER,
+        };
+      });
+      get().updatePalettes();
+    },
+    resetBezoldBrucke() {
+      set((state) => {
+        return {
+          ...state,
+          bezoldBruckeActive:
+            PALETTE_BUILDER_DEFAULT_SETTINGS.bezoldBruckeActive,
+          bezoldBruckeGap: PALETTE_BUILDER_DEFAULT_SETTINGS.bezoldBruckeGap,
+        };
+      });
+      get().updatePalettes();
+    },
   })
 );
 
@@ -235,3 +310,14 @@ function parabolaValue(
 function normalizeNumber(n: number) {
   return n / 100;
 }
+
+// Fonction de correction de la teinte
+const correctBezoldBrucke = (
+  hue: number,
+  luminance: number,
+  k = 15,
+  epsilon = 0.01
+): number => {
+  const hueShift = k * Math.log(luminance + epsilon);
+  return (hue + hueShift) % 360; // Assurer que la teinte reste dans [0, 360]
+};

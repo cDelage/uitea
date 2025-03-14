@@ -41,6 +41,14 @@ function PaletteBuilderTwoComponent() {
     minSaturation,
     tintNamingMode,
     setTintNamingMode,
+    bezoldBruckeActive,
+    toggleCorrectBezoldBrucke,
+    bezoldBruckeGap,
+    setBezoldBruckeGap,
+    resetBezoldBrucke,
+    resetLightness,
+    resetPalette,
+    resetSaturation,
   } = usePaletteBuilderTwoStore();
   const [advancedSettings, setAdvancedSettings] = useState(false);
   const chevronClassname = advancedSettings ? "rotate-chevron" : "";
@@ -141,17 +149,27 @@ function PaletteBuilderTwoComponent() {
           <div className="flex-1 column">
             <FormComponent label="Hue correction" className="flex-1">
               <div className="row gap-2 align-center">
-                <input type="checkbox" checked={true} />
+                <input
+                  type="checkbox"
+                  checked={bezoldBruckeActive}
+                  onChange={toggleCorrectBezoldBrucke}
+                />
                 Active
               </div>
             </FormComponent>
             <FormComponent label="Hue correction factor" className="flex-1">
               <div className="row align-center gap-3">
-                <button className="action-button">
+                <button
+                  className="action-button"
+                  onClick={() => setBezoldBruckeGap(bezoldBruckeGap - 1)}
+                >
                   <MdRemove size={ICON_SIZE_MD} />
                 </button>
-                <strong className="text-color-light">7</strong>
-                <button className="action-button">
+                <strong className="text-color-light">{bezoldBruckeGap}</strong>
+                <button
+                  className="action-button"
+                  onClick={() => setBezoldBruckeGap(bezoldBruckeGap + 1)}
+                >
                   <MdAdd size={ICON_SIZE_MD} />
                 </button>
               </div>
@@ -191,19 +209,20 @@ function PaletteBuilderTwoComponent() {
               </div>
             </FormComponent>
           </div>
-          <div className="column flex-1">
-            <FormComponent label="Resets">
-              <button className="action-button w-full justify-center">
-                <MdRefresh size={ICON_SIZE_MD} /> Lightness
-              </button>
-              <button className="action-button w-full justify-center">
-                <MdRefresh size={ICON_SIZE_MD} /> Saturation
-              </button>
-              <button className="action-button w-full justify-center">
-                <MdRefresh size={ICON_SIZE_MD} /> Palettes
-              </button>
-            </FormComponent>
-          </div>
+          <FormComponent label="Resets" className="flex-1">
+            <button className="action-button w-full justify-center" onClick={resetLightness}>
+              <MdRefresh size={ICON_SIZE_MD} /> Lightness
+            </button>
+            <button className="action-button w-full justify-center" onClick={resetSaturation}>
+              <MdRefresh size={ICON_SIZE_MD} /> Saturation
+            </button>
+            <button className="action-button w-full justify-center" onClick={resetPalette}>
+              <MdRefresh size={ICON_SIZE_MD} /> Palettes
+            </button>
+            <button className="action-button w-full justify-center" onClick={resetBezoldBrucke}>
+              <MdRefresh size={ICON_SIZE_MD} /> Hue correction
+            </button>
+          </FormComponent>
         </div>
       )}
       <div className={styles.tableContainer}>
