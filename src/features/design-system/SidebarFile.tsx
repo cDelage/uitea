@@ -9,14 +9,17 @@ function SidebarFile({
   underFolder,
   id,
   icon,
+  visible,
 }: {
   filename: string;
   underFolder?: boolean;
   id: string;
   icon?: ReactNode;
+  visible: string | null;
 }) {
   const fileClassname = classNames(styles.sidebarSection, {
     [styles.fileUnderFolder]: underFolder,
+    [styles.sidebarSectionVisible]: visible === id,
   });
 
   function triggerScrollRequest() {

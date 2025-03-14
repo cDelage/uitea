@@ -84,6 +84,8 @@ function SidebarDesignSystem() {
       });
   }
 
+  const visible = searchParams.get("visible");
+
   return (
     <div className={styles.sidebarDesignSystem}>
       <div className={styles.topContainer}>
@@ -130,6 +132,7 @@ function SidebarDesignSystem() {
                   underFolder={true}
                   id={`palette-${palette.paletteName}`}
                   icon={<PaletteIcon palette={palette} size={ICON_SIZE_SM} />}
+                  visible={visible}
                 />
               ))}
             </SidebarFolder>
@@ -139,6 +142,7 @@ function SidebarDesignSystem() {
                 id="base"
                 underFolder={true}
                 icon={<BaseIcon base={base} size={ICON_SIZE_SM} />}
+                visible={visible}
               />
             </SidebarFolder>
             <SidebarFolder name="Themes">
@@ -149,6 +153,7 @@ function SidebarDesignSystem() {
                   underFolder={true}
                   id={`theme-${theme.themeName}`}
                   icon={<ThemeIcon size={ICON_SIZE_SM} theme={theme} />}
+                  visible={visible}
                 />
               ))}
             </SidebarFolder>
@@ -161,12 +166,14 @@ function SidebarDesignSystem() {
               id="fonts"
               underFolder={true}
               icon={<MdAbc size={ICON_SIZE_SM} />}
+              visible={visible}
             />
             <SidebarFile
               filename={"Typography"}
               underFolder={true}
               id={"typography"}
               icon={<MdTextFields size={ICON_SIZE_SM} />}
+              visible={visible}
             />
           </>
         </SidebarSection>
@@ -181,18 +188,21 @@ function SidebarDesignSystem() {
               id="spaces"
               underFolder={true}
               icon={<MdLineWeight size={ICON_SIZE_SM} />}
+              visible={visible}
             />
             <SidebarFile
               filename={"Radius"}
               underFolder={true}
               id={"radius"}
               icon={<MdRoundedCorner size={ICON_SIZE_SM} />}
+              visible={visible}
             />
             <SidebarFile
               filename={"Effects"}
               underFolder={true}
               id={"effects"}
               icon={<MdContrast size={ICON_SIZE_SM} />}
+              visible={visible}
             />
           </>
         </SidebarSection>

@@ -1,7 +1,11 @@
-use anyhow_tauri::{self, IntoTAResult};
+use anyhow_tauri::{self, IntoTAResult, TAResult};
 use tauri::State;
 
-use crate::{application::home_application, domain::home_domain::{RecentFile, RecentFiles, RemoveRecentFilesPayload}, AppState};
+use crate::{
+    application::home_application,
+    domain::{home_domain::{PresetDressing, RecentFile, RecentFiles, RemoveRecentFilesPayload}, image_domain::ImageLocal},
+    AppState,
+};
 
 #[tauri::command]
 pub fn insert_recent_file(
@@ -28,7 +32,20 @@ pub fn remove_recent_file(
 
 /// Supprime un chemin de fichier spécifique
 #[tauri::command]
-pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> anyhow_tauri::TAResult<()> {
+pub fn update_recent_file(
+    state: State<AppState>,
+    updated_file: RecentFile,
+) -> anyhow_tauri::TAResult<()> {
     home_application::update_recent_file(state, updated_file).into_ta_result()
+}
+
+#[tauri::command]
+pub fn fetch_presets_dressing() -> TAResult<PresetDressing> {
+    home_application::fetch_presets_dressing().into_ta_result()
+}
+
+#[tauri::command]
+    pub fn encode_image_base64(path: String) -> TAResult<ImageLocal> {
+    home_application::encode_image_base64(path).into_ta_result()
 }
 

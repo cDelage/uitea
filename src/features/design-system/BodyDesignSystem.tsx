@@ -9,7 +9,6 @@ import {
   ICON_SIZE_XL,
 } from "../../ui/UiConstants";
 import PaletteComponent from "./PaletteComponent";
-import { MdAdd, MdDragIndicator, MdEdit, MdRemove } from "react-icons/md";
 import BaseComponent from "./BaseComponent";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import ThemeComponent from "./ThemeComponent";
@@ -24,6 +23,9 @@ import SpacesIcon from "../../ui/icons/SpacesIcon";
 import SpacesComponent from "./SpacesComponent";
 import RadiusComponent from "./RadiusComponent";
 import EffectsComponent from "./EffectsComponent";
+import Modal from "../../ui/kit/Modal";
+import { MdBuild } from "react-icons/md";
+import PaletteBuilderTwoComponent from "./PaletteBuilderTwoComponent";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -32,7 +34,6 @@ function BodyDesignSystem() {
   const { scrollRef } = useScrollTriggerRefresh();
 
   function initPalette() {
-
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -43,7 +44,6 @@ function BodyDesignSystem() {
   }
 
   function initTheme() {
-
     saveDesignSystem({
       designSystem: {
         ...designSystem,
@@ -69,7 +69,23 @@ function BodyDesignSystem() {
           </>
         }
       >
-        <Section.Subsection subSectionName="Palettes">
+        <Section.Subsection
+          subSectionName="Palettes"
+          actions={
+            <>
+              <Modal>
+                <Modal.Toggle id="palette-builder">
+                  <button className="action-ghost-button" type="button">
+                    <MdBuild size={ICON_SIZE_MD}/>Palette builder
+                  </button>
+                </Modal.Toggle>
+                <Modal.Body id="palette-builder">
+                  <PaletteBuilderTwoComponent />
+                </Modal.Body>
+              </Modal>
+            </>
+          }
+        >
           <>
             <Section.EmptySection
               sectionName="palettes"
@@ -89,14 +105,10 @@ function BodyDesignSystem() {
             </DraggableList>
           </>
         </Section.Subsection>
-        <Section.Subsection
-          subSectionName="Base"
-        >
+        <Section.Subsection subSectionName="Base">
           <BaseComponent />
         </Section.Subsection>
-        <Section.Subsection
-          subSectionName="Themes"
-        >
+        <Section.Subsection subSectionName="Themes">
           <>
             <Section.EmptySection
               sectionName="themes"
@@ -125,52 +137,10 @@ function BodyDesignSystem() {
           </>
         }
       >
-        <Section.Subsection
-          subSectionName="Fonts"
-          actions={
-            <>
-              <Section.Actions>
-                All
-                <Section.ActionButton componentId="all" mode="edit">
-                  <MdEdit size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-              <Section.Actions>
-                Additionals
-                <Section.ActionButton componentId="fonts" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="fonts" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="fonts" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-            </>
-          }
-        >
+        <Section.Subsection subSectionName="Fonts">
           <FontsComponent />
         </Section.Subsection>
-        <Section.Subsection
-          subSectionName="Typography"
-          actions={
-            <Section.Actions>
-              <Section.ActionButton componentId="typography" mode="remove">
-                <MdRemove size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="typography" mode="drag">
-                <MdDragIndicator size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="all" mode="edit">
-                <MdEdit size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="typography" mode="add">
-                <MdAdd size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-            </Section.Actions>
-          }
-        >
+        <Section.Subsection subSectionName="Typography">
           <TypographyComponent />
         </Section.Subsection>
       </Section>
@@ -182,75 +152,13 @@ function BodyDesignSystem() {
           </>
         }
       >
-        <Section.Subsection
-          subSectionName="Spaces"
-          actions={
-            <Section.Actions>
-              <Section.ActionButton componentId="spaces" mode="remove">
-                <MdRemove size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="spaces" mode="drag">
-                <MdDragIndicator size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="all" mode="edit">
-                <MdEdit size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-              <Section.ActionButton componentId="spaces" mode="add">
-                <MdAdd size={ICON_SIZE_MD} />
-              </Section.ActionButton>
-            </Section.Actions>
-          }
-        >
+        <Section.Subsection subSectionName="Spaces">
           <SpacesComponent />
         </Section.Subsection>
-        <Section.Subsection
-          subSectionName="Radius"
-          actions={
-            <>
-              <Section.Actions>
-                All
-                <Section.ActionButton componentId="all" mode="edit">
-                  <MdEdit size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-              <Section.Actions>
-                Additionals
-                <Section.ActionButton componentId="radius" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="radius" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="radius" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-            </>
-          }
-        >
+        <Section.Subsection subSectionName="Radius">
           <RadiusComponent />
         </Section.Subsection>
-        <Section.Subsection
-          subSectionName="Effects"
-          actions={
-            <>
-              <Section.Actions>
-                <Section.ActionButton componentId="effects" mode="remove">
-                  <MdRemove size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="effects" mode="drag">
-                  <MdDragIndicator size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="all" mode="edit">
-                  <MdEdit size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-                <Section.ActionButton componentId="effects" mode="add">
-                  <MdAdd size={ICON_SIZE_MD} />
-                </Section.ActionButton>
-              </Section.Actions>
-            </>
-          }
-        >
+        <Section.Subsection subSectionName="Effects">
           <EffectsComponent />
         </Section.Subsection>
       </Section>

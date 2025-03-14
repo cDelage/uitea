@@ -6,10 +6,21 @@ use std::{
 use tauri::State;
 
 use crate::{
-    domain::home_domain::{RecentFile, RemoveRecentFilesPayload}, repository::DESIGN_SYSTEM_METADATA_PATH,
+    domain::home_domain::{PresetDressing, RecentFile, RemoveRecentFilesPayload},
+    repository::DESIGN_SYSTEM_METADATA_PATH,
     AppState,
 };
-pub fn insert_recent_file(state: State<AppState>, file_path: String, edit_mode: Option<bool>) -> Result<String> {
+
+use super::fetch_image_folder;
+
+const BANNERS_PATH: &str = "./assets/banners";
+const LOGOS_PATH: &str = "./assets/logos";
+
+pub fn insert_recent_file(
+    state: State<AppState>,
+    file_path: String,
+    edit_mode: Option<bool>,
+) -> Result<String> {
     let folder_path = Path::new(&file_path);
     let design_system_metadata_path = PathBuf::from(&folder_path).join(DESIGN_SYSTEM_METADATA_PATH);
 
@@ -25,7 +36,10 @@ pub fn insert_recent_file(state: State<AppState>, file_path: String, edit_mode: 
 
     // Vérifier si le fichier est déjà dans la liste
     if !recent_files.iter().any(|rf| rf.file_path == file_path) {
-        recent_files.push(RecentFile { file_path: file_path.clone(), edit_mode });
+        recent_files.push(RecentFile {
+            file_path: file_path.clone(),
+            edit_mode,
+        });
         db.set("recentFiles", &recent_files)
             .map_err(|e| anyhow!(e.to_string()))?;
     }
@@ -74,7 +88,10 @@ pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> R
 
     let mut recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
 
-    if let Some(existing_file) = recent_files.iter_mut().find(|rf| rf.file_path == updated_file.file_path) {
+    if let Some(existing_file) = recent_files
+        .iter_mut()
+        .find(|rf| rf.file_path == updated_file.file_path)
+    {
         existing_file.edit_mode = updated_file.edit_mode;
         db.set("recentFiles", &recent_files)
             .map_err(|e| anyhow!(e.to_string()))?;
@@ -83,4 +100,10 @@ pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> R
     } else {
         Err(anyhow!("File not found in recent files"))
     }
+}
+
+pub fn fetch_presets_dressing() -> Result<PresetDressing> {
+    let banners: Vec<String> = fetch_image_folder(BANNERS_PATH)?;
+    let logos: Vec<String> = fetch_image_folder(LOGOS_PATH)?;
+    Ok(PresetDressing { banners, logos })
 }

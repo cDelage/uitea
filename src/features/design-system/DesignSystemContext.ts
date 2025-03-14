@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { DesignSystem } from "../../domain/DesignSystemDomain";
+import { DesignSystem, DesignToken } from "../../domain/DesignSystemDomain";
 
 export type ComponentMode =
   | "add"
@@ -7,7 +7,8 @@ export type ComponentMode =
   | "remove"
   | "delete"
   | "drag"
-  | "default";
+  | "default"
+  | "drag-hover";
 
 export type EffectsPopoverMode = "default" | "drag" | "remove";
 
@@ -26,26 +27,13 @@ export type ActiveComponent = {
 export type DesignSystemContextType = {
   activeComponent?: ActiveComponent;
   setActiveComponent: (activeComponent: ActiveComponent) => void;
-  getActionButtonClassName: (
-    mode: ComponentMode,
-    componentId: string,
-    activeComponent: ActiveComponent | undefined
-  ) => string;
   findDesignSystemColor: (props: {
     label?: string;
     defaultValue?: string;
   }) => string | undefined;
   designSystem: DesignSystem;
-  palettesMode: ComponentMode;
-  shadesMode: ComponentMode;
-  themesMode: ComponentMode;
-  baseMode: ComponentMode;
-  fontsMode: ComponentMode;
-  typographyMode: ComponentMode;
-  spacesMode: ComponentMode;
-  radiusMode: ComponentMode;
-  effectsMode: ComponentMode;
   editMode: boolean;
+  colorTokens?: DesignToken[];
 };
 
 export const DesignSystemContext =

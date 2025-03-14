@@ -14,6 +14,7 @@ import {
 } from "../domain/DesignSystemDomain";
 import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
 import { DEFAULT_BASE } from "../ui/UiConstants";
+import { ColorResult } from "react-color";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
@@ -340,11 +341,26 @@ export function getEffectCss(effect: Effect): CSSProperties {
   return cssProps;
 }
 
-
-export function stopPropagation(e: MouseEvent){
+export function stopPropagation(e: MouseEvent) {
   e.stopPropagation();
 }
 
-export function inputSelectDisabled(e: MouseEvent<HTMLInputElement>){
+export function inputSelectDisabled(e: MouseEvent<HTMLInputElement>) {
   e.preventDefault();
 }
+
+export function colorToString(color: ColorResult): string {
+  const { hex, rgb, hsl } = color;
+  let colorString = hex; // Par défaut, on utilise l'hex
+
+  // Si l'alpha est défini, on préfère un format RGBA ou HSLA
+  if (rgb.a !== undefined && rgb.a !== 1) {
+    colorString = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`;
+  } else if (hsl.a !== undefined && hsl.a !== 1) {
+    colorString = `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${hsl.a})`;
+  }
+
+  return colorString;
+}
+
+export const KEYBOARD_ACTIONS = ["i", "d"];

@@ -15,10 +15,16 @@ pub struct RemoveRecentFilesPayload {
     pub is_delete_from_computer: bool,
 }
 
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RecentFile {
     pub file_path: String,
     pub edit_mode: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PresetDressing {
+    pub banners: Vec<String>,
+    pub logos: Vec<String>,
 }

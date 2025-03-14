@@ -5,14 +5,10 @@ import {
   DEFAULT_TYPOGRAPHIES,
   DEFAULT_TYPOGRAPHY_SCALE,
 } from "../../ui/UiConstants";
-import {
-  ModificationsMode,
-  useDesignSystemContext,
-} from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import InputDesignSystem from "./InputDesignSystem";
 import TypographyPopover from "./TypographyPopover";
-import Section from "./SectionDesignSystem";
 import {
   AdditionalTypographyScale,
   Typography,
@@ -27,24 +23,23 @@ import {
   RemovableIndex,
   useDraggableFeatures,
 } from "../../util/DraggableContext";
-import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { isEqual } from "lodash";
+import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function TypographyComponent() {
-  const { designSystem, findDesignSystemColor, typographyMode } =
+  const { designSystem, findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const { base, typography } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
 
-  const { register, watch, control, handleSubmit } = useForm({
+  const { register, watch, control, handleSubmit, reset } = useForm({
     defaultValues: typography,
   });
   const {
     fields: additionalsScales,
-    append,
     insert,
     remove,
     move,
@@ -57,10 +52,15 @@ function TypographyComponent() {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
-        hoverIndex === "remove"
+        hoverIndex === dragIndex
       )
         return;
-      move(dragIndex, hoverIndex);
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
+      handleSubmit(submitTypography)();
     }
   );
   const typographyRef = useRef(null);
@@ -69,7 +69,14 @@ function TypographyComponent() {
     triggerId: `typography`,
   });
 
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: typography,
+  });
+  useSidebarComponentVisible(typographyRef, "typography");
+
   function handleAddAdditionalScale(index: number) {
+
     const key = generateUniqueTypographyKey(
       additionalsScales,
       `additional-${index + 2}`
@@ -78,8 +85,9 @@ function TypographyComponent() {
       ...DEFAULT_TYPOGRAPHY_SCALE,
       scaleName: key,
     };
-    insert(index + 1, newScale);
-    handleSubmit(submitTypography);
+    insert(index + 1, newScale, { shouldFocus: false });
+    handleSubmit(submitTypography)();
+
   }
 
   function submitTypography(newTypo: Typography) {
@@ -104,13 +112,19 @@ function TypographyComponent() {
     styles.scrollableSettings
   );
 
+  function handleRemove(index: number) {
+    remove(index);
+    handleSubmit(submitTypography)();
+
+  }
+
   return (
     <form
       className={formClassNames}
       onSubmit={handleSubmit(submitTypography)}
       ref={typographyRef}
     >
-      <div className={sideSettingsClass} ref={scrollableLeft}>
+      <div className={sideSettingsClass}>
         <div className={styles.sideSettingsTitle}>
           <h5>Typography scales</h5>
         </div>
@@ -119,26 +133,20 @@ function TypographyComponent() {
             <InputDesignSystem
               key={typoScale}
               label={typoScale}
-              mode={typographyMode}
               handleSubmit={handleSubmit(submitTypography)}
               value={`${watch(`${typoScale}.fontSize`)}/${watch(
                 `${typoScale}.lineHeight`
               )}`}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable={`font-size-${typoScale}`} />
-                  <CopyableLabel copyable={`font-weight-${typoScale}`} />
-                  <CopyableLabel copyable={`line-height-${typoScale}`} />
-                </div>
-              }
               popoverEdit={
                 <TypographyPopover
                   register={register}
-                  mode={typographyMode}
                   fieldPath={typoScale}
                   watch={watch}
+                  scaleName={typoScale}
                 />
               }
+              tooltipValue={`typography-${typoScale === "paragraph" ? "p" : typoScale}`}
+              keyPopover={typoScale}
             />
           ))}
         </div>
@@ -150,11 +158,10 @@ function TypographyComponent() {
             <InputDesignSystem
               label={scale.scaleName}
               key={scale.scaleName}
-              mode={typographyMode}
               handleSubmit={handleSubmit(submitTypography)}
               isAddRemoveDragAllowed={true}
               onAdd={() => handleAddAdditionalScale(index)}
-              onRemove={() => remove(index)}
+              onRemove={() => handleRemove(index)}
               value={`${watch(
                 `additionalsScales.${index}.scale.fontSize`
               )}/${watch(`additionalsScales.${index}.scale.fontSize`)}`}
@@ -164,33 +171,32 @@ function TypographyComponent() {
               popoverEdit={
                 <TypographyPopover
                   register={register}
-                  mode={typographyMode}
                   fieldPath={`additionalsScales.${index}.scale`}
                   watch={watch}
+                  scaleName={scale.scaleName}
                 />
               }
+              keyPopover={scale.scaleName}
+              tooltipValue={`typography-${scale.scaleName}`}
             />
           ))}
-          {ModificationsMode.includes(typographyMode) && (
-            <Section.EmptySection
-              itemToInsert="font"
-              onInsert={() => {
-                append(DEFAULT_TYPOGRAPHY_SCALE);
-              }}
-              sectionLength={additionalsScales.length}
-              sectionName="additionals"
+          {editMode && (
+            <InputDesignSystemAddRemove
+              draggableTools={draggableTools}
+              itemName="typography"
+              onAppend={() =>
+                handleAddAdditionalScale(additionalsScales.length - 1)
+              }
             />
           )}
-          {!ModificationsMode.includes(typographyMode) &&
-            !additionalsScales.length && (
-              <div className="row justify-center">Empty</div>
-            )}
+          {!editMode && !additionalsScales.length && (
+            <div className="row justify-center">Empty</div>
+          )}
         </div>
       </div>
       <div className={styles.previewContainer}>
         <div
           className={styles.previewElement}
-          ref={scrollableRight}
           style={{
             background: findDesignSystemColor({
               label: base.background.default,

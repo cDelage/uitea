@@ -3,9 +3,9 @@ use std::path::PathBuf;
 use crate::{
     domain::{
         design_system_domain::DesignSystemMetadataHome,
-        home_domain::{RecentFile, RecentFiles, RemoveRecentFilesPayload},
+        home_domain::{PresetDressing, RecentFile, RecentFiles, RemoveRecentFilesPayload}, image_domain::ImageLocal,
     },
-    repository::{design_system_repository, home_repository},
+    repository::{self, design_system_repository, home_repository},
     AppState,
 };
 use anyhow::Result;
@@ -43,4 +43,12 @@ pub fn remove_recent_file(
 
 pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> Result<()> {
     home_repository::update_recent_file(state, updated_file)
+}
+
+pub fn fetch_presets_dressing() -> Result<PresetDressing> {
+    home_repository::fetch_presets_dressing()
+}
+
+pub fn encode_image_base64(path: String) -> Result<ImageLocal> {
+    repository::encode_image_base64(path)
 }

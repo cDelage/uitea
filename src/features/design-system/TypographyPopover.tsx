@@ -3,7 +3,7 @@ import {
   Typography,
   TypographyScaleFieldPath,
 } from "../../domain/DesignSystemDomain";
-import { ComponentMode } from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./InputPopover.module.css";
 import {
   FONT_STYLES,
@@ -17,15 +17,16 @@ import Tabs from "./Tabs";
 
 function TypographyPopover({
   register,
-  mode,
   fieldPath,
   watch,
+  scaleName
 }: {
   register: UseFormRegister<Typography>;
-  mode: ComponentMode;
   fieldPath: TypographyScaleFieldPath;
   watch: UseFormWatch<Typography>;
+  scaleName: string;
 }) {
+  const { editMode } = useDesignSystemContext();
   return (
     <div className={styles.inputPopover}>
       <div className={styles.popoverHeader}>
@@ -33,7 +34,7 @@ function TypographyPopover({
         <h5>Typography</h5>
       </div>
       <div className={styles.previewContainer} style={{ ...watch(fieldPath) }}>
-        <div className={styles.previewText}>Typography scale sample</div>
+        <div className={styles.previewText}>{scaleName} Typography scale sample</div>
       </div>
       <div className={styles.popoverBody}>
         <div className={styles.importantValuesContainer}>
@@ -41,7 +42,12 @@ function TypographyPopover({
             <h6>font-size</h6>
             <div>
               <input
-                disabled={mode !== "edit"}
+                readOnly={!editMode}
+                onMouseDown={(e) => {
+                  if (e.currentTarget.readOnly) {
+                    e.preventDefault();
+                  }
+                }}
                 className="inherit-input"
                 {...register(`${fieldPath}.fontSize`)}
               />
@@ -51,7 +57,12 @@ function TypographyPopover({
             <h6>line-height</h6>
             <div>
               <input
-                disabled={mode !== "edit"}
+                readOnly={!editMode}
+                onMouseDown={(e) => {
+                  if (e.currentTarget.readOnly) {
+                    e.preventDefault();
+                  }
+                }}
                 className="inherit-input"
                 {...register(`${fieldPath}.lineHeight`)}
               />
@@ -72,7 +83,7 @@ function TypographyPopover({
               <strong>font-weight</strong>
               <div>
                 <select
-                  disabled={mode !== "edit"}
+                  disabled={!editMode}
                   className="inherit-input"
                   {...register(`${fieldPath}.fontWeight`)}
                 >
@@ -92,7 +103,12 @@ function TypographyPopover({
               <div>
                 <input
                   className="inherit-input inherit-input-size"
-                  disabled={mode !== "edit"}
+                  readOnly={!editMode}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
                   {...register(`${fieldPath}.padding`)}
                 />
               </div>
@@ -100,7 +116,12 @@ function TypographyPopover({
               <div>
                 <input
                   className="inherit-input inherit-input-size"
-                  disabled={mode !== "edit"}
+                  readOnly={!editMode}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
                   {...register(`${fieldPath}.margin`)}
                 />
               </div>
@@ -109,7 +130,7 @@ function TypographyPopover({
               <strong>letter-spacing</strong>
               <div>
                 <select
-                  disabled={mode !== "edit"}
+                  disabled={!editMode}
                   className="inherit-input"
                   {...register(`${fieldPath}.letterSpacing`)}
                 >
@@ -128,7 +149,7 @@ function TypographyPopover({
               <strong>word-spacing</strong>
               <div>
                 <select
-                  disabled={mode !== "edit"}
+                  disabled={!editMode}
                   className="inherit-input"
                   {...register(`${fieldPath}.wordSpacing`)}
                 >
@@ -147,7 +168,7 @@ function TypographyPopover({
               <strong>font-styles</strong>
               <div>
                 <select
-                  disabled={mode !== "edit"}
+                  disabled={!editMode}
                   className="inherit-input"
                   {...register(`${fieldPath}.fontStyle`)}
                 >
@@ -166,7 +187,7 @@ function TypographyPopover({
               <strong>text-transform</strong>
               <div>
                 <select
-                  disabled={mode !== "edit"}
+                  disabled={!editMode}
                   className="inherit-input"
                   {...register(`${fieldPath}.textTransform`)}
                 >

@@ -1,0 +1,97 @@
+.modalPaletteBuilder {
+  width: 90vw;
+  max-width: 90vw;
+  height: 90vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--base-bg);
+}
+
+.header {
+  display: flex;
+  padding: var(--space-3) var(--space-6);
+  gap: var(--space-2);
+  border-bottom: var(--base-border) 1px solid;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.settings {
+  display: grid;
+  padding: var(--space-0) var(--space-6);
+  gap: var(--space-6);
+  grid-template-columns: 220px 1fr;
+  box-sizing: border-box;
+}
+
+.advancedSettingsTab {
+  padding: var(--space-0) var(--space-6);
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+}
+
+.advancedSettings {
+  display: flex;
+  padding: var(--space-0) var(--space-6);
+  gap: var(--space-8);
+}
+
+.tableContainer {
+  padding: var(--space-0) var(--space-6);
+}
+
+.tablePaletteBuilder {
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+}
+
+.columnCheck {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 24px;
+  max-width: 24px;
+  width: 24px;
+  background-color: var(--palette-single-white);
+  padding: var(--space-3);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.columnPalette {
+  position: sticky;
+  left: 24px;
+  z-index: 2;
+  min-width: 100px;
+  max-width: 100px;
+  width: 100px;
+  background-color: var(--palette-single-white);
+  padding: var(--space-3);
+  text-align: left;
+  box-sizing: border-box;
+  border-right: 1px solid var(--base-border);
+}
+
+.columnTint {
+  font-weight: var(--font-weight-default);
+  min-width: 80px;
+  padding: var(--space-3);
+}
+
+.saturationBlock {
+  width: 40%;
+}

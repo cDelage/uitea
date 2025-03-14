@@ -12,6 +12,7 @@ import {
 } from "../../domain/DesignSystemDomain";
 import styles from "./ThemeStateForm.module.css";
 import { getThemeToken } from "../../util/DesignSystemUtils";
+import { RefObject } from "react";
 
 function ThemeStateForm({
   handleSubmit,
@@ -19,18 +20,19 @@ function ThemeStateForm({
   themeStateCategory,
   darkableCategory,
   watch,
-  nullableTheme,
   setValue,
+  portalTooltip,
 }: {
   handleSubmit: () => void;
   register: UseFormRegister<ThemeColor>;
   themeStateCategory: ThemeStateCategory;
   darkableCategory: DarkableCategory;
   watch: UseFormWatch<ThemeColor>;
-  nullableTheme?: boolean;
   setValue: UseFormSetValue<ThemeColor>;
+  portalTooltip?: RefObject<HTMLDivElement | null>;
 }) {
-  const { themesMode, findDesignSystemColor } = useDesignSystemContext();
+  const { themesMode, findDesignSystemColor, editMode } =
+    useDesignSystemContext();
   const themeUndefined = watch(themeStateCategory) == undefined;
 
   function handleCheck(checked: boolean) {
@@ -43,31 +45,29 @@ function ThemeStateForm({
     } else {
       setValue(themeStateCategory, undefined);
     }
+    handleSubmit();
   }
 
   return (
     <div className="column">
-      {((nullableTheme && themesMode === "edit") || !themeUndefined) &&
-        themeStateCategory !== "default" && (
-          <div className={styles.checkboxThemeContainer}>
-            {themesMode === "edit" && (
-              <input
-                checked={!themeUndefined}
-                type="checkbox"
-                disabled={themesMode !== "edit"}
-                onChange={(e) => handleCheck(e.target.checked)}
-              />
-            )}
-            <strong>
-              {themesMode !== "edit" && <>:</>}
-              {themeStateCategory}
-            </strong>
-          </div>
-        )}
+      {themeStateCategory !== "default" && (editMode || !themeUndefined) && (
+        <div className={styles.checkboxThemeContainer}>
+          {editMode && (
+            <input
+              checked={!themeUndefined}
+              type="checkbox"
+              onChange={(e) => handleCheck(e.target.checked)}
+            />
+          )}
+          <strong>
+            {themesMode !== "edit" && <>:</>}
+            {themeStateCategory}
+          </strong>
+        </div>
+      )}
       {!themeUndefined && (
         <>
           <InputDesignSystem
-            mode={themesMode}
             handleSubmit={handleSubmit}
             label="background"
             register={register(
@@ -87,9 +87,11 @@ function ThemeStateForm({
               themeName: watch("themeName"),
               themeStateCategory,
             })}
+            portalTooltip={
+              themeStateCategory === "default" ? portalTooltip : undefined
+            }
           />
           <InputDesignSystem
-            mode={themesMode}
             handleSubmit={handleSubmit}
             label="border"
             value={watch(`${themeStateCategory}.border.${darkableCategory}`)}
@@ -107,7 +109,6 @@ function ThemeStateForm({
             })}
           />
           <InputDesignSystem
-            mode={themesMode}
             handleSubmit={handleSubmit}
             label="text"
             value={watch(`${themeStateCategory}.text.${darkableCategory}`)}

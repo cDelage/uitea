@@ -4,10 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
 import styles from "./ComponentDesignSystem.module.css";
-import {
-  ModificationsMode,
-  useDesignSystemContext,
-} from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import {
@@ -16,20 +13,20 @@ import {
 } from "../../util/DraggableContext";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
 
-import Section from "./SectionDesignSystem";
 import InputDesignSystem from "./InputDesignSystem";
 import SpacePreview from "./SpacePreview"; // le composant créé plus haut
 
 import { DesignSystem, Space } from "../../domain/DesignSystemDomain";
 import { generateUniqueSpacesKey } from "../../util/DesignSystemUtils";
 import { DEFAULT_BASE } from "../../ui/UiConstants";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 // import { DEFAULT_SPACES } from "../../domain/DesignSystemDomain"; // si tu veux les defaults
 
 function SpacesComponent() {
-  const { designSystem, findDesignSystemColor, spacesMode } =
+  const { designSystem, findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const { base, spaces } = designSystem;
   const { designSystemPath } = useParams();
@@ -45,7 +42,6 @@ function SpacesComponent() {
 
   const {
     fields: spacesArray,
-    append,
     remove,
     move,
     insert,
@@ -59,16 +55,22 @@ function SpacesComponent() {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
-        hoverIndex === "remove"
+        hoverIndex === dragIndex
       )
         return;
-      move(dragIndex, hoverIndex);
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
+      handleSubmit(submitSpaces)();
     }
   );
 
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
 
   const spacesRef = useRef<HTMLFormElement>(null);
+  useSidebarComponentVisible(spacesRef, "spaces");
   useTriggerScroll({
     ref: spacesRef,
     triggerId: `spaces`,
@@ -79,7 +81,7 @@ function SpacesComponent() {
   });
 
   function submitSpaces(newSpaces: Pick<DesignSystem, "spaces">) {
-    if (isEqual(newSpaces, spaces)) return;
+    if (isEqual(newSpaces.spaces, spaces)) return;
 
     saveDesignSystem({
       designSystem: {
@@ -96,7 +98,7 @@ function SpacesComponent() {
       spaceKey,
       spaceValue: spacesArray[index]?.spaceValue ?? "8px",
     };
-    insert(index + 1, newSpace);
+    insert(index + 1, newSpace, { shouldFocus: false });
     handleSubmit(submitSpaces)();
   }
 
@@ -124,9 +126,7 @@ function SpacesComponent() {
             <InputDesignSystem
               key={field.id}
               label={watch(`spaces.${index}.spaceKey`)}
-              mode={spacesMode}
               handleSubmit={handleSubmit(submitSpaces)}
-              value={watch(`spaces.${index}.spaceValue`)}
               isAddRemoveDragAllowed={true}
               onAdd={() => handleAddSpace(index)}
               onRemove={() => {
@@ -137,33 +137,17 @@ function SpacesComponent() {
               index={index}
               registerKey={register(`spaces.${index}.spaceKey`)}
               register={register(`spaces.${index}.spaceValue`)}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={`space-${watch(`spaces.${index}.spaceKey`)}`}
-                  />
-                  <CopyableLabel
-                    copyable={watch(`spaces.${index}.spaceValue`)}
-                  />
-                </div>
-              }
+              tooltipValue={`space-${watch(`spaces.${index}.spaceKey`)}`}
             />
           ))}
-
-          {ModificationsMode.includes("edit") && (
-            <Section.EmptySection
-              itemToInsert="space"
-              onInsert={() => {
-                append({
-                  spaceKey: `1`,
-                  spaceValue: "8px",
-                });
-              }}
-              sectionLength={spacesArray.length}
-              sectionName="spaces"
+          {editMode && (
+            <InputDesignSystemAddRemove
+              draggableTools={draggableTools}
+              itemName="space"
+              onAppend={() => handleAddSpace(spacesArray.length - 1)}
             />
           )}
-          {!ModificationsMode.includes("edit") && !spacesArray.length && (
+          {!editMode && !spacesArray.length && (
             <div className="row justify-center">Empty</div>
           )}
         </div>

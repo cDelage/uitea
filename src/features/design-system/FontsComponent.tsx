@@ -1,17 +1,12 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import styles from "./ComponentDesignSystem.module.css";
-import {
-  ModificationsMode,
-  useDesignSystemContext,
-} from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import { Fonts } from "../../domain/DesignSystemDomain";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
 import { DEFAULT_BASE } from "../../ui/UiConstants";
 import InputDesignSystem from "./InputDesignSystem";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
-import Section from "./SectionDesignSystem";
 import { generateUniqueFontKey } from "../../util/DesignSystemUtils";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRef } from "react";
@@ -20,25 +15,36 @@ import {
   useDraggableFeatures,
 } from "../../util/DraggableContext";
 import { isEqual } from "lodash";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
+import FontsPopover from "./FontsPopover";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function FontsComponent() {
-  const { designSystem, findDesignSystemColor, fontsMode } =
+  const { designSystem, findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const { fonts, base } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const { handleSubmit, watch, control, register } = useForm<Fonts>({
-    defaultValues: fonts,
-  });
+  const { handleSubmit, watch, control, register, reset, setValue } =
+    useForm<Fonts>({
+      defaultValues: fonts,
+    });
   const fontsRef = useRef(null);
+  useSidebarComponentVisible(fontsRef, "fonts");
+
   useTriggerScroll({
     ref: fontsRef,
     triggerId: `fonts`,
   });
 
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: fonts,
+  });
+
   const {
     fields: fontAdditionals,
-    append,
     insert,
     remove,
     move,
@@ -51,10 +57,15 @@ function FontsComponent() {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
-        hoverIndex === "remove"
+        dragIndex === hoverIndex
       )
         return;
-      move(dragIndex, hoverIndex);
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
+      handleSubmit(submitFonts)();
     }
   );
 
@@ -80,10 +91,14 @@ function FontsComponent() {
       fontAdditionals,
       `font-${index + 2}`
     );
-    insert(index + 1, {
-      fontName: fontName,
-      value: "sans-serif",
-    });
+    insert(
+      index + 1,
+      {
+        fontName: fontName,
+        value: "sans-serif",
+      },
+      { shouldFocus: false }
+    );
   }
 
   const sideSettingsClassNames = classNames(
@@ -105,14 +120,8 @@ function FontsComponent() {
           handleSubmit={handleSubmit(submitFonts)}
           label="default"
           register={register("default", { required: true })}
-          mode={fontsMode}
           value={watch("default")}
-          popoverCopy={
-            <div className="popover-body">
-              <CopyableLabel copyable="font-default" />
-              <CopyableLabel copyable={watch("default")} />
-            </div>
-          }
+          tooltipValue="font-default"
         />
         <div className={styles.sideSettingsTitle}>
           <h5>Additionals</h5>
@@ -123,8 +132,6 @@ function FontsComponent() {
               handleSubmit={handleSubmit(submitFonts)}
               key={typo.fontName}
               label={watch(`additionals.${index}.fontName`)}
-              mode={fontsMode}
-              value={watch(`additionals.${index}.value`)}
               register={register(`additionals.${index}.value`, {
                 required: true,
               })}
@@ -136,33 +143,27 @@ function FontsComponent() {
               isAddRemoveDragAllowed={true}
               draggableTools={draggableTools}
               index={index}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={`font-${typo.fontName.toLowerCase()}`}
-                  />
-                  <CopyableLabel
-                    copyable={watch(`additionals.${index}.value`)}
-                  />
-                </div>
+              editText={true}
+              tooltipValue={`font-${watch(`additionals.${index}.fontName`)}`}
+              popoverEdit={
+                <FontsPopover
+                  value={watch(`additionals.${index}.value`)}
+                  setValue={(value) =>
+                    setValue(`additionals.${index}.value`, value)
+                  }
+                />
               }
             />
           ))}
+          {editMode && (
+            <InputDesignSystemAddRemove
+              itemName="font"
+              draggableTools={draggableTools}
+              onAppend={() => handleAddFonts(fontAdditionals.length - 1)}
+            />
+          )}
         </div>
-        {ModificationsMode.includes(fontsMode) && (
-          <Section.EmptySection
-            itemToInsert="font"
-            onInsert={() => {
-              append({
-                fontName: "font-1",
-                value: "sans-serif",
-              });
-            }}
-            sectionLength={fontAdditionals.length}
-            sectionName="additionals"
-          />
-        )}
-        {!ModificationsMode.includes(fontsMode) && !fontAdditionals.length && (
+        {!editMode && !fontAdditionals.length && (
           <div className="row justify-center">Empty</div>
         )}
       </div>

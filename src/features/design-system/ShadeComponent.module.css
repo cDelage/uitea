@@ -15,14 +15,14 @@
   border: dashed 2px var(--theme-add-border);
   box-sizing: border-box;
   color: var(--theme-add-text);
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: pointer;
 }
 
 .shadeRemove {
   border: dashed 2px var(--theme-remove-border);
   color: var(--theme-remove-text);
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: pointer;
 }
 

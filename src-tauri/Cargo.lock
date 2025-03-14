@@ -78,6 +78,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "anyhow-tauri",
+ "base64 0.22.1",
  "env_logger",
  "indexmap 1.9.3",
  "log",

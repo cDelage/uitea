@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -22,6 +22,8 @@ pub struct DesignSystemCreationPayload {
     pub name: String,
     pub folder_path: String,
     pub dark_mode: bool,
+    pub banner: String,
+    pub logo: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -50,6 +52,7 @@ impl DesignSystemMetadataHome {
             is_tmp,
             can_redo,
             can_undo,
+            ..
         } = metadata;
 
         DesignSystemMetadataHome {
@@ -75,6 +78,8 @@ pub struct DesignSystemMetadata {
     pub is_tmp: bool,
     pub can_undo: bool,
     pub can_redo: bool,
+    pub banner: String,
+    pub logo: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -82,6 +87,14 @@ pub struct DesignSystemMetadataFile {
     pub design_system_id: String,
     pub design_system_name: String,
     pub dark_mode: bool,
+    #[serde(default = "default_string")]
+    pub banner: String,
+    #[serde(default = "default_string")]
+    pub logo: String,
+}
+
+fn default_string() -> String {
+    String::from("")
 }
 
 impl DesignSystemMetadataFile {
@@ -90,12 +103,18 @@ impl DesignSystemMetadataFile {
             design_system_id,
             design_system_name,
             dark_mode,
+            banner,
+            logo,
             ..
         } = design_system_metadata;
+        let banner_filename: &str = Path::new(banner).file_name().unwrap().to_str().unwrap();
+        let logo_filename: &str = Path::new(logo).file_name().unwrap().to_str().unwrap();
         DesignSystemMetadataFile {
             design_system_id: design_system_id.to_string(),
             dark_mode: dark_mode.to_owned(),
             design_system_name: design_system_name.to_string(),
+            banner: String::from(banner_filename),
+            logo: String::from(logo_filename),
         }
     }
 }
@@ -105,17 +124,26 @@ impl DesignSystemMetadata {
         design_system_file: &DesignSystemMetadataFile,
         path: &PathBuf,
         is_tmp: bool,
+        image_pathbuf: &PathBuf,
     ) -> DesignSystemMetadata {
         let DesignSystemMetadataFile {
             design_system_id,
             design_system_name,
             dark_mode,
+            banner,
+            logo,
         } = design_system_file;
+
+        let banner_path: PathBuf = image_pathbuf.join(banner);
+        let logo_path: PathBuf = image_pathbuf.join(logo);
+
         DesignSystemMetadata {
             dark_mode: dark_mode.to_owned(),
             design_system_id: design_system_id.to_string(),
             design_system_name: design_system_name.to_string(),
             design_system_path: path.to_owned(),
+            banner: banner_path.to_string_lossy().into_owned(),
+            logo: logo_path.to_string_lossy().into_owned(),
             is_tmp,
             can_redo: false,
             can_undo: false,

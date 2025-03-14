@@ -4,11 +4,16 @@ use anyhow::{anyhow, Result};
 use tauri::State;
 
 use crate::{
-    domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts, Palette, Radius, Space, ThemeColor, Typography
+    application::home_application::fetch_presets_dressing,
+    domain::{
+        design_system_domain::{
+            Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts,
+            Palette, Radius, Space, ThemeColor, Typography,
+        },
+        home_domain::PresetDressing,
     },
     repository::{
-        compute_path, design_system_repository,
+        self, assert_file_in_directory, compute_path, design_system_repository,
         undo_repository::{self, UndoRedoActions},
     },
     utils::generate_uuid,
@@ -20,10 +25,13 @@ pub fn create_design_system(payload: DesignSystemCreationPayload) -> Result<Desi
         name,
         folder_path,
         dark_mode,
+        banner,
+        logo,
+        ..
     } = payload;
     let folder_pathbuf: PathBuf = PathBuf::from(folder_path);
     let design_system_path: PathBuf = compute_path(&folder_pathbuf, &name);
-    let design_system: DesignSystemMetadata = DesignSystemMetadata {
+    let mut design_system: DesignSystemMetadata = DesignSystemMetadata {
         dark_mode: dark_mode,
         design_system_id: generate_uuid(),
         design_system_name: name,
@@ -31,9 +39,11 @@ pub fn create_design_system(payload: DesignSystemCreationPayload) -> Result<Desi
         is_tmp: false,
         can_redo: false,
         can_undo: false,
+        banner,
+        logo,
     };
 
-    design_system_repository::create_design_system(&design_system)?;
+    design_system_repository::create_design_system(&mut design_system)?;
     Ok(design_system)
 }
 
@@ -43,9 +53,36 @@ pub fn find_design_system(
 ) -> Result<DesignSystem> {
     println!("find design system");
     let design_system_pathbuf: PathBuf = PathBuf::from(design_system_path);
-
+    let fetch_path = repository::compute_fetch_pathbuf(&design_system_pathbuf);
     let mut metadata: DesignSystemMetadata =
         design_system_repository::find_design_system_metadata(&design_system_pathbuf)?;
+
+    //Verify banner & logo
+    let images_pathbuf: PathBuf = design_system_repository::get_images_path(&design_system_pathbuf);
+    match assert_file_in_directory(&metadata.banner, &images_pathbuf) {
+        Err(_) => {
+            if !PathBuf::from(&metadata.banner).is_file() {
+                let images: PresetDressing = fetch_presets_dressing()?;
+                metadata.banner = images.banners[0].clone();
+                design_system_repository::save_metadata(&fetch_path.fetch_pathbuf, &metadata)?;
+            }
+        }
+        Ok(_) => {
+            //Do nothing
+        }
+    };
+    match assert_file_in_directory(&metadata.logo, &images_pathbuf) {
+        Err(_) => {
+            if !PathBuf::from(&metadata.logo).is_file() {
+                let images: PresetDressing = fetch_presets_dressing()?;
+                metadata.logo = images.logos[0].clone();
+                design_system_repository::save_metadata(&fetch_path.fetch_pathbuf, &metadata)?;
+            }
+        }
+        Ok(_) => {
+            //Do nothing
+        }
+    };
 
     let UndoRedoActions { can_redo, can_undo } =
         undo_repository::can_undo_redo::<DesignSystem>(&state, design_system_path)?;
@@ -111,7 +148,8 @@ pub fn find_design_system(
         Ok(radius) => Ok(radius),
     }?;
 
-    let effects: Vec<Effect> = match design_system_repository::fetch_effects(&design_system_pathbuf) {
+    let effects: Vec<Effect> = match design_system_repository::fetch_effects(&design_system_pathbuf)
+    {
         Err(_) => {
             design_system_repository::init_effects(&design_system_pathbuf)?;
             design_system_repository::fetch_effects(&design_system_pathbuf)
@@ -128,7 +166,7 @@ pub fn find_design_system(
         typography,
         spaces,
         radius,
-        effects
+        effects,
     })
 }
 

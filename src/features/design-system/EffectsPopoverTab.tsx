@@ -1,75 +1,100 @@
 import classNames from "classnames";
-import { ComponentMode, EffectsPopoverMode } from "./DesignSystemContext";
+import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./InputPopover.module.css";
 import { DraggableTools } from "../../util/DraggableContext";
-import {
-  UseFieldArrayRemove,
-  UseFormRegister,
-  UseFormWatch,
-} from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
 import { Effect } from "../../domain/DesignSystemDomain";
-import { EFFECT_TYPES } from "../../ui/UiConstants";
-import { MouseEvent } from "react";
+import { EFFECT_TYPES, ICON_SIZE_SM } from "../../ui/UiConstants";
+import { MdDragIndicator } from "react-icons/md";
+import { useSearchParams } from "react-router-dom";
 
 function EffectsPopoverTab({
   itemIndex,
   effectIndex,
-  popoverMode,
   draggableTools,
   register,
-  watch,
-  remove,
-  mode,
-  handleSubmit
+  handleSubmit,
+  onAdd,
+  onRemove,
 }: {
   itemIndex: number;
   effectIndex: number;
-  popoverMode: EffectsPopoverMode;
   draggableTools: DraggableTools;
   register: UseFormRegister<{ effects: Effect[] }>;
-  watch: UseFormWatch<{ effects: Effect[] }>;
-  remove: UseFieldArrayRemove;
-  mode: ComponentMode;
-  handleSubmit : () => void;
+  handleSubmit: () => void;
+  onAdd: (index: number) => void;
+  onRemove: (index: number) => void;
 }) {
-  const effectClassName = classNames(
-    styles.tabEffectContainer,
-    { remove: popoverMode === "remove" },
-    {
-      draggable:
-        draggableTools &&
-        ((popoverMode === "drag" && draggableTools.dragIndex === undefined) ||
-          draggableTools.dragIndex === itemIndex),
-    },
-    {
-      "drag-hover-top":
-        popoverMode === "drag" &&
-        draggableTools &&
-        draggableTools.hoverIndex === itemIndex &&
-        draggableTools.dragIndex !== itemIndex,
-    }
-  );
+  const { editMode } = useDesignSystemContext();
+  const [searchParams] = useSearchParams();
+  const keyboardActions = searchParams.get("keyboardAction");
 
-  function handleClickEvent(e: MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    if (popoverMode === "remove") {
-      remove(itemIndex);
+  function getEffectPopoverTabMode(): ComponentMode {
+    if (editMode) {
+      if (
+        (draggableTools.hoverIndex === "remove" &&
+          draggableTools.dragIndex === itemIndex) ||
+        keyboardActions === "d"
+      ) {
+        return "remove";
+      } else if (draggableTools.dragIndex === itemIndex) {
+        return "drag";
+      } else if (
+        draggableTools.hoverIndex === itemIndex &&
+        draggableTools.dragIndex !== itemIndex
+      ) {
+        return "drag-hover";
+      } else if (keyboardActions === "i") {
+        return "add";
+      }
+
+      return "edit";
+    } else {
+      return "default";
     }
   }
 
+  const effectPopoverTabMode = getEffectPopoverTabMode();
+
+  const effectClassName = classNames(
+    styles.tabEffectContainer,
+    {
+      remove:
+        effectPopoverTabMode === "remove" &&
+        draggableTools.dragIndex === itemIndex,
+    },
+    {
+      "remove-hover":
+        effectPopoverTabMode === "remove" && keyboardActions === "d",
+    },
+    {
+      draggable: effectPopoverTabMode === "drag",
+    },
+    {
+      "drag-hover-top": effectPopoverTabMode === "drag-hover",
+    },
+    {
+      add: effectPopoverTabMode === "add",
+    }
+  );
+
   function handleHoverEvent() {
-    if (
-      draggableTools &&
-      popoverMode === "drag" &&
-      draggableTools?.dragIndex !== undefined
-    ) {
+    if (effectPopoverTabMode === "drag-hover") {
       draggableTools.setHoverIndex(itemIndex);
     }
   }
 
   function handleMouseDown() {
-    if (popoverMode === "drag" && draggableTools) {
+    if (effectPopoverTabMode === "edit") {
       draggableTools.setDragIndex(itemIndex);
+    }
+  }
+
+  function handleClick() {
+    if (effectPopoverTabMode === "add") {
+      onAdd(itemIndex + 1);
+    } else if (effectPopoverTabMode === "remove") {
+      onRemove(itemIndex);
     }
   }
 
@@ -77,42 +102,36 @@ function EffectsPopoverTab({
     <div
       className={effectClassName}
       onMouseEnter={handleHoverEvent}
-      onMouseDown={handleMouseDown}
-      onClick={handleClickEvent}
+      onClick={handleClick}
     >
-      {popoverMode === "default" ? (
-        <>
-          <select
-            className="inherit-input"
-            {...register(
-              `effects.${effectIndex}.items.${itemIndex}.effectType`
-            )}
-            disabled={mode !== "edit" || popoverMode !== "default"}
-            onBlur={handleSubmit}
-          >
-            {EFFECT_TYPES.map((type) => (
-              <option key={type}>{type}</option>
-            ))}
-          </select>
-          <input
-            className="inherit-input inherit-input-size"
-            {...register(
-              `effects.${effectIndex}.items.${itemIndex}.effectValue`
-            )}
-            disabled={mode !== "edit" || popoverMode !== "default"}
-            onBlur={handleSubmit}
-          />
-        </>
-      ) : (
-        <>
-          <div className="inherit-input-placeholder inherit-input-size">
-            {watch(`effects.${effectIndex}.items.${itemIndex}.effectType`)}
-          </div>
-          <div className="inherit-input-placeholder inherit-input-size">
-            {watch(`effects.${effectIndex}.items.${itemIndex}.effectValue`)}
-          </div>
-        </>
-      )}
+      <select
+        className="inherit-input"
+        {...register(`effects.${effectIndex}.items.${itemIndex}.effectType`)}
+        disabled={!editMode}
+        onBlur={handleSubmit}
+      >
+        {EFFECT_TYPES.map((type) => (
+          <option key={type}>{type}</option>
+        ))}
+      </select>
+      <input
+        className="inherit-input inherit-input-size"
+        {...register(`effects.${effectIndex}.items.${itemIndex}.effectValue`)}
+        readOnly={effectPopoverTabMode !== "edit"}
+        onMouseDown={(e) => {
+          if (e.currentTarget.readOnly) {
+            e.preventDefault();
+          }
+        }}
+        onBlur={handleSubmit}
+      />
+      <button
+        className="action-button"
+        onMouseDown={handleMouseDown}
+        type="button"
+      >
+        <MdDragIndicator size={ICON_SIZE_SM} />
+      </button>
     </div>
   );
 }

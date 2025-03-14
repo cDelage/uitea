@@ -1,12 +1,23 @@
 import { MouseEvent, useRef } from "react";
 import styles from "./ShadeComponent.module.css";
-import { useDesignSystemContext } from "./DesignSystemContext";
+import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
 import { Palette, Shade } from "../../domain/DesignSystemDomain";
-import { UseFormGetValues, UseFormRegister } from "react-hook-form";
+import {
+  UseFieldArrayReturn,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import { useDraggableContext } from "../../util/DraggableContext";
-import { stopPropagation } from "../../util/DesignSystemUtils";
+import {
+  generateUniqueShadeKey,
+  stopPropagation,
+} from "../../util/DesignSystemUtils";
 import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
+import Popover from "../../ui/kit/Popover";
+import ColorPicker from "./ColorPicker";
+import { useSearchParams } from "react-router-dom";
 
 function ShadeComponent({
   index,
@@ -16,14 +27,18 @@ function ShadeComponent({
   shades,
   error,
   paletteName,
+  setValue,
+  shadesFieldArray,
 }: {
   paletteName: string;
   index: number;
   register: UseFormRegister<Palette>;
   getValues: UseFormGetValues<Palette>;
   submitEvent: () => void;
+  setValue: UseFormSetValue<Palette>;
   shades: Shade[];
   error?: string;
+  shadesFieldArray: UseFieldArrayReturn<Palette, "shades", "id">;
 }) {
   const { editMode } = useDesignSystemContext();
 
@@ -35,16 +50,49 @@ function ShadeComponent({
     `shades.${index}.label`
   )}`;
 
+  const [searchParams] = useSearchParams();
+
+  const keyboardAction = searchParams.get("keyboardAction");
+
+  function getShadeComponentMode(): ComponentMode {
+    if (editMode) {
+      if (!dragIndex && keyboardAction === "i") {
+        return "add";
+      } else if (
+        (dragIndex === index && hoverIndex === "remove") ||
+        (!dragIndex && keyboardAction === "d")
+      ) {
+        return "remove";
+      } else if (dragIndex === index && hoverIndex !== "remove") {
+        return "drag";
+      } else if (hoverIndex === index && dragIndex !== index) {
+        return "drag-hover";
+      } else {
+        return "edit";
+      }
+    } else {
+      return "default";
+    }
+  }
+
+  const shadeComponentMode = getShadeComponentMode();
+
   const shadeClassname = classNames(
     styles.shade,
     {
-      draggable: dragIndex === index && hoverIndex !== "remove",
+      draggable: shadeComponentMode === "drag",
     },
     {
-      remove: dragIndex === index && hoverIndex === "remove",
+      "remove-hover": shadeComponentMode === "remove",
     },
     {
-      "drag-hover-left": hoverIndex === index && dragIndex !== index,
+      remove: shadeComponentMode === "remove" && dragIndex === index,
+    },
+    {
+      "drag-hover-left": shadeComponentMode === "drag-hover",
+    },
+    {
+      "add-right": shadeComponentMode === "add",
     }
   );
 
@@ -62,7 +110,30 @@ function ShadeComponent({
 
   function handleMouseDown(e: MouseEvent<HTMLInputElement>) {
     e.stopPropagation();
-    setDragIndex(index);
+    if (shadeComponentMode === "edit") {
+      setDragIndex(index);
+    }
+  }
+
+  function handleClick() {
+    if (shadeComponentMode === "add") {
+      const label = generateUniqueShadeKey(
+        shadesFieldArray.fields,
+        `palette-${index + 1}`
+      );
+      shadesFieldArray.insert(
+        index,
+        {
+          label,
+          color: "#DDDDDD",
+        },
+        { shouldFocus: false }
+      );
+      submitEvent();
+    } else if (shadeComponentMode === "remove") {
+      shadesFieldArray.remove(index);
+      submitEvent();
+    }
   }
 
   return (
@@ -75,6 +146,7 @@ function ShadeComponent({
         onDragStart={(event) => {
           event.preventDefault();
         }}
+        onClick={handleClick}
       >
         <div
           className={colorPreviewClassname}
@@ -108,21 +180,39 @@ function ShadeComponent({
               }}
             />
           </strong>
-          <small className="text-color-light">
-            <input
-              {...register(`shades.${index}.color`)}
-              type="text"
-              className="inherit-input"
-              autoComplete="off"
-              onBlur={submitEvent}
-              readOnly={!editMode && !dragIndex}
-              onMouseDown={(e) => {
-                if (e.currentTarget.readOnly) {
-                  e.preventDefault();
-                }
-              }}
-            />
-          </small>
+          <Popover>
+            <Popover.Toggle
+              id="color-picker"
+              disableButtonClosure={true}
+              keyPopover={shadeToken}
+            >
+              <small className="text-color-light">
+                <input
+                  {...register(`shades.${index}.color`)}
+                  type="text"
+                  className="inherit-input"
+                  autoComplete="off"
+                  onBlur={submitEvent}
+                  readOnly={!editMode && !dragIndex}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </small>
+            </Popover.Toggle>
+            <Popover.Body id="color-picker">
+              <div className="popover-body">
+                <ColorPicker
+                  setColor={(color: string) => {
+                    if (editMode) setValue(`shades.${index}.color`, color);
+                  }}
+                  color={getValues(`shades.${index}.color`)}
+                />
+              </div>
+            </Popover.Body>
+          </Popover>
         </div>
       </div>
     </CopyableTopTooltip>

@@ -13,7 +13,16 @@
   background-color: var(--theme-base-button-hover-bg);
 }
 
-.fileUnderFolder{
+.sidebarSectionVisible {
+  background: var(--theme-base-button-active-bg);
+}
+
+.sidebarSectionVisibleFirst {
+}
+.sidebarSectionVisibleLast {
+}
+
+.fileUnderFolder {
   padding-left: var(--space-8);
 }
 

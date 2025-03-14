@@ -28,6 +28,7 @@ import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
 import Popover from "../../ui/kit/Popover";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function ThemeComponent({
   theme,
@@ -36,7 +37,7 @@ function ThemeComponent({
   theme: ThemeColor;
   index: number;
 }) {
-  const { designSystem, themesMode, editMode } = useDesignSystemContext();
+  const { designSystem, editMode } = useDesignSystemContext();
   const {
     base,
     metadata: { darkMode },
@@ -51,9 +52,14 @@ function ThemeComponent({
   const { dragIndex, hoverIndex, setDragIndex, setHoverIndex } =
     useParentDraggableContext();
   const themeRef = useRef<HTMLFormElement | null>(null);
+  const tooltipPortalComponent = useRef<HTMLDivElement>(null);
+  const tooltipPortalComponentRight = useRef<HTMLDivElement>(null);
+  const themeId = `theme-${theme.themeName}`;
+  useSidebarComponentVisible(themeRef, themeId);
+
   useTriggerScroll({
     ref: themeRef,
-    triggerId: `theme-${theme.themeName}`,
+    triggerId: themeId,
   });
   useRefreshDesignSystemFormsEvent({
     reset,
@@ -98,6 +104,11 @@ function ThemeComponent({
     }
   );
 
+  const scrollableClassNames = classNames(
+    styles.themeScrollableSizing,
+    styles.scrollableSettings
+  );
+
   function handleAddTheme(place: "before" | "after") {
     const newIndex = place === "before" ? index : index + 1;
     const themeKey = generateUniqueThemesKey(themes, `theme-${newIndex + 1}`);
@@ -137,18 +148,17 @@ function ThemeComponent({
     >
       <div className={styles.componentHead}>
         <h4>
-          {themesMode === "edit" ? (
-            <input
-              className="inherit-input"
-              {...register("themeName")}
-              disabled={themesMode !== "edit"}
-              onBlur={() => handleSubmit(submitTheme)()}
-            />
-          ) : (
-            <div className="inherit-input-placeholder">
-              {watch(`themeName`)}
-            </div>
-          )}
+          <input
+            className="inherit-input"
+            {...register("themeName")}
+            readOnly={!editMode}
+            onMouseDown={(e) => {
+              if (e.currentTarget.readOnly) {
+                e.preventDefault();
+              }
+            }}
+            onBlur={() => handleSubmit(submitTheme)()}
+          />
         </h4>
         {editMode && (
           <div className="row gap-3 align-center">
@@ -197,42 +207,43 @@ function ThemeComponent({
             <h5 className={styles.titlePadding}>Default</h5>
             <MdSunny size={ICON_SIZE_SM} />
           </div>
-          <div className={styles.scrollableSettings} ref={scrollableLeft}>
-            <ThemeStateForm
-              register={register}
-              darkableCategory="default"
-              themeStateCategory="default"
-              handleSubmit={handleSubmit(submitTheme)}
-              watch={watch}
-              setValue={setValue}
-            />
-            <ThemeStateForm
-              register={register}
-              darkableCategory="default"
-              themeStateCategory="hover"
-              handleSubmit={handleSubmit(submitTheme)}
-              watch={watch}
-              nullableTheme={true}
-              setValue={setValue}
-            />
-            <ThemeStateForm
-              register={register}
-              darkableCategory="default"
-              themeStateCategory="focus"
-              handleSubmit={handleSubmit(submitTheme)}
-              watch={watch}
-              nullableTheme={true}
-              setValue={setValue}
-            />
-            <ThemeStateForm
-              register={register}
-              darkableCategory="default"
-              themeStateCategory="active"
-              handleSubmit={handleSubmit(submitTheme)}
-              watch={watch}
-              nullableTheme={true}
-              setValue={setValue}
-            />
+          <div>
+            <div className="relative" ref={tooltipPortalComponent} />
+            <div className={scrollableClassNames} ref={scrollableLeft}>
+              <ThemeStateForm
+                register={register}
+                darkableCategory="default"
+                themeStateCategory="default"
+                handleSubmit={handleSubmit(submitTheme)}
+                watch={watch}
+                setValue={setValue}
+                portalTooltip={tooltipPortalComponent}
+              />
+              <ThemeStateForm
+                register={register}
+                darkableCategory="default"
+                themeStateCategory="hover"
+                handleSubmit={handleSubmit(submitTheme)}
+                watch={watch}
+                setValue={setValue}
+              />
+              <ThemeStateForm
+                register={register}
+                darkableCategory="default"
+                themeStateCategory="focus"
+                handleSubmit={handleSubmit(submitTheme)}
+                watch={watch}
+                setValue={setValue}
+              />
+              <ThemeStateForm
+                register={register}
+                darkableCategory="default"
+                themeStateCategory="active"
+                handleSubmit={handleSubmit(submitTheme)}
+                watch={watch}
+                setValue={setValue}
+              />
+            </div>
           </div>
         </div>
         <div className={styles.previewContainer}>
@@ -257,42 +268,43 @@ function ThemeComponent({
               <h5 className={styles.titlePadding}>Dark</h5>
               <MdDarkMode size={ICON_SIZE_SM} />
             </div>
-            <div className={styles.scrollableSettings} ref={scrollableRight}>
-              <ThemeStateForm
-                register={register}
-                darkableCategory="dark"
-                themeStateCategory="default"
-                handleSubmit={handleSubmit(submitTheme)}
-                watch={watch}
-                setValue={setValue}
-              />
-              <ThemeStateForm
-                register={register}
-                darkableCategory="dark"
-                themeStateCategory="hover"
-                handleSubmit={handleSubmit(submitTheme)}
-                watch={watch}
-                nullableTheme={true}
-                setValue={setValue}
-              />
-              <ThemeStateForm
-                register={register}
-                darkableCategory="dark"
-                themeStateCategory="focus"
-                handleSubmit={handleSubmit(submitTheme)}
-                watch={watch}
-                nullableTheme={true}
-                setValue={setValue}
-              />
-              <ThemeStateForm
-                register={register}
-                darkableCategory="dark"
-                themeStateCategory="active"
-                handleSubmit={handleSubmit(submitTheme)}
-                watch={watch}
-                nullableTheme={true}
-                setValue={setValue}
-              />
+            <div>
+              <div className="relative" ref={tooltipPortalComponentRight} />
+              <div className={scrollableClassNames} ref={scrollableRight}>
+                <ThemeStateForm
+                  register={register}
+                  darkableCategory="dark"
+                  themeStateCategory="default"
+                  handleSubmit={handleSubmit(submitTheme)}
+                  watch={watch}
+                  setValue={setValue}
+                  portalTooltip={tooltipPortalComponentRight}
+                />
+                <ThemeStateForm
+                  register={register}
+                  darkableCategory="dark"
+                  themeStateCategory="hover"
+                  handleSubmit={handleSubmit(submitTheme)}
+                  watch={watch}
+                  setValue={setValue}
+                />
+                <ThemeStateForm
+                  register={register}
+                  darkableCategory="dark"
+                  themeStateCategory="focus"
+                  handleSubmit={handleSubmit(submitTheme)}
+                  watch={watch}
+                  setValue={setValue}
+                />
+                <ThemeStateForm
+                  register={register}
+                  darkableCategory="dark"
+                  themeStateCategory="active"
+                  handleSubmit={handleSubmit(submitTheme)}
+                  watch={watch}
+                  setValue={setValue}
+                />
+              </div>
             </div>
           </div>
         ) : (

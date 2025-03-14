@@ -97,7 +97,7 @@
 .keyValueMenuContainer {
   display: flex;
   flex-direction: column;
-  max-height: 180px;
+  max-height: 240px;
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -105,17 +105,66 @@
 
 .tabEffectContainer {
   display: grid;
-  grid-template-columns: 100px 1fr;
+  grid-template-columns: 100px 1fr auto;
   padding: var(--space-3) var(--space-3);
   box-sizing: border-box;
   gap: var(--space-3);
   align-items: center;
+  border-bottom: transparent 2px solid;
 }
-
 
 .rectPreview {
   width: 60%;
   height: 60%;
   background-color: var(--palette-single-white);
   border-radius: var(--rounded-md);
+}
+
+.colorPreviewContainer {
+  width: var(--space-5);
+  min-width: var(--space-5);
+  max-width: var(--space-5);
+  height: var(--space-5);
+  min-height: var(--space-5);
+  max-height: var(--space-5);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+  border: var(--base-border) 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+}
+
+.selectionTab {
+  display: flex;
+  padding: var(--space-5) var(--space-3);
+  gap: var(--space-3);
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  background-color: transparent;
+}
+
+.selectionTab[data-active="true"] {
+  background-color: var(--theme-primary-bg);
+  color: var(--theme-primary-text);
+}
+
+.selectionTab:hover[data-active="false"] {
+  background-color: var(--theme-primary-outline-hover-bg);
+  color: var(--theme-primary-outline-hover-text);
+}
+
+.imgTab {
+  height: 100px;
+  width: 100%;
+  padding: var(--space-3);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.imgTab[data-active="true"] {
+  border: 2px solid var(--theme-add-border);
 }

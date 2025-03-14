@@ -28,6 +28,7 @@ import {
 import { ICON_SIZE_MD } from "../../ui/UiConstants";
 import { generateUniqueColorPaletteKey } from "../../util/DesignSystemUtils";
 import isEqual from "lodash/isEqual";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function PaletteComponent({
   colorPalette,
@@ -36,19 +37,21 @@ function PaletteComponent({
   colorPalette: Palette;
   index: number;
 }) {
-  const { palettesMode, designSystem, editMode } = useDesignSystemContext();
+  const { designSystem, editMode } = useDesignSystemContext();
   const { paletteName } = colorPalette;
+  const componentId = `palette-${paletteName}`
   const colorPaletteRef = useRef<HTMLFormElement>(null);
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { setDragIndex, dragIndex, setHoverIndex, hoverIndex } =
     useParentDraggableContext();
-
+  useSidebarComponentVisible(colorPaletteRef, componentId);
   //Form
   const {
     control,
     register,
     getValues,
+    setValue,
     handleSubmit,
     reset,
     formState: { errors },
@@ -62,7 +65,7 @@ function PaletteComponent({
   });
   useTriggerScroll({
     ref: colorPaletteRef,
-    triggerId: `palette-${paletteName}`,
+    triggerId: componentId,
   });
   useRefreshDesignSystemFormsEvent({
     reset,
@@ -88,10 +91,6 @@ function PaletteComponent({
 
   const colorPalettesClass = classNames(
     styles.componentDesignSystemColumn,
-    { add: palettesMode === "add" },
-    {
-      remove: palettesMode === "remove",
-    },
     {
       draggable: dragIndex === index,
     },
@@ -246,10 +245,12 @@ function PaletteComponent({
               getValues={getValues}
               index={shadeIndex}
               register={register}
+              setValue={setValue}
               shades={shadesFieldArray.fields}
               submitEvent={handleSubmit(submitPalette)}
               error={errors.shades?.[index]?.label?.message}
               paletteName={paletteName}
+              shadesFieldArray={shadesFieldArray}
             />
           ))}
           {editMode && (

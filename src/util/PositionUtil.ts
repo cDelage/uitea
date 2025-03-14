@@ -39,6 +39,79 @@ export function getRectPosition(
   return pos;
 }
 
+/**
+ * Calcule la position pour que le popover reste visible
+ * @param initialPosition Position initiale calculée (ex. via getRectPosition)
+ * @param popoverBoundingRect Bounding rect du popover
+ * @param toggleButtonRect Bounding rect du bouton toggle
+ * @returns Position ajustée
+ */
+export function calcPositionVisible(
+  initialPosition: PositionAbsolute,
+  popoverBoundingRect?: DOMRect,
+  toggleButtonRect?: DOMRect
+): PositionAbsolute {
+  if (!popoverBoundingRect || !toggleButtonRect) return initialPosition;
+
+  const { innerWidth, innerHeight } = window;
+  const finalPos: PositionAbsolute = { ...initialPosition };
+
+  const toggleVisibleX =
+    toggleButtonRect.x >= 0 &&
+    toggleButtonRect.x + toggleButtonRect.width <= innerWidth;
+
+  if (toggleVisibleX) {
+    if (finalPos.left !== undefined) {
+      if (finalPos.left + popoverBoundingRect.width > innerWidth) {
+        finalPos.left = innerWidth - popoverBoundingRect.width;
+      }
+      if (finalPos.left < 0) {
+        finalPos.left = 0;
+      }
+    }
+    // Sinon, s'il est positionné via "right", on convertit en "left"
+    else if (finalPos.right !== undefined) {
+      let computedLeft = innerWidth - finalPos.right - popoverBoundingRect.width;
+      if (computedLeft < 0) {
+        computedLeft = 0;
+      } else if (computedLeft + popoverBoundingRect.width > innerWidth) {
+        computedLeft = innerWidth - popoverBoundingRect.width;
+      }
+      finalPos.left = computedLeft;
+      delete finalPos.right;
+    }
+  }
+  const toggleVisibleY =
+    toggleButtonRect.top >= 0 &&
+    toggleButtonRect.top + toggleButtonRect.height <= innerHeight;
+
+  if (toggleVisibleY) {
+    if (finalPos.top !== undefined) {
+      // S'il déborde en bas
+      if (finalPos.top + popoverBoundingRect.height > innerHeight) {
+        finalPos.top = innerHeight - popoverBoundingRect.height;
+      }
+      // S'il déborde en haut
+      if (finalPos.top < 0) {
+        finalPos.top = 0;
+      }
+    } else if (finalPos.bottom !== undefined) {
+      let computedTop = innerHeight - finalPos.bottom - popoverBoundingRect.height;
+      if (computedTop < 0) {
+        computedTop = 0;
+      } else if (computedTop + popoverBoundingRect.height > innerHeight) {
+        computedTop = innerHeight - popoverBoundingRect.height;
+      }
+      finalPos.top = computedTop;
+      delete finalPos.bottom;
+    }
+  }
+  // Sinon, si le bouton n'est pas totalement visible verticalement,
+  // le popover suit le bouton (position initiale).
+
+  return finalPos;
+}
+
 export function getAbsolutePosition(
   position: PositionPayload
 ): PositionAbsolute {

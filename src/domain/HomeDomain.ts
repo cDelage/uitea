@@ -17,3 +17,8 @@ export interface RecentFile {
   filePath: string;
   editMode: string;
 }
+
+export interface PresetDressing {
+  banners: string[];
+  logos: string[];
+}

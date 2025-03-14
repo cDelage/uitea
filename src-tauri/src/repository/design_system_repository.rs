@@ -1,17 +1,22 @@
-use std::{collections::HashMap, fs, path::PathBuf};
+use std::{collections::HashMap, fs, path::{Path, PathBuf}};
 
 use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette, PalettesMetadataFile, Radius, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile, ThemesMetadataFile, Typography
+        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette,
+        PalettesMetadataFile, Radius, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile,
+        ThemesMetadataFile, Typography,
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
     },
 };
 
-use super::{load_yaml_from_pathbuf, save_to_yaml_file, DESIGN_SYSTEM_METADATA_PATH};
+use super::{
+    assert_file_in_directory, copy_file, load_yaml_from_pathbuf, save_to_yaml_file,
+    DESIGN_SYSTEM_METADATA_PATH,
+};
 
 const PALETTES_PATH: &str = "palettes";
 const NEUTRAL_PALETTE_PATH: &str = "neutral.yaml";
@@ -25,8 +30,9 @@ const NEUTRAL_THEME_PATH: &str = "neutral.yaml";
 const SPACES_PATH: &str = "spaces.yaml";
 const RADIUS_PATH: &str = "radius.yaml";
 const EFFECTS_PATH: &str = "effects.yaml";
+const IMAGES_PATH: &str = "images";
 
-pub fn create_design_system(design_system_metadata: &DesignSystemMetadata) -> Result<()> {
+pub fn create_design_system(design_system_metadata: &mut DesignSystemMetadata) -> Result<()> {
     println!(
         "Create new design system : {:?}",
         &design_system_metadata.design_system_name
@@ -35,8 +41,27 @@ pub fn create_design_system(design_system_metadata: &DesignSystemMetadata) -> Re
     let design_system_metadata_path = &design_system_metadata
         .design_system_path
         .join(DESIGN_SYSTEM_METADATA_PATH);
-    let design_system_file = DesignSystemMetadataFile::from(design_system_metadata);
-    save_to_yaml_file(design_system_metadata_path, &design_system_file)
+
+    let banner: String = insert_image(
+        &design_system_metadata.banner,
+        &design_system_metadata.design_system_path,
+    )?;
+    let logo: String = insert_image(
+        &design_system_metadata.logo,
+        &design_system_metadata.design_system_path,
+    )?;
+
+    design_system_metadata.banner = banner;
+    design_system_metadata.logo = logo;
+    let design_system_file: DesignSystemMetadataFile =
+        DesignSystemMetadataFile::from(design_system_metadata);
+    save_to_yaml_file(design_system_metadata_path, &design_system_file)?;
+
+    Ok(())
+}
+
+pub fn get_images_path(design_system_path: &PathBuf) -> PathBuf {
+    design_system_path.join(IMAGES_PATH)
 }
 
 pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<DesignSystemMetadata> {
@@ -59,6 +84,7 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
         &file,
         &original_pathbuf,
         design_system_path.join(TMP_PATH).is_dir(),
+        &get_images_path(&fetch_pathbuf),
     ))
 }
 
@@ -178,9 +204,7 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     }
 
     //Save metadata
-    let design_system_metadata_path: PathBuf = design_system_path.join(DESIGN_SYSTEM_METADATA_PATH);
-    let design_system_file = DesignSystemMetadataFile::from(&design_system.metadata);
-    save_to_yaml_file(design_system_metadata_path, &design_system_file)?;
+    save_metadata(&design_system_path, &design_system.metadata)?;
 
     save_palettes(&design_system, &design_system_path)?;
 
@@ -196,10 +220,10 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     save_to_yaml_file(typography_pathbuf, &design_system.typography)?;
 
     save_spaces(&design_system.spaces, &design_system_path)?;
-    
+
     let radius_pathbuf: PathBuf = design_system_path.join(RADIUS_PATH);
     save_to_yaml_file(radius_pathbuf, &design_system.radius)?;
-    
+
     let effect_pathbuf: PathBuf = design_system_path.join(EFFECTS_PATH);
     save_to_yaml_file(effect_pathbuf, &design_system.effects)?;
 
@@ -218,6 +242,43 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     Ok(())
 }
 
+pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetadata) -> Result<()> {
+    let images_path: PathBuf = get_images_path(&design_system_path);
+    let banner = match assert_file_in_directory(&metadata.banner, &images_path) {
+        Ok(path) => path,
+        Err(_) => {
+            let banner_pathbuf = PathBuf::from(&metadata.banner);
+            if banner_pathbuf.is_file() {
+                let image = insert_image(&metadata.banner, &design_system_path)?;
+                image
+            } else {
+                String::new()
+            }
+        }
+    };
+
+    let logo = match assert_file_in_directory(&metadata.logo, &images_path) {
+        Ok(path) => path,
+        Err(_) => {
+            let logo_pathbuf = PathBuf::from(&metadata.logo);
+            if logo_pathbuf.is_file() {
+                let image = insert_image(&metadata.logo, &design_system_path)?;
+                image
+            } else {
+                String::new()
+            }
+        }
+    };
+
+    //Save metadata
+    let design_system_metadata_path: PathBuf = design_system_path.join(DESIGN_SYSTEM_METADATA_PATH);
+    let mut design_system_file = DesignSystemMetadataFile::from(metadata);
+    let banner_filename: &str = Path::new(&banner).file_name().unwrap().to_str().unwrap();
+    let logo_filename: &str = Path::new(&logo).file_name().unwrap().to_str().unwrap();
+    design_system_file.banner = String::from(banner_filename);
+    design_system_file.logo = String::from(logo_filename);
+    save_to_yaml_file(design_system_metadata_path, &design_system_file)
+}
 
 pub fn save_themes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
     let themes_path: PathBuf = design_system_path.join(THEMES_PATH);
@@ -399,4 +460,21 @@ pub fn init_effects(design_system_path: &PathBuf) -> Result<()> {
     let effect_pathbuf: PathBuf = fetch_pathbuf.join(EFFECTS_PATH);
     let effect = Effect::new();
     save_to_yaml_file(effect_pathbuf, &vec![effect])
+}
+
+pub fn init_images(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let images_pathbuf: PathBuf = fetch_pathbuf.join(IMAGES_PATH);
+    fs::create_dir(images_pathbuf)?;
+    Ok(())
+}
+
+pub fn insert_image(image_path: &String, design_system_path: &PathBuf) -> Result<String> {
+    println!("insert image {}", image_path);
+    let images_folder: PathBuf = PathBuf::from(design_system_path).join(IMAGES_PATH);
+    let image_path: PathBuf = PathBuf::from(image_path);
+    if !images_folder.is_dir() {
+        init_images(&design_system_path)?;
+    }
+    copy_file(&image_path, &images_folder)
 }

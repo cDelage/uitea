@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const Table = styled.table`
   border-spacing: 0;
-
   td.expand {
     width: auto; /* La cellule de gauche s'étend automatiquement */
   }

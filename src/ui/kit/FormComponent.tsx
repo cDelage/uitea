@@ -4,13 +4,15 @@ function FormComponent({
   children,
   label,
   error,
+  className,
 }: {
   children: ReactNode;
   label: string;
   error?: string;
+  className?: string;
 }) {
   return (
-    <div className="column gap-4">
+    <div className={"column gap-4 " + className}>
       <label>{label}</label>
       {children}
       <small className={styles.errorTheme}>{error}</small>

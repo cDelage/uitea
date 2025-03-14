@@ -4,10 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
 import styles from "./ComponentDesignSystem.module.css";
-import {
-  ModificationsMode,
-  useDesignSystemContext,
-} from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import {
@@ -16,19 +13,19 @@ import {
 } from "../../util/DraggableContext";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
 
-import Section from "./SectionDesignSystem";
 import InputDesignSystem from "./InputDesignSystem";
 import RadiusPreview from "./RadiusPreview";
 
 import { Radius, RadiusItem } from "../../domain/DesignSystemDomain";
 import { generateUniqueRadiusKey } from "../../util/DesignSystemUtils";
 import { DEFAULT_BASE } from "../../ui/UiConstants";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function RadiusComponent() {
-  const { designSystem, findDesignSystemColor, radiusMode } =
+  const { designSystem, findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const { base, radius } = designSystem;
   const { designSystemPath } = useParams();
@@ -40,7 +37,6 @@ function RadiusComponent() {
 
   const {
     fields: additionalsRadiusArray,
-    append,
     remove,
     move,
     insert,
@@ -54,16 +50,22 @@ function RadiusComponent() {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
-        hoverIndex === "remove"
+        hoverIndex === dragIndex
       )
         return;
-      move(dragIndex, hoverIndex);
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
+      handleSubmit(submitRadius)();
     }
   );
 
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
 
   const radiusRef = useRef<HTMLFormElement>(null);
+  useSidebarComponentVisible(radiusRef, "radius");
   useTriggerScroll({
     ref: radiusRef,
     triggerId: `radius`,
@@ -96,7 +98,7 @@ function RadiusComponent() {
       radiusValue: additionalsRadiusArray[index]?.radiusValue ?? "8px",
     };
 
-    insert(index + 1, newRadius);
+    insert(index + 1, newRadius, { shouldFocus: false });
     handleSubmit(submitRadius)();
   }
 
@@ -122,16 +124,10 @@ function RadiusComponent() {
         <InputDesignSystem
           key="defaultRadius"
           label="default"
-          mode={radiusMode}
           handleSubmit={handleSubmit(submitRadius)}
           value={watch("default")}
           register={register("default")}
-          popoverCopy={
-            <div className="popover-body">
-              <CopyableLabel copyable="radius-default" />
-              <CopyableLabel copyable={watch("default")} />
-            </div>
-          }
+          tooltipValue="radius-default"
         />
         <div className={styles.sideSettingsTitle}>
           <h5>Additionals radius</h5>
@@ -141,9 +137,7 @@ function RadiusComponent() {
             <InputDesignSystem
               key={field.id}
               label={watch(`additionalsRadius.${index}.radiusKey`)}
-              mode={radiusMode}
               handleSubmit={handleSubmit(submitRadius)}
-              value={watch(`additionalsRadius.${index}.radiusValue`)}
               isAddRemoveDragAllowed={true}
               onAdd={() => handleAddRadius(index)}
               onRemove={() => {
@@ -154,39 +148,23 @@ function RadiusComponent() {
               index={index}
               registerKey={register(`additionalsRadius.${index}.radiusKey`)}
               register={register(`additionalsRadius.${index}.radiusValue`)}
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel
-                    copyable={`radius-${watch(
-                      `additionalsRadius.${index}.radiusKey`
-                    )}`}
-                  />
-                  <CopyableLabel
-                    copyable={watch(`additionalsRadius.${index}.radiusValue`)}
-                  />
-                </div>
-              }
+              tooltipValue={`radius-${watch(
+                `additionalsRadius.${index}.radiusKey`
+              )}`}
             />
           ))}
         </div>
-        {ModificationsMode.includes("edit") && (
-          <Section.EmptySection
-            itemToInsert="radius"
-            onInsert={() => {
-              append({
-                radiusKey: "radius-1",
-                radiusValue: "8px",
-              });
-            }}
-            sectionLength={additionalsRadiusArray.length}
-            sectionName="radius"
+        {editMode && (
+          <InputDesignSystemAddRemove
+            draggableTools={draggableTools}
+            itemName="radius"
+            onAppend={() => handleAddRadius(additionalsRadiusArray.length - 1)}
           />
         )}
 
-        {!ModificationsMode.includes("edit") &&
-          !additionalsRadiusArray.length && (
-            <div className="row justify-center">Empty</div>
-          )}
+        {!editMode && !additionalsRadiusArray.length && (
+          <div className="row justify-center">Empty</div>
+        )}
       </div>
 
       <div className={styles.previewContainer}>

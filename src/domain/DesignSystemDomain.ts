@@ -7,13 +7,15 @@ export interface DesignSystem {
   typography: Typography;
   spaces: Space[];
   radius: Radius;
-  effects: Effect[]
+  effects: Effect[];
 }
 
 export interface DesignSystemCreationPayload {
   name: string;
   folderPath: string;
   darkMode: boolean;
+  banner?: string;
+  logo?:string;
 }
 
 export type DesignSystemMetadataHome = DesignSystemMetadata & {
@@ -28,6 +30,8 @@ export interface DesignSystemMetadata {
   isTmp: boolean;
   canUndo: boolean;
   canRedo: boolean;
+  banner: string;
+  logo: string;
 }
 
 export interface Palette {
@@ -182,9 +186,7 @@ export interface Effect {
 
 export interface EffectItem {
   effectType: EffectType;
-  effectValue : string;
+  effectValue: string;
 }
 
 export type EffectType = "BoxShadow" | "Blur" | "BackdropFilter";
-
-

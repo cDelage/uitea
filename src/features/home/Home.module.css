@@ -4,5 +4,5 @@
   padding: 32px;
   gap: 32px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: scroll;
 }

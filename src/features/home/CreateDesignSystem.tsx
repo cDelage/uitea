@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { ICON_SIZE_MD, ICON_SIZE_XXL } from "../../ui/UiConstants";
-import styles from "./HomeActionButtons.module.css";
+import buttonStyles from "./HomeActionButtons.module.css";
 import { MdOutlineFolder, MdSquareFoot } from "react-icons/md";
 import Modal from "../../ui/kit/Modal";
 import FormComponent from "../../ui/kit/FormComponent";
@@ -11,9 +10,16 @@ import { DesignSystemCreationPayload } from "../../domain/DesignSystemDomain";
 import { useCreateDesignSystem } from "../design-system/DesignSystemQueries";
 import { open } from "@tauri-apps/api/dialog";
 import toast from "react-hot-toast";
+import { usePresetDressing } from "./HomeQueries";
+import { useEffect } from "react";
+import styles from "./CreateDesignSystem.module.css";
+import Loader from "../../ui/kit/Loader";
+import ImageLocalComponent from "../../ui/kit/ImageLocal";
+import Popover from "../../ui/kit/Popover";
+import ImageSelectorPopover from "./ImageSelectorPopover";
+import ButtonImagePicker from "../../ui/kit/ButtonImagePicker";
 
 function CreateDesignSystem() {
-  const navigate = useNavigate();
   const { createDesignSystem } = useCreateDesignSystem();
   const {
     register,
@@ -21,7 +27,15 @@ function CreateDesignSystem() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<DesignSystemCreationPayload>();
+  } = useForm<DesignSystemCreationPayload>({
+    defaultValues: {
+      name: undefined,
+      darkMode: true,
+      folderPath: undefined,
+    },
+  });
+
+  const { presetDressing, isLoadingPresetDressing } = usePresetDressing();
 
   async function handlePickFolder() {
     try {
@@ -47,17 +61,26 @@ function CreateDesignSystem() {
   }
 
   const folderPath = watch("folderPath");
-  register("folderPath", { required: true });
+  register("folderPath", { required: "Location is required" });
+
+  useEffect(() => {
+    if (presetDressing?.banners[0]) {
+      setValue("banner", presetDressing.banners[0]);
+      setValue("logo", presetDressing.logos[0]);
+    }
+  }, [presetDressing, setValue]);
+
+  const banner = watch("banner");
+  const logo = watch("logo");
+
+  if (isLoadingPresetDressing) return <Loader />;
 
   return (
     <Modal>
       <Modal.Toggle id="create-design-system">
-        <button
-          className={styles.homeActionButton}
-          onClick={() => navigate("/design-system")}
-        >
-          <div className={styles.centerContainer}>
-            <div className={styles.iconContainer}>
+        <button className={buttonStyles.homeActionButton}>
+          <div className={buttonStyles.centerContainer}>
+            <div className={buttonStyles.iconContainer}>
               <MdSquareFoot size={ICON_SIZE_XXL} />
             </div>
           </div>
@@ -66,27 +89,67 @@ function CreateDesignSystem() {
       </Modal.Toggle>
       <Modal.Body id="create-design-system">
         <form onSubmit={handleSubmit(handleCreateDesignSystem)}>
-          <Modal.Md>
-            <h3>New design system</h3>
-
-            <FormComponent label="Name" error={errors.name?.message}>
-              <InputText {...register("name", { required: true })} />
-            </FormComponent>
-            <FormComponent label="Folder" error={errors.folderPath?.message}>
+          <Modal.Custom title="New design system">
+            <Popover>
+              <Popover.Toggle id="banner-selector">
+                <div className={styles.presetBanner}>
+                  <ButtonImagePicker id="banner-selector" />
+                  <ImageLocalComponent srcPath={banner} />
+                </div>
+              </Popover.Toggle>
+              <Popover.Body id="banner-selector" zIndex={40}>
+                <ImageSelectorPopover
+                  width={"498px"}
+                  imagesPreset={presetDressing?.banners}
+                  value={watch("banner")}
+                  setValue={(value: string) => setValue("banner", value)}
+                />
+              </Popover.Body>
+            </Popover>
+            <Modal.Md>
               <div className="row gap-4 align-center">
-                <ButtonTertiary onClick={handlePickFolder}>
-                  <MdOutlineFolder size={ICON_SIZE_MD} /> Folder
-                </ButtonTertiary>
-                {folderPath || "No location selected"}
+                <Popover>
+                  <Popover.Toggle id="banner-selector">
+                    <div className={styles.logoContainer}>
+                      <ButtonImagePicker id="banner-selector" />
+                      <ImageLocalComponent srcPath={logo} />
+                    </div>
+                  </Popover.Toggle>
+                  <Popover.Body id="banner-selector" zIndex={40}>
+                    <ImageSelectorPopover
+                      width={"150px"}
+                      imagesPreset={presetDressing?.logos}
+                      value={watch("logo")}
+                      setValue={(value: string) => setValue("logo", value)}
+                    />
+                  </Popover.Body>
+                </Popover>
+                <div className="flex-1">
+                  <FormComponent label="Name" error={errors.name?.message}>
+                    <InputText
+                      {...register("name", {
+                        required: "Project name is required",
+                      })}
+                    />
+                  </FormComponent>
+                </div>
               </div>
-            </FormComponent>
-            <FormComponent label="Dark mode" error={errors.darkMode?.message}>
-              <div className="checkbox-container">
-                <input type="checkbox" {...register("darkMode")} />
-                Dark mode
-              </div>
-            </FormComponent>
-          </Modal.Md>
+              <FormComponent label="Folder" error={errors.folderPath?.message}>
+                <div className="row gap-4 align-center">
+                  <ButtonTertiary onClick={handlePickFolder} type="button">
+                    <MdOutlineFolder size={ICON_SIZE_MD} /> Folder
+                  </ButtonTertiary>
+                  {folderPath || "No location selected"}
+                </div>
+              </FormComponent>
+              <FormComponent label="Dark mode" error={errors.darkMode?.message}>
+                <div className="checkbox-container">
+                  <input type="checkbox" {...register("darkMode")} />
+                  Dark mode
+                </div>
+              </FormComponent>
+            </Modal.Md>
+          </Modal.Custom>
           <Modal.Footer>
             <ButtonPrimary>Create</ButtonPrimary>
             <Modal.Close>

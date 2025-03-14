@@ -6,14 +6,13 @@ import Loader from "../../ui/kit/Loader";
 import SidebarDesignSystem from "./SidebarDesignSystem";
 import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
-import {
-  ActiveComponent,
-  ComponentMode,
-  DesignSystemContext,
-} from "./DesignSystemContext";
+import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useState } from "react";
 import { DesignToken } from "../../domain/DesignSystemDomain";
-import { isValidCssColorOrGradient } from "../../util/DesignSystemUtils";
+import {
+  isValidCssColorOrGradient,
+  KEYBOARD_ACTIONS,
+} from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 
 function DesignSystemPage() {
@@ -23,7 +22,7 @@ function DesignSystemPage() {
   const [activeComponent, setActiveComponent] = useState<
     ActiveComponent | undefined
   >(undefined);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const editMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
   ) as boolean;
@@ -37,25 +36,6 @@ function DesignSystemPage() {
     );
   }
 
-  function getActionButtonClassName(
-    mode: ComponentMode,
-    componentId: string,
-    activeComponent: ActiveComponent | undefined
-  ) {
-    let buttonClassName = "action-button ";
-    if (activeComponent?.componentId === componentId) {
-      if (activeComponent.mode === mode) {
-        if (mode !== "remove" && mode !== "delete") {
-          buttonClassName += "active";
-        } else {
-          buttonClassName += "negative";
-        }
-      }
-    }
-
-    return buttonClassName;
-  }
-
   const colorTokens: DesignToken[] | undefined = designSystem?.palettes.flatMap(
     (palette) => {
       return palette.shades.map((shade) => {
@@ -66,6 +46,44 @@ function DesignSystemPage() {
       });
     }
   );
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!event.repeat && KEYBOARD_ACTIONS.includes(event.key.toLowerCase())) {
+        const target = event.target as HTMLElement;
+
+        if (
+          (target.tagName.toLowerCase() === "input" ||
+            target.tagName.toLowerCase() === "textarea") &&
+          target === document.activeElement
+        ) {
+          return; // On ignore le keydown
+        }
+        searchParams.set("keyboardAction", event.key.toLowerCase());
+        setSearchParams(searchParams);
+      }
+    }
+
+    function handleKeyUp(event: KeyboardEvent) {
+      if (
+        searchParams.get("keyboardAction") &&
+        KEYBOARD_ACTIONS.includes(event.key.toLowerCase())
+      ) {
+        searchParams.delete("keyboardAction");
+        setSearchParams(searchParams);
+      }
+    }
+
+    // On écoute les événements sur la fenêtre entière
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    // On nettoie en retirant les listeners à la fin du cycle de vie
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [searchParams, setSearchParams]);
 
   function findDesignSystemColor({
     label,
@@ -80,35 +98,6 @@ function DesignSystemPage() {
       defaultValue
     );
   }
-
-  function getMode(componentId: string): ComponentMode {
-    if (
-      activeComponent?.componentId === componentId ||
-      activeComponent?.componentId === "all"
-    ) {
-      return activeComponent.mode;
-    } else {
-      return "default";
-    }
-  }
-
-  const shadesMode: ComponentMode = getMode("shades");
-
-  const palettesMode: ComponentMode = getMode("palettes");
-
-  const themesMode: ComponentMode = getMode("themes");
-
-  const baseMode: ComponentMode = getMode("base");
-
-  const fontsMode: ComponentMode = getMode("fonts");
-
-  const typographyMode: ComponentMode = getMode("typography");
-
-  const spacesMode: ComponentMode = getMode("spaces");
-
-  const radiusMode: ComponentMode = getMode("radius");
-
-  const effectsMode: ComponentMode = getMode("effects");
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -137,19 +126,10 @@ function DesignSystemPage() {
       value={{
         activeComponent,
         setActiveComponent: handleSetActiveComponent,
-        getActionButtonClassName,
         findDesignSystemColor,
         designSystem,
-        palettesMode,
-        shadesMode,
-        themesMode,
-        baseMode,
-        fontsMode,
-        typographyMode,
-        spacesMode,
-        radiusMode,
-        effectsMode,
         editMode,
+        colorTokens,
       }}
     >
       <div className={styles.designSystemPage}>

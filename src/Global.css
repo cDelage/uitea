@@ -116,19 +116,26 @@
   --theme-component-hover-bg: var(--palette-gray-100);
   --theme-component-hover-text: var(--palette-gray-900);
 
+  --theme-sunny-text: var(--palette-secondary-700);
+  --theme-moon-text: var(--palette-primary-900);
+  --theme-contrast-off-text: var(--palette-gray-400);
+  --theme-contrast-on-text: var(--palette-primary-700);
+
   --theme-tooltip-bg: rgb(23, 23, 23, 80%);
   --theme-tooltip-text: var(--palette-single-white);
 
-  --theme-primary-bg: var(--palette-primary-600);
-  --theme-primary-text: var(--palette-primary-50);
+  --theme-primary-bg: var(--palette-primary-800);
+  --theme-primary-text: var(--palette-single-white);
   --theme-primary-border: var(--palette-primary-800);
-  --theme-primary-hover-bg: var(--palette-primary-800);
+  --theme-primary-hover-bg: var(--palette-primary-900);
   --theme-primary-hover-text: var(--palette-primary-50);
   --theme-primary-hover-border: var(--palette-primary-950);
 
   --theme-primary-outline-bg: var(--palette-primary-50);
   --theme-primary-outline-text: var(--palette-primary-800);
   --theme-primary-outline-border: var(--palette-primary-600);
+  --theme-primary-outline-hover-bg: var(--palette-primary-100);
+  --theme-primary-outline-hover-text: var(--palette-primary-950);
 
   --theme-add-bg: var(--palette-primary-200);
   --theme-add-text: var(--palette-primary-700);
@@ -149,6 +156,8 @@
   --theme-tertiary-hover-border: var(--palette-gray-400);
 
   --theme-base-button-hover-bg: rgb(212, 212, 216, 0.3);
+  --theme-base-button-active-bg: rgb(219, 234, 254, 1);
+
   --theme-action-button-bg: var(--palette-gray-50);
   --theme-action-button-text: var(--palette-gray-500);
   --theme-action-button-hover-text: var(--palette-gray-700);
@@ -205,6 +214,7 @@
 
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
     background-color: var(#ffffff);
   }
 
@@ -252,6 +262,8 @@ body {
 main {
   overflow: hidden;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
@@ -587,6 +599,16 @@ p {
   height: 100%;
 }
 
+select {
+  padding: var(--space-2) var(--space-0);
+  margin: 0;
+  border: none;
+  box-sizing: border-box;
+  background-color: var(--theme-component-bg);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+}
+
 .inherit-input-placeholder {
   padding: var(--space-1) var(--space-0);
   margin: 0;
@@ -602,6 +624,10 @@ p {
 
 .inherit-input:hover {
   border-bottom: var(--base-border) 1px solid;
+}
+
+.empty-border:hover {
+  border-bottom: var(--base-border) 1px transparent;
 }
 
 .inherit-input:read-only {
@@ -680,6 +706,10 @@ select:disabled {
   transform: rotate(90deg);
 }
 
+.rotate-chevron-left {
+  transform: rotate(-90deg);
+}
+
 .container-start {
   flex: 1;
   justify-content: start;
@@ -719,6 +749,11 @@ select:disabled {
   cursor: pointer;
 }
 
+.remove-hover:hover {
+  background-color: var(--theme-remove-bg);
+  cursor: pointer;
+}
+
 .draggable {
   background-color: var(--theme-drag-bg);
   cursor: pointer;
@@ -736,6 +771,10 @@ select:disabled {
   cursor: pointer;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .remove-text-color {
   color: var(--theme-remove-text);
 }
@@ -748,3 +787,75 @@ select:disabled {
   cursor: n-resize;
 }
 
+.relative {
+  position: relative;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-visible {
+  overflow: visible;
+}
+
+.border-box {
+  box-sizing: border-box;
+}
+
+.tableBuilder {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--theme-component-bg);
+}
+
+.tableBuilder tr,
+td {
+  text-align: left;
+}
+
+.sunny-text {
+  color: var(--theme-sunny-text);
+}
+
+.moon-text {
+  color: var(--theme-moon-text);
+}
+
+.contrast-on {
+  color: var(--theme-contrast-on-text);
+}
+
+.contrast-off {
+  color: var(--theme-contrast-off-text);
+}
+
+.tableBuilder {
+  display: table;
+}
+
+.tableBuilder tr[data-disable="true"] {
+  background-color: var(--base-bg-disabled);
+}
+
+.tableBuilder td[data-disable="true"] {
+  background-color: var(--base-bg-disabled);
+}
+
+.flag {
+  background-color: var(--palette-primary-200);
+  color: var(--palette-primary-800);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-1) var(--space-2);
+  width: fit-content;
+  font-size: 12px;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+
+.select-none {
+  user-select: none;
+}

@@ -1,6 +1,6 @@
-import { MdAdd, MdDragIndicator, MdFormatSize, MdRemove } from "react-icons/md";
+import { MdFormatSize } from "react-icons/md";
 import styles from "./InputPopover.module.css";
-import { ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
+import { ICON_SIZE_MD } from "../../ui/UiConstants";
 import {
   Control,
   useFieldArray,
@@ -10,25 +10,20 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { Effect } from "../../domain/DesignSystemDomain";
-import {
-  ComponentMode,
-  EffectsPopoverMode,
-  ModificationsMode,
-} from "./DesignSystemContext";
-import { ChangeEvent, useState } from "react";
-import classNames from "classnames";
+import { ChangeEvent } from "react";
 import {
   RemovableIndex,
   useDraggableFeatures,
 } from "../../util/DraggableContext";
 import EffectsPopoverTab from "./EffectsPopoverTab";
 import { getEffectCss } from "../../util/DesignSystemUtils";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useDesignSystemContext } from "./DesignSystemContext";
 
 function EffectsPopover({
   register,
   watch,
   index,
-  mode,
   control,
   setValue,
   getValue,
@@ -41,33 +36,28 @@ function EffectsPopover({
   control: Control<{ effects: Effect[] }>;
   effect: Effect;
   index: number;
-  mode: ComponentMode;
   handleSubmit: () => void;
 }) {
-  const [popoverMode, setPopoverMode] = useState<EffectsPopoverMode>("default");
+  const { editMode } = useDesignSystemContext();
   const {
     fields: items,
-    append,
-    remove,
     move,
+    remove,
+    insert,
   } = useFieldArray({
     control,
     name: `effects.${index}.items`,
   });
   const { draggableTools } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: RemovableIndex) => {
-      if (
-        dragIndex === undefined ||
-        hoverIndex === undefined ||
-        hoverIndex === "remove"
-      )
-        return;
-      move(dragIndex, hoverIndex);
+      if (dragIndex === undefined || hoverIndex === undefined) return;
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
     }
   );
-  function handleSetMode(newMode: EffectsPopoverMode) {
-    setPopoverMode((mode) => (newMode === mode ? "default" : newMode));
-  }
 
   function handleChangeBackground(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.checked) {
@@ -81,18 +71,27 @@ function EffectsPopover({
     handleSubmit();
   }
 
-  const dragButtonClassNames = classNames("action-button", {
-    active: popoverMode === "drag",
-  });
+  function handleInsertEffectItem(index: number) {
+    insert(index, {
+      effectType: "BoxShadow",
+      effectValue: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px",
+    });
+    handleSubmit();
+  }
 
-  const removeButtonClassNames = classNames("action-button", {
-    negative: popoverMode === "remove",
-  });
+  function handleRemoveEffectItem(itemIndex: number) {
+    remove(itemIndex);
+    handleSubmit();
+  }
 
   const background = watch(`effects.${index}.bg`);
 
   return (
-    <div className={styles.inputPopover}>
+    <div
+      className={styles.inputPopover}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={styles.popoverHeader}>
         <MdFormatSize size={ICON_SIZE_MD} />
         <h5>Effects</h5>
@@ -106,33 +105,6 @@ function EffectsPopover({
       <div className={styles.bodyContainer}>
         <div className={styles.bodyMenuContainer}>
           <h6>Effect</h6>
-          {ModificationsMode.includes(mode) && (
-            <div className="row gap-2">
-              <button
-                className="action-button"
-                onClick={() =>
-                  append({
-                    effectType: "BoxShadow",
-                    effectValue: "",
-                  })
-                }
-              >
-                <MdAdd size={ICON_SIZE_SM} />
-              </button>
-              <button
-                className={dragButtonClassNames}
-                onClick={() => handleSetMode("drag")}
-              >
-                <MdDragIndicator size={ICON_SIZE_SM} />
-              </button>
-              <button
-                className={removeButtonClassNames}
-                onClick={() => handleSetMode("remove")}
-              >
-                <MdRemove size={ICON_SIZE_SM} />
-              </button>
-            </div>
-          )}
         </div>
         <div className={styles.keyValueMenuContainer}>
           {items.map((item, itemIndex) => (
@@ -141,14 +113,19 @@ function EffectsPopover({
               effectIndex={index}
               draggableTools={draggableTools}
               itemIndex={itemIndex}
-              popoverMode={popoverMode}
-              mode={mode}
               register={register}
-              remove={remove}
-              watch={watch}
               handleSubmit={handleSubmit}
+              onAdd={handleInsertEffectItem}
+              onRemove={handleRemoveEffectItem}
             />
           ))}
+          {editMode && (
+            <InputDesignSystemAddRemove
+              itemName="effect item"
+              draggableTools={draggableTools}
+              onAppend={() => handleInsertEffectItem(items.length + 1)}
+            />
+          )}
         </div>
         <div className={styles.tabEffectContainer}>
           <div>

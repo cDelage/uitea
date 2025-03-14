@@ -5,10 +5,12 @@ use std::sync::Mutex;
 
 use application::undo_application::remove_undo_repository;
 use exposition::design_system_exposition::{
-    create_design_system, find_design_system, save_design_system, undo_design_system, redo_design_system
+    create_design_system, find_design_system, redo_design_system, save_design_system,
+    undo_design_system,
 };
 use exposition::home_exposition::{
-    find_all_recent_files, insert_recent_file, remove_recent_file, update_recent_file,
+    fetch_presets_dressing, find_all_recent_files, insert_recent_file, remove_recent_file,
+    update_recent_file,encode_image_base64
 };
 use pickledb::{PickleDb, PickleDbDumpPolicy, SerializationMethod};
 
@@ -65,7 +67,9 @@ fn main() {
             save_design_system,
             update_recent_file,
             undo_design_system,
-            redo_design_system
+            redo_design_system,
+            fetch_presets_dressing,
+            encode_image_base64
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

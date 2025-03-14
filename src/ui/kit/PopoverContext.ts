@@ -3,10 +3,11 @@ import { PositionAbsolute } from "./PositionAbsolute.type";
 
 export type PopoverContextType = {
   position: PositionAbsolute | null;
-  openPopover: (pos: PositionAbsolute, id: string) => void;
+  openPopover: (pos: PositionAbsolute, id: string, domRect: DOMRect) => void;
   closePopover: () => void;
   openPopoverId: string | null;
   setPosition: (pos: PositionAbsolute) => void;
+  toggleRect?: DOMRect;
 };
 
 export const PopoverContext = createContext<PopoverContextType | null>(null);

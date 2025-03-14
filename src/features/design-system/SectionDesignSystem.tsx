@@ -1,6 +1,5 @@
 import { ReactNode, useRef } from "react";
 import styles from "./SectionDesignSystem.module.css";
-import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
 import { useSearchParams } from "react-router-dom";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
 import { ButtonPrimary } from "../../ui/kit/Buttons";
@@ -60,41 +59,6 @@ function SubSection({
   );
 }
 
-function ActionButton({
-  children,
-  componentId,
-  mode,
-  type,
-}: {
-  children: ReactNode;
-  componentId: string;
-  mode: ComponentMode;
-  type?: "button" | "submit";
-}) {
-  const { getActionButtonClassName, setActiveComponent, activeComponent } =
-    useDesignSystemContext();
-
-  return (
-    <button
-      type={type ? type : "button"}
-      className={getActionButtonClassName(mode, componentId, activeComponent)}
-      onClick={(e) => {
-        e.stopPropagation();
-        setActiveComponent({
-          componentId,
-          mode,
-        });
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Actions({ children }: { children: ReactNode }) {
-  return <div className={styles.actions}>{children}</div>;
-}
-
 function EmptySection({
   sectionName,
   itemToInsert,
@@ -129,7 +93,5 @@ function EmptySection({
 }
 
 Section.Subsection = SubSection;
-Section.ActionButton = ActionButton;
-Section.Actions = Actions;
 Section.EmptySection = EmptySection;
 export default Section;

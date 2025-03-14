@@ -12,6 +12,7 @@ import { useRef } from "react";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
 import BaseForm from "./BaseForm";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function BaseComponent() {
   const { designSystem } = useDesignSystemContext();
@@ -38,6 +39,7 @@ function BaseComponent() {
     reset,
     originalValue: base,
   });
+  useSidebarComponentVisible(baseRef, "base");
 
   function submitBase(newBase: Base) {
     if (isEqual(newBase, base)) return;

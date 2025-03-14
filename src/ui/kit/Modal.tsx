@@ -28,7 +28,9 @@ function Modal({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ModalContext.Provider value={{ openModalId: openId, openModal: open, closeModal: close }}>
+    <ModalContext.Provider
+      value={{ openModalId: openId, openModal: open, closeModal: close }}
+    >
       {children}
     </ModalContext.Provider>
   );
@@ -36,7 +38,7 @@ function Modal({ children }: { children: ReactNode }) {
 
 function Toggle({ children, id }: { children: ReactNode; id: string }) {
   const { openModal: open } = useContext(ModalContext) as ModalContextType;
-  
+
   return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
     onClick: () => open(id),
   });
@@ -50,7 +52,9 @@ function Body({
   id: string;
   isFull?: boolean;
 }): JSX.Element | null {
-  const { openModalId: openId, closeModal: close } = useContext(ModalContext) as ModalContextType;
+  const { openModalId: openId, closeModal: close } = useContext(
+    ModalContext
+  ) as ModalContextType;
   const RefModalBody = useDivClickOutside(close);
   if (id !== openId) return null;
 
@@ -72,6 +76,23 @@ function Md({ children }: { children: ReactNode }) {
   return <div className={styles.modalBodyMd}>{children}</div>;
 }
 
+function ModalCustom({
+  children,
+  title,
+}: {
+  children: ReactNode;
+  title: string;
+}) {
+  return (
+    <div className={styles.modalBodyCustom}>
+      <div className={styles.modalCustomHeader}>
+        <h5>{title}</h5>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function Footer({ children }: { children: ReactNode }) {
   return <div className={styles.modalFooter}>{children}</div>;
 }
@@ -88,4 +109,5 @@ Modal.Body = Body;
 Modal.Md = Md;
 Modal.Footer = Footer;
 Modal.Close = Close;
+Modal.Custom = ModalCustom;
 export default Modal;

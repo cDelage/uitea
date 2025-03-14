@@ -1,19 +1,14 @@
 import classNames from "classnames";
 import styles from "./ComponentDesignSystem.module.css";
 import { DEFAULT_BASE, DEFAULT_EFFECT } from "../../ui/UiConstants";
-import {
-  ModificationsMode,
-  useDesignSystemContext,
-} from "./DesignSystemContext";
+import { useDesignSystemContext } from "./DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Effect } from "../../domain/DesignSystemDomain";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import { useSynchronizedVerticalScroll } from "../../util/SynchronizedScroll";
-import Section from "./SectionDesignSystem";
 import InputDesignSystem from "./InputDesignSystem";
 import EffectsPopover from "./EffectsPopover";
-import CopyableLabel from "../../ui/kit/CopyableLabel";
 import { generateUniqueEffectsKey } from "../../util/DesignSystemUtils";
 import {
   RemovableIndex,
@@ -24,22 +19,23 @@ import { useRef } from "react";
 import { useRefreshDesignSystemFormsEvent } from "../../util/RefreshDesignSystemFormsEvent";
 import EffectsPreview from "./EffectsPreview";
 import { isEqual } from "lodash";
+import InputDesignSystemAddRemove from "./InputDesignSystemAddRemove";
+import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
 function EffectsComponent() {
-  const { designSystem, findDesignSystemColor, effectsMode } =
+  const { designSystem, findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const { base, effects } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
-
+  const topTooltipRef = useRef(null);
   const { register, watch, control, handleSubmit, setValue, getValues, reset } =
     useForm({
       defaultValues: { effects },
     });
   const {
     fields: effectsFields,
-    append,
     insert,
     remove,
     move,
@@ -52,13 +48,20 @@ function EffectsComponent() {
       if (
         dragIndex === undefined ||
         hoverIndex === undefined ||
-        hoverIndex === "remove"
+        dragIndex === hoverIndex
       )
         return;
-      move(dragIndex, hoverIndex);
+      if (hoverIndex !== "remove") {
+        move(dragIndex, hoverIndex);
+      } else {
+        remove(dragIndex);
+      }
+      handleSubmit(submitEffects)();
     }
   );
   const effectsRef = useRef(null);
+
+  useSidebarComponentVisible(effectsRef, "effects");
   useTriggerScroll({
     ref: effectsRef,
     triggerId: `effects`,
@@ -85,8 +88,8 @@ function EffectsComponent() {
       ...DEFAULT_EFFECT,
       effectName: key,
     };
-    insert(index + 1, newEffect);
-    handleSubmit(submitEffects);
+    insert(index + 1, newEffect, { shouldFocus: false });
+    handleSubmit(submitEffects)();
   }
 
   const formClassNames = classNames(
@@ -105,65 +108,55 @@ function EffectsComponent() {
       onSubmit={handleSubmit(submitEffects)}
       ref={effectsRef}
     >
-      <div className={sideSettingsClass} ref={scrollableLeft}>
-        <div className="column">
-          {effectsFields.map((effect, index) => (
-            <InputDesignSystem
-              key={effect.effectName}
-              label={watch(`effects.${index}.effectName`)}
-              mode={effectsMode}
-              draggableTools={draggableTools}
-              isAddRemoveDragAllowed={true}
-              index={index}
-              onAdd={() => handleAddEffect(index)}
-              onRemove={() => {
-                remove(index);
-                handleSubmit(submitEffects);
-              }}
-              value={effect.items.map((item) => item.effectValue).join(",")}
-              registerKey={register(`effects.${index}.effectName`, {
-                required: true,
-              })}
-              handleSubmit={handleSubmit(submitEffects)}
-              popoverEdit={
-                <EffectsPopover
-                  effect={effect}
-                  register={register}
-                  index={index}
-                  mode={effectsMode}
-                  control={control}
-                  watch={watch}
-                  setValue={setValue}
-                  getValue={getValues}
-                  handleSubmit={handleSubmit(submitEffects)}
-                />
-              }
-              popoverCopy={
-                <div className="popover-body">
-                  <CopyableLabel copyable={`effect-${effect.effectName}`} />
-                  <CopyableLabel
-                    copyable={effect.items
-                      .map((item) => item.effectValue)
-                      .join(",")}
+      <div>
+        <div ref={topTooltipRef} className="relative" />
+        <div className={sideSettingsClass} ref={scrollableLeft}>
+          <div className="column">
+            {effectsFields.map((effect, index) => (
+              <InputDesignSystem
+                key={effect.effectName}
+                keyPopover={`effect-${index}`}
+                label={watch(`effects.${index}.effectName`)}
+                draggableTools={draggableTools}
+                isAddRemoveDragAllowed={true}
+                index={index}
+                onAdd={() => handleAddEffect(index)}
+                onRemove={() => {
+                  remove(index);
+                  handleSubmit(submitEffects);
+                }}
+                value={effect.items.map((item) => item.effectValue).join(",")}
+                registerKey={register(`effects.${index}.effectName`, {
+                  required: true,
+                })}
+                handleSubmit={handleSubmit(submitEffects)}
+                popoverEdit={
+                  <EffectsPopover
+                    effect={effect}
+                    register={register}
+                    index={index}
+                    control={control}
+                    watch={watch}
+                    setValue={setValue}
+                    getValue={getValues}
+                    handleSubmit={handleSubmit(submitEffects)}
                   />
-                </div>
-              }
-            />
-          ))}
-          {ModificationsMode.includes(effectsMode) && (
-            <Section.EmptySection
-              itemToInsert="effect"
-              onInsert={() => {
-                append(DEFAULT_EFFECT);
-              }}
-              sectionLength={effectsFields.length}
-              sectionName="effects"
-            />
-          )}
-          {!ModificationsMode.includes(effectsMode) &&
-            !effectsFields.length && (
+                }
+                tooltipValue={`effect-${effect.effectName}`}
+                portalTooltip={index === 0 ? topTooltipRef : undefined}
+              />
+            ))}
+            {editMode && (
+              <InputDesignSystemAddRemove
+                draggableTools={draggableTools}
+                itemName="effect"
+                onAppend={() => handleAddEffect(effectsFields.length - 1)}
+              />
+            )}
+            {!editMode && !effectsFields.length && (
               <div className="row justify-center">Empty</div>
             )}
+          </div>
         </div>
       </div>
       <div className={styles.previewContainer}>

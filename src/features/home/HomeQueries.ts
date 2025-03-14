@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { RecentFiles, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
+import { PresetDressing, RecentFiles, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
 import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
 
 /**
@@ -54,8 +54,8 @@ export function useInsertRecentFile() {
       await invoke("insert_recent_file", { filePath }),
     onSuccess: (res) => {
       // Mettre à jour le cache après une insertion réussie
-      queryClient.invalidateQueries({ queryKey: ["recentFiles"] });
-      navigate(`/design-system/${encodeURIComponent(res)}`);
+      queryClient.invalidateQueries({ queryKey: ["recent-files"] });
+      navigate(`/design-system/${encodeURIComponent(res)}?editMode=true`);
     },
     onError: (err) => {
       toast.error(err);
@@ -80,7 +80,7 @@ export function useRemoveRecentFile() {
       await invoke("remove_recent_file", { removePayload }),
     onSuccess: (path) => {
       // Mettre à jour le cache après une suppression réussie
-      queryClient.invalidateQueries({ queryKey: ["recentFiles"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-files"] });
       toast.success(`Succeed to remove ${path} from recent file`);
     },
     onError: (err) => {
@@ -89,4 +89,15 @@ export function useRemoveRecentFile() {
   });
 
   return { removeFile, isRemovingFile };
+}
+
+export function usePresetDressing() {
+  const { data: presetDressing, isLoading: isLoadingPresetDressing } = useQuery<PresetDressing>(
+    {
+      queryKey: ["preset-dressing"],
+      queryFn: async () => await invoke("fetch_presets_dressing"),
+    }
+  );
+
+  return { presetDressing, isLoadingPresetDressing };
 }

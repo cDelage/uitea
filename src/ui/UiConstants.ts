@@ -1,3 +1,4 @@
+import { SliderStyles } from "rc-slider/lib/interface";
 import {
   AdditionalTypographyScale,
   Base,
@@ -13,6 +14,7 @@ import {
   ThemeColor,
   TypographySpacing,
 } from "../domain/DesignSystemDomain";
+import { MainPaletteBuilder } from "../util/PaletteBuilderTwoStore";
 
 export const ICON_SIZE_SM = "16";
 export const ICON_SIZE_MD = "20";
@@ -220,3 +222,148 @@ export const EFFECT_TYPES: EffectType[] = [
   "BackdropFilter",
   "Blur",
 ];
+
+export const WEB_SAFE_FONTS: string[] = [
+  "Arial",
+  "Helvetica",
+  "Times New Roman",
+  "Times",
+  "Courier New",
+  "Courier",
+  "Verdana",
+  "Georgia",
+  "Palatino",
+  "Garamond",
+  "Bookman",
+  "Trebuchet MS",
+  "Arial Black",
+  "Impact",
+  "Comic Sans MS",
+  "ui-sans-serif",
+  "system-ui",
+  "sans-serif",
+  "Apple Color Emoji",
+  "Segoe UI Emoji",
+  "Segoe UI Symbol",
+  "Noto Color Emoji",
+];
+
+export const SLIDER_STYLE: SliderStyles = {
+  handle: {
+    backgroundColor: "var(--palette-primary-800)",
+    border: "white 2px solid",
+    boxShadow: "var(--shadow-md)"
+  },
+  rail:{
+    backgroundColor: "var(--palette-gray-300)"
+  },
+  track:{
+    backgroundColor:"var(--palette-primary-300)"
+  }
+};
+
+export const DEFAULT_PALETTE_BUILDER : MainPaletteBuilder = {
+  name: "main",
+  hue: "#0004FF",
+  tints: [
+    {
+      name: "100",
+      color: {
+        hex: "#fbfcfe",
+        h: 264.07333984373315,
+        s: 0.5,
+        l: 0.99,
+      },
+    },
+    {
+      name: "200",
+      color: {
+        hex: "#d7e2f8",
+        h: 264.07333984373315,
+        s: 0.6799999999999999,
+        l: 0.896,
+      },
+    },
+    {
+      name: "300",
+      color: {
+        hex: "#afc7f8",
+        h: 264.07333984373315,
+        s: 0.8200000000000001,
+        l: 0.802,
+      },
+    },
+    {
+      name: "400",
+      color: {
+        hex: "#87acfa",
+        h: 264.07333984373315,
+        s: 0.9199999999999999,
+        l: 0.708,
+      },
+    },
+    {
+      name: "500",
+      color: {
+        hex: "#5d8ffd",
+        h: 264.07333984373315,
+        s: 0.98,
+        l: 0.614,
+      },
+    },
+    {
+      name: "600",
+      color: {
+        hex: "#336dff",
+        h: 264.07333984373315,
+        s: 1,
+        l: 0.52,
+      },
+    },
+    {
+      name: "700",
+      color: {
+        hex: "#124bf0",
+        h: 264.07333984373315,
+        s: 0.98,
+        l: 0.42600000000000005,
+      },
+    },
+    {
+      name: "800",
+      color: {
+        hex: "#1640af",
+        h: 264.07333984373315,
+        s: 0.9199999999999999,
+        l: 0.3320000000000001,
+      },
+    },
+    {
+      name: "900",
+      color: {
+        hex: "#163173",
+        h: 264.07333984373315,
+        s: 0.8200000000000001,
+        l: 0.238,
+      },
+    },
+    {
+      name: "1000",
+      color: {
+        hex: "#0f1f42",
+        h: 264.07333984373315,
+        s: 0.6799999999999999,
+        l: 0.14400000000000002,
+      },
+    },
+    {
+      name: "1100",
+      color: {
+        hex: "#040814",
+        h: 264.07333984373315,
+        s: 0.5,
+        l: 0.050000000000000044,
+      },
+    },
+  ],
+};
