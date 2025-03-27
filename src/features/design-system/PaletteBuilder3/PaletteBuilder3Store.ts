@@ -6,7 +6,7 @@ import {
   getClosestTwo,
 } from "../../../util/FindClosestPoints";
 import { ColorOkhsl } from "../../../util/PaletteBuilderTwoStore";
-
+import chroma from "chroma-js";
 export type InterpolationMode = "curve" | "linear";
 
 export interface PaletteSettings {
