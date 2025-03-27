@@ -244,7 +244,7 @@ function InputDesignSystem({
                         {!computedColor && (
                           <MdWarning
                             size={12}
-                            color="var(--theme-warning-outline-text)"
+                            color="var(--warning-outline-text)"
                           />
                         )}
                       </div>

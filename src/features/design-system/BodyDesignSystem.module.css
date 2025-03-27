@@ -1,6 +1,6 @@
 .bodyDesignSystem {
   overflow: auto;
-  background-color: var(--theme-component-bg);
+  background-color: var(--component-bg);
   box-shadow: var(--shadow-md);
   box-sizing: border-box;
   margin: var(--space-0) var(--space-3) var(--space-3) var(--space-0);

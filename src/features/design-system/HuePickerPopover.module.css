@@ -20,7 +20,7 @@
 }
 
 .hueInstance[data-active="true"] {
-  border: 1px solid var(--theme-primary-border);
+  border: 1px solid var(--primary-border);
 }
 
 .headerContainer {

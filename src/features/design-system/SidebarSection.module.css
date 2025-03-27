@@ -10,11 +10,11 @@
 }
 
 .sidebarSection:hover {
-  background-color: var(--theme-base-button-hover-bg);
+  background-color: var(--base-button-hover-bg);
 }
 
 .sidebarSectionVisible {
-  background: var(--theme-base-button-active-bg);
+  background: var(--base-button-active-bg);
 }
 
 .sidebarSectionVisibleFirst {

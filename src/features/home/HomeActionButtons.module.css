@@ -1,7 +1,7 @@
 .homeActionButton {
     height: var(--space-14);
     width: var(--space-14);
-    background-color: var(--theme-component-bg);
+    background-color: var(--component-bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -18,8 +18,8 @@
 }
 
 .homeActionButton:hover{
-    background-color: var(--theme-component-hover-bg);
-    color: var(--theme-component-hover-text);
+    background-color: var(--component-hover-bg);
+    color: var(--component-hover-text);
 }
 
 .iconContainer {

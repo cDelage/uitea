@@ -28,8 +28,8 @@ function ShadeAddRemove({
   );
 
   const background = !draggableTools.dragIndex
-    ? "var(--theme-add-bg)"
-    : "var(--theme-remove-bg)";
+    ? "var(--add-bg)"
+    : "var(--remove-bg)";
 
   function handleMouseEnter() {
     if (draggableTools.dragIndex) {

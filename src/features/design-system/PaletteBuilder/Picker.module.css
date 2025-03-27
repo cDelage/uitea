@@ -1,0 +1,4 @@
+.zoomContainer {
+  padding: var(--space-2);
+  box-sizing: border-box;
+}

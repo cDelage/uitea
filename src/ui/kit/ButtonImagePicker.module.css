@@ -18,6 +18,6 @@
   }
 
   .imageButtonActive {
-    border: 2px solid var(--theme-add-border);
+    border: 2px solid var(--add-border);
   }
   

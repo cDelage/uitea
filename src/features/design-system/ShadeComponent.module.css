@@ -12,16 +12,15 @@
 }
 
 .shadeAdd {
-  border: dashed 2px var(--theme-add-border);
+  border: dashed 2px var(--add-border);
   box-sizing: border-box;
-  color: var(--theme-add-text);
-  opacity: 0.7;
+  color: var(--add-text);
   cursor: pointer;
 }
 
 .shadeRemove {
-  border: dashed 2px var(--theme-remove-border);
-  color: var(--theme-remove-text);
+  border: dashed 2px var(--remove-border);
+  color: var(--remove-text);
   opacity: 0.7;
   cursor: pointer;
 }
@@ -31,7 +30,8 @@
 }
 
 .shadeAdd:hover {
-  opacity: 1;
+  border: dashed 2px var(--add-hover-border);
+  color: var(--add-hover-text);
 }
 
 .elevateColor {
@@ -48,12 +48,12 @@
 }
 
 .draggable {
-  background-color: var(--theme-drag-bg);
+  background-color: var(--drag-bg);
   cursor: pointer;
 }
 
 .dragHover {
-  border-left: var(--theme-add-border) 2px solid;
+  border-left: var(--add-border) 2px solid;
   border-radius: 0px;
   cursor: pointer;
 }

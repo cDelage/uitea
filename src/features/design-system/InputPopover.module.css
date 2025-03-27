@@ -6,8 +6,8 @@
 
 .previewContainer {
   height: 100px;
-  background-color: var(--theme-tertiary-bg);
-  color: var(--theme-tertiary-text);
+  background-color: var(--tertiary-bg);
+  color: var(--tertiary-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,13 +148,13 @@
 }
 
 .selectionTab[data-active="true"] {
-  background-color: var(--theme-primary-bg);
-  color: var(--theme-primary-text);
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
 }
 
 .selectionTab:hover[data-active="false"] {
-  background-color: var(--theme-primary-outline-hover-bg);
-  color: var(--theme-primary-outline-hover-text);
+  background-color: var(--primary-outline-hover-bg);
+  color: var(--primary-outline-hover-text);
 }
 
 .imgTab {
@@ -166,5 +166,5 @@
 }
 
 .imgTab[data-active="true"] {
-  border: 2px solid var(--theme-add-border);
+  border: 2px solid var(--add-border);
 }

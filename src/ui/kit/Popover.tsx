@@ -21,9 +21,9 @@ const BodyDefault = styled.div<{
   $width?: number;
   $zIndex?: number;
 }>`
-  background-color: var(--theme-component-bg);
+  background-color: var(--component-bg);
   border-radius: var(--rounded-md);
-  border: 1px solid var(--theme-component-border);
+  border: 1px solid var(--component-border);
   box-shadow: var(--shadow-md);
   position: absolute;
   z-index: ${(props) => props.$zIndex ?? 20};

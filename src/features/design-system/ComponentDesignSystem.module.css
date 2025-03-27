@@ -144,6 +144,6 @@
 }
 
 .primaryTheme {
-  background-color: var(--theme-primary-bg);
-  color: var(--theme-primary-text);
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
 }

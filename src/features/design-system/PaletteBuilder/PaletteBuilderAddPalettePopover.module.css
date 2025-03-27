@@ -1,0 +1,31 @@
+.popoverStep {
+  width: 300px;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.colorSmallPreview{
+  height: 20px;
+  flex: 1;
+  box-shadow: var(--shadow-md);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+}
+
+.colorBigPreview{
+  height: 60px;
+  width: 80px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex:1;
+}

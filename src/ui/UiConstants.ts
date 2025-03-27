@@ -14,7 +14,7 @@ import {
   ThemeColor,
   TypographySpacing,
 } from "../domain/DesignSystemDomain";
-import { MainPaletteBuilder } from "../util/PaletteBuilderTwoStore";
+import { ColorOkhsl, PaletteBuilder } from "../util/PaletteBuilderTwoStore";
 
 export const ICON_SIZE_SM = "16";
 export const ICON_SIZE_MD = "20";
@@ -252,116 +252,116 @@ export const SLIDER_STYLE: SliderStyles = {
   handle: {
     backgroundColor: "var(--palette-primary-800)",
     border: "white 2px solid",
-    boxShadow: "var(--shadow-md)"
+    boxShadow: "var(--shadow-md)",
   },
-  rail:{
-    backgroundColor: "var(--palette-gray-300)"
+  rail: {
+    backgroundColor: "var(--palette-gray-300)",
   },
-  track:{
-    backgroundColor:"var(--palette-primary-300)"
-  }
+  track: {
+    backgroundColor: "var(--palette-primary-300)",
+  },
 };
 
-export const DEFAULT_PALETTE_BUILDER : MainPaletteBuilder = {
-  name: "main",
-  hue: "#0004FF",
+export const DEFAULT_PALETTE_BUILDER: PaletteBuilder = {
+  name: "violet",
+  mainColorHex: "#3e40d7",
   tints: [
+    {
+      name: "50",
+      color: {
+        hex: "#eff1f6",
+        h: 272.8329605438294,
+        s: 0.27,
+        l: 0.95,
+      },
+    },
     {
       name: "100",
       color: {
-        hex: "#fbfcfe",
-        h: 264.07333984373315,
-        s: 0.5,
-        l: 0.99,
+        hex: "#ced7f0",
+        h: 271.3563594516306,
+        s: 0.5004,
+        l: 0.86,
       },
     },
     {
       name: "200",
       color: {
-        hex: "#d7e2f8",
-        h: 264.07333984373315,
-        s: 0.6799999999999999,
-        l: 0.896,
+        hex: "#abbdf0",
+        h: 269.7183700721558,
+        s: 0.6796,
+        l: 0.77,
       },
     },
     {
       name: "300",
       color: {
-        hex: "#afc7f8",
-        h: 264.07333984373315,
-        s: 0.8200000000000001,
-        l: 0.802,
+        hex: "#85a3f2",
+        h: 267.8793352407708,
+        s: 0.8076,
+        l: 0.6799999999999999,
       },
     },
     {
       name: "400",
       color: {
-        hex: "#87acfa",
-        h: 264.07333984373315,
-        s: 0.9199999999999999,
-        l: 0.708,
+        hex: "#5e88f2",
+        h: 265.7829061051434,
+        s: 0.8844,
+        l: 0.59,
       },
     },
     {
       name: "500",
       color: {
-        hex: "#5d8ffd",
-        h: 264.07333984373315,
-        s: 0.98,
-        l: 0.614,
+        hex: "#366de8",
+        h: 263.3451221626768,
+        s: 0.91,
+        l: 0.5,
       },
     },
     {
       name: "600",
       color: {
-        hex: "#336dff",
-        h: 264.07333984373315,
-        s: 1,
-        l: 0.52,
+        hex: "#205abe",
+        h: 260.4327819460624,
+        s: 0.8844,
+        l: 0.41000000000000003,
       },
     },
     {
       name: "700",
       color: {
-        hex: "#124bf0",
-        h: 264.07333984373315,
-        s: 0.98,
-        l: 0.42600000000000005,
+        hex: "#18498a",
+        h: 256.8153510938091,
+        s: 0.8076,
+        l: 0.32000000000000006,
       },
     },
     {
       name: "800",
       color: {
-        hex: "#1640af",
-        h: 264.07333984373315,
-        s: 0.9199999999999999,
-        l: 0.3320000000000001,
+        hex: "#14365a",
+        h: 252.03854512703106,
+        s: 0.6796,
+        l: 0.22999999999999998,
       },
     },
     {
       name: "900",
       color: {
-        hex: "#163173",
-        h: 264.07333984373315,
-        s: 0.8200000000000001,
-        l: 0.238,
+        hex: "#0f2231",
+        h: 244.98849068834502,
+        s: 0.5004,
+        l: 0.14,
       },
     },
     {
-      name: "1000",
+      name: "950",
       color: {
-        hex: "#0f1f42",
-        h: 264.07333984373315,
-        s: 0.6799999999999999,
-        l: 0.14400000000000002,
-      },
-    },
-    {
-      name: "1100",
-      color: {
-        hex: "#040814",
-        h: 264.07333984373315,
-        s: 0.5,
+        hex: "#05090c",
+        h: 231.2441297102327,
+        s: 0.27,
         l: 0.050000000000000044,
       },
     },
@@ -373,7 +373,14 @@ export const PALETTE_BUILDER_DEFAULT_SETTINGS = {
   endLuminance: 5,
   minSaturation: 50,
   maxSaturation: 100,
-  bezoldBruckeGap: 15,
-  bezoldBruckeActive: true,
-  steps: 11
+  hueCorrectionGap: 5,
+  hueCorrectionActive: true,
+  steps: 11,
+};
+
+export const DEFAULT_OKHSL: ColorOkhsl = {
+  hex: "#dddddd",
+  h: 0,
+  s: 0,
+  l: 0
 }

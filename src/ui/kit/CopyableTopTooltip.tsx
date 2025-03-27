@@ -82,7 +82,7 @@ function CopyableTopTooltip({
             ) : (
               <MdContentCopy size={ICON_SIZE_MD} />
             )}
-            <div className={styles.tooltipArrow}></div>
+            <div className={styles.tooltipArrow}/>
           </div>,
           portalComponent.current
         )}

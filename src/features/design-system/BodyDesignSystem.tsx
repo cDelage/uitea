@@ -25,7 +25,7 @@ import RadiusComponent from "./RadiusComponent";
 import EffectsComponent from "./EffectsComponent";
 import Modal from "../../ui/kit/Modal";
 import { MdBuild } from "react-icons/md";
-import PaletteBuilderTwoComponent from "./PaletteBuilderTwoComponent";
+import PaletteBuilder3Component from "./PaletteBuilder3/PaletteBuilder3Component";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -76,11 +76,12 @@ function BodyDesignSystem() {
               <Modal>
                 <Modal.Toggle id="palette-builder">
                   <button className="action-ghost-button" type="button">
-                    <MdBuild size={ICON_SIZE_MD}/>Palette builder
+                    <MdBuild size={ICON_SIZE_MD} />
+                    Palette builder
                   </button>
                 </Modal.Toggle>
                 <Modal.Body id="palette-builder">
-                  <PaletteBuilderTwoComponent />
+                  <PaletteBuilder3Component />
                 </Modal.Body>
               </Modal>
             </>

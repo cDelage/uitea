@@ -26,15 +26,15 @@ export const Table = styled.table`
   }
 
   tbody {
-    background-color: var(--theme-component-bg);
+    background-color: var(--component-bg);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
 
     tr {
       cursor: pointer;
       &:hover {
-        background-color: var(--theme-component-hover-bg);
-        color: var(--theme-component-hover-text);
+        background-color: var(--component-hover-bg);
+        color: var(--component-hover-text);
       }
 
       td {

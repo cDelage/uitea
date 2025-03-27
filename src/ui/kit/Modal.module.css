@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: var(--theme-modal-bg);
+  background-color: var(--modal-bg);
   z-index: 30;
   transition: all 0.5s;
 }
@@ -14,7 +14,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: var(--theme-component-bg);
+  background-color: var(--component-bg);
   border-radius: 8px;
   box-shadow: var(--shadow-md);
   transition: all 0.5s;
