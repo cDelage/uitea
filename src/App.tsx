@@ -6,6 +6,8 @@ import Layout from "./ui/layout/Layout";
 import DesignSystemPage from "./features/design-system/PageDesignSystem";
 import { Toaster } from "react-hot-toast";
 import ErrorFallback from "./ui/layout/ErrorFallback";
+import { Suspense } from "react";
+import Loader from "./ui/kit/Loader";
 
 const router = createBrowserRouter([
   {
@@ -14,11 +16,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <HomePage />,
+        element: <Suspense fallback={<Loader/>}><HomePage /></Suspense>,
       },
       {
         path: "/design-system/:designSystemPath",
-        element: <DesignSystemPage />,
+        element: (
+          <Suspense fallback={<Loader />}>
+            <DesignSystemPage />
+          </Suspense>
+        ),
       },
     ],
   },

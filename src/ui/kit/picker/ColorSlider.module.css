@@ -1,0 +1,28 @@
+.colorSliderBody {
+  position: absolute;
+  background-color: var(--tooltip-bg);
+  padding: var(--space-2);
+  border-radius: var(--rounded-md);
+  bottom: 14px;
+}
+
+.colorPreview {
+  width: var(--space-5);
+  min-width: var(--space-5);
+  max-width: var(--space-5);
+  height: var(--space-5);
+  min-height: var(--space-5);
+  max-height: var(--space-5);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+}
+
+.tooltipArrow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--tooltip-bg);
+}

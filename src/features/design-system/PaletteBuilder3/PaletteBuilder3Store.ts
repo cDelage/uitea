@@ -1,56 +1,58 @@
 import { create } from "zustand";
 import { getTintName, TintsNamingMode } from "../../../util/TintsNaming";
-import { formatHex, hsl, okhsl } from "culori";
-import {
-  getClosestThree,
-  getClosestTwo,
-} from "../../../util/FindClosestPoints";
-import { ColorOkhsl } from "../../../util/PaletteBuilderTwoStore";
+import { formatHex, hsl, hwb } from "culori";
 import chroma from "chroma-js";
-export type InterpolationMode = "curve" | "linear";
+import { Color as ChromaColor } from "chroma-js";
 
-export interface PaletteSettings {
-  lightnessMax: number;
-  lightnessMin: number;
-  saturationMin: number;
-  saturationMax: number;
-  lightnessInterpolationMode: InterpolationMode;
-  saturationInterpolationMode: InterpolationMode;
-}
-
-const DEFAULT_SETTINGS: PaletteSettings = {
-  lightnessMax: 0.9,
-  lightnessMin: 0.1,
-  lightnessInterpolationMode: "linear",
-  saturationMin: 0.8,
-  saturationMax: 1,
-  saturationInterpolationMode: "curve",
-};
-
-export interface PaletteBuild {
-  name: string;
-  tints: TintBuild[];
-}
-
-export interface OkhslColor {
-  hex: string;
+export interface HslStore {
   h: number;
   s: number;
   l: number;
 }
 
+export interface OklchStore {
+  l: number;
+  c: number;
+  h: number;
+}
+
+export type PaletteColor = ChromaColor & {
+  hslStore?: HslStore;
+  oklchStore?: OklchStore;
+};
+
+export interface PaletteSettings {
+  lightnessMax: number;
+  lightnessMin: number;
+}
+
+interface ColorPositionIndex {
+  color?: ChromaColor;
+  index: number;
+}
+
+interface ReduceColors {
+  colors: ChromaColor[];
+  previousColor: ColorPositionIndex;
+}
+
+export interface PaletteBuild {
+  name: string;
+  tints: TintBuild[];
+  settings: PaletteSettings;
+}
+
 export interface TintBuild {
   name: string;
   isFixed?: boolean;
-  color: OkhslColor;
+  isCenter?: boolean;
+  color: PaletteColor;
 }
 
 interface PalettesStoreSettings {
   steps: number;
-  lightnessInterpolationMode: InterpolationMode;
-  saturationInterpolationMode: InterpolationMode;
-  hueInterpolationMode: InterpolationMode;
   tintNamingMode: TintsNamingMode;
+  paletteSettings: PaletteSettings;
 }
 
 export interface Point {
@@ -62,10 +64,11 @@ interface PaletteBuilderStore {
   palettes: PaletteBuild[];
   settings: PalettesStoreSettings;
   createPalette: (tint?: string) => void;
-  buildPaletteTints: (fixedTints: (TintBuild | undefined)[]) => TintBuild[];
+  buildPaletteTints: (tints: TintBuild[]) => TintBuild[];
   updatePalettes: () => void;
   updatePalette: (index: number, palette: PaletteBuild) => void;
   setSettings: (settings: PalettesStoreSettings) => void;
+  reset: () => void;
 }
 
 export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
@@ -73,184 +76,80 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
     palettes: [],
     settings: {
       steps: 11,
-      lightnessInterpolationMode: "linear",
-      saturationInterpolationMode: "curve",
-      hueInterpolationMode: "curve",
       tintNamingMode: "50,100,200...900,950",
+      paletteSettings: {
+        lightnessMax: 0.9,
+        lightnessMin: 0.1,
+      },
     },
     createPalette(tint?: string) {
       const {
-        settings: { steps, tintNamingMode },
-        buildPaletteTints,
+        settings: { steps, tintNamingMode, paletteSettings },
       } = get();
-      const paletteTint: string = tint ?? "#00ff44";
-      const [startColor, centerColor, endColor] = buildStartingTints(
-        paletteTint,
-        DEFAULT_SETTINGS
-      );
-      const tints: (TintBuild | undefined)[] = Array.from(
-        { length: steps },
-        (_, i) => {
-          if (i === 0) {
-            return {
-              name: getTintName({
-                index: i,
-                length: steps,
-                mode: tintNamingMode,
-              }),
-              color: startColor,
-            } as TintBuild;
-          }
-          if (i === Math.floor(steps / 2)) {
-            return {
-              name: getTintName({
-                index: i,
-                length: steps,
-                mode: tintNamingMode,
-              }),
-              color: centerColor,
-            } as TintBuild;
-          }
-          if (i === steps - 1) {
-            return {
-              name: getTintName({
-                index: i,
-                length: steps,
-                mode: tintNamingMode,
-              }),
-              color: endColor,
-            } as TintBuild;
-          }
-          return undefined;
-        }
-      );
-      const tintsBuilded = buildPaletteTints(tints);
+      const paletteTint: ChromaColor = chroma(tint ?? "#e24");
+      const [startColor, endColor] = getEndsTints(paletteTint, paletteSettings);
+      const tints: TintBuild[] = chroma
+        .scale([startColor, paletteTint, endColor])
+        .domain([0, Math.floor(steps / 2) / steps])
+        .mode("oklch")
+        .colors(steps, null)
+        .map((step, index) => {
+          return {
+            name: getTintName({
+              index,
+              length: steps,
+              mode: tintNamingMode,
+            }),
+            isCenter: index === Math.floor(steps / 2),
+            color: step as PaletteColor,
+          };
+        });
       set((state) => {
         return {
           ...state,
           palettes: [
             ...state.palettes,
             {
-              name: getHueName(paletteTint),
-              tints: tintsBuilded,
+              name: getHueName(paletteTint.hex()),
+              tints,
+              settings: paletteSettings,
             },
           ],
         };
       });
     },
     updatePalettes() {
-      const {
-        settings: { steps },
-        buildPaletteTints,
-      } = get();
+      const { buildPaletteTints } = get();
       set((state) => {
         return {
           ...state,
           palettes: state.palettes.map((palette) => {
-            const fixedTints: (TintBuild | undefined)[] = Array.from(
-              { length: steps },
-              (_, i) => {
-                if (i === 0) {
-                  return palette.tints[0];
-                } else if (i === Math.floor(steps / 2)) {
-                  return palette.tints[Math.floor(palette.tints.length / 2)];
-                } else if (i === steps - 1) {
-                  return palette.tints[palette.tints.length - 1];
-                } else if (
-                  palette.tints[i]?.isFixed &&
-                  i !== palette.tints.length - 1 &&
-                  i !== Math.floor(palette.tints.length / 2)
-                ) {
-                  return palette.tints[i];
-                } else {
-                  return undefined;
-                }
-              }
-            );
-            const paletteBuild = buildPaletteTints(fixedTints);
             return {
               ...palette,
-              tints: paletteBuild,
+              tints: buildPaletteTints(palette.tints),
             };
           }),
         };
       });
     },
     updatePalette(index: number, newPalette: PaletteBuild) {
+      const { buildPaletteTints } = get();
+      const tints = buildPaletteTints(newPalette.tints);
       set((state) => {
         return {
           ...state,
           palettes: state.palettes.map((palette, i) =>
-            index === i ? newPalette : palette
+            index === i ? { ...newPalette, tints } : palette
           ),
         };
       });
     },
-    buildPaletteTints(fixedTints: (TintBuild | undefined)[]): TintBuild[] {
+    buildPaletteTints(originalTints: TintBuild[]): TintBuild[] {
       const {
-        settings: {
-          steps,
-          lightnessInterpolationMode,
-          saturationInterpolationMode,
-          hueInterpolationMode,
-          tintNamingMode,
-        },
+        settings: { steps, tintNamingMode },
       } = get();
-      const tints = Array.from({ length: steps }, (_, i) => {
-        const name = getTintName({
-          index: i,
-          mode: tintNamingMode,
-          length: steps,
-        });
-        const existing = fixedTints[i];
-        if (existing) return { ...existing, name };
-        const huePoints = fixedTints.map((tint, index) =>
-          paletteTintToPoint({ tint, key: "h", index })
-        );
-        const saturationPoints = fixedTints.map((tint, index) =>
-          paletteTintToPoint({ tint, key: "s", index })
-        );
-        const lightnessPoints = fixedTints.map((tint, index) =>
-          paletteTintToPoint({ tint, key: "l", index })
-        );
 
-        const h: number = interpolate(huePoints, i, hueInterpolationMode, {
-          min: 0,
-          max: 360,
-          modulo: true,
-        });
-
-        const s: number = interpolate(
-          saturationPoints,
-          i,
-          saturationInterpolationMode,
-          {
-            min: 0,
-            max: 1,
-          }
-        );
-
-        const l: number = interpolate(
-          lightnessPoints,
-          i,
-          lightnessInterpolationMode,
-          {
-            min: 0,
-            max: 1,
-          }
-        );
-
-        return {
-          name,
-          color: computeOkhslColor({
-            hex: "",
-            h,
-            s,
-            l,
-          }),
-        } as TintBuild;
-      });
-      return tints;
+      return constructTints(originalTints, steps, tintNamingMode);
     },
     setSettings(settings: PalettesStoreSettings) {
       set((state) => {
@@ -264,52 +163,16 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
       });
       get().updatePalettes();
     },
+    reset() {
+      set((state) => {
+        return {
+          ...state,
+          palettes: [],
+        };
+      });
+    },
   })
 );
-
-function interpolate(
-  points: (Point | undefined)[],
-  index: number,
-  interpolationMode: InterpolationMode,
-  range?: {
-    min: number;
-    max: number;
-    modulo?: boolean;
-  }
-): number {
-  return interpolationMode === "curve"
-    ? quadraticInterpolation(
-        getClosestThree<Point>(points, index),
-        index,
-        range
-      )
-    : linearInterpolation(getClosestTwo(points, index), index, range);
-}
-
-export function autoRangeNumber(
-  value: number,
-  min: number,
-  max: number,
-  modulo?: boolean
-) {
-  if (modulo) {
-    return Math.max(min, value % max);
-  }
-  return Math.min(max, Math.max(min, value));
-}
-
-function paletteTintToPoint({
-  tint,
-  key,
-  index,
-}: {
-  tint?: TintBuild;
-  key: "h" | "s" | "l";
-  index: number;
-}): Point | undefined {
-  if (!tint) return undefined;
-  return { x: index, y: tint.color[key] };
-}
 
 export function getProportionalValue({
   initialMax,
@@ -347,116 +210,142 @@ function getHueName(color: string): string {
   return "pink";
 }
 
-function buildStartingTints(
-  color: string,
+export function getEndsTints(
+  color: ChromaColor,
   settings: PaletteSettings
-): OkhslColor[] {
-  const centerColor = colorToOkhsl(color);
-  const startColor: OkhslColor = computeOkhslColor({
-    ...centerColor,
-    s:
-      settings.saturationInterpolationMode === "curve"
-        ? settings.saturationMin
-        : centerColor.s,
-    l: settings.lightnessMax,
+): [ChromaColor, ChromaColor] {
+  const startColor = chroma(color).tint(0.9);
+  const endColor = chroma.mix(
+    color,
+    "#000000",
+    1 - settings.lightnessMin,
+    "oklch"
+  );
+  return [startColor, endColor];
+}
+
+export function autoRangeNumber(
+  value: number,
+  min: number,
+  max: number,
+  modulo?: boolean
+) {
+  if (modulo) {
+    return Math.max(min, value % max);
+  }
+  return Math.min(max, Math.max(min, value));
+}
+
+function constructTints(
+  originalTints: TintBuild[],
+  steps: number,
+  tintNamingMode: TintsNamingMode
+): TintBuild[] {
+  //Step 1 : construct an array with the fixed colors : [Color, undefined, undefined, Color...]
+  const anchorTints: (TintBuild | undefined)[] = Array.from(
+    { length: steps },
+    (_, i) => {
+      if (i === 0) {
+        return originalTints[0];
+      }
+      if (i === Math.floor(steps / 2)) {
+        return (
+          originalTints.find((tint) => tint.isCenter) ?? {
+            ...originalTints[Math.floor(originalTints.length / 2)],
+            isCenter: true,
+          }
+        );
+      }
+      if (i === steps - 1) {
+        return originalTints[originalTints.length - 1];
+      }
+      if (
+        originalTints[i].isFixed &&
+        i !== steps - 1 &&
+        !originalTints[i].isCenter
+      ) {
+        return originalTints[i];
+      }
+      return undefined;
+    }
+  );
+
+  //Step 2 : Reduce the array to calc the undefined entries (and conserve the existing colors)
+  const reducedTints = anchorTints.reduce<ReduceColors>(
+    (acc, tint, index) => {
+      if (acc.colors[index]) {
+        return acc;
+      } else if (tint) {
+        return {
+          ...acc,
+          colors: [...acc.colors, tint.color],
+        };
+      } else {
+        const nextColor: ColorPositionIndex = anchorTints
+          .map((e, i) => {
+            return {
+              color: e?.color,
+              index: i,
+            };
+          })
+          .find(
+            (e) => e.index > index && e?.color !== undefined
+          ) as ColorPositionIndex;
+        const subSteps = nextColor.index + 1 - acc.previousColor.index;
+        const colors = chroma
+          .scale([
+            acc.previousColor.color as ChromaColor,
+            nextColor.color as ChromaColor,
+          ])
+          .mode("oklch")
+          .colors(subSteps, null);
+        colors.shift();
+        colors.pop();
+        return {
+          colors: [...acc.colors, ...colors],
+          previousColor: nextColor,
+        };
+      }
+    },
+    {
+      colors: [],
+      previousColor: { index: 0, color: anchorTints[0]?.color as ChromaColor },
+    }
+  );
+
+  //Step 3: Transform into tint object
+  return reducedTints.colors.map((step, index) => {
+    return {
+      name: getTintName({
+        index,
+        length: steps,
+        mode: tintNamingMode,
+      }),
+      isCenter: anchorTints[index]?.isCenter,
+      isFixed: anchorTints[index]?.isFixed,
+      color: step as PaletteColor,
+    };
   });
-  const endColor: OkhslColor = computeOkhslColor({
-    ...centerColor,
-    s:
-      settings.saturationInterpolationMode === "curve"
-        ? settings.saturationMin
-        : centerColor.s,
-    l: settings.lightnessMin,
-  });
-  return [startColor, centerColor, endColor];
 }
 
-function colorToOkhsl(color: string): OkhslColor {
-  const colOk = okhsl(color);
+export function hwbHueAligner({
+  newColor,
+  colorToAlign,
+}: {
+  newColor: ChromaColor;
+  colorToAlign: ChromaColor;
+}): ChromaColor {
+  const newColorHwb = hwb(newColor.hex());
+  const colorToAlignHwb = hwb(colorToAlign.hex());
+  if (newColorHwb && colorToAlignHwb) {
+    const newHex = formatHex({
+      mode: "hwb",
+      h: newColorHwb.h,
+      w: colorToAlignHwb.w,
+      b: colorToAlignHwb.b,
+    });
 
-  if (!colOk) throw new Error("Fail to convert color");
-
-  return {
-    hex: formatHex({
-      mode: "okhsl",
-      h: colOk.h ?? 0,
-      s: colOk.s,
-      l: colOk.l,
-    }),
-    h: colOk.h ?? 0,
-    s: colOk.s,
-    l: colOk.l,
-  };
-}
-
-function computeOkhslColor(okhslColor: OkhslColor): OkhslColor {
-  return {
-    ...okhslColor,
-    hex: formatHex({
-      mode: "okhsl",
-      h: okhslColor.h,
-      s: okhslColor.s,
-      l: okhslColor.l,
-    }),
-  };
-}
-
-function linearInterpolation(
-  points: [Point, Point],
-  x: number,
-  range?: {
-    min: number;
-    max: number;
-    modulo?: boolean;
+    return chroma(newHex);
   }
-): number {
-  const [p1, p2] = points;
-
-  if (p2.x - p1.x === 0) {
-    return range
-      ? autoRangeNumber(p1.y, range.min, range.max, range.modulo)
-      : p1.y;
-  }
-
-  // Compute y by using linear interpolation
-  // y = y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
-  const y = p1.y + ((p2.y - p1.y) / (p2.x - p1.x)) * (x - p1.x);
-
-  return range ? autoRangeNumber(y, range.min, range.max, range.modulo) : y;
-}
-
-/**
- * Calculates the y-value for a given x based on three points (a, b, c)
- * using quadratic interpolation (Lagrange formula).
- *
- * @param a - First point with x and y properties.
- * @param b - Second point with x and y properties.
- * @param c - Third point with x and y properties.
- * @param x - The x value for which the y value is to be determined.
- * @returns The interpolated y value.
- */
-function quadraticInterpolation(
-  points: [Point, Point, Point],
-  x: number,
-  range?: {
-    min: number;
-    max: number;
-    modulo?: boolean;
-  }
-): number {
-  const [a, b, c] = points;
-  // Calculate the Lagrange coefficients
-  const L0 = ((x - b.x) * (x - c.x)) / ((a.x - b.x) * (a.x - c.x));
-  const L1 = ((x - a.x) * (x - c.x)) / ((b.x - a.x) * (b.x - c.x));
-  const L2 = ((x - a.x) * (x - b.x)) / ((c.x - a.x) * (c.x - b.x));
-
-  const interpolatedValue = a.y * L0 + b.y * L1 + c.y * L2;
-
-  return range
-    ? autoRangeNumber(interpolatedValue, range.min, range.max, range.modulo)
-    : interpolatedValue;
-}
-
-export function findCenterColor(palette: PaletteBuild): ColorOkhsl {
-  return palette.tints[Math.floor(palette.tints.length / 2)].color;
+  return colorToAlign;
 }

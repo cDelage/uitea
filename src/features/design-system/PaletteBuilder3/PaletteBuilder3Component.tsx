@@ -1,10 +1,7 @@
 import { MdAdd, MdBuild, MdRemove, MdRestartAlt } from "react-icons/md";
 import styles from "./PaletteBuilder3.module.css";
 import { ICON_SIZE_MD } from "../../../ui/UiConstants";
-import {
-  findCenterColor,
-  usePaletteBuilder3Store,
-} from "./PaletteBuilder3Store";
+import { usePaletteBuilder3Store } from "./PaletteBuilder3Store";
 import SidePanel from "../../../ui/kit/SidePanel";
 import { useMemo, useState } from "react";
 import PaletteSidePanel from "./PaletteSidePanel";
@@ -16,7 +13,7 @@ import {
 } from "../../../util/TintsNaming";
 
 function PaletteBuilder3Component() {
-  const { palettes, createPalette, settings, setSettings } =
+  const { palettes, createPalette, settings, setSettings, reset } =
     usePaletteBuilder3Store();
   const { steps, tintNamingMode } = settings;
   const firstPalette = palettes[0];
@@ -53,8 +50,8 @@ function PaletteBuilder3Component() {
           <MdBuild />
           <h5>Palette builder</h5>
         </div>
-        <button className="action-ghost-button" onClick={() => {}}>
-          <MdRestartAlt size={ICON_SIZE_MD} /> Reset all
+        <button className="action-ghost-button" onClick={reset}>
+          <MdRestartAlt size={ICON_SIZE_MD} /> Reset
         </button>
       </div>
       <div className={styles.builderBodyContainer}>
@@ -84,14 +81,14 @@ function PaletteBuilder3Component() {
             <div className="row align-center gap-3">
               <button
                 className="menu-button"
-                onClick={() => setSteps(Math.max(steps - 1, 1))}
+                onClick={() => setSteps(steps - 1)}
               >
                 <MdRemove size={ICON_SIZE_MD} />
               </button>
               <strong className="text-color-light">{steps}</strong>
               <button
                 className="menu-button"
-                onClick={() => setSteps(Math.min(steps + 1, 20))}
+                onClick={() => setSteps(steps + 1)}
               >
                 <MdAdd size={ICON_SIZE_MD} />
               </button>
@@ -126,7 +123,9 @@ function PaletteBuilder3Component() {
                             <div
                               className={styles.paletteColor}
                               style={{
-                                background: findCenterColor(palette).hex,
+                                background: palette.tints
+                                  .find((palette) => palette.isCenter)
+                                  ?.color.hex(),
                               }}
                             ></div>
                             {palette.name}
@@ -136,8 +135,9 @@ function PaletteBuilder3Component() {
                           <td
                             key={tint.name}
                             className={styles.columnTint}
-                            style={{ background: tint.color.hex }}
-                          ></td>
+                            style={{ background: tint.color.hex() }}
+                          >
+                          </td>
                         ))}
                       </tr>
                     </SidePanel.Button>
@@ -153,7 +153,10 @@ function PaletteBuilder3Component() {
             Append palette
           </button>
           <SidePanel.BodyRelative id="palette" width="500px">
-            <PaletteSidePanel palette={selectedPalette} index={selectedPaletteIndex}/>
+            <PaletteSidePanel
+              palette={selectedPalette}
+              index={selectedPaletteIndex}
+            />
           </SidePanel.BodyRelative>
         </SidePanel>
       </div>

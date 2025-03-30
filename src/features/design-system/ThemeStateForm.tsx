@@ -31,7 +31,7 @@ function ThemeStateForm({
   setValue: UseFormSetValue<ThemeColor>;
   portalTooltip?: RefObject<HTMLDivElement | null>;
 }) {
-  const { themesMode, findDesignSystemColor, editMode } =
+  const { findDesignSystemColor, editMode } =
     useDesignSystemContext();
   const themeUndefined = watch(themeStateCategory) == undefined;
 
@@ -60,7 +60,6 @@ function ThemeStateForm({
             />
           )}
           <strong>
-            {themesMode !== "edit" && <>:</>}
             {themeStateCategory}
           </strong>
         </div>

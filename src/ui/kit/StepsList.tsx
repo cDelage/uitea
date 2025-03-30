@@ -136,7 +136,7 @@ function NextStepButton({
     >,
     {
       onClick: handleClick,
-      onMouseDown: (e) => e.stopPropagation(),
+      onMouseDown: (e: MouseEvent) => e.stopPropagation(),
     }
   );
 }

@@ -218,7 +218,7 @@ function Toggle({
     {
       onClick: handleClick,
       ref: toggleRef,
-      onMouseDown: (e) => e.stopPropagation(),
+      onMouseDown: (e: MouseEvent) => e.stopPropagation(),
     }
   );
 }
@@ -240,7 +240,7 @@ function Close({ children }: { children: ReactNode }) {
     >,
     {
       onClick: handleClick,
-      onMouseDown: (e) => e.stopPropagation(),
+      onMouseDown: (e: MouseEvent) => e.stopPropagation(),
     }
   );
 }
