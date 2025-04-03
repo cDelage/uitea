@@ -225,7 +225,21 @@
 
   --transition-base: transform 100ms ease-in-out;
 
-  --hsl-gradient: linear-gradient(to right, hsl(0 100% 50%), hsl(30 100% 50%), hsl(60 100% 50%), hsl(90 100% 50%), hsl(120 100% 50%), hsl(150 100% 50%), hsl(180 100% 50%), hsl(210 100% 50%), hsl(240 100% 50%), hsl(270 100% 50%), hsl(330 100% 50%), hsl(360 100% 50%));
+  --hsl-gradient: linear-gradient(
+    to right,
+    hsl(0 100% 50%),
+    hsl(30 100% 50%),
+    hsl(60 100% 50%),
+    hsl(90 100% 50%),
+    hsl(120 100% 50%),
+    hsl(150 100% 50%),
+    hsl(180 100% 50%),
+    hsl(210 100% 50%),
+    hsl(240 100% 50%),
+    hsl(270 100% 50%),
+    hsl(330 100% 50%),
+    hsl(360 100% 50%)
+  );
 
   ::-webkit-scrollbar {
     width: 6px;
@@ -339,11 +353,15 @@ strong {
   font-size: 14px;
   line-height: 16px;
   user-select: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
 }
 
 label {
   color: var(--base-text-light);
+  font-weight: var(--font-weight-bold);
+}
+
+.bold {
   font-weight: var(--font-weight-bold);
 }
 
@@ -486,6 +504,10 @@ p {
 
 .w-full {
   width: 100%;
+}
+
+.w-fit {
+  width: fit-content;
 }
 
 .h-full {
@@ -664,6 +686,12 @@ p {
   height: 100%;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 select {
   padding: var(--space-2) var(--space-0);
   margin: 0;
@@ -725,6 +753,10 @@ select:disabled {
   padding: 0px;
   padding-left: 4px;
   margin: 0px;
+}
+
+.text-align-right {
+  text-align: right;
 }
 
 .error {
@@ -981,4 +1013,14 @@ td {
 .modal-exit-active {
   transform: translateX(100%);
   transition: transform 200ms;
+}
+
+.paletteColor {
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+  border: var(--base-border) 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
 }

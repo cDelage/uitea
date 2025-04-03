@@ -1,4 +1,28 @@
+.picker {
+    display: flex;
+    flex-direction: column;
+}
+
 .sliderContainer {
-    display: grid;
-    
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.sliderLabel {
+    width: 40px;
+}
+
+.settingsContainer {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-0);
+}
+
+.colorSpaceMode {
+    width: fit-content;
+}
+
+.hexContainer {
+    width: 64px;
 }

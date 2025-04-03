@@ -1,3 +1,5 @@
+import { InterpolationColorSpace } from "../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
+
 export type TintsNamingMode =
   | "5,10,20...90,95"
   | "50,100,200...900,950"
@@ -66,5 +68,13 @@ export function isTintsNamingMode(value: string): value is TintsNamingMode {
     "10,20,30...",
     "100,200,300...",
     "manual",
+  ].includes(value);
+}
+
+export function isInterpolationColorSpace(value: string): value is InterpolationColorSpace {
+  return [
+    "oklch",
+    "lch",
+    "hsl",
   ].includes(value);
 }

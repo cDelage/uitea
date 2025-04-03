@@ -37,19 +37,18 @@ function ColorSlider({
         rail: {
           background: gradient,
           height: "20px",
-          borderRadius: "var(--rounded-md)",
+          borderRadius: "4px",
           boxShadow: "var(--shadow-md)",
           bottom: 2,
         },
         handle: {
           background: color?.hex(),
           opacity: 1,
-          borderRadius: "var(--rounded-md)",
+          borderRadius: "2px",
           height: "24px",
           width: "10px",
           boxShadow: "var(--shadow-md)",
-          outline: "white 1px solid",
-          border: "black 1px solid",
+          border: "var(--base-border) 1px solid",
           bottom: 0,
         },
       }}

@@ -15,6 +15,7 @@ import {
   TypographySpacing,
 } from "../domain/DesignSystemDomain";
 import { ColorOkhsl, PaletteBuilder } from "../util/PaletteBuilderTwoStore";
+import { CSSProperties } from "styled-components";
 
 export const ICON_SIZE_SM = "16";
 export const ICON_SIZE_MD = "20";
@@ -382,5 +383,34 @@ export const DEFAULT_OKHSL: ColorOkhsl = {
   hex: "#dddddd",
   h: 0,
   s: 0,
-  l: 0
+  l: 0,
+};
+
+export const HANDLE_SLIDER: CSSProperties = {
+  width: "var(--space-5)",
+  height: "var(--space-5)",
+  borderRadius: "var(--rounded-md)",
+  opacity: 1,
+  border: "1px solid var(--base-border)",
+  boxShadow: "var(--shadow-md)",
+};
+
+export function getRectSize({
+  height,
+  flex,
+  width,
+}: {
+  height: string;
+  width?: string;
+  flex?: boolean;
+}): CSSProperties {
+  return {
+    minHeight: height,
+    height: height,
+    maxHeight: height,
+    minWidth: width ?? (!flex ? height : undefined),
+    width: width ?? (!flex ? height : undefined),
+    maxWidth: width ?? (!flex ? height : undefined),
+    flex: flex ? 1 : 0,
+  };
 }

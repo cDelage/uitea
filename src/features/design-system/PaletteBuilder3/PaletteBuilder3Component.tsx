@@ -1,21 +1,27 @@
 import { MdAdd, MdBuild, MdRemove, MdRestartAlt } from "react-icons/md";
 import styles from "./PaletteBuilder3.module.css";
-import { ICON_SIZE_MD } from "../../../ui/UiConstants";
-import { usePaletteBuilder3Store } from "./PaletteBuilder3Store";
+import { getRectSize, ICON_SIZE_MD } from "../../../ui/UiConstants";
+import {
+  InterpolationColorSpace,
+  INTERPOLATIONS_COLOR_SPACES,
+  usePaletteBuilder3Store,
+} from "./PaletteBuilder3Store";
 import SidePanel from "../../../ui/kit/SidePanel";
 import { useMemo, useState } from "react";
 import PaletteSidePanel from "./PaletteSidePanel";
 import FormComponent from "../../../ui/kit/FormComponent";
 import {
+  isInterpolationColorSpace,
   isTintsNamingMode,
   TINTS_NAMING_MODE,
   TintsNamingMode,
 } from "../../../util/TintsNaming";
+import classNames from "classnames";
 
 function PaletteBuilder3Component() {
   const { palettes, createPalette, settings, setSettings, reset } =
     usePaletteBuilder3Store();
-  const { steps, tintNamingMode } = settings;
+  const { steps, tintNamingMode, interpolationColorSpace } = settings;
   const firstPalette = palettes[0];
   const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<
     number | undefined
@@ -35,6 +41,15 @@ function PaletteBuilder3Component() {
     });
   }
 
+  function setInterpolationColorSpace(
+    interpolationColorSpace: InterpolationColorSpace
+  ) {
+    setSettings({
+      ...settings,
+      interpolationColorSpace,
+    });
+  }
+
   const selectedPalette = useMemo(
     () =>
       selectedPaletteIndex !== undefined
@@ -42,6 +57,10 @@ function PaletteBuilder3Component() {
         : undefined,
     [selectedPaletteIndex, palettes]
   );
+
+  const tableBuilderClass = classNames(styles.tablePaletteBuilder, {
+    [styles.rightSidepanelSpace]: selectedPalette !== undefined,
+  });
 
   return (
     <div className={styles.modalPaletteBuilder}>
@@ -94,10 +113,34 @@ function PaletteBuilder3Component() {
               </button>
             </div>
           </FormComponent>
+          <div>
+            <FormComponent
+              label="Interpolation color spaces"
+              className="flex-1"
+            >
+              <div>
+                <select
+                  value={interpolationColorSpace}
+                  className="w-full"
+                  onChange={(e) => {
+                    if (isInterpolationColorSpace(e.target.value)) {
+                      setInterpolationColorSpace(e.target.value);
+                    }
+                  }}
+                >
+                  {INTERPOLATIONS_COLOR_SPACES.map((space) => (
+                    <option value={space} key={space}>
+                      {space}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </FormComponent>
+          </div>
         </div>
-        <SidePanel>
+        <SidePanel closeCallback={() => setSelectedPaletteIndex(undefined)}>
           {palettes.length ? (
-            <div className={styles.tablePaletteBuilder}>
+            <div className={tableBuilderClass}>
               <table className="tableBuilder">
                 <thead>
                   <tr className={styles.tableHeader}>
@@ -121,11 +164,12 @@ function PaletteBuilder3Component() {
                         <td className={styles.columnPalette}>
                           <div className="row align-center gap-2">
                             <div
-                              className={styles.paletteColor}
+                              className="paletteColor"
                               style={{
                                 background: palette.tints
                                   .find((palette) => palette.isCenter)
                                   ?.color.hex(),
+                                ...getRectSize({ height: "var(--space-5)" }),
                               }}
                             ></div>
                             {palette.name}
@@ -136,8 +180,7 @@ function PaletteBuilder3Component() {
                             key={tint.name}
                             className={styles.columnTint}
                             style={{ background: tint.color.hex() }}
-                          >
-                          </td>
+                          ></td>
                         ))}
                       </tr>
                     </SidePanel.Button>

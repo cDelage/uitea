@@ -141,6 +141,29 @@ export function updateColor({
   return newColor;
 }
 
+export function updateColorFromString({
+  color,
+  value,
+}: {
+  color: PaletteColor;
+  value: string;
+}): PaletteColor {
+  const newColor = chromajs(value) as PaletteColor;
+
+  newColor.oklchStore = getColorOrOldColor({
+    oldColor: color,
+    newColor,
+    pickerMode: "oklch",
+  }) as OklchStore;
+  newColor.hslStore = getColorOrOldColor({
+    oldColor: color,
+    newColor,
+    pickerMode: "hsl",
+  }) as HslStore;
+
+  return newColor;
+}
+
 function getColorOrOldColor({
   oldColor,
   newColor,

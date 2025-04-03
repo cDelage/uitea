@@ -48,7 +48,6 @@
   overflow: hidden;
 }
 
-
 .columnPalette {
   position: sticky;
   left: 0;
@@ -76,52 +75,90 @@
 
 .columnTint {
   font-weight: var(--font-weight-default);
-  min-width: 80px;
+  min-width: 30px;
   padding: var(--space-3);
 }
 
-.paletteColor {
-  width: var(--space-5);
-  min-width: var(--space-5);
-  max-width: var(--space-5);
-  height: var(--space-5);
-  min-height: var(--space-5);
-  max-height: var(--space-5);
-  border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-md);
-  border: var(--base-border) 1px solid;
+.sidePanel {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-base);
-}
-
-.bigPaletteColor {
-  width: var(--space-10);
-  min-width: var(--space-10);
-  max-width: var(--space-10);
-  height: var(--space-10);
-  min-height: var(--space-10);
-  max-height: var(--space-10);
-  border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-md);
-  border: var(--base-border) 1px solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-base);
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-0) var(--space-0) var(--space-8) var(--space-0);
+  overflow-y: auto;
+  position: relative;
 }
 
 .sidePanelHeader {
-  padding: var(--space-8);
   display: flex;
   align-items: center;
   gap: var(--space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.6),
+    30%,
+    #FFFFFF
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--space-4) var(--space-4);
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-0) var(--space-4);
 }
 
 .sidePanelContainer {
-  padding: var(--space-0) var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.separator {
+  display: flex;
+  height: 1px;
+  min-height: 1px;
+  max-height: 1px;
+  background-color: var(--base-border);
+  box-sizing: border-box;
+}
+
+.recommandedHueButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  box-sizing: border-box;
+  color: var(--base-text-light);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+}
+
+.recommandedHueButton:hover {
+  background-color: var(--component-hover-bg);
+  color: var(--component-hover-text);
+}
+
+
+.rightSidepanelSpace {
+  padding-right: 500px;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.percentContainer {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
 }

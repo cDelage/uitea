@@ -8,9 +8,11 @@ import { SidepanelContext, useSidepanelContext } from "./SidepanelContext";
 function SidePanel({
   children,
   background,
+  closeCallback
 }: {
   children: ReactNode;
   background?: boolean;
+  closeCallback?: () => void;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [openKey, setOpenKey] = useState<string | undefined>(undefined);
@@ -22,6 +24,9 @@ function SidePanel({
 
   function toggle(id: string, key?: string) {
     if (!openKey || openKey === key) {
+      if(openId === id){
+        closeCallback?.();
+      }
       setOpenId(id === openId ? null : id);
     }
     setOpenKey(key);
@@ -31,6 +36,7 @@ function SidePanel({
     if (openId === id) {
       setOpenId(null);
       setOpenKey(undefined);
+      closeCallback?.();
     }
   }
 
