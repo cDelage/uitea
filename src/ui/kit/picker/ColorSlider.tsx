@@ -1,5 +1,9 @@
 import Slider from "rc-slider";
-import { PaletteColor } from "../../../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
+import ColorIO from "colorjs.io";
+import {
+  HANDLE_SLIDER_HORIZONTAL,
+  RAIL_SLIDER_HORIZONTAL,
+} from "../../UiConstants";
 
 function ColorSlider({
   gradient,
@@ -9,6 +13,7 @@ function ColorSlider({
   onChange,
   step = 1,
   color,
+  reverse,
 }: {
   gradient: string;
   value: number;
@@ -16,7 +21,8 @@ function ColorSlider({
   min: number;
   onChange: (value: number) => void;
   step?: number;
-  color?: PaletteColor;
+  color?: ColorIO;
+  reverse?: boolean;
 }) {
   return (
     <Slider
@@ -25,9 +31,14 @@ function ColorSlider({
       step={step}
       included={false}
       value={value}
+      reverse={reverse}
       onChange={(value) => {
         if (typeof value === "number") {
-          onChange(value);
+          if (Number.isInteger(value)) {
+            onChange(value);
+          } else {
+            onChange(Number(value.toFixed(2)));
+          }
         }
       }}
       style={{
@@ -35,21 +46,12 @@ function ColorSlider({
       }}
       styles={{
         rail: {
+          ...RAIL_SLIDER_HORIZONTAL,
           background: gradient,
-          height: "20px",
-          borderRadius: "4px",
-          boxShadow: "var(--shadow-md)",
-          bottom: 2,
         },
         handle: {
-          background: color?.hex(),
-          opacity: 1,
-          borderRadius: "2px",
-          height: "24px",
-          width: "10px",
-          boxShadow: "var(--shadow-md)",
-          border: "var(--base-border) 1px solid",
-          bottom: 0,
+          ...HANDLE_SLIDER_HORIZONTAL,
+          background: color?.toString({ format: "hex" }),
         },
       }}
     />

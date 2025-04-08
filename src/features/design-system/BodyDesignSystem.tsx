@@ -26,6 +26,8 @@ import EffectsComponent from "./EffectsComponent";
 import Modal from "../../ui/kit/Modal";
 import { MdBuild } from "react-icons/md";
 import PaletteBuilder3Component from "./PaletteBuilder3/PaletteBuilder3Component";
+import { Palette } from "../../domain/DesignSystemDomain";
+import { generateUniquePaletteKey } from "../../util/DesignSystemUtils";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -48,6 +50,24 @@ function BodyDesignSystem() {
       designSystem: {
         ...designSystem,
         themes: [...designSystem.themes, DEFAULT_THEME],
+      },
+      isTmp: true,
+    });
+  }
+
+  function handlePaletteBuilderConfirm(palettes: Palette[]) {
+    const newPalettes = [...designSystem.palettes];
+    for(const id in palettes){
+      const palette = palettes[id];
+      newPalettes.push({
+        ...palette,
+        paletteName: generateUniquePaletteKey(newPalettes, palette.paletteName)
+      })
+    }
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        palettes: newPalettes,
       },
       isTmp: true,
     });
@@ -81,7 +101,7 @@ function BodyDesignSystem() {
                   </button>
                 </Modal.Toggle>
                 <Modal.Body id="palette-builder">
-                  <PaletteBuilder3Component />
+                  <PaletteBuilder3Component onConfirmCreation={handlePaletteBuilderConfirm}/>
                 </Modal.Body>
               </Modal>
             </>

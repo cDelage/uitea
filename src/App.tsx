@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./features/home/Home";
 import Layout from "./ui/layout/Layout";
-import DesignSystemPage from "./features/design-system/PageDesignSystem";
+import PageDesignSystem from "./features/design-system/PageDesignSystem";
 import { Toaster } from "react-hot-toast";
 import ErrorFallback from "./ui/layout/ErrorFallback";
 import { Suspense } from "react";
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
         path: "/design-system/:designSystemPath",
         element: (
           <Suspense fallback={<Loader />}>
-            <DesignSystemPage />
+            <PageDesignSystem />
           </Suspense>
         ),
       },

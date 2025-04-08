@@ -36,11 +36,10 @@ export interface DesignSystemMetadata {
 
 export interface Palette {
   paletteName: string;
-  palettePath?: string;
-  shades: Shade[];
+  shades: Tint[];
 }
 
-export interface Shade {
+export interface Tint {
   label: string;
   color: string;
 }

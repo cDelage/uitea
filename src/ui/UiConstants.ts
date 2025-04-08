@@ -386,13 +386,37 @@ export const DEFAULT_OKHSL: ColorOkhsl = {
   l: 0,
 };
 
-export const HANDLE_SLIDER: CSSProperties = {
-  width: "var(--space-5)",
-  height: "var(--space-5)",
-  borderRadius: "var(--rounded-md)",
+export const HANDLE_SLIDER_HORIZONTAL: CSSProperties = {
+  opacity: 1,
+  borderRadius: "2px",
+  height: "24px",
+  width: "10px",
+  boxShadow: "var(--shadow-md)",
+  border: "var(--base-border) 1px solid",
+  bottom: 0,
+};
+
+export const RAIL_SLIDER_HORIZONTAL: CSSProperties = {
+  height: "16px",
+  borderRadius: "4px",
+  boxShadow: "var(--shadow-md)",
+  bottom: 4,
+};
+
+export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
   opacity: 1,
   border: "1px solid var(--base-border)",
   boxShadow: "var(--shadow-md)",
+  borderRadius: "4px",
+  height: "12px",
+  width: "24px",
+};
+
+export const RAIL_SLIDER_VERTICAL: CSSProperties = {
+  width: "12px",
+  borderRadius: "4px",
+  boxShadow: "var(--shadow-md)",
+  left: "6px",
 };
 
 export function getRectSize({

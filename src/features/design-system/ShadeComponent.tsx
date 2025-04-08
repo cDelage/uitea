@@ -2,7 +2,7 @@ import { MouseEvent, useRef } from "react";
 import styles from "./ShadeComponent.module.css";
 import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
 import classNames from "classnames";
-import { Palette, Shade } from "../../domain/DesignSystemDomain";
+import { Palette, Tint } from "../../domain/DesignSystemDomain";
 import {
   UseFieldArrayReturn,
   UseFormGetValues,
@@ -11,7 +11,7 @@ import {
 } from "react-hook-form";
 import { useDraggableContext } from "../../util/DraggableContext";
 import {
-  generateUniqueShadeKey,
+  generateUniqueTintKey,
   stopPropagation,
 } from "../../util/DesignSystemUtils";
 import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
@@ -36,7 +36,7 @@ function ShadeComponent({
   getValues: UseFormGetValues<Palette>;
   submitEvent: () => void;
   setValue: UseFormSetValue<Palette>;
-  shades: Shade[];
+  shades: Tint[];
   error?: string;
   shadesFieldArray: UseFieldArrayReturn<Palette, "shades", "id">;
 }) {
@@ -117,7 +117,7 @@ function ShadeComponent({
 
   function handleClick() {
     if (shadeComponentMode === "add") {
-      const label = generateUniqueShadeKey(
+      const label = generateUniqueTintKey(
         shadesFieldArray.fields,
         `palette-${index + 1}`
       );

@@ -1,4 +1,10 @@
-import { cloneElement, ReactElement, ReactNode, useState } from "react";
+import {
+  cloneElement,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import { useDivClickOutside } from "../../util/DivClickOutside";
@@ -8,7 +14,7 @@ import { SidepanelContext, useSidepanelContext } from "./SidepanelContext";
 function SidePanel({
   children,
   background,
-  closeCallback
+  closeCallback,
 }: {
   children: ReactNode;
   background?: boolean;
@@ -24,7 +30,7 @@ function SidePanel({
 
   function toggle(id: string, key?: string) {
     if (!openKey || openKey === key) {
-      if(openId === id){
+      if (openId === id) {
         closeCallback?.();
       }
       setOpenId(id === openId ? null : id);
@@ -69,13 +75,23 @@ function SidePanelButton({
   id,
   openKey,
   callback,
+  toggleKey,
 }: {
   children: ReactNode;
   id: string;
   openKey?: string;
   callback?: () => void;
+  toggleKey?: string;
 }) {
-  const { toggleModal } = useSidepanelContext();
+  const { toggleModal, openModalId, openModal } =
+    useSidepanelContext();
+
+  useEffect(() => {
+    if (toggleKey && openModalId !== toggleKey) {
+      openModal(toggleKey, openKey);
+    }
+  }, [openModalId, toggleKey, openKey, openModal]);
+
   return cloneElement(
     children as ReactElement<{
       onClick?: () => void;

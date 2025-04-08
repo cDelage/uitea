@@ -11,3 +11,15 @@
   background-color: var(--component-hover-bg);
   color: var(--component-hover-text);
 }
+
+
+.tabAlert {
+  background-color: var(--alert-bg);
+  color: var(--alert-text);
+}
+
+
+.tabAlert:hover {
+  background-color: var(--alert-hover-bg);
+  color: var(--alert-hover-text);
+}

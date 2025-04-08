@@ -60,6 +60,11 @@
   box-sizing: border-box;
 }
 
+.columnPalette[data-open="true"] {
+  background-color: var(--palette-gray-50);
+  color: var(--add-text);
+}
+
 .columnPaletteHeader {
   position: sticky;
   left: 0;
@@ -161,4 +166,28 @@
   width: 30px;
   min-width: 30px;
   max-width: 30px;
+}
+
+.complementaryColorsRow {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--space-3);
+}
+
+.dragActionContainer {
+  display: none;
+}
+
+.columnPalette:hover .dragActionContainer {
+  display: flex;
+}
+
+.columnPalette[data-dragged="true"]{
+  background-color: var(--add-bg);
+  color: var(--add-text);
+}
+
+.columnPalette[data-dragged="true"][data-remove="true"]{
+  background-color: var(--remove-bg);
+  color: var(--remove-text);
 }

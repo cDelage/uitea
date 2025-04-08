@@ -15,7 +15,7 @@ import {
 } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 
-function DesignSystemPage() {
+function PageDesignSystem() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
@@ -140,4 +140,4 @@ function DesignSystemPage() {
   );
 }
 
-export default DesignSystemPage;
+export default PageDesignSystem;

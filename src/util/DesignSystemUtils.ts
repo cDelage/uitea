@@ -2,7 +2,7 @@ import { CSSProperties, MouseEvent } from "react";
 import {
   Base,
   Palette,
-  Shade,
+  Tint,
   ThemeColor,
   ThemeItem,
   ThemeStateCategory,
@@ -22,8 +22,8 @@ import { ColorResult } from "react-color";
  * @param baseKey - Le nom de la clé à insérer.
  * @returns Un nom unique pour la clé.
  */
-export const generateUniqueShadeKey = (
-  shades: Shade[],
+export const generateUniqueTintKey = (
+  shades: Tint[],
   baseKey: string
 ): string => {
   let uniqueKey = baseKey;
@@ -62,7 +62,7 @@ export const generateUniqueEffectsKey = (
   return uniqueKey;
 };
 
-export const generateUniqueColorPaletteKey = (
+export const generateUniquePaletteKey = (
   colorPalettes: Palette[],
   baseKey: string
 ): string => {

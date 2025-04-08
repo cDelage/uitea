@@ -1,44 +1,56 @@
 import { useEffect, useMemo, useState } from "react";
 import ColorSlider from "./ColorSlider";
 import {
+  DEFAULT_PICKER_MODE,
   getPickerData,
-  PickerMode,
+  PICKER_MODES,
+  ColorSpace,
+  PickerSpace,
   updateColor,
   updateColorFromString,
 } from "../../../util/PickerUtil";
-import { PaletteColor } from "../../../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
 import styles from "./ColorPickerLinear.module.css";
 import InputNumber from "./InputNumber";
 import FormComponent from "../FormComponent";
 import { isValidColor } from "../../../util/PaletteBuilderStore";
+import ColorIO from "colorjs.io";
 
 function ColorPickerLinear({
   color,
   onChange,
 }: {
-  color: PaletteColor;
-  onChange: (color: PaletteColor) => void;
+  color: ColorIO;
+  onChange: (color: ColorIO) => void;
 }) {
-  const [colorHex, setColorHex] = useState(color.hex());
-  const [lastColorHex, setLastColorHex] = useState(color.hex());
-  const [pickerMode, setPickerMode] = useState<PickerMode>("hsl");
+  const [colorHex, setColorHex] = useState(color.toString({ format: "hex" }));
+  const [lastColorHex, setLastColorHex] = useState(
+    color.toString({ format: "hex" })
+  );
+  const [pickerMode, setPickerMode] = useState<ColorSpace>(DEFAULT_PICKER_MODE);
   const pickerData = useMemo(
     () => getPickerData({ color, pickerMode }),
     [color, pickerMode]
   );
 
+  function handleSetPickerMode(space: PickerSpace) {
+    setPickerMode(
+      PICKER_MODES.find((picker) => picker.space === space) ??
+        DEFAULT_PICKER_MODE
+    );
+  }
+
   useEffect(() => {
-    if (color.hex() !== lastColorHex) {
-      setColorHex(color.hex());
-      setLastColorHex(color.hex());
+    if (color.toString({ format: "hex" }) !== lastColorHex) {
+      setColorHex(color.toString({ format: "hex" }));
+      setLastColorHex(color.toString({ format: "hex" }));
     }
   }, [color, lastColorHex]);
 
   useEffect(() => {
     if (colorHex !== lastColorHex && isValidColor(colorHex)) {
-      onChange(updateColorFromString({ value: colorHex, color }));
+      onChange(updateColorFromString({ value: colorHex, color, pickerMode }));
     }
-  }, [colorHex, lastColorHex, color, onChange]);
+  }, [colorHex, lastColorHex, color, onChange, pickerMode]);
 
   return (
     <div className={styles.picker}>
@@ -46,11 +58,12 @@ function ColorPickerLinear({
         <div className={styles.colorSpaceMode}>
           <select
             className="inherit-input"
-            value={pickerMode}
-            onChange={(e) => setPickerMode(e.target.value as PickerMode)}
+            value={pickerMode.space}
+            onChange={(e) => handleSetPickerMode(e.target.value as PickerSpace)}
           >
-            <option>hsl</option>
-            <option>oklch</option>
+            {PICKER_MODES.map((picker) => (
+              <option key={picker.space}>{picker.space}</option>
+            ))}
           </select>
         </div>
         <div className={styles.hexContainer}>
@@ -61,37 +74,38 @@ function ColorPickerLinear({
           />
         </div>
       </div>
-      {pickerMode === "hsl" && (
-        <>
+      {pickerData.map((axe) => (
+        <div key={axe.name}>
           <FormComponent
-            label="hue"
+            label={axe.label}
             rightElement={
               <InputNumber
-                value={pickerData.hue}
+                value={axe.value}
                 setValue={(value: number) =>
                   onChange(
                     updateColor({
-                      axe: "h",
+                      axe: axe.name,
                       color,
                       pickerMode,
                       value,
                     })
                   )
                 }
-                min={0}
-                max={360}
+                min={axe.min}
+                max={axe.max}
               />
             }
           >
             <ColorSlider
-              gradient={pickerData.hueGradient}
-              value={pickerData.hue}
-              max={360}
-              min={0}
+              gradient={axe.gradient}
+              value={axe.value}
+              max={axe.max}
+              min={axe.min}
+              step={axe.steps}
               onChange={(value: number) => {
                 onChange(
                   updateColor({
-                    axe: "h",
+                    axe: axe.name,
                     color,
                     pickerMode,
                     value,
@@ -101,207 +115,8 @@ function ColorPickerLinear({
               color={color}
             />
           </FormComponent>
-          <FormComponent
-            label="saturation"
-            rightElement={
-              <InputNumber
-                value={pickerData.saturationChroma}
-                setValue={(value: number) =>
-                  onChange(
-                    updateColor({
-                      axe: "s",
-                      color,
-                      pickerMode,
-                      value,
-                    })
-                  )
-                }
-                min={0}
-                max={1}
-              />
-            }
-          >
-            <ColorSlider
-              gradient={pickerData.saturationChromaGradient}
-              value={pickerData.saturationChroma}
-              max={1}
-              min={0}
-              step={0.01}
-              onChange={(value: number) => {
-                onChange(
-                  updateColor({
-                    axe: "s",
-                    color,
-                    pickerMode,
-                    value,
-                  })
-                );
-              }}
-              color={color}
-            />
-          </FormComponent>
-          <FormComponent
-            label="lightness"
-            rightElement={
-              <InputNumber
-                value={pickerData.lightness}
-                setValue={(value: number) =>
-                  onChange(
-                    updateColor({
-                      axe: "l",
-                      color,
-                      pickerMode,
-                      value,
-                    })
-                  )
-                }
-                min={0}
-                max={1}
-              />
-            }
-          >
-            <ColorSlider
-              gradient={pickerData.lightnessGradient}
-              value={pickerData.lightness}
-              max={1}
-              min={0}
-              step={0.01}
-              onChange={(value: number) => {
-                onChange(
-                  updateColor({
-                    axe: "l",
-                    color,
-                    pickerMode,
-                    value,
-                  })
-                );
-              }}
-              color={color}
-            />
-          </FormComponent>
-        </>
-      )}
-      {pickerMode === "oklch" && (
-        <>
-          <FormComponent
-            label="lightness"
-            rightElement={
-              <InputNumber
-                value={pickerData.lightness}
-                setValue={(value: number) =>
-                  onChange(
-                    updateColor({
-                      axe: "l",
-                      color,
-                      pickerMode,
-                      value,
-                    })
-                  )
-                }
-                min={0}
-                max={1}
-              />
-            }
-          >
-            <ColorSlider
-              gradient={pickerData.lightnessGradient}
-              value={pickerData.lightness}
-              max={1}
-              min={0}
-              step={0.01}
-              onChange={(value: number) => {
-                onChange(
-                  updateColor({
-                    axe: "l",
-                    color,
-                    pickerMode,
-                    value,
-                  })
-                );
-              }}
-              color={color}
-            />
-          </FormComponent>
-          <FormComponent
-            label="chroma"
-            rightElement={
-              <InputNumber
-                value={pickerData.saturationChroma}
-                setValue={(value: number) =>
-                  onChange(
-                    updateColor({
-                      axe: "c",
-                      color,
-                      pickerMode,
-                      value,
-                    })
-                  )
-                }
-                min={0}
-                max={1}
-              />
-            }
-          >
-            <ColorSlider
-              gradient={pickerData.saturationChromaGradient}
-              value={pickerData.saturationChroma}
-              max={0.4}
-              min={0}
-              step={0.01}
-              onChange={(value: number) => {
-                onChange(
-                  updateColor({
-                    axe: "c",
-                    color,
-                    pickerMode,
-                    value,
-                  })
-                );
-              }}
-              color={color}
-            />
-          </FormComponent>
-          <FormComponent
-            label="hue"
-            rightElement={
-              <InputNumber
-                value={pickerData.hue}
-                setValue={(value: number) =>
-                  onChange(
-                    updateColor({
-                      axe: "h",
-                      color,
-                      pickerMode,
-                      value,
-                    })
-                  )
-                }
-                min={0}
-                max={360}
-              />
-            }
-          >
-            <ColorSlider
-              gradient={pickerData.hueGradient}
-              value={pickerData.hue}
-              max={360}
-              min={0}
-              step={0.25}
-              onChange={(value: number) => {
-                onChange(
-                  updateColor({
-                    axe: "h",
-                    color,
-                    pickerMode,
-                    value,
-                  })
-                );
-              }}
-              color={color}
-            />
-          </FormComponent>
-        </>
-      )}
+        </div>
+      ))}
     </div>
   );
 }

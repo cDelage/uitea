@@ -27,7 +27,7 @@ function InputNumber({
       <input
         className={inputStyle}
         type="number"
-        value={value.toFixed(2)}
+        value={value}
         step={step}
         onChange={handleChange}
       />

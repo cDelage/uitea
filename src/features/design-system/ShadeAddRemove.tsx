@@ -5,7 +5,7 @@ import { DraggableTools } from "../../util/DraggableContext";
 import { ICON_SIZE_MD } from "../../ui/UiConstants";
 import { UseFieldArrayReturn } from "react-hook-form";
 import { Palette } from "../../domain/DesignSystemDomain";
-import { generateUniqueShadeKey } from "../../util/DesignSystemUtils";
+import { generateUniqueTintKey } from "../../util/DesignSystemUtils";
 import { MouseEvent } from "react";
 
 function ShadeAddRemove({
@@ -40,7 +40,7 @@ function ShadeAddRemove({
   function handleClick(e: MouseEvent<HTMLDivElement>) {
     e.stopPropagation();
     if (!draggableTools.dragIndex) {
-      const label = generateUniqueShadeKey(
+      const label = generateUniqueTintKey(
         shadesFieldArray.fields,
         `palette-${shadesFieldArray.fields.length + 1}`
       );

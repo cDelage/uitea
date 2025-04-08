@@ -26,7 +26,7 @@ import {
   MdMoreHoriz,
 } from "react-icons/md";
 import { ICON_SIZE_MD } from "../../ui/UiConstants";
-import { generateUniqueColorPaletteKey } from "../../util/DesignSystemUtils";
+import { generateUniquePaletteKey } from "../../util/DesignSystemUtils";
 import isEqual from "lodash/isEqual";
 import { useSidebarComponentVisible } from "../../util/SidebarComponentVisible";
 
@@ -103,7 +103,7 @@ function PaletteComponent({
   function handleAddPalette(place: "before" | "after") {
     const newIndex = place === "before" ? index : index + 1;
     const newPalette: Palette = {
-      paletteName: generateUniqueColorPaletteKey(
+      paletteName: generateUniquePaletteKey(
         designSystem.palettes,
         `palette-${newIndex + 1}`
       ),

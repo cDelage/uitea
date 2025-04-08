@@ -1,9 +1,9 @@
-import { Palette, Shade } from "../../domain/DesignSystemDomain";
+import { Palette, Tint } from "../../domain/DesignSystemDomain";
 import { getClosestToPercentage } from "../../util/DesignSystemUtils";
 
 function PaletteIcon({ palette, size }: { palette: Palette; size: string }) {
-  const { shades } = palette;
-  const defaultShade: Shade = {
+  const { shades: shades } = palette;
+  const defaultShade: Tint = {
     label: "default",
     color: "#60A5FA",
   };

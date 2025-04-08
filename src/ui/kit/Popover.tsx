@@ -12,9 +12,10 @@ import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { PositionAbsolute, PositionPayload } from "./PositionAbsolute.type";
 import { calcPositionVisible, getRectPosition } from "../../util/PositionUtil";
-import { useDivClickOutside } from "../../util/DivClickOutside";
 import { PopoverContext, usePopoverContext } from "./PopoverContext";
 import styles from "./Popover.module.css";
+import classNames from "classnames";
+import { useDivClickOutside } from "../../util/DivClickOutside";
 
 const BodyDefault = styled.div<{
   $position: PositionAbsolute;
@@ -81,22 +82,17 @@ function Body({
   children,
   id,
   zIndex,
-  closeCallback,
 }: {
   children: ReactNode;
   id: string;
   zIndex?: number;
-  closeCallback?: () => void;
 }): JSX.Element | null {
   const { position, closePopover, openPopoverId, toggleRect } =
     usePopoverContext();
   function handleClose() {
     closePopover();
-    closeCallback?.();
   }
-
   const ref = useDivClickOutside(handleClose);
-
   const positionVisible =
     position && openPopoverId === id
       ? calcPositionVisible(
@@ -213,21 +209,30 @@ function Toggle({
     children as ReactElement<
       { onClick?: (e: MouseEvent) => void } & {
         ref?: React.Ref<HTMLButtonElement>;
+        "data-disableoutside": boolean;
       } & { onMouseDown?: (e: MouseEvent) => void }
     >,
     {
       onClick: handleClick,
       ref: toggleRef,
+      "data-disableoutside": true,
       onMouseDown: (e: MouseEvent) => e.stopPropagation(),
     }
   );
 }
 
-function Close({ children }: { children: ReactNode }) {
+function Close({
+  children,
+  closeCallback,
+}: {
+  children: ReactNode;
+  closeCallback?: () => void;
+}) {
   const { closePopover, openPopoverId } = usePopoverContext();
 
   function handleClick() {
     if (openPopoverId) {
+      closeCallback?.();
       closePopover();
     }
   }
@@ -253,10 +258,12 @@ function Tab({
   children,
   clickEvent,
   disableClose,
+  theme,
 }: {
   children: ReactNode;
   clickEvent?: () => void;
   disableClose?: boolean;
+  theme?: "alert";
 }) {
   const { closePopover } = usePopoverContext();
 
@@ -266,8 +273,12 @@ function Tab({
     clickEvent?.();
     if (!disableClose) closePopover();
   };
+
+  const tabStyle = classNames(styles.tab, {
+    [styles.tabAlert]: theme === "alert",
+  });
   return (
-    <div className={styles.tab} onClick={handleClick}>
+    <div className={tabStyle} onClick={handleClick} data-disableoutside={true}>
       {children}
     </div>
   );
