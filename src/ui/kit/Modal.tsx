@@ -5,6 +5,7 @@ import {
   ReactElement,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { useDivClickOutside } from "../../util/DivClickOutside";
@@ -16,7 +17,15 @@ import {
   useModalContext,
 } from "./ModalContext";
 
-function Modal({ children }: { children: ReactNode }) {
+function Modal({
+  children,
+  isOpenToSync,
+  setIsOpenToSync,
+}: {
+  children: ReactNode;
+  isOpenToSync?: boolean;
+  setIsOpenToSync?: (value: boolean) => void;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   function open(id: string) {
@@ -26,6 +35,14 @@ function Modal({ children }: { children: ReactNode }) {
   function close() {
     setOpenId(null);
   }
+
+  useEffect(() => {
+    if (isOpenToSync && !openId && setIsOpenToSync) {
+      setIsOpenToSync(false);
+    } else if (!isOpenToSync && openId && setIsOpenToSync) {
+      setIsOpenToSync(true);
+    }
+  }, [openId, isOpenToSync, setIsOpenToSync]);
 
   return (
     <ModalContext.Provider
@@ -55,7 +72,9 @@ function Body({
   const { openModalId: openId, closeModal: close } = useContext(
     ModalContext
   ) as ModalContextType;
-  const RefModalBody = useDivClickOutside(close);
+  const RefModalBody = useDivClickOutside(() => {
+    close();
+  });
   if (id !== openId) return null;
 
   function handleClickOverlay(e: MouseEvent<HTMLDivElement>) {
@@ -73,7 +92,11 @@ function Body({
 }
 
 function Md({ children }: { children: ReactNode }) {
-  return <div className={styles.modalBodyMd}>{children}</div>;
+  return (
+    <div className={styles.modalBodyMd} data-disableoutside={true}>
+      {children}
+    </div>
+  );
 }
 
 function ModalCustom({
@@ -94,13 +117,19 @@ function ModalCustom({
 }
 
 function Footer({ children }: { children: ReactNode }) {
-  return <div className={styles.modalFooter}>{children}</div>;
+  return (
+    <div className={styles.modalFooter} data-disableoutside={true}>
+      {children}
+    </div>
+  );
 }
 
 function Close({ children }: { children: ReactNode }) {
   const { closeModal: close } = useModalContext();
   return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
-    onClick: () => close(),
+    onClick: () => {
+      close();
+    },
   });
 }
 

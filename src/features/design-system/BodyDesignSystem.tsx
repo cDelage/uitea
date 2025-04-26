@@ -15,7 +15,7 @@ import ThemeComponent from "./ThemeComponent";
 import DraggableList from "./DraggableList";
 import FontIcon from "../../ui/icons/FontIcon";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import FontsComponent from "./FontsComponent";
 import TypographyComponent from "./TypographyComponent";
 import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
@@ -24,16 +24,18 @@ import SpacesComponent from "./SpacesComponent";
 import RadiusComponent from "./RadiusComponent";
 import EffectsComponent from "./EffectsComponent";
 import Modal from "../../ui/kit/Modal";
-import { MdBuild } from "react-icons/md";
-import PaletteBuilder3Component from "./PaletteBuilder3/PaletteBuilder3Component";
-import { Palette } from "../../domain/DesignSystemDomain";
-import { generateUniquePaletteKey } from "../../util/DesignSystemUtils";
+import { MdConstruction, MdPalette } from "react-icons/md";
+import PaletteBuilderModal from "../palette-builder/PaletteBuilderModal";
+import { useEffect, useState } from "react";
+import ColorPickerModal from "../color-picker/ColorPickerModal";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { scrollRef } = useScrollTriggerRefresh();
+  const [isPaletteBuilderOpen, setIsPaletteBuilderOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   function initPalette() {
     saveDesignSystem({
@@ -55,23 +57,13 @@ function BodyDesignSystem() {
     });
   }
 
-  function handlePaletteBuilderConfirm(palettes: Palette[]) {
-    const newPalettes = [...designSystem.palettes];
-    for(const id in palettes){
-      const palette = palettes[id];
-      newPalettes.push({
-        ...palette,
-        paletteName: generateUniquePaletteKey(newPalettes, palette.paletteName)
-      })
-    }
-    saveDesignSystem({
-      designSystem: {
-        ...designSystem,
-        palettes: newPalettes,
-      },
-      isTmp: true,
-    });
-  }
+  useEffect(() => {
+    searchParams.set(
+      "paletteBuilderOpen",
+      isPaletteBuilderOpen ? "true" : "false"
+    );
+    setSearchParams(searchParams);
+  }, [isPaletteBuilderOpen, searchParams, setSearchParams]);
 
   return (
     <div
@@ -93,15 +85,27 @@ function BodyDesignSystem() {
           subSectionName="Palettes"
           actions={
             <>
-              <Modal>
+              <Modal
+                isOpenToSync={isPaletteBuilderOpen}
+                setIsOpenToSync={setIsPaletteBuilderOpen}
+              >
                 <Modal.Toggle id="palette-builder">
                   <button className="action-ghost-button" type="button">
-                    <MdBuild size={ICON_SIZE_MD} />
+                    <MdConstruction size={ICON_SIZE_MD} />
                     Palette builder
                   </button>
                 </Modal.Toggle>
                 <Modal.Body id="palette-builder">
-                  <PaletteBuilder3Component onConfirmCreation={handlePaletteBuilderConfirm}/>
+                  <PaletteBuilderModal />
+                </Modal.Body>
+                <Modal.Toggle id="color-picker">
+                  <button className="action-ghost-button" type="button">
+                    <MdPalette size={ICON_SIZE_MD} />
+                    Color picker
+                  </button>
+                </Modal.Toggle>
+                <Modal.Body id="color-picker">
+                  <ColorPickerModal />
                 </Modal.Body>
               </Modal>
             </>

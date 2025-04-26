@@ -1,93 +1,25 @@
 import { create } from "zustand";
-import { getTintName, TintsNamingMode } from "../../../util/TintsNaming";
-import { hsl } from "culori";
-import { Color as ChromaColor } from "chroma-js";
+import { getTintName } from "../../util/TintsNaming";
 import { ChartData, ChartOptions } from "chart.js";
 import ColorIO from "colorjs.io";
 import { v4 } from "uuid";
-import { Palette } from "../../../domain/DesignSystemDomain";
-import { PICKER_MODES, ColorSpace, PickerAxe } from "../../../util/PickerUtil";
-import { moveItem } from "../../../util/ArrayMove";
-import { linearPieceInterpolation } from "../../../util/Interpolation";
-
-export interface HslStore {
-  h: number;
-  s: number;
-  l: number;
-}
-
-export interface OklchStore {
-  l: number;
-  c: number;
-  h: number;
-}
-
-export type PaletteColor = ChromaColor & {
-  hslStore?: HslStore;
-  oklchStore?: OklchStore;
-};
-
-export type InterpolationColorSpace = "oklch" | "lch" | "hsl";
-
-export type HueGapMode = "accurate" | "large";
-
-export const HUE_GAP_MODES: HueGapMode[] = ["accurate", "large"];
-
-export const INTERPOLATIONS_COLOR_SPACES: InterpolationColorSpace[] = [
-  "oklch",
-  "lch",
-  "hsl",
-];
-
-export type PaletteAxeSetting =
-  | "lightnessMax"
-  | "lightnessMin"
-  | "satChromaGapLeft"
-  | "satChromaGapRight"
-  | "hueGapLeft"
-  | "hueGapRight";
-
-export interface PaletteSettings {
-  lightnessMax: number;
-  lightnessMin: number;
-  satChromaGapLeft: number;
-  satChromaGapRight: number;
-  hueGapLeft: number;
-  hueGapRight: number;
-  hueGapModeLeft: HueGapMode;
-  hueGapModeRight: HueGapMode;
-}
-
-interface ColorPositionIndex {
-  color?: ColorIO;
-  index: number;
-}
-
-interface ReduceColors {
-  colors: ColorIO[];
-  previousColor: ColorPositionIndex;
-}
-
-export interface PaletteBuild {
-  id: string;
-  name: string;
-  tints: TintBuild[];
-  settings: PaletteSettings;
-}
-
-export interface TintBuild {
-  name: string;
-  isAnchor?: boolean;
-  isCenter?: boolean;
-  color: ColorIO;
-}
-
-interface PalettesStoreSettings {
-  steps: number;
-  tintNamingMode: TintsNamingMode;
-  interpolationColorSpace: InterpolationColorSpace;
-  paletteSettings: PaletteSettings;
-}
+import { Palette } from "../../domain/DesignSystemDomain";
+import { PICKER_MODES, ColorSpace, PickerAxe } from "../../util/PickerUtil";
+import { moveItem } from "../../util/ArrayMove";
+import { linearPieceInterpolation } from "../../util/Interpolation";
+import {
+  PalettesStoreSettings,
+  TintBuild,
+  PaletteBuild,
+  PaletteSettings,
+  InterpolationColorSpace,
+  AlignerSettings,
+  PaletteBuilderPayload,
+  paletteBuildToFile,
+  paletteBuilderFromFile,
+} from "../../domain/PaletteBuilderDomain";
+import { invoke } from "@tauri-apps/api";
+import { CanUndoRedo } from "../../util/UndoRedo";
 
 export interface Point {
   x: number;
@@ -97,20 +29,34 @@ export interface Point {
 interface PaletteBuilderStore {
   palettes: PaletteBuild[];
   settings: PalettesStoreSettings;
+  alignerSettings: AlignerSettings;
+  canUndoRedo: CanUndoRedo;
   createPalette: (tint?: ColorIO) => void;
   createPaletteFromExisting: (
     palette: PaletteBuild,
     color: ColorRecommanded
   ) => void;
   updatePalettes: () => void;
-  updatePalette: (index: number, palette: PaletteBuild) => void;
+  updatePalette: (
+    index: number,
+    palette: PaletteBuild,
+    stopUndoRedo?: boolean
+  ) => void;
   setSettings: (settings: PalettesStoreSettings) => void;
   reset: () => void;
   deletePalette: (id: string) => void;
   movePalette: (fromIndex: number, toIndex: number) => void;
+  loadPaletteBuilder: (
+    palettes: PaletteBuild[],
+    settings: PalettesStoreSettings
+  ) => void;
+  setAlignerSettings: (alignerSettings: AlignerSettings) => void;
+  doPaletteBuilder: () => void;
+  undoPaletteBuilder: () => void;
+  redoPaletteBuilder: () => void;
 }
 
-export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
+export const usePaletteBuilderStore = create<PaletteBuilderStore>(
   (set, get) => ({
     palettes: [],
     settings: {
@@ -119,17 +65,26 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
       interpolationColorSpace: "oklch",
       paletteSettings: {
         lightnessMax: 0.9,
-        lightnessMin: 0.1,
+        lightnessMin: 0.3,
         satChromaGapRight: 0.5,
         satChromaGapLeft: 0.5,
         hueGapLeft: 0.5,
         hueGapRight: 0.5,
-        hueGapModeLeft: "accurate",
-        hueGapModeRight: "accurate",
       },
     },
+    alignerSettings: {
+      aligner: "HWB",
+      alignerContrastMode: "PALETTE_STEP",
+      alignerConstrastCustomColor: new ColorIO("#000000"),
+      alignerContrastPaletteStep: 0,
+      isDisplay: false,
+    },
+    canUndoRedo: {
+      canUndo: false,
+      canRedo: false,
+    },
     createPalette(tint?: ColorIO) {
-      const { settings } = get();
+      const { settings, doPaletteBuilder } = get();
       const paletteTint = new ColorIO(tint ?? "#DDDDDD");
       const [startColor, endColor] = getEndsTints({
         color: paletteTint,
@@ -157,19 +112,20 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
             ...state.palettes,
             {
               id: v4(),
-              name: getHueName(paletteTint.toString({ format: "hex" })),
+              name: getHueName(paletteTint),
               tints,
               settings: settings.paletteSettings,
             },
           ],
         };
       });
+      doPaletteBuilder();
     },
     createPaletteFromExisting(
       palette: PaletteBuild,
       colorRecommanded: ColorRecommanded
     ) {
-      const { settings } = get();
+      const { settings, doPaletteBuilder } = get();
       const [startColor, endColor] = getEndsTints({
         color: colorRecommanded.color,
         settings: palette.settings,
@@ -217,9 +173,10 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
           ],
         };
       });
+      doPaletteBuilder();
     },
     updatePalettes() {
-      const { settings } = get();
+      const { settings, doPaletteBuilder } = get();
       set((state) => {
         return {
           ...state,
@@ -231,9 +188,14 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
           }),
         };
       });
+      doPaletteBuilder();
     },
-    updatePalette(index: number, newPalette: PaletteBuild) {
-      const { settings } = get();
+    updatePalette(
+      index: number,
+      newPalette: PaletteBuild,
+      stopUndoRedo?: boolean
+    ) {
+      const { settings, doPaletteBuilder } = get();
       const centerTint = newPalette.tints.find((tint) => tint.isCenter);
       if (centerTint) {
         const [startColor, endColor] = getEndsTints({
@@ -263,6 +225,9 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
           };
         });
       }
+      if (!stopUndoRedo) {
+        doPaletteBuilder();
+      }
     },
     setSettings(settings: PalettesStoreSettings) {
       set((state) => {
@@ -283,6 +248,7 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
           palettes: [],
         };
       });
+      get().doPaletteBuilder();
     },
     deletePalette(id: string) {
       set((state) => {
@@ -291,12 +257,84 @@ export const usePaletteBuilder3Store = create<PaletteBuilderStore>(
           palettes: state.palettes.filter((palette) => palette.id !== id),
         };
       });
+      get().doPaletteBuilder();
     },
     movePalette(fromIndex: number, toIndex: number) {
       set((state) => {
         return {
           ...state,
           palettes: moveItem(state.palettes, fromIndex, toIndex),
+        };
+      });
+      get().doPaletteBuilder();
+    },
+    loadPaletteBuilder(
+      palettes: PaletteBuild[],
+      settings: PalettesStoreSettings
+    ) {
+      set((state) => {
+        return {
+          ...state,
+          palettes,
+          settings,
+        };
+      });
+      get().doPaletteBuilder();
+    },
+    setAlignerSettings(alignerSettings) {
+      set((state) => {
+        return {
+          ...state,
+          alignerSettings,
+        };
+      });
+    },
+    doPaletteBuilder: async () => {
+      const { palettes, settings } = get();
+      await invoke("do_palette_builder", {
+        paletteBuilder: {
+          palettes: palettes.map(paletteBuildToFile),
+          settings,
+        },
+      });
+      const canUndoRedo = await invoke<CanUndoRedo>(
+        "can_undo_redo_palette_builder"
+      );
+      set((state) => {
+        return {
+          ...state,
+          canUndoRedo,
+        };
+      });
+    },
+    undoPaletteBuilder: async () => {
+      const paletteBuilder = await invoke<PaletteBuilderPayload>(
+        "undo_palette_builder"
+      );
+      const canUndoRedo = await invoke<CanUndoRedo>(
+        "can_undo_redo_palette_builder"
+      );
+      set((state) => {
+        return {
+          ...state,
+          ...paletteBuilderFromFile(paletteBuilder),
+          canUndoRedo
+        };
+      });
+      
+    },
+    redoPaletteBuilder: async () => {
+      const paletteBuilder = await invoke<PaletteBuilderPayload>(
+        "redo_palette_builder"
+      );
+      const canUndoRedo = await invoke<CanUndoRedo>(
+        "can_undo_redo_palette_builder"
+      );
+      set((state) => {
+        return {
+          ...state,
+          ...paletteBuilderFromFile(paletteBuilder),
+          canUndoRedo
         };
       });
     },
@@ -336,22 +374,36 @@ export const huesName: string[] = [
   "violet",
   "purple",
   "pink",
+  "gray-red",
+  "gray-orange",
+  "gray-yellow",
+  "gray-lime",
+  "gray-green",
+  "gray-teal",
+  "gray-cyan",
+  "gray-blue",
+  "gray-indigo",
+  "gray-violet",
+  "gray-purple",
+  "gray-pink",
 ];
 
-export function getHueName(color: string): string {
-  const angle = hsl(color)?.h ?? 0;
-  if (angle < 15 || angle >= 345) return "red";
-  if (angle < 45) return "orange";
-  if (angle < 75) return "yellow";
-  if (angle < 105) return "lime";
-  if (angle < 135) return "green";
-  if (angle < 165) return "teal";
-  if (angle < 195) return "cyan";
-  if (angle < 225) return "blue";
-  if (angle < 255) return "indigo";
-  if (angle < 285) return "violet";
-  if (angle < 315) return "purple";
-  return "pink";
+export function getHueName(color: ColorIO): string {
+  const angle: number = color.hsl[0];
+  const saturation: number = color.hsl[1];
+  const preColor = saturation < 15 ? "gray-" : "";
+  if (angle < 15 || angle >= 345) return `${preColor}red`;
+  if (angle < 45) return `${preColor}orange`;
+  if (angle < 75) return `${preColor}yellow`;
+  if (angle < 105) return `${preColor}lime`;
+  if (angle < 135) return `${preColor}green`;
+  if (angle < 165) return `${preColor}teal`;
+  if (angle < 195) return `${preColor}cyan`;
+  if (angle < 225) return `${preColor}blue`;
+  if (angle < 255) return `${preColor}indigo`;
+  if (angle < 285) return `${preColor}violet`;
+  if (angle < 315) return `${preColor}purple`;
+  return `${preColor}pink`;
 }
 
 export function getEndsTints({
@@ -435,10 +487,8 @@ export function getEndsTints({
       const colorPoints = getColorAxeToPoints({
         axe: {
           ...hueAxe,
-          min:
-            settings.hueGapModeLeft === "accurate" ? startHue - 20 : hueAxe.min,
-          max:
-            settings.hueGapModeLeft === "accurate" ? startHue + 20 : hueAxe.max,
+          min: startHue - 30,
+          max: startHue + 30,
         },
         centerColor: startColor,
         interpolationColorSpace,
@@ -453,10 +503,8 @@ export function getEndsTints({
       const colorPoints = getColorAxeToPoints({
         axe: {
           ...hueAxe,
-          min:
-            settings.hueGapModeLeft === "accurate" ? endHue - 20 : hueAxe.min,
-          max:
-            settings.hueGapModeLeft === "accurate" ? endHue + 20 : hueAxe.max,
+          min: endHue - 20,
+          max: endHue + 20,
         },
         centerColor: endColor,
         interpolationColorSpace,
@@ -512,6 +560,16 @@ export function autoRangeNumber(
     return Math.max(min, value % max);
   }
   return Math.min(max, Math.max(min, value));
+}
+
+interface ColorPositionIndex {
+  color?: ColorIO;
+  index: number;
+}
+
+interface ReduceColors {
+  colors: ColorIO[];
+  previousColor: ColorPositionIndex;
 }
 
 function constructTints(
@@ -705,25 +763,35 @@ export function getColorRecommanded({
     "hwb.b": color.hwb[2],
   });
   if (flag === "gray") {
+    const hsl = [...colorRecommanded.hsl];
     colorRecommanded.set({
-      "hsl.h": colorRecommanded.hsl[0],
-      "hsl.s": 0.08,
-      "hsl.l": colorRecommanded.hsl[2],
+      "hsl.h": hsl[0],
+      "hsl.s": 8,
+      "hsl.l": hsl[2],
     });
   }
   return {
     color: colorRecommanded,
-    name: `${flag === "gray" ? "gray-" : ""}${getHueName(
-      colorRecommanded.toString({ format: "hex" })
-    )}`,
+    name: getHueName(colorRecommanded),
   };
 }
 
-export function getColorsRecommanded(color?: ColorIO): FlagColors[] {
+export function getColorsRecommanded(
+  palettes: PaletteBuild[],
+  color?: ColorIO
+): FlagColors[] {
   const hue = color?.get("oklch.h");
   if (color && hue && !Number.isNaN(hue)) {
+    const existingTints: string[] = palettes.map((palette) => {
+      const tint = palette.tints.find(
+        (tint, index) =>
+          tint.isCenter || index === Math.floor(palette.tints.length / 2)
+      ) as TintBuild;
+      return tint.color.toString({ format: "hex" });
+    });
+
     return COLOR_FLAGS_TO_RECOMMAND.map((toRecomand) => {
-      return {
+      const colorToRecommand = {
         flag: toRecomand.flag,
         colors: toRecomand.gap.map((gap) => {
           return getColorRecommanded({
@@ -732,6 +800,13 @@ export function getColorsRecommanded(color?: ColorIO): FlagColors[] {
             color,
           });
         }),
+      };
+      return {
+        ...colorToRecommand,
+        colors: colorToRecommand.colors.filter(
+          (color) =>
+            !existingTints.includes(color.color.toString({ format: "hex" }))
+        ),
       };
     });
   } else {

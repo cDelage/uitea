@@ -2,8 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { PresetDressing, RecentFiles, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
+import {
+  PresetDressing,
+  RecentFilesMetadata,
+  RemoveRecentFilesPayload,
+} from "../../domain/HomeDomain";
 import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
+import { PaletteBuilderMetadata } from "../../domain/PaletteBuilderDomain";
 
 /**
  * Hook pour récupérer tous les fichiers récents
@@ -14,7 +19,9 @@ export function useFindAllRecentFiles() {
   const { data: recentFiles, isLoading: isLoadingRecentFiles } = useQuery({
     queryKey: ["recent-files"],
     queryFn: async () => {
-      const files = await invoke<RecentFiles[]>("find_all_recent_files");
+      const files = await invoke<RecentFilesMetadata[]>(
+        "find_all_recent_files"
+      );
 
       files
         .filter((recentFile) => "Unknown" in recentFile)
@@ -29,33 +36,50 @@ export function useFindAllRecentFiles() {
         });
 
       return files
-        .filter((recentFile) => "DesignSystem" in recentFile)
-        .map(
-          (designSystem) => designSystem.DesignSystem
-        ) as DesignSystemMetadataHome[];
+        .filter((recentFile) => !("Unknown" in recentFile))
+        .map((recentFile) => {
+          if ("DesignSystem" in recentFile) return recentFile.DesignSystem;
+          if ("PaletteBuilder" in recentFile) return recentFile.PaletteBuilder;
+        }) as (DesignSystemMetadataHome | PaletteBuilderMetadata)[];
     },
   });
 
-  return { recentFiles, isLoadingRecentFiles };
+  return {
+    recentFiles: recentFiles as (
+      | DesignSystemMetadataHome
+      | PaletteBuilderMetadata
+    )[],
+    isLoadingRecentFiles,
+  };
 }
 
 /**
  * Hook pour ajouter un fichier récent
  */
-export function useInsertRecentFile() {
+export function useInsertRecentFile(
+  category: "DesignSystemCategory" | "PaletteBuilderCategory"
+) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { mutate: insertRecentFile, isPending: isInsertingFile } = useMutation<
     string,
     Error,
-    string
+    {
+      filePath: string;
+      editMode: boolean;
+      category: "DesignSystemCategory" | "PaletteBuilderCategory";
+    }
   >({
-    mutationFn: async (filePath: string) =>
-      await invoke("insert_recent_file", { filePath }),
+    mutationFn: async (recentFile) =>
+      await invoke("insert_recent_file", {
+        recentFile,
+      }),
     onSuccess: (res) => {
-      // Mettre à jour le cache après une insertion réussie
-      queryClient.invalidateQueries({ queryKey: ["recent-files"] });
-      navigate(`/design-system/${encodeURIComponent(res)}?editMode=true`);
+      if (category === "DesignSystemCategory") {
+        // Mettre à jour le cache après une insertion réussie
+        queryClient.invalidateQueries({ queryKey: ["recent-files"] });
+        navigate(`/design-system/${encodeURIComponent(res)}?editMode=true`);
+      }
     },
     onError: (err) => {
       toast.error(err);
@@ -84,6 +108,7 @@ export function useRemoveRecentFile() {
       toast.success(`Succeed to remove ${path} from recent file`);
     },
     onError: (err) => {
+      console.error(err);
       toast.error(err);
     },
   });
@@ -92,12 +117,11 @@ export function useRemoveRecentFile() {
 }
 
 export function usePresetDressing() {
-  const { data: presetDressing, isLoading: isLoadingPresetDressing } = useQuery<PresetDressing>(
-    {
+  const { data: presetDressing, isLoading: isLoadingPresetDressing } =
+    useQuery<PresetDressing>({
       queryKey: ["preset-dressing"],
       queryFn: async () => await invoke("fetch_presets_dressing"),
-    }
-  );
+    });
 
   return { presetDressing, isLoadingPresetDressing };
 }

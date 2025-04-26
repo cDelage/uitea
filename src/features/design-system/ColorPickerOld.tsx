@@ -1,7 +1,7 @@
 import { ChromePicker } from "react-color";
 import { colorToString } from "../../util/DesignSystemUtils";
 
-function ColorPicker({
+function ColorPickerOld({
   color,
   setColor,
   disableAlpha,
@@ -36,4 +36,4 @@ function ColorPicker({
   );
 }
 
-export default ColorPicker;
+export default ColorPickerOld;

@@ -1,11 +1,13 @@
 import { DesignSystemMetadataHome } from "./DesignSystemDomain";
+import { PaletteBuilderMetadata } from "./PaletteBuilderDomain";
 
 export type InsertFilePayload = {
   filePath: string;
 };
 
-export type RecentFiles =
+export type RecentFilesMetadata =
   | { DesignSystem: DesignSystemMetadataHome }
+  | { PaletteBuilder: PaletteBuilderMetadata }
   | { Unknown: string };
 
 export type RemoveRecentFilesPayload = {

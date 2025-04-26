@@ -4,8 +4,8 @@ import styles from "./StepsList.module.css";
 import { ICON_SIZE_SM } from "../UiConstants";
 import classNames from "classnames";
 import { cloneElement, ReactElement, ReactNode, useState } from "react";
-import { getContrastColor } from "../../util/PaletteBuilderTwoStore";
 import LeftTooltip from "./LeftTooltip";
+import { getContrastColor } from "../../util/PickerUtil";
 
 function StepsList({
   steps,

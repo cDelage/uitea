@@ -1,25 +1,35 @@
-use super::design_system_domain::DesignSystemMetadataHome;
+use std::path::PathBuf;
+
+use super::{design_system_domain::DesignSystemMetadataHome, palette_builder_domain::PaletteBuilderMetadata};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum RecentFiles {
+pub enum RecentFilesMetadata {
     DesignSystem(DesignSystemMetadataHome),
-    Unknown(String),
+    PaletteBuilder(PaletteBuilderMetadata),
+    Unknown(PathBuf),
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum RecentFileCategory {
+    DesignSystemCategory,
+    PaletteBuilderCategory
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 
 pub struct RemoveRecentFilesPayload {
-    pub file_path: String,
+    pub file_path: PathBuf,
     pub is_delete_from_computer: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RecentFile {
-    pub file_path: String,
+    pub file_path: PathBuf,
     pub edit_mode: Option<bool>,
+    pub category: RecentFileCategory
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

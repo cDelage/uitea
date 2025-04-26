@@ -20,6 +20,7 @@ import {
   useUndoRedoDesignSystem,
 } from "../../features/design-system/DesignSystemQueries";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { usePaletteBuilderStore } from "../../features/palette-builder/PaletteBuilderStore";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
@@ -29,27 +30,50 @@ function Header() {
   const { pathname } = useLocation();
   const { undoDesignSystem, redoDesignSystem } =
     useUndoRedoDesignSystem(designSystemPath);
+  const {
+    canUndoRedo: canUndoRedoPaletteBuilder,
+    undoPaletteBuilder,
+    redoPaletteBuilder,
+  } = usePaletteBuilderStore();
   const [searchParams] = useSearchParams();
   const isEditMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
   ) as boolean;
+  const paletteBuilderPageActive = pathname === "/palette-builder";
+  const paletteBuilderActive =
+    paletteBuilderPageActive ||
+    searchParams.get("paletteBuilderOpen") === "true";
+
+  function getHeaderActiveName(): string {
+    if (pathname === "/") {
+      return "Home";
+    } else if (designSystem) {
+      return designSystem?.metadata.designSystemName ?? "undefined";
+    } else if (pathname === "/palette-builder") {
+      return "palette builder";
+    } else {
+      return "undefined";
+    }
+  }
 
   const isHomepageActive: boolean = pathname === "/";
-  const headerName: string = isHomepageActive
-    ? "Home"
-    : designSystem?.metadata.designSystemName ?? "undefined";
+  const headerName: string = getHeaderActiveName();
   const isTmp: boolean | undefined = designSystem?.metadata.isTmp;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === "z") {
-        if (designSystem?.metadata.canUndo) {
+        if (paletteBuilderActive && canUndoRedoPaletteBuilder.canUndo) {
+          undoPaletteBuilder();
+        } else if (designSystem?.metadata.canUndo) {
           event.preventDefault(); // Empêche le comportement par défaut du navigateur
           undoDesignSystem();
         }
       }
       if (event.ctrlKey && event.key === "y") {
-        if (designSystem?.metadata.canRedo) {
+        if (paletteBuilderActive && canUndoRedoPaletteBuilder.canRedo) {
+          redoPaletteBuilder();
+        } else if (designSystem?.metadata.canRedo) {
           event.preventDefault();
           redoDesignSystem();
         }
@@ -60,7 +84,15 @@ function Header() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [undoDesignSystem, redoDesignSystem, designSystem]);
+  }, [
+    undoDesignSystem,
+    redoDesignSystem,
+    designSystem,
+    paletteBuilderActive,
+    canUndoRedoPaletteBuilder,
+    undoPaletteBuilder,
+    redoPaletteBuilder,
+  ]);
 
   useEffect(() => {
     const updateMaximizedState = async () => {
@@ -96,19 +128,35 @@ function Header() {
         )}
       </div>
       <div className={styles.buttons}>
-        {!isHomepageActive && isEditMode && (
+        {((!isHomepageActive && isEditMode) || paletteBuilderPageActive) && (
           <div className={styles.undoRedoButtons}>
             <button
               className="action-ghost-button"
-              disabled={!designSystem?.metadata.canUndo}
-              onClick={() => undoDesignSystem()}
+              disabled={
+                (!paletteBuilderPageActive &&
+                  !designSystem?.metadata.canUndo) ||
+                (paletteBuilderPageActive && !canUndoRedoPaletteBuilder.canUndo)
+              }
+              onClick={() =>
+                paletteBuilderPageActive
+                  ? undoPaletteBuilder()
+                  : undoDesignSystem()
+              }
             >
               <MdArrowBack size={ICON_SIZE_SM} />
             </button>
             <button
               className="action-ghost-button"
-              disabled={!designSystem?.metadata.canRedo}
-              onClick={() => redoDesignSystem()}
+              disabled={
+                (!paletteBuilderPageActive &&
+                  !designSystem?.metadata.canRedo) ||
+                (paletteBuilderPageActive && !canUndoRedoPaletteBuilder.canRedo)
+              }
+              onClick={() =>
+                paletteBuilderPageActive
+                  ? redoPaletteBuilder()
+                  : redoDesignSystem()
+              }
             >
               <MdArrowForward size={ICON_SIZE_SM} />
             </button>

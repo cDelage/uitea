@@ -1,14 +1,18 @@
+.paletteBuilder {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--base-bg);
+  height: 100%;
+}
+
 .modalPaletteBuilder {
   width: 90vw;
   max-width: 90vw;
   height: 90vh;
   max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  background-color: var(--base-bg);
 }
 
 .header {
@@ -27,11 +31,15 @@
   flex-direction: column;
   gap: var(--space-6);
   position: relative;
-  height: 100%;
+  overflow: hidden;
+  max-height: 100%;
+  flex: 1;
+  box-sizing: border-box;
 }
 
 .tablePaletteBuilder {
   overflow-x: auto;
+  overflow-y: auto;
   width: 100%;
   max-width: 100%;
   position: relative;
@@ -63,6 +71,7 @@
 .columnPalette[data-open="true"] {
   background-color: var(--palette-gray-50);
   color: var(--add-text);
+  text-decoration: underline;
 }
 
 .columnPaletteHeader {
@@ -80,8 +89,10 @@
 
 .columnTint {
   font-weight: var(--font-weight-default);
-  min-width: 30px;
-  padding: var(--space-3);
+  min-width: 30px !important;
+  padding: var(--space-0) !important;
+  margin: var(--space-0) !important;
+  position: relative;
 }
 
 .sidePanel {
@@ -100,12 +111,7 @@
   position: sticky;
   top: -1px;
   z-index: 100;
-  background: linear-gradient(
-    to left,
-    rgba(255, 255, 255, 0.6),
-    30%,
-    #FFFFFF
-  );
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.6), 30%, #ffffff);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #fff;
   z-index: 2;
@@ -150,7 +156,6 @@
   color: var(--component-hover-text);
 }
 
-
 .rightSidepanelSpace {
   padding-right: 500px;
 }
@@ -182,12 +187,25 @@
   display: flex;
 }
 
-.columnPalette[data-dragged="true"]{
+.columnPalette[data-dragged="true"] {
   background-color: var(--add-bg);
   color: var(--add-text);
 }
 
-.columnPalette[data-dragged="true"][data-remove="true"]{
+.columnPalette[data-dragged="true"][data-remove="true"] {
   background-color: var(--remove-bg);
   color: var(--remove-text);
+}
+
+.anchorPreviewContainer {
+  display: flex;
+  justify-content: end;
+}
+
+.anchorPlaceholder {
+  height: 16px;
+}
+
+.valueRealign {
+  padding-bottom: 3px;
 }

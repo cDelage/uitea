@@ -85,6 +85,7 @@ dependencies = [
  "pickledb",
  "serde",
  "serde_json",
+ "serde_with",
  "serde_yaml",
  "tauri",
  "tauri-build",

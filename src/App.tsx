@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import HomePage from "./features/home/Home";
+import HomePage from "./features/home/HomePage";
 import Layout from "./ui/layout/Layout";
 import PageDesignSystem from "./features/design-system/PageDesignSystem";
 import { Toaster } from "react-hot-toast";
 import ErrorFallback from "./ui/layout/ErrorFallback";
 import { Suspense } from "react";
 import Loader from "./ui/kit/Loader";
+import PagePaletteBuilder from "./features/palette-builder/PagePaletteBuilder";
 
 const router = createBrowserRouter([
   {
@@ -16,13 +17,25 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Suspense fallback={<Loader/>}><HomePage /></Suspense>,
+        element: (
+          <Suspense fallback={<Loader />}>
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: "/design-system/:designSystemPath",
         element: (
           <Suspense fallback={<Loader />}>
             <PageDesignSystem />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/palette-builder/",
+        element: (
+          <Suspense fallback={<Loader />}>
+            <PagePaletteBuilder />
           </Suspense>
         ),
       },

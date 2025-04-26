@@ -1,0 +1,34 @@
+.tokenSelector {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+}
+
+.family {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  position: relative;
+}
+
+.family[data-active="true"] {
+  background-color: var(--component-hover-bg);
+}
+
+.tokens {
+  display: flex;
+  flex-direction: column;
+}
+
+.token {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  cursor: pointer;
+}
+
+.token:hover {
+  background-color: var(--component-hover-bg);
+}

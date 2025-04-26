@@ -11,7 +11,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 
 export function useCreateDesignSystem() {
-  const { insertRecentFile } = useInsertRecentFile();
+  const { insertRecentFile } = useInsertRecentFile("DesignSystemCategory");
   const { mutate: createDesignSystem, isPending: isCreatingDesignSystem } =
     useMutation<DesignSystemMetadata, Error, DesignSystemCreationPayload>({
       mutationFn: async (
@@ -27,7 +27,11 @@ export function useCreateDesignSystem() {
         toast.success(
           `Design system ${result.designSystemName} successfully created`
         );
-        insertRecentFile(result.designSystemPath);
+        insertRecentFile({
+          filePath: result.designSystemPath,
+          category: "DesignSystemCategory",
+          editMode: true,
+        });
       },
     });
 

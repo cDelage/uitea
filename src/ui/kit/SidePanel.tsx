@@ -15,36 +15,40 @@ function SidePanel({
   children,
   background,
   closeCallback,
+  isOpenToSync,
+  setIsOpenToSync,
+  defaultOpen
 }: {
   children: ReactNode;
   background?: boolean;
   closeCallback?: () => void;
+  isOpenToSync?: boolean;
+  setIsOpenToSync?: (value: boolean) => void;
+  defaultOpen?: string;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [openKey, setOpenKey] = useState<string | undefined>(undefined);
-
-  function open(id: string, key?: string) {
+  const [openId, setOpenId] = useState<string | null>(defaultOpen ?? null);
+  function open(id: string) {
     setOpenId(id);
-    setOpenKey(key);
   }
 
-  function toggle(id: string, key?: string) {
-    if (!openKey || openKey === key) {
-      if (openId === id) {
-        closeCallback?.();
-      }
-      setOpenId(id === openId ? null : id);
-    }
-    setOpenKey(key);
+  function toggle(id: string) {
+    setOpenId(id === openId ? null : id);
   }
 
   function close(id: string) {
     if (openId === id) {
       setOpenId(null);
-      setOpenKey(undefined);
       closeCallback?.();
     }
   }
+
+  useEffect(() => {
+    if (isOpenToSync && !openId && setIsOpenToSync) {
+      setIsOpenToSync(false);
+    } else if (!isOpenToSync && openId && setIsOpenToSync) {
+      setIsOpenToSync(true);
+    }
+  }, [openId, isOpenToSync, setIsOpenToSync]);
 
   return (
     <SidepanelContext.Provider
@@ -73,24 +77,15 @@ function SidePannelBackground() {
 function SidePanelButton({
   children,
   id,
-  openKey,
   callback,
-  toggleKey,
+  stopClose,
 }: {
   children: ReactNode;
   id: string;
-  openKey?: string;
   callback?: () => void;
-  toggleKey?: string;
+  stopClose?: boolean;
 }) {
-  const { toggleModal, openModalId, openModal } =
-    useSidepanelContext();
-
-  useEffect(() => {
-    if (toggleKey && openModalId !== toggleKey) {
-      openModal(toggleKey, openKey);
-    }
-  }, [openModalId, toggleKey, openKey, openModal]);
+  const { toggleModal, openModalId } = useSidepanelContext();
 
   return cloneElement(
     children as ReactElement<{
@@ -100,7 +95,9 @@ function SidePanelButton({
     {
       onClick: () => {
         callback?.();
-        toggleModal(id, openKey);
+        if (!stopClose || openModalId !== id) {
+          toggleModal(id);
+        }
       },
       "data-disableoutside": true,
     }
@@ -143,27 +140,28 @@ function SidePanelBodyRelative({
   const refModalBody = useDivClickOutside(() => {
     if (openModalId === id) setTimeout(() => closeModal(id), 0);
   });
-
   const isOpen: boolean = openModalId === id;
   return (
-    <CSSTransition
-      in={isOpen}
-      timeout={200}
-      mountOnEnter
-      unmountOnExit
-      classNames="modal"
-      nodeRef={refModalBody}
-    >
-      <div
-        className={styles.sidePanelBody}
-        style={{
-          width,
-        }}
-        ref={refModalBody}
+    <>
+      <CSSTransition
+        in={isOpen}
+        timeout={200}
+        mountOnEnter
+        unmountOnExit
+        classNames="modal"
+        nodeRef={refModalBody}
       >
-        {children}
-      </div>
-    </CSSTransition>
+        <div
+          className={styles.sidePanelBody}
+          style={{
+            width,
+          }}
+          ref={refModalBody}
+        >
+          {children}
+        </div>
+      </CSSTransition>
+    </>
   );
 }
 

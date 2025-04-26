@@ -1,4 +1,8 @@
-use std::{collections::HashMap, fs, path::{Path, PathBuf}};
+use std::{
+    collections::HashMap,
+    fs,
+    path::{Path, PathBuf},
+};
 
 use anyhow::{anyhow, Result};
 
@@ -477,4 +481,17 @@ pub fn insert_image(image_path: &String, design_system_path: &PathBuf) -> Result
         init_images(&design_system_path)?;
     }
     copy_file(&image_path, &images_folder)
+}
+
+pub fn is_under_design_system(path: &PathBuf) -> bool {
+    // Remonte d'un dossier
+    if let Some(parent) = path.parent() {
+        // Crée le chemin complet du fichier design_system_metadata.yaml
+        let metadata_path = parent.join(DESIGN_SYSTEM_METADATA_PATH);
+
+        // Vérifie si le fichier existe
+        return metadata_path.exists();
+    }
+
+    false
 }

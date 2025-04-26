@@ -5,11 +5,9 @@ import { useModalContext } from "../../ui/kit/ModalContext";
 import { useState } from "react";
 import { ButtonAlert, ButtonTertiary } from "../../ui/kit/Buttons";
 import { useRemoveRecentFile } from "./HomeQueries";
-import { usePopoverContext } from "../../ui/kit/PopoverContext";
 
 function ModalRemoveRecentFile({ recentFilePath }: { recentFilePath: string }) {
-  const { openModal } = useModalContext();
-  const { closePopover } = usePopoverContext();
+  const { openModal, closeModal } = useModalContext();
   const [isDeleteFromComputer, setIsDeleteFromComputer] = useState(false);
   const { removeFile } = useRemoveRecentFile();
 
@@ -21,10 +19,10 @@ function ModalRemoveRecentFile({ recentFilePath }: { recentFilePath: string }) {
       },
       {
         onSuccess: () => {
-          closePopover();
+          closeModal();
         },
         onError: () => {
-          closePopover();
+          closeModal();
         },
       }
     );
@@ -58,7 +56,9 @@ function ModalRemoveRecentFile({ recentFilePath }: { recentFilePath: string }) {
             </div>
           </Modal.Md>
           <Modal.Footer>
-            <ButtonAlert onClick={handleRemoveFile}>Remove</ButtonAlert>
+            <ButtonAlert onClick={handleRemoveFile} type="button">
+              Remove
+            </ButtonAlert>
             <Modal.Close>
               <ButtonTertiary>Cancel</ButtonTertiary>
             </Modal.Close>

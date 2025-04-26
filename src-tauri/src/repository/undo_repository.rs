@@ -6,6 +6,8 @@ use tauri::State;
 
 use crate::AppState;
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UndoRedoActions {
     pub can_undo: bool,
     pub can_redo: bool,
@@ -46,7 +48,6 @@ pub fn set_new<T: Serialize + for<'de> Deserialize<'de> + Clone>(
     object_id: &str,
     new_value: &T,
 ) -> Result<()> {
-    println!("set new undo repo");
     let mut undo_db = state.undo_db.lock().unwrap();
     let mut historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
 
@@ -64,7 +65,6 @@ pub fn undo<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
     state: &State<AppState>,
     object_id: &str,
 ) -> Result<T> {
-    println!("undo - undo repo");
     let mut undo_db = state.undo_db.lock().unwrap();
     let mut historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
     if let Some(prev) = historic.past.pop() {
@@ -88,7 +88,6 @@ pub fn redo<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
     state: &State<AppState>,
     object_id: &str,
 ) -> Result<T> {
-    println!("redo - undo repo");
     let mut undo_db = state.undo_db.lock().unwrap();
     let mut historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
 
@@ -113,7 +112,6 @@ pub fn get_present<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
     state: &State<AppState>,
     object_id: &str,
 ) -> Result<T> {
-    println!("get_present - undo repo");
     let undo_db = state.undo_db.lock().unwrap();
     let historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
     let present_historic: T = historic.present.ok_or(anyhow!("fail to find present"))?;

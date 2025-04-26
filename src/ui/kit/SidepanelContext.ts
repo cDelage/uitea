@@ -2,9 +2,9 @@ import { createContext, useContext } from "react";
 
 export type SidepanelContextType = {
   openModalId: string | null;
-  openModal: (id: string, key?: string) => void;
-  closeModal: (id: string, key?: string) => void;
-  toggleModal: (id: string, key?: string) => void;
+  openModal: (id: string) => void;
+  closeModal: (id: string) => void;
+  toggleModal: (id: string) => void;
 };
 
 export const SidepanelContext = createContext<null | SidepanelContextType>(

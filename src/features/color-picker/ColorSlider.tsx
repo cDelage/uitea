@@ -3,7 +3,7 @@ import ColorIO from "colorjs.io";
 import {
   HANDLE_SLIDER_HORIZONTAL,
   RAIL_SLIDER_HORIZONTAL,
-} from "../../UiConstants";
+} from "../../ui/UiConstants";
 
 function ColorSlider({
   gradient,
@@ -14,6 +14,7 @@ function ColorSlider({
   step = 1,
   color,
   reverse,
+  onChangeComplete
 }: {
   gradient: string;
   value: number;
@@ -23,6 +24,7 @@ function ColorSlider({
   step?: number;
   color?: ColorIO;
   reverse?: boolean;
+  onChangeComplete?: () => void;
 }) {
   return (
     <Slider
@@ -32,6 +34,7 @@ function ColorSlider({
       included={false}
       value={value}
       reverse={reverse}
+      onChangeComplete={onChangeComplete}
       onChange={(value) => {
         if (typeof value === "number") {
           if (Number.isInteger(value)) {

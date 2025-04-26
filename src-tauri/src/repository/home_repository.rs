@@ -1,55 +1,71 @@
 use anyhow::{anyhow, Result};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf};
 use tauri::State;
 
 use crate::{
-    domain::home_domain::{PresetDressing, RecentFile, RemoveRecentFilesPayload},
+    domain::{
+        home_domain::{
+            PresetDressing, RecentFile,
+            RecentFileCategory::{DesignSystemCategory, PaletteBuilderCategory},
+            RemoveRecentFilesPayload,
+        },
+        palette_builder_domain::PaletteBuilderFile,
+    },
     repository::DESIGN_SYSTEM_METADATA_PATH,
     AppState,
 };
 
-use super::fetch_image_folder;
+use super::{fetch_image_folder, load_yaml_from_pathbuf};
 
 const BANNERS_PATH: &str = "./assets/banners";
 const LOGOS_PATH: &str = "./assets/logos";
 
-pub fn insert_recent_file(
-    state: State<AppState>,
-    file_path: String,
-    edit_mode: Option<bool>,
-) -> Result<String> {
-    let folder_path = Path::new(&file_path);
-    let design_system_metadata_path = PathBuf::from(&folder_path).join(DESIGN_SYSTEM_METADATA_PATH);
+pub fn insert_recent_file(state: State<AppState>, recent_file: RecentFile) -> Result<PathBuf> {
+    validate_recent_file(&recent_file)?;
 
-    if !folder_path.exists() || !folder_path.is_dir() || !design_system_metadata_path.is_file() {
-        return Err(anyhow!(
-            "Folder loaded do not include a pathframe design-system"
-        ));
-    }
-
-    let mut db = state.db.lock().unwrap();
+    let mut db = state.user_settings_db.lock().unwrap();
     // Récupérer la liste existante ou en créer une nouvelle
     let mut recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
 
     // Vérifier si le fichier est déjà dans la liste
-    if !recent_files.iter().any(|rf| rf.file_path == file_path) {
-        recent_files.push(RecentFile {
-            file_path: file_path.clone(),
-            edit_mode,
-        });
+    if !recent_files
+        .iter()
+        .any(|rf| &rf.file_path == &recent_file.file_path)
+    {
+        recent_files.push(recent_file.clone());
         db.set("recentFiles", &recent_files)
             .map_err(|e| anyhow!(e.to_string()))?;
     }
+    Ok(recent_file.file_path)
+}
 
-    Ok(file_path)
+pub fn validate_recent_file(recent_file: &RecentFile) -> Result<PathBuf> {
+    let validated_path: PathBuf = match recent_file.category {
+        DesignSystemCategory => {
+            let design_system_metadata_path =
+                recent_file.file_path.join(DESIGN_SYSTEM_METADATA_PATH);
+            if !recent_file.file_path.exists()
+                || !recent_file.file_path.is_dir()
+                || !design_system_metadata_path.is_file()
+            {
+                return Err(anyhow!(
+                    "Le dossier chargé n'inclut pas un design-system pathframe"
+                ));
+            }
+            recent_file.file_path.to_path_buf()
+        }
+        PaletteBuilderCategory => {
+            load_yaml_from_pathbuf::<PaletteBuilderFile>(&recent_file.file_path)?;
+            recent_file.file_path.to_path_buf()
+        }
+    };
+
+    Ok(validated_path)
 }
 
 pub fn find_all_recent_files(state: State<AppState>) -> Vec<RecentFile> {
     println!("Fetch all recent files");
-    let db = state.db.lock().unwrap();
+    let db = state.user_settings_db.lock().unwrap();
     db.get("recentFiles").unwrap_or_default()
 }
 
@@ -57,8 +73,8 @@ pub fn remove_recent_file(
     state: State<AppState>,
     remove_payload: &RemoveRecentFilesPayload,
 ) -> Result<String> {
-    println!("Try to remove recent file {}", &remove_payload.file_path);
-    let mut db = state.db.lock().unwrap();
+    println!("Try to remove recent file {:?}", &remove_payload.file_path);
+    let mut db = state.user_settings_db.lock().unwrap();
 
     // Récupérer la liste existante
     let recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();
@@ -73,9 +89,15 @@ pub fn remove_recent_file(
 
     if remove_payload.is_delete_from_computer {
         println!("Try to remove file from computer");
-        fs::remove_dir_all(&remove_payload.file_path).or(Err(anyhow!(
-            "Recent file successfully removed, but failed to remove from computer"
-        )))?;
+        if remove_payload.file_path.is_dir() {
+            fs::remove_dir_all(&remove_payload.file_path).or(Err(anyhow!(
+                "Recent file successfully removed, but failed to remove from computer"
+            )))?;
+        } else if remove_payload.file_path.is_file() {
+            fs::remove_file(&remove_payload.file_path).or(Err(anyhow!(
+                "Recent file successfully removed, but failed to remove from computer"
+            )))?;
+        }
     }
 
     println!("Succeed remove operation");
@@ -83,7 +105,7 @@ pub fn remove_recent_file(
 }
 
 pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> Result<()> {
-    let mut db = state.db.lock().unwrap();
+    let mut db = state.user_settings_db.lock().unwrap();
     println!("update_recent_file : {:?}", updated_file);
 
     let mut recent_files: Vec<RecentFile> = db.get("recentFiles").unwrap_or_default();

@@ -16,7 +16,7 @@ import {
 } from "../../util/DesignSystemUtils";
 import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
 import Popover from "../../ui/kit/Popover";
-import ColorPicker from "./ColorPicker";
+import ColorPickerOld from "./ColorPickerOld";
 import { useSearchParams } from "react-router-dom";
 
 function ShadeComponent({
@@ -204,7 +204,7 @@ function ShadeComponent({
             </Popover.Toggle>
             <Popover.Body id="color-picker">
               <div className="popover-body">
-                <ColorPicker
+                <ColorPickerOld
                   setColor={(color: string) => {
                     if (editMode) setValue(`shades.${index}.color`, color);
                   }}

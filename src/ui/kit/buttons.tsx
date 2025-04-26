@@ -42,6 +42,11 @@ export const ButtonPrimary = styled.button`
     background-color: var(--primary-hover-bg);
     color: var(--primary-hover-text);
   }
+
+  &:disabled{
+    background-color: var(--base-bg-disabled);
+    color: var(--base-text-disabled);
+  }
 `;
 
 export const ButtonAlert = styled.button`

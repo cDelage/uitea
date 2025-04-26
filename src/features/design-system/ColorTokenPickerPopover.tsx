@@ -3,7 +3,7 @@ import { useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./InputPopover.module.css";
 import Tabs from "./Tabs";
 import InputText from "../../ui/kit/InputText";
-import ColorPicker from "./ColorPicker";
+import ColorPickerOld from "./ColorPickerOld";
 
 function ColorTokenPickerPopover({
   value,
@@ -66,7 +66,7 @@ function ColorTokenPickerPopover({
         </Tabs.TabBody>
         <Tabs.TabBody id="picker">
           <div>
-            <ColorPicker 
+            <ColorPickerOld 
               color={value}
               setColor={setValue}
             />

@@ -1,4 +1,7 @@
-import { PositionAbsolute, PositionPayload } from "../ui/kit/PositionAbsolute.type";
+import {
+  PositionAbsolute,
+  PositionPayload,
+} from "../ui/kit/PositionAbsolute.type";
 
 export function getRectPosition(
   position: PositionPayload,
@@ -7,11 +10,11 @@ export function getRectPosition(
 ): PositionAbsolute {
   const pos: PositionAbsolute = {};
 
-  if(!rect){
+  if (!rect) {
     return {
       top: 0,
-      left:0
-    }
+      left: 0,
+    };
   }
   switch (position) {
     case "top-left":
@@ -27,25 +30,17 @@ export function getRectPosition(
     case "bottom-left":
       pos.left = rect.x;
       pos.top = rect.y + rect.height;
-      pos.transform = transform
+      pos.transform = transform;
       break;
     case "bottom-right":
       pos.right = window.innerWidth - rect.x - rect.width;
       pos.top = rect.y + rect.height;
-      pos.transform = transform
+      pos.transform = transform;
       break;
   }
 
   return pos;
 }
-
-/**
- * Calcule la position pour que le popover reste visible
- * @param initialPosition Position initiale calculée (ex. via getRectPosition)
- * @param popoverBoundingRect Bounding rect du popover
- * @param toggleButtonRect Bounding rect du bouton toggle
- * @returns Position ajustée
- */
 export function calcPositionVisible(
   initialPosition: PositionAbsolute,
   popoverBoundingRect?: DOMRect,
@@ -55,59 +50,58 @@ export function calcPositionVisible(
 
   const { innerWidth, innerHeight } = window;
   const finalPos: PositionAbsolute = { ...initialPosition };
-
-  const toggleVisibleX =
-    toggleButtonRect.x >= 0 &&
-    toggleButtonRect.x + toggleButtonRect.width <= innerWidth;
-
-  if (toggleVisibleX) {
-    if (finalPos.left !== undefined) {
-      if (finalPos.left + popoverBoundingRect.width > innerWidth) {
-        finalPos.left = innerWidth - popoverBoundingRect.width;
+  // Gestion verticale (Y)
+  if (finalPos.top !== undefined) {
+    const popoverBottom = finalPos.top + popoverBoundingRect.height;
+    if (
+      popoverBottom > innerHeight &&
+      initialPosition.transform !== "translateY(-100%)"
+    ) {
+      // Si ça déborde en bas, essayer de le placer au-dessus du toggleButton
+      const newTop = toggleButtonRect.top - popoverBoundingRect.height;
+      if (newTop >= 0) {
+        finalPos.top = newTop;
+      } else {
+        // Si pas possible, rester collé en bas (sans déborder si possible)
+        finalPos.top = Math.max(innerHeight - popoverBoundingRect.height, 0);
       }
-      if (finalPos.left < 0) {
-        finalPos.left = 0;
-      }
-    }
-    // Sinon, s'il est positionné via "right", on convertit en "left"
-    else if (finalPos.right !== undefined) {
-      let computedLeft = innerWidth - finalPos.right - popoverBoundingRect.width;
-      if (computedLeft < 0) {
-        computedLeft = 0;
-      } else if (computedLeft + popoverBoundingRect.width > innerWidth) {
-        computedLeft = innerWidth - popoverBoundingRect.width;
-      }
-      finalPos.left = computedLeft;
-      delete finalPos.right;
+    } else if (
+      initialPosition.top &&
+      initialPosition.transform === "translateY(-100%)" &&
+      toggleButtonRect.y - popoverBoundingRect.height < 0
+    ) {
+      finalPos.top = toggleButtonRect.y + toggleButtonRect.height;
+      finalPos.transform = undefined;
     }
   }
-  const toggleVisibleY =
-    toggleButtonRect.top >= 0 &&
-    toggleButtonRect.top + toggleButtonRect.height <= innerHeight;
 
-  if (toggleVisibleY) {
-    if (finalPos.top !== undefined) {
-      // S'il déborde en bas
-      if (finalPos.top + popoverBoundingRect.height > innerHeight) {
-        finalPos.top = innerHeight - popoverBoundingRect.height;
+  // Gestion horizontale (X)
+  if (finalPos.left !== undefined) {
+    const popoverRight = finalPos.left + popoverBoundingRect.width;
+    if (popoverRight > innerWidth) {
+      // Si ça déborde à droite, essayer de le caler à gauche du toggle
+      const newLeft = toggleButtonRect.right - popoverBoundingRect.width;
+      if (newLeft + popoverBoundingRect.width <= innerWidth) {
+        finalPos.left = Math.max(newLeft, 0);
+      } else {
+        // Sinon coller contre la droite de l'écran
+        finalPos.left = Math.max(innerWidth - popoverBoundingRect.width, 0);
       }
-      // S'il déborde en haut
-      if (finalPos.top < 0) {
-        finalPos.top = 0;
+    }
+  } else if (finalPos.right !== undefined) {
+    const popoverLeft = innerWidth - finalPos.right - popoverBoundingRect.width;
+    if (popoverLeft < 0) {
+      // Si ça déborde à gauche, essayer de le caler à droite du toggle
+      const newRight =
+        innerWidth - toggleButtonRect.left - popoverBoundingRect.width;
+      if (newRight >= 0) {
+        finalPos.right = newRight;
+      } else {
+        // Sinon coller contre la gauche de l'écran
+        finalPos.right = Math.max(innerWidth - popoverBoundingRect.width, 0);
       }
-    } else if (finalPos.bottom !== undefined) {
-      let computedTop = innerHeight - finalPos.bottom - popoverBoundingRect.height;
-      if (computedTop < 0) {
-        computedTop = 0;
-      } else if (computedTop + popoverBoundingRect.height > innerHeight) {
-        computedTop = innerHeight - popoverBoundingRect.height;
-      }
-      finalPos.top = computedTop;
-      delete finalPos.bottom;
     }
   }
-  // Sinon, si le bouton n'est pas totalement visible verticalement,
-  // le popover suit le bouton (position initiale).
 
   return finalPos;
 }
@@ -141,4 +135,93 @@ export function getAbsolutePosition(
   }
 
   return pos;
+}
+
+export function getOutsideAbsolutePosition(
+  position: PositionPayload
+): PositionAbsolute {
+  const pos: PositionAbsolute = {};
+
+  switch (position) {
+    case "top-left":
+      pos.left = 0;
+      pos.top = 0;
+      pos.transform = "translate(-100%, 0%)";
+      break;
+    case "top-right":
+      pos.right = 0;
+      pos.top = 0;
+      pos.transform = "translate(100%, 0%)";
+      break;
+    case "bottom-left":
+      pos.left = 0;
+      pos.bottom = 0;
+      pos.transform = "translate(-100%, 0%)";
+      break;
+    case "bottom-right":
+      pos.right = 0;
+      pos.bottom = 0;
+      pos.transform = "translate(100%, 0%)";
+      break;
+  }
+
+  return pos;
+}
+
+export function checkPositionPayload(
+  position: PositionPayload,
+  rect: DOMRect
+): PositionPayload {
+  const { innerWidth, innerHeight } = window;
+  const overflowX: boolean =
+    (rect.x + rect.width > innerWidth &&
+      (position === "top-right" || position === "bottom-right")) ||
+    (rect.x < 0 && (position === "bottom-left" || position === "top-left"));
+
+  const overflowY: boolean =
+    (rect.y + rect.height > innerHeight &&
+      (position === "top-left" || position === "top-right")) ||
+    (rect.y < 0 && (position === "bottom-right" || position === "bottom-left"));
+
+
+  if (overflowX || overflowY) {
+    const [yPos, xPos] = position.split("-");
+    return recalcPosition({
+      x: xPos as XPosition,
+      y: yPos as YPosition,
+      overflowX,
+      overflowY,
+    });
+  }
+  return position;
+}
+
+export type XPosition = "left" | "right";
+export type YPosition = "top" | "bottom";
+
+function recalcPosition({
+  x,
+  y,
+  overflowX,
+  overflowY,
+}: {
+  x: XPosition;
+  y: YPosition;
+  overflowX: boolean;
+  overflowY: boolean;
+}): PositionPayload {
+  if (overflowY) {
+    return `${getYOpposite(y)}-${overflowX ? getXOpposite(x) : x}`;
+  } else if (overflowX) {
+    return `${y}-${getXOpposite(x)}`;
+  }
+  return `${y}-${x}`;
+}
+
+function getXOpposite(x: XPosition): XPosition {
+  return x === "left" ? "right" : "left";
+}
+
+function getYOpposite(y: YPosition): YPosition {
+  return y === "top" ? "bottom" : "top";
 }

@@ -2,13 +2,11 @@ import styled from "styled-components";
 
 export const Table = styled.table`
   border-spacing: 0;
+  table-layout: fixed;
+  width: 100%; /* La cellule de gauche s'étend automatiquement */
   td.expand {
-    width: auto; /* La cellule de gauche s'étend automatiquement */
-  }
-
-  td.shrink {
-    width: 1%; /* La cellule de droite occupe le minimum nécessaire */
-    white-space: nowrap; /* Empêche la cellule de réduire son contenu sur plusieurs lignes */
+    overflow-x: hidden;
+    width: auto;
   }
 
   thead {
@@ -17,12 +15,16 @@ export const Table = styled.table`
       line-height: 20px;
       font-weight: var(--font-weight-bold);
       color: var(--base-text-light);
-
       td {
         padding: var(--space-3);
       }
-    }
 
+      td.shrink {
+        width: 1%; /* La cellule de droite occupe le minimum nécessaire */
+        white-space: nowrap; /* Empêche la cellule de réduire son contenu sur plusieurs lignes */
+        padding: var(--space-5) var(--space-2); /* Applique le padding ici */
+      }
+    }
   }
 
   tbody {
@@ -30,15 +32,24 @@ export const Table = styled.table`
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
 
-    tr {
-      cursor: pointer;
+    .hoverable {
       &:hover {
         background-color: var(--component-hover-bg);
         color: var(--component-hover-text);
       }
+    }
+
+    tr {
+      cursor: pointer;
 
       td {
         padding: var(--space-5); /* Applique le padding ici */
+      }
+
+      td.shrink {
+        width: 1%; /* La cellule de droite occupe le minimum nécessaire */
+        white-space: nowrap; /* Empêche la cellule de réduire son contenu sur plusieurs lignes */
+        padding: var(--space-5) var(--space-2); /* Applique le padding ici */
       }
     }
   }

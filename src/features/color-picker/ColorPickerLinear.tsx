@@ -8,19 +8,21 @@ import {
   PickerSpace,
   updateColor,
   updateColorFromString,
-} from "../../../util/PickerUtil";
+  isValidColor,
+} from "../../util/PickerUtil";
 import styles from "./ColorPickerLinear.module.css";
 import InputNumber from "./InputNumber";
-import FormComponent from "../FormComponent";
-import { isValidColor } from "../../../util/PaletteBuilderStore";
+import FormComponent from "../../ui/kit/FormComponent";
 import ColorIO from "colorjs.io";
 
 function ColorPickerLinear({
   color,
   onChange,
+  onChangeComplete
 }: {
   color: ColorIO;
   onChange: (color: ColorIO) => void;
+  onChangeComplete?: () => void;
 }) {
   const [colorHex, setColorHex] = useState(color.toString({ format: "hex" }));
   const [lastColorHex, setLastColorHex] = useState(
@@ -98,10 +100,11 @@ function ColorPickerLinear({
           >
             <ColorSlider
               gradient={axe.gradient}
-              value={axe.value}
+              value={axe.value ?? 0}
               max={axe.max}
               min={axe.min}
               step={axe.steps}
+              onChangeComplete={onChangeComplete}
               onChange={(value: number) => {
                 onChange(
                   updateColor({

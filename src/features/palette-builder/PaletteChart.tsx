@@ -1,15 +1,15 @@
 import Slider from "rc-slider";
-import FormComponent from "../../../ui/kit/FormComponent";
+import FormComponent from "../../ui/kit/FormComponent";
 import {
   HANDLE_SLIDER_VERTICAL,
   ICON_SIZE_MD,
   RAIL_SLIDER_VERTICAL,
-} from "../../../ui/UiConstants";
+} from "../../ui/UiConstants";
 import { Line } from "react-chartjs-2";
 import { useMemo } from "react";
-import { InterpolationColorSpace, PaletteBuild } from "./PaletteBuilder3Store";
 import { ChartAxeData, getPaletteChart } from "./PaletteChartsUtil";
 import { MdRestartAlt } from "react-icons/md";
+import { InterpolationColorSpace, PaletteBuild } from "../../domain/PaletteBuilderDomain";
 
 function PaletteChart({
   palette,
@@ -24,10 +24,6 @@ function PaletteChart({
     () => getPaletteChart({ axeName, interpolationColorSpace, palette }),
     [axeName, interpolationColorSpace, palette]
   );
-
-  if (axeName === "h") {
-    console.log(paletteChartData);
-  }
 
   return (
     <FormComponent label={axeLabel} className="w-full">

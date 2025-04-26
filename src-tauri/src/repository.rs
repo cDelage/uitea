@@ -16,7 +16,9 @@ use crate::domain::image_domain::ImageLocal;
 
 pub mod design_system_repository;
 pub mod home_repository;
+pub mod palette_builder_repository;
 pub mod undo_repository;
+pub mod color_picker_repository;
 
 const DESIGN_SYSTEM_METADATA_PATH: &str = "design_system_metadata.yaml";
 const TMP_PATH: &str = "tmp";
@@ -77,15 +79,24 @@ pub fn compute_path_with_extension(
     if file_path_with_extension.exists() {
         let mut i = 1;
         // Trouver un nom unique en ajoutant "(i)" avant l'extension
-        while Path::new(&format!("{}-{}{}", file_path.display(), i, extension)).exists() {
+        while Path::new(&format!("{}-{}.{}", file_path.display(), i, extension)).exists() {
             i += 1;
         }
-        file_path = PathBuf::from(format!("{}-{}{}", file_path.display(), i, extension));
+        file_path = PathBuf::from(format!("{}-{}.{}", file_path.display(), i, extension));
     } else {
         file_path = file_path_with_extension;
     }
 
     file_path
+}
+
+pub fn compute_path_with_extension_overwrite(
+    directory: &PathBuf,
+    filename: &str,
+    extension: &str,
+) -> PathBuf {
+    let file_path: PathBuf = directory.join(filename.replace(" ", "-"));
+    file_path.with_extension(extension)
 }
 
 fn save_to_yaml_file<P, T>(path: P, data: &T) -> Result<()>
@@ -198,7 +209,6 @@ pub fn copy_file(original_file: &PathBuf, destination_folder: &PathBuf) -> Resul
     Ok(String::from(string_path))
 }
 
-
 pub fn assert_file_in_directory(filepath: &String, folder: &PathBuf) -> Result<String> {
     let file_path = PathBuf::from(filepath);
 
@@ -208,13 +218,19 @@ pub fn assert_file_in_directory(filepath: &String, folder: &PathBuf) -> Result<S
         return Err(anyhow!("'{}' is not a file.", filepath));
     }
 
-    let abs_folder = folder.canonicalize()
+    let abs_folder = folder
+        .canonicalize()
         .map_err(|e| anyhow::anyhow!("Impossible to read dir '{:?}': {}", folder, e))?;
-    let abs_file_path = file_path.canonicalize()
+    let abs_file_path = file_path
+        .canonicalize()
         .map_err(|e| anyhow::anyhow!("Impossible to canonicalize file '{}': {}", filepath, e))?;
 
     if !abs_file_path.starts_with(&abs_folder) {
-        return Err(anyhow!("Le fichier '{}' ne se trouve pas dans le dossier '{:?}'.", filepath, abs_folder));
+        return Err(anyhow!(
+            "Le fichier '{}' ne se trouve pas dans le dossier '{:?}'.",
+            filepath,
+            abs_folder
+        ));
     }
 
     Ok(filepath.to_string())

@@ -60,6 +60,11 @@ export interface DesignToken {
   value: string;
 }
 
+export interface TokenFamily {
+  label: string;
+  tokens: DesignToken[];
+}
+
 export interface ThemeColor {
   themeName: string;
   default: ThemeColorState;

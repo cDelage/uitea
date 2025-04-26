@@ -11,10 +11,13 @@ import {
   Space,
   RadiusItem,
   Effect,
+  DesignToken,
 } from "../domain/DesignSystemDomain";
 import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
 import { DEFAULT_BASE } from "../ui/UiConstants";
 import { ColorResult } from "react-color";
+import { PaletteBuilderMetadata } from "../domain/PaletteBuilderDomain";
+import { getFilenameDate } from "./DateUtil";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
@@ -172,6 +175,21 @@ export const generateUniqueSpacesKey = (
   let counter = 1;
 
   while (spaces.find((space) => space.spaceKey === uniqueKey)) {
+    uniqueKey = `${baseKey}-${counter}`;
+    counter++;
+  }
+
+  return uniqueKey;
+};
+
+export const generateUniquePaletteBuilder = (
+  existing: PaletteBuilderMetadata[] | undefined
+): string => {
+  const baseKey = `palette-builder_${getFilenameDate()}`;
+  let uniqueKey = baseKey;
+  let counter = 1;
+
+  while (existing?.find((pal) => pal.paletteBuilderName === uniqueKey)) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -364,3 +382,12 @@ export function colorToString(color: ColorResult): string {
 }
 
 export const KEYBOARD_ACTIONS = ["i", "d"];
+
+export function getPaletteTokens(palette: Palette): DesignToken[] {
+  return palette.shades.map((token) => {
+    return {
+      label: `palette-${palette.paletteName}-${token.label}`,
+      value: token.color,
+    };
+  });
+}

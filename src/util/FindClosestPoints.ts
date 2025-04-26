@@ -1,4 +1,4 @@
-import { Point } from "../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
+import { Point } from "../features/palette-builder/PaletteBuilderStore";
 
 function findBefore<T>(from: number, arr: (T | undefined)[]): number | null {
   for (let i = from - 1; i >= 0; i--) {

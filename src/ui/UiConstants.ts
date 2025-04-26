@@ -14,7 +14,6 @@ import {
   ThemeColor,
   TypographySpacing,
 } from "../domain/DesignSystemDomain";
-import { ColorOkhsl, PaletteBuilder } from "../util/PaletteBuilderTwoStore";
 import { CSSProperties } from "styled-components";
 
 export const ICON_SIZE_SM = "16";
@@ -263,112 +262,6 @@ export const SLIDER_STYLE: SliderStyles = {
   },
 };
 
-export const DEFAULT_PALETTE_BUILDER: PaletteBuilder = {
-  name: "violet",
-  mainColorHex: "#3e40d7",
-  tints: [
-    {
-      name: "50",
-      color: {
-        hex: "#eff1f6",
-        h: 272.8329605438294,
-        s: 0.27,
-        l: 0.95,
-      },
-    },
-    {
-      name: "100",
-      color: {
-        hex: "#ced7f0",
-        h: 271.3563594516306,
-        s: 0.5004,
-        l: 0.86,
-      },
-    },
-    {
-      name: "200",
-      color: {
-        hex: "#abbdf0",
-        h: 269.7183700721558,
-        s: 0.6796,
-        l: 0.77,
-      },
-    },
-    {
-      name: "300",
-      color: {
-        hex: "#85a3f2",
-        h: 267.8793352407708,
-        s: 0.8076,
-        l: 0.6799999999999999,
-      },
-    },
-    {
-      name: "400",
-      color: {
-        hex: "#5e88f2",
-        h: 265.7829061051434,
-        s: 0.8844,
-        l: 0.59,
-      },
-    },
-    {
-      name: "500",
-      color: {
-        hex: "#366de8",
-        h: 263.3451221626768,
-        s: 0.91,
-        l: 0.5,
-      },
-    },
-    {
-      name: "600",
-      color: {
-        hex: "#205abe",
-        h: 260.4327819460624,
-        s: 0.8844,
-        l: 0.41000000000000003,
-      },
-    },
-    {
-      name: "700",
-      color: {
-        hex: "#18498a",
-        h: 256.8153510938091,
-        s: 0.8076,
-        l: 0.32000000000000006,
-      },
-    },
-    {
-      name: "800",
-      color: {
-        hex: "#14365a",
-        h: 252.03854512703106,
-        s: 0.6796,
-        l: 0.22999999999999998,
-      },
-    },
-    {
-      name: "900",
-      color: {
-        hex: "#0f2231",
-        h: 244.98849068834502,
-        s: 0.5004,
-        l: 0.14,
-      },
-    },
-    {
-      name: "950",
-      color: {
-        hex: "#05090c",
-        h: 231.2441297102327,
-        s: 0.27,
-        l: 0.050000000000000044,
-      },
-    },
-  ],
-};
-
 export const PALETTE_BUILDER_DEFAULT_SETTINGS = {
   startLuminance: 95,
   endLuminance: 5,
@@ -377,13 +270,6 @@ export const PALETTE_BUILDER_DEFAULT_SETTINGS = {
   hueCorrectionGap: 5,
   hueCorrectionActive: true,
   steps: 11,
-};
-
-export const DEFAULT_OKHSL: ColorOkhsl = {
-  hex: "#dddddd",
-  h: 0,
-  s: 0,
-  l: 0,
 };
 
 export const HANDLE_SLIDER_HORIZONTAL: CSSProperties = {

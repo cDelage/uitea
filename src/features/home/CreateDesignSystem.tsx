@@ -84,7 +84,7 @@ function CreateDesignSystem() {
               <MdSquareFoot size={ICON_SIZE_XXL} />
             </div>
           </div>
-          <div>new design system</div>
+          <div>Create design system</div>
         </button>
       </Modal.Toggle>
       <Modal.Body id="create-design-system">

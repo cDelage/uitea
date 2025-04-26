@@ -8,8 +8,9 @@ import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
 import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useState } from "react";
-import { DesignToken } from "../../domain/DesignSystemDomain";
+import { DesignToken, TokenFamily } from "../../domain/DesignSystemDomain";
 import {
+  getPaletteTokens,
   isValidCssColorOrGradient,
   KEYBOARD_ACTIONS,
 } from "../../util/DesignSystemUtils";
@@ -36,54 +37,70 @@ function PageDesignSystem() {
     );
   }
 
-  const colorTokens: DesignToken[] | undefined = designSystem?.palettes.flatMap(
-    (palette) => {
-      return palette.shades.map((shade) => {
-        return {
-          label: `palette-${palette.paletteName}-${shade.label}`,
-          value: shade.color,
-        } as DesignToken;
-      });
-    }
-  );
+  const colorTokens: DesignToken[] | undefined =
+    designSystem?.palettes.flatMap(getPaletteTokens);
+
+  const tokenFamilies: TokenFamily[] =
+    designSystem?.palettes.map((palette) => {
+      return {
+        label: palette.paletteName,
+        tokens: getPaletteTokens(palette),
+      };
+    }) ?? [];
 
   useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (!event.repeat && KEYBOARD_ACTIONS.includes(event.key.toLowerCase())) {
-        const target = event.target as HTMLElement;
-
-        if (
-          (target.tagName.toLowerCase() === "input" ||
-            target.tagName.toLowerCase() === "textarea") &&
-          target === document.activeElement
-        ) {
-          return; // On ignore le keydown
+    const clearKeyboardAction = () => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (next.has("keyboardAction")) {
+          next.delete("keyboardAction");
         }
-        searchParams.set("keyboardAction", event.key.toLowerCase());
-        setSearchParams(searchParams);
+        return next;
+      });
+    };
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (
+        !event.repeat &&
+        KEYBOARD_ACTIONS.includes(event.key.toLowerCase()) &&
+        !(
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement
+        )
+      ) {
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.set("keyboardAction", event.key.toLowerCase());
+          return next;
+        });
       }
     }
 
     function handleKeyUp(event: KeyboardEvent) {
-      if (
-        searchParams.get("keyboardAction") &&
-        KEYBOARD_ACTIONS.includes(event.key.toLowerCase())
-      ) {
-        searchParams.delete("keyboardAction");
-        setSearchParams(searchParams);
+      if (KEYBOARD_ACTIONS.includes(event.key.toLowerCase())) {
+        clearKeyboardAction();
       }
     }
 
-    // On écoute les événements sur la fenêtre entière
+    // ⌨️ clavier
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
-    // On nettoie en retirant les listeners à la fin du cycle de vie
+    // 🚪 la fenêtre sort / entre
+    window.addEventListener("blur", clearKeyboardAction); // perte de focus
+    window.addEventListener("focus", clearKeyboardAction); // retour au focus
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") clearKeyboardAction();
+    });
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", clearKeyboardAction);
+      window.removeEventListener("focus", clearKeyboardAction);
+      document.removeEventListener("visibilitychange", clearKeyboardAction);
     };
-  }, [searchParams, setSearchParams]);
+  }, [setSearchParams]);
 
   function findDesignSystemColor({
     label,
@@ -130,6 +147,7 @@ function PageDesignSystem() {
         designSystem,
         editMode,
         colorTokens,
+        tokenFamilies,
       }}
     >
       <div className={styles.designSystemPage}>

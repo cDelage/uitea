@@ -1,4 +1,4 @@
-import { InterpolationColorSpace } from "../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
+import { InterpolationColorSpace } from "../domain/PaletteBuilderDomain";
 
 export type TintsNamingMode =
   | "5,10,20...90,95"

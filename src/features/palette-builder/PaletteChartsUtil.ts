@@ -5,14 +5,14 @@ import {
   PICKER_MODES,
   PickerAxe,
   PickerAxeName,
-} from "../../../util/PickerUtil";
+} from "../../util/PickerUtil";
+import { usePaletteBuilderStore } from "./PaletteBuilderStore";
+import ColorIO from "colorjs.io";
 import {
   InterpolationColorSpace,
   PaletteAxeSetting,
   PaletteBuild,
-  usePaletteBuilder3Store,
-} from "./PaletteBuilder3Store";
-import ColorIO from "colorjs.io";
+} from "../../domain/PaletteBuilderDomain";
 
 export interface PaletteChartData {
   line: ChartData<"line">;
@@ -49,20 +49,24 @@ export function useChartAxeData({
   const {
     updatePalette,
     settings: { paletteSettings },
-  } = usePaletteBuilder3Store();
+  } = usePaletteBuilderStore();
 
   function handleUpdateAxe(
     value: number | number[],
     setting: PaletteAxeSetting
   ) {
     if (typeof value === "number" && palette && index !== undefined) {
-      updatePalette(index, {
-        ...palette,
-        settings: {
-          ...palette.settings,
-          [setting]: value,
+      updatePalette(
+        index,
+        {
+          ...palette,
+          settings: {
+            ...palette.settings,
+            [setting]: value,
+          },
         },
-      });
+        true
+      );
     }
   }
 
@@ -119,14 +123,8 @@ export function useChartAxeData({
     centerColor: colorCenterLeft,
     axe: {
       ...hueAxe,
-      min:
-        palette.settings.hueGapModeLeft === "accurate"
-          ? colorCenterRight.get(`${interpolationColorSpace}.h`) - 20
-          : hueAxe.min,
-      max:
-        palette.settings.hueGapModeLeft === "accurate"
-          ? colorCenterRight.get(`${interpolationColorSpace}.h`) + 20
-          : hueAxe.max,
+      min: colorCenterRight.get(`${interpolationColorSpace}.h`) - 20,
+      max: colorCenterRight.get(`${interpolationColorSpace}.h`) + 20,
     },
     interpolationColorSpace,
   });
@@ -135,14 +133,8 @@ export function useChartAxeData({
     centerColor: colorCenterRight,
     axe: {
       ...hueAxe,
-      min:
-        palette.settings.hueGapModeRight === "accurate"
-          ? colorCenterRight.get(`${interpolationColorSpace}.h`) - 20
-          : hueAxe.min,
-      max:
-        palette.settings.hueGapModeRight === "accurate"
-          ? colorCenterRight.get(`${interpolationColorSpace}.h`) + 20
-          : hueAxe.max,
+      min: colorCenterRight.get(`${interpolationColorSpace}.h`) - 20,
+      max: colorCenterRight.get(`${interpolationColorSpace}.h`) + 20,
     },
     interpolationColorSpace,
   });

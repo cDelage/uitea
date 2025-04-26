@@ -5,36 +5,29 @@ import {
   ReactNode,
   cloneElement,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { PositionAbsolute, PositionPayload } from "./PositionAbsolute.type";
-import { calcPositionVisible, getRectPosition } from "../../util/PositionUtil";
-import { PopoverContext, usePopoverContext } from "./PopoverContext";
+import {
+  calcPositionVisible,
+  checkPositionPayload,
+  getOutsideAbsolutePosition,
+  getRectPosition,
+} from "../../util/PositionUtil";
+import {
+  PopoverContext,
+  PopoverSelectorContext,
+  usePopoverContext,
+  usePopoverSelectorContext,
+} from "./PopoverContext";
 import styles from "./Popover.module.css";
 import classNames from "classnames";
 import { useDivClickOutside } from "../../util/DivClickOutside";
-
-const BodyDefault = styled.div<{
-  $position: PositionAbsolute;
-  $width?: number;
-  $zIndex?: number;
-}>`
-  background-color: var(--component-bg);
-  border-radius: var(--rounded-md);
-  border: 1px solid var(--component-border);
-  box-shadow: var(--shadow-md);
-  position: absolute;
-  z-index: ${(props) => props.$zIndex ?? 20};
-  overflow: hidden;
-  top: ${(props) => props.$position.top}px;
-  bottom: ${(props) => props.$position.bottom}px;
-  left: ${(props) => props.$position.left}px;
-  right: ${(props) => props.$position.right}px;
-  transform: ${(props) => props.$position.transform};
-`;
+import { MdChevronRight } from "react-icons/md";
+import { ICON_SIZE_SM } from "../UiConstants";
 
 function Popover({
   children,
@@ -68,6 +61,7 @@ function Popover({
         openPopoverId: openId,
         setPosition,
         toggleRect,
+        setToggleRect,
       }}
     >
       {children}
@@ -75,45 +69,56 @@ function Popover({
   );
 }
 
-/**
- * Unorder list of action in the menu
- */
 function Body({
   children,
   id,
   zIndex,
+  skipDisableOutside,
 }: {
   children: ReactNode;
   id: string;
   zIndex?: number;
+  skipDisableOutside?: boolean;
 }): JSX.Element | null {
   const { position, closePopover, openPopoverId, toggleRect } =
     usePopoverContext();
+  const popoverRef = useDivClickOutside(handleClose, true, skipDisableOutside);
+  const [positionVisible, setPositionVisible] = useState<
+    PositionAbsolute | undefined
+  >(undefined);
+
   function handleClose() {
     closePopover();
   }
-  const ref = useDivClickOutside(handleClose);
-  const positionVisible =
-    position && openPopoverId === id
-      ? calcPositionVisible(
+
+  const shouldRender = position !== null && openPopoverId === id;
+
+  useLayoutEffect(() => {
+    if (popoverRef.current && shouldRender) {
+      setPositionVisible(
+        calcPositionVisible(
           position,
-          ref.current?.getBoundingClientRect(),
+          popoverRef.current.getBoundingClientRect(),
           toggleRect
         )
-      : undefined;
+      );
+    }
+  }, [position, popoverRef, toggleRect, id, openPopoverId, shouldRender]);
 
-  if (!positionVisible || position === null || openPopoverId !== id)
-    return null;
+  if (!shouldRender) return null;
 
   return createPortal(
-    <BodyDefault
-      $position={positionVisible}
-      ref={ref}
+    <div
+      className={styles.bodyDefault}
+      style={{
+        ...positionVisible,
+        zIndex,
+      }}
+      ref={popoverRef}
       onMouseDown={(e) => e.stopPropagation()}
-      $zIndex={zIndex}
     >
       {children}
-    </BodyDefault>,
+    </div>,
     document.body
   );
 }
@@ -129,6 +134,7 @@ function Toggle({
   positionPayload,
   disableButtonClosure,
   keyPopover,
+  disabled,
 }: {
   children: ReactNode;
   id: string;
@@ -136,31 +142,42 @@ function Toggle({
   scrollListener?: string[];
   disableButtonClosure?: boolean;
   keyPopover?: string;
+  disabled?: boolean;
 }): JSX.Element {
-  const { openPopover, closePopover, openPopoverId, setPosition } =
-    usePopoverContext();
+  const {
+    openPopover,
+    closePopover,
+    openPopoverId,
+    setPosition,
+    setToggleRect,
+  } = usePopoverContext();
 
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   function handleClick(e: MouseEvent) {
     e.stopPropagation();
-    const rect = toggleRef.current?.getBoundingClientRect();
-    if (rect) {
-      const menuPosition = getRectPosition(
-        positionPayload || "bottom-left",
-        rect
-      );
-      if (openPopoverId === "" || openPopoverId !== id) {
-        openPopover(menuPosition, id, rect);
-        document.dispatchEvent(
-          new CustomEvent<{ keyPopover: string | undefined }>("open-popover", {
-            detail: {
-              keyPopover,
-            },
-          })
+    if (!disabled) {
+      const rect = toggleRef.current?.getBoundingClientRect();
+      if (rect) {
+        const menuPosition = getRectPosition(
+          positionPayload || "bottom-left",
+          rect
         );
-      } else if (!disableButtonClosure) {
-        closePopover();
+        if (openPopoverId === "" || openPopoverId !== id) {
+          openPopover(menuPosition, id, rect);
+          document.dispatchEvent(
+            new CustomEvent<{ keyPopover: string | undefined }>(
+              "open-popover",
+              {
+                detail: {
+                  keyPopover,
+                },
+              }
+            )
+          );
+        } else if (!disableButtonClosure) {
+          closePopover();
+        }
       }
     }
   }
@@ -173,13 +190,14 @@ function Toggle({
         rect
       );
       setPosition(menuPosition);
+      setToggleRect(toggleRef.current?.getBoundingClientRect());
     }
 
     document.addEventListener("refresh-scroll", handleSetPosition);
     return () => {
       document.removeEventListener("refresh-scroll", handleSetPosition);
     };
-  }, [toggleRef, setPosition, positionPayload]);
+  }, [toggleRef, setPosition, positionPayload, setToggleRect]);
 
   useEffect(() => {
     function handleClose(e: ClosePopoverEvent) {
@@ -251,7 +269,11 @@ function Close({
 }
 
 function Actions({ children }: { children: ReactNode }) {
-  return <div className="column">{children}</div>;
+  return (
+    <div className="column" data-disableoutside={true}>
+      {children}
+    </div>
+  );
 }
 
 function Tab({
@@ -263,22 +285,125 @@ function Tab({
   children: ReactNode;
   clickEvent?: () => void;
   disableClose?: boolean;
-  theme?: "alert";
+  theme?: "alert" | "disabled";
 }) {
   const { closePopover } = usePopoverContext();
 
   const handleClick = (e: MouseEvent) => {
-    //When action trigger a modal opening, then do not close.
-    e.stopPropagation();
-    clickEvent?.();
-    if (!disableClose) closePopover();
+    if (theme !== "disabled") {
+      //When action trigger a modal opening, then do not close.
+      e.stopPropagation();
+      clickEvent?.();
+      if (!disableClose) closePopover();
+    }
   };
 
   const tabStyle = classNames(styles.tab, {
     [styles.tabAlert]: theme === "alert",
+    [styles.tabDisabled]: theme === "disabled",
   });
   return (
     <div className={tabStyle} onClick={handleClick} data-disableoutside={true}>
+      {children}
+    </div>
+  );
+}
+
+function Selector({ children }: { children: ReactNode }) {
+  const [activeSelectTab, setActiveSelectTab] = useState<number | undefined>(
+    undefined
+  );
+
+  const [position, setPosition] = useState<PositionPayload>("top-right");
+  const [initialPosition, setInitialPosition] =
+    useState<PositionPayload>("top-right");
+
+  return (
+    <PopoverSelectorContext.Provider
+      value={{
+        activeSelectTab,
+        setActiveSelectTab,
+        position,
+        setPosition,
+        initialPosition,
+        setInitialPosition,
+      }}
+    >
+      {children}
+    </PopoverSelectorContext.Provider>
+  );
+}
+
+function SelectorTab({
+  children,
+  selectNode,
+  id,
+  position = "top-right",
+}: {
+  children: ReactNode;
+  id: number;
+  selectNode: ReactNode;
+  position?: PositionPayload;
+}) {
+  const {
+    setActiveSelectTab,
+    setPosition,
+    activeSelectTab,
+    setInitialPosition,
+  } = usePopoverSelectorContext();
+  const active = id === activeSelectTab;
+  function handleMouseEnter() {
+    if (!active) {
+      setActiveSelectTab(id);
+      setPosition(position);
+      setInitialPosition(position);
+    }
+  }
+
+  return (
+    <div
+      className={styles.tabSelector}
+      data-active={active}
+      onMouseEnter={handleMouseEnter}
+      data-disableoutside={true}
+    >
+      {children}
+      {active && (
+        <>
+          <MdChevronRight size={ICON_SIZE_SM} />
+          <SelectorChildren>{selectNode}</SelectorChildren>
+        </>
+      )}
+    </div>
+  );
+}
+
+function SelectorChildren({ children }: { children: ReactNode }) {
+  const childrenRef = useRef<HTMLDivElement>(null);
+  const { position, setPosition, initialPosition } =
+    usePopoverSelectorContext();
+
+  useEffect(() => {
+    if (childrenRef.current) {
+      const pos = checkPositionPayload(
+        position,
+        childrenRef.current.getBoundingClientRect()
+      );
+      if (pos !== position && pos !== initialPosition) {
+        setPosition(pos);
+      }
+    }
+  }, [childrenRef, position, setPosition, initialPosition]);
+  return (
+    <div
+      className={styles.popoverSelectorChildren}
+      style={{
+        position: "absolute",
+        ...getOutsideAbsolutePosition(position),
+      }}
+      ref={childrenRef}
+      data-disableoutside={true}
+    >
       {children}
     </div>
   );
@@ -289,4 +414,6 @@ Popover.Body = Body;
 Popover.Actions = Actions;
 Popover.Tab = Tab;
 Popover.Close = Close;
+Popover.Selector = Selector;
+Popover.SelectorTab = SelectorTab;
 export default Popover;

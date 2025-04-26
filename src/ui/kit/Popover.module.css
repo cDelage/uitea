@@ -12,14 +12,52 @@
   color: var(--component-hover-text);
 }
 
-
 .tabAlert {
   background-color: var(--alert-bg);
   color: var(--alert-text);
 }
 
+.tabDisabled {
+  background-color: var(--base-bg-disabled);
+  color: var(--base-text-disabled);
+  cursor: not-allowed;
+}
+
+.tabDisabled:hover {
+  background-color: var(--base-bg-disabled);
+  color: var(--base-text-disabled);
+}
 
 .tabAlert:hover {
   background-color: var(--alert-hover-bg);
   color: var(--alert-hover-text);
+}
+
+.tabSelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  position: relative;
+  width: 200px;
+}
+
+.tabSelector[data-active="true"] {
+  background-color: var(--component-hover-bg);
+}
+
+.bodyDefault {
+  background-color: var(--component-bg);
+  border-radius: var(--rounded-md);
+  border: 1px solid var(--component-border);
+  box-shadow: var(--shadow-md);
+  position: absolute;
+}
+
+.popoverSelectorChildren {
+  background-color: var(--component-bg);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  width: 200px;
 }

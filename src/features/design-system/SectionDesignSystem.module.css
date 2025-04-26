@@ -34,7 +34,7 @@
 
 .subSectionHeaderRight {
   display: flex;
-  gap: var(--space-10);
+  gap: var(--space-4);
 }
 
 .subSectionTitle {

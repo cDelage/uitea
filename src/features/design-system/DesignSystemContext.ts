@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { DesignSystem, DesignToken } from "../../domain/DesignSystemDomain";
+import { DesignSystem, DesignToken, TokenFamily } from "../../domain/DesignSystemDomain";
 
 export type ComponentMode =
   | "add"
@@ -34,6 +34,7 @@ export type DesignSystemContextType = {
   designSystem: DesignSystem;
   editMode: boolean;
   colorTokens?: DesignToken[];
+  tokenFamilies: TokenFamily[];
 };
 
 export const DesignSystemContext =

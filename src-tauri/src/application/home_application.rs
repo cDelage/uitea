@@ -3,34 +3,50 @@ use std::path::PathBuf;
 use crate::{
     domain::{
         design_system_domain::DesignSystemMetadataHome,
-        home_domain::{PresetDressing, RecentFile, RecentFiles, RemoveRecentFilesPayload}, image_domain::ImageLocal,
+        home_domain::{
+            PresetDressing, RecentFile,
+            RecentFileCategory::{DesignSystemCategory, PaletteBuilderCategory},
+            RecentFilesMetadata, RemoveRecentFilesPayload,
+        },
+        image_domain::ImageLocal,
     },
-    repository::{self, design_system_repository, home_repository},
+    repository::{
+        self, design_system_repository, home_repository,
+        palette_builder_repository::find_palette_builder_metadata,
+    },
     AppState,
 };
 use anyhow::Result;
 use tauri::State;
 
-pub fn insert_recent_file(state: State<AppState>, file_path: String) -> Result<String> {
-    home_repository::insert_recent_file(state, file_path, Some(true))
+pub fn insert_recent_file(state: State<AppState>, recent_file: RecentFile) -> Result<PathBuf> {
+    home_repository::insert_recent_file(state, recent_file)
 }
 
 /// Récupère tous les chemins de fichiers
-pub fn find_all_recent_files(state: State<AppState>) -> Result<Vec<RecentFiles>> {
+pub fn find_all_recent_files(state: State<AppState>) -> Result<Vec<RecentFilesMetadata>> {
     let paths: Vec<RecentFile> = home_repository::find_all_recent_files(state);
     Ok(paths
         .into_iter()
-        .map(|recent_file: RecentFile| {
-            let design_system_pathbuf: PathBuf = PathBuf::from(&recent_file.file_path);
-            match design_system_repository::find_design_system_metadata(&design_system_pathbuf) {
-                Ok(design_system) => RecentFiles::DesignSystem(DesignSystemMetadataHome::from(
-                    design_system,
-                    recent_file.edit_mode,
-                )),
-                Err(_) => RecentFiles::Unknown(recent_file.file_path.clone()),
+        .map(|recent_file: RecentFile| match recent_file.category {
+            DesignSystemCategory => {
+                let design_system_pathbuf: PathBuf = PathBuf::from(&recent_file.file_path);
+                match design_system_repository::find_design_system_metadata(&design_system_pathbuf)
+                {
+                    Ok(design_system) => RecentFilesMetadata::DesignSystem(
+                        DesignSystemMetadataHome::from(design_system, recent_file.edit_mode),
+                    ),
+                    Err(_) => RecentFilesMetadata::Unknown(recent_file.file_path.clone()),
+                }
+            }
+            PaletteBuilderCategory => {
+                match find_palette_builder_metadata(&recent_file.file_path) {
+                    Ok(metadata) => RecentFilesMetadata::PaletteBuilder(metadata),
+                    Err(_) => RecentFilesMetadata::Unknown(recent_file.file_path.clone()),
+                }
             }
         })
-        .collect::<Vec<RecentFiles>>())
+        .collect::<Vec<RecentFilesMetadata>>())
 }
 
 /// Supprime un chemin de fichier spécifique

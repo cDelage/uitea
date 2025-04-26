@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { autoRangeNumber } from "../../../features/design-system/PaletteBuilder3/PaletteBuilder3Store";
+import { autoRangeNumber } from "../palette-builder/PaletteBuilderStore";
 import styles from "./InputNumber.module.css";
 import classNames from "classnames";
 

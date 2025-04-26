@@ -6,7 +6,7 @@ import { useInsertRecentFile } from "./HomeQueries";
 import toast from "react-hot-toast";
 
 function LoadDesignSystem() {
-  const { insertRecentFile } = useInsertRecentFile();
+  const { insertRecentFile } = useInsertRecentFile("DesignSystemCategory");
   async function handlePickFolder() {
     try {
       const folder = (await open({
@@ -17,12 +17,16 @@ function LoadDesignSystem() {
       })) as null | string;
 
       if (folder) {
-        insertRecentFile(folder);
+        insertRecentFile({
+          filePath: folder,
+          category: "DesignSystemCategory",
+          editMode: true,
+        });
       }
     } catch (error) {
       toast.error(`Error while selecting the folder : ${error}`);
     }
-  };
+  }
 
   return (
     <button
@@ -34,7 +38,7 @@ function LoadDesignSystem() {
           <MdUploadFile size={ICON_SIZE_XXL} />
         </div>
       </div>
-      <div>load design system </div>
+      <div>Load design system </div>
     </button>
   );
 }

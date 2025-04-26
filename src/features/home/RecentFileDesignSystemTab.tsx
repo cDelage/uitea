@@ -1,13 +1,13 @@
-import { MdMoreHoriz, MdOpenInNew } from "react-icons/md";
+import { MdMoreHoriz, MdOpenInNew, MdSquareFoot } from "react-icons/md";
 import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
 import { GhostButton } from "../../ui/kit/Buttons";
-import { ICON_SIZE_MD } from "../../ui/UiConstants";
+import { ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
 import { useNavigate } from "react-router-dom";
 import Popover from "../../ui/kit/Popover";
 import Modal from "../../ui/kit/Modal";
 import ModalRemoveRecentFile from "./ModalRemoveRecentFile";
 
-function RecentFileTab({
+function RecentFileDesignSystemTab({
   designSystemMetadata: { designSystemName, designSystemPath, editMode },
 }: {
   designSystemMetadata: DesignSystemMetadataHome;
@@ -21,10 +21,18 @@ function RecentFileTab({
   }
 
   return (
-    <tr onClick={() => navigate(getPath())}>
-      <td className="column expand">
-        <strong>{designSystemName}</strong>
-        <small className="text-color-light">{designSystemPath}</small>
+    <>
+      <td className="expand">
+        <div className="row gap-6 align-center">
+          <div className="column gap-2 align-center">
+            <MdSquareFoot size={ICON_SIZE_XL} />
+            <small>Design system</small>
+          </div>
+          <div className="column gap-2">
+            <strong>{designSystemName}</strong>
+            <small className="text-color-light">{designSystemPath}</small>
+          </div>
+        </div>
       </td>
       <td className="shrink">
         <Popover>
@@ -45,8 +53,8 @@ function RecentFileTab({
           </Popover.Body>
         </Popover>
       </td>
-    </tr>
+    </>
   );
 }
 
-export default RecentFileTab;
+export default RecentFileDesignSystemTab;

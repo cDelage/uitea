@@ -3,15 +3,13 @@ import {
   getEndsTints,
   getHueName,
   huesName,
-  PaletteBuild,
-  TintBuild,
-  usePaletteBuilder3Store,
-} from "./PaletteBuilder3Store";
-import styles from "./PaletteBuilder3.module.css";
+  usePaletteBuilderStore,
+} from "./PaletteBuilderStore";
+import styles from "./PaletteBuilder.module.css";
 import { useEffect, useMemo, useState } from "react";
 import "rc-slider/assets/index.css";
-import ColorPickerLinear from "../../../ui/kit/picker/ColorPickerLinear";
-import FormComponent from "../../../ui/kit/FormComponent";
+import ColorPickerLinear from "../color-picker/ColorPickerLinear";
+import FormComponent from "../../ui/kit/FormComponent";
 import {
   CategoryScale,
   LinearScale,
@@ -19,11 +17,7 @@ import {
   PointElement,
 } from "chart.js";
 import { Chart } from "chart.js";
-import {
-  getRectSize,
-  ICON_SIZE_MD,
-  ICON_SIZE_XL,
-} from "../../../ui/UiConstants";
+import { getRectSize, ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
 import ColorIO from "colorjs.io";
 import {
   MdArrowForward,
@@ -31,15 +25,16 @@ import {
   MdDelete,
   MdLocationPin,
 } from "react-icons/md";
-import { FaDiamond } from "react-icons/fa6";
-import { getContrastColor } from "../../../util/PaletteBuilderTwoStore";
-import { ButtonAlert, ButtonPrimary } from "../../../ui/kit/Buttons";
+import { ButtonAlert, ButtonPrimary } from "../../ui/kit/Buttons";
 import { BiCross, BiArrowToLeft, BiArrowToRight } from "react-icons/bi";
-import Popover from "../../../ui/kit/Popover";
-import { useSidepanelContext } from "../../../ui/kit/SidepanelContext";
-import ColorSlider from "../../../ui/kit/picker/ColorSlider";
+import Popover from "../../ui/kit/Popover";
+import { useSidepanelContext } from "../../ui/kit/SidepanelContext";
+import ColorSlider from "../color-picker/ColorSlider";
 import { useChartAxeData } from "./PaletteChartsUtil";
 import PaletteChart from "./PaletteChart";
+import { PaletteBuild, TintBuild } from "../../domain/PaletteBuilderDomain";
+import { getContrastColor } from "../../util/PickerUtil";
+import Anchor from "./Anchor";
 
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -47,10 +42,14 @@ function PaletteSidePanel({
   palette,
   index,
   setSelectedPaletteIndex,
+  selectedTintIndex,
+  setSelectedTintIndex,
 }: {
   palette?: PaletteBuild;
   index?: number;
   setSelectedPaletteIndex: (id: number | undefined) => void;
+  selectedTintIndex: number | undefined;
+  setSelectedTintIndex: (value: number | undefined) => void;
 }) {
   const {
     updatePalette,
@@ -58,7 +57,8 @@ function PaletteSidePanel({
     deletePalette,
     settings: { interpolationColorSpace },
     palettes,
-  } = usePaletteBuilder3Store();
+    doPaletteBuilder,
+  } = usePaletteBuilderStore();
   const { closeModal } = useSidepanelContext();
   const centerTint = useMemo<TintBuild | undefined>(
     () => (palette ? palette.tints.find((color) => color.isCenter) : undefined),
@@ -70,7 +70,7 @@ function PaletteSidePanel({
     [palettes, palette]
   );
 
-  const [isCompare, setIsCompare] = useState(true);
+  const [isCompare, setIsCompare] = useState(false);
 
   const [paletteComparatorId, setPaletteComparatorId] = useState<
     string | undefined
@@ -84,10 +84,6 @@ function PaletteSidePanel({
     [paletteComparatorId, palettes]
   );
 
-  const [selectedTintIndex, setSelectedTintIndex] = useState<
-    number | undefined
-  >(palette?.tints.findIndex((color) => color.isCenter));
-
   const selectedTint = useMemo<TintBuild | undefined>(() => {
     return selectedTintIndex !== undefined && palette
       ? palette?.tints[selectedTintIndex]
@@ -95,8 +91,8 @@ function PaletteSidePanel({
   }, [selectedTintIndex, palette]);
 
   const colorsRecommanded = useMemo(
-    () => getColorsRecommanded(centerTint?.color),
-    [centerTint]
+    () => getColorsRecommanded(palettes, centerTint?.color),
+    [centerTint, palettes]
   );
 
   const chartsAxeData = useChartAxeData({
@@ -138,7 +134,7 @@ function PaletteSidePanel({
       const newCenter = newPalette.tints.find((tint) => tint.isCenter)?.color;
       newPalette.name =
         newCenter && huesName.includes(newPalette.name)
-          ? getHueName(newCenter.toString({ format: "hex" }))
+          ? getHueName(newCenter)
           : newPalette.name;
       if (newTintUpdated.isCenter && centerTint) {
         const [startColor, endColor] = getEndsTints({
@@ -156,7 +152,7 @@ function PaletteSidePanel({
           color: endColor,
         };
       }
-      updatePalette(index, newPalette);
+      updatePalette(index, newPalette, true);
     }
   }
 
@@ -180,6 +176,12 @@ function PaletteSidePanel({
       });
     }
   }
+
+  useEffect(() => {
+    if (!selectedTint) {
+      setSelectedTintIndex(palette?.tints.findIndex((tint) => tint.isCenter));
+    }
+  }, [selectedTint, setSelectedTintIndex, palette]);
 
   useEffect(() => {
     if (
@@ -289,12 +291,7 @@ function PaletteSidePanel({
                       !tint.isCenter &&
                       tintIndex !== 0 &&
                       tintIndex !== palette.tints.length && (
-                        <FaDiamond
-                          size={ICON_SIZE_MD}
-                          color={getContrastColor(
-                            tint.color.toString({ format: "hex" })
-                          )}
-                        />
+                        <Anchor background={tint.color} />
                       )}
                     {tint.isCenter && (
                       <BiCross
@@ -327,47 +324,6 @@ function PaletteSidePanel({
           </div>
           <div className={styles.sidePanelBodyContainer}>
             <div className={styles.sidePanelContainer}>
-              <h5 className="text-color-dark">Comparator</h5>
-              {otherPalettes.length ? (
-                <div className="row justify-between align-center select-none">
-                  <div
-                    className="row align-center"
-                    onClick={() => setIsCompare((comp) => !comp)}
-                  >
-                    <input type="checkbox" checked={isCompare} />
-                    <label>Compare</label>
-                  </div>
-                  <div className="row align-center gap-3">
-                    <label>Comparaison palette</label>
-                    <select
-                      onChange={(e) => setPaletteComparatorId(e.target.value)}
-                    >
-                      {otherPalettes.map((paletteToCompare) => (
-                        <option
-                          key={paletteToCompare.id}
-                          value={paletteToCompare.id}
-                        >
-                          <div
-                            className="palette-color"
-                            style={{
-                              background: centerTint?.color.toString({
-                                format: "hex",
-                              }),
-                              ...getRectSize({ height: "var(--space-5)" }),
-                            }}
-                          ></div>
-                          {paletteToCompare.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              ) : (
-                <div>No other palette to compare</div>
-              )}
-            </div>
-            <div className={styles.separator} />
-            <div className={styles.sidePanelContainer}>
               <h5 className="text-color-dark">Colors</h5>
               {selectedTint && selectedTintIndex !== undefined ? (
                 <>
@@ -382,6 +338,7 @@ function PaletteSidePanel({
                             applyAnchor: !selectedTint.isCenter,
                           });
                         }}
+                        onChangeComplete={doPaletteBuilder}
                       />
                     )}
                   {selectedTintIndex === 0 && (
@@ -395,9 +352,34 @@ function PaletteSidePanel({
                           reverse={true}
                           color={selectedTint.color}
                           onChange={chartsAxeData[0].leftAxeData.update}
-                          gradient={`linear-gradient(to right, #ffffff,  ${centerTint.color.toString(
-                            { format: "hex" }
-                          )})`}
+                          onChangeComplete={doPaletteBuilder}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[0].leftAxeData.gradient})`}
+                        />
+                      </FormComponent>
+                      <FormComponent label={`${chartsAxeData[1].axeLabel} gap`}>
+                        <ColorSlider
+                          value={palette.settings.satChromaGapLeft}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          reverse={true}
+                          color={selectedTint.color}
+                          onChange={chartsAxeData[1].leftAxeData.update}
+                          onChangeComplete={doPaletteBuilder}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[1].leftAxeData.gradient})`}
+                        />
+                      </FormComponent>
+                      <FormComponent label="Hue gap">
+                        <ColorSlider
+                          value={palette.settings.hueGapLeft}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          reverse={true}
+                          color={selectedTint.color}
+                          onChange={chartsAxeData[2].leftAxeData.update}
+                          onChangeComplete={doPaletteBuilder}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[2].leftAxeData.gradient})`}
                         />
                       </FormComponent>
                     </>
@@ -413,9 +395,34 @@ function PaletteSidePanel({
                           reverse={true}
                           color={selectedTint.color}
                           onChange={chartsAxeData[0].rightAxeData.update}
-                          gradient={`linear-gradient(to right, ${centerTint.color.toString(
-                            { format: "hex" }
-                          )}, #000000)`}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[0].rightAxeData.gradient})`}
+                          onChangeComplete={doPaletteBuilder}
+                        />
+                      </FormComponent>
+                      <FormComponent label={`${chartsAxeData[1].axeLabel} gap`}>
+                        <ColorSlider
+                          value={palette.settings.satChromaGapRight}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          reverse={true}
+                          color={selectedTint.color}
+                          onChange={chartsAxeData[1].rightAxeData.update}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[1].rightAxeData.gradient})`}
+                          onChangeComplete={doPaletteBuilder}
+                        />
+                      </FormComponent>
+                      <FormComponent label="Hue gap">
+                        <ColorSlider
+                          value={palette.settings.hueGapRight}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          reverse={true}
+                          color={selectedTint.color}
+                          onChange={chartsAxeData[2].rightAxeData.update}
+                          gradient={`linear-gradient(to right, ${chartsAxeData[2].rightAxeData.gradient})`}
+                          onChangeComplete={doPaletteBuilder}
                         />
                       </FormComponent>
                     </>
@@ -487,11 +494,84 @@ function PaletteSidePanel({
                       </div>
                     </div>
                   )}
+                  {otherPalettes.length ? (
+                    <div className="row justify-between align-center select-none">
+                      <div
+                        className="row align-center"
+                        onClick={() => setIsCompare((comp) => !comp)}
+                      >
+                        <input type="checkbox" checked={isCompare} />
+                        <label>Compare</label>
+                      </div>
+                      <div className="row align-center gap-3">
+                        <label>Comparaison palette</label>
+                        <select
+                          onChange={(e) =>
+                            setPaletteComparatorId(e.target.value)
+                          }
+                        >
+                          {otherPalettes.map((paletteToCompare) => (
+                            <option
+                              key={paletteToCompare.id}
+                              value={paletteToCompare.id}
+                            >
+                              <div
+                                className="palette-color"
+                                style={{
+                                  background: centerTint?.color.toString({
+                                    format: "hex",
+                                  }),
+                                  ...getRectSize({ height: "var(--space-5)" }),
+                                }}
+                              ></div>
+                              {paletteToCompare.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </>
               ) : (
                 <div className="row justify-center">No tints selected</div>
               )}
             </div>
+            <div className={styles.separator} />
+            <h5 className="text-color-dark">Recommanded colors</h5>
+            {colorsRecommanded
+              .filter((colorSet) => colorSet.colors.length)
+              .map((colorSet) => (
+                <div key={colorSet.flag}>
+                  <FormComponent label={colorSet.flag}>
+                    <div className={styles.complementaryColorsRow}>
+                      {colorSet.colors.map((color, colorIndex) => (
+                        <div
+                          className={styles.recommandedHueButton}
+                          key={`${color.name}${color.color.toString({
+                            format: "hex",
+                          })}${colorIndex}`}
+                          onClick={() =>
+                            createPaletteFromExisting(palette, color)
+                          }
+                        >
+                          <div
+                            className="palette-color"
+                            style={{
+                              background: color.color.toString({
+                                format: "hex",
+                              }),
+                              ...getRectSize({ height: "var(--space-7)" }),
+                            }}
+                          ></div>
+                          {color.name}
+                        </div>
+                      ))}
+                    </div>
+                  </FormComponent>
+                </div>
+              ))}
             <div className={styles.separator} />
             <h5 className="text-color-dark">Charts</h5>
             <div className={styles.chartContainer}>
@@ -504,36 +584,6 @@ function PaletteSidePanel({
                 />
               ))}
             </div>
-            <div className={styles.separator} />
-            <h5 className="text-color-dark">Recommanded colors</h5>
-            {colorsRecommanded.map((colorSet) => (
-              <div key={colorSet.flag}>
-                <FormComponent label={colorSet.flag}>
-                  <div className={styles.complementaryColorsRow}>
-                    {colorSet.colors.map((color, colorIndex) => (
-                      <div
-                        className={styles.recommandedHueButton}
-                        key={`${color.name}${color.color.toString({
-                          format: "hex",
-                        })}${colorIndex}`}
-                        onClick={() =>
-                          createPaletteFromExisting(palette, color)
-                        }
-                      >
-                        <div
-                          className="palette-color"
-                          style={{
-                            background: color.color.toString({ format: "hex" }),
-                            ...getRectSize({ height: "var(--space-7)" }),
-                          }}
-                        ></div>
-                        {color.name}
-                      </div>
-                    ))}
-                  </div>
-                </FormComponent>
-              </div>
-            ))}
           </div>
         </>
       )}

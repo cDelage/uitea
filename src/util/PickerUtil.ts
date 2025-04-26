@@ -204,7 +204,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -214,7 +214,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "s",
-        label: "saturation",
+        label: "Saturation",
 
         min: 0,
         max: 100,
@@ -224,7 +224,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "l",
-        label: "lightness",
+        label: "Lightness",
         min: 0,
         max: 100,
         steps: 0.5,
@@ -238,7 +238,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -248,7 +248,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "s",
-        label: "saturation",
+        label: "Saturation",
 
         min: 0,
         max: 100,
@@ -258,7 +258,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "v",
-        label: "value",
+        label: "Value",
 
         min: 0,
         max: 100,
@@ -273,7 +273,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -283,7 +283,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "w",
-        label: "whiteness",
+        label: "Whiteness",
         min: 0,
         max: 100,
         steps: 0.5,
@@ -292,7 +292,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "b",
-        label: "blackness",
+        label: "Blackness",
 
         min: 0,
         max: 100,
@@ -307,7 +307,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "l",
-        label: "lightness",
+        label: "Lightness",
 
         min: 0,
         max: 100,
@@ -317,7 +317,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "c",
-        label: "chroma",
+        label: "Chroma",
 
         min: 0,
         max: 150,
@@ -327,7 +327,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -342,7 +342,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "l",
-        label: "lightness",
+        label: "Lightness",
 
         min: 0,
         max: 1,
@@ -352,7 +352,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "c",
-        label: "chroma",
+        label: "Chroma",
 
         min: 0,
         max: 0.4,
@@ -362,7 +362,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -377,7 +377,7 @@ export const PICKER_MODES: ColorSpace[] = [
     axes: [
       {
         axe: "h",
-        label: "hue",
+        label: "Hue",
 
         min: 0,
         max: 360,
@@ -387,7 +387,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "s",
-        label: "saturation",
+        label: "Saturation",
 
         min: 0,
         max: 1,
@@ -397,7 +397,7 @@ export const PICKER_MODES: ColorSpace[] = [
       },
       {
         axe: "l",
-        label: "lightness",
+        label: "Lightness",
         min: 0,
         max: 1,
         steps: 0.01,
@@ -407,3 +407,75 @@ export const PICKER_MODES: ColorSpace[] = [
     ],
   },
 ];
+
+export const WHITE = new ColorIO("#ffffff");
+export const BLACK = new ColorIO("#000000");
+
+export function getContrastColor(hex: string) {
+  const baseColor = new ColorIO(hex);
+  const whiteContrast = baseColor.contrastWCAG21(WHITE);
+  const blackContrast = baseColor.contrastWCAG21(BLACK);
+  return whiteContrast > blackContrast ? "#ffffff" : "#000000";
+}
+
+export function isValidColor(color: string) {
+  const hexRegex = /^#([0-9A-Fa-f]{3}){1,2}$/; // Validation pour hex (short et long)
+  const rgbRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/; // Validation pour RGB
+  const hslRegex = /^hsl\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\)$/; // Validation pour HSL
+
+  return hexRegex.test(color) || rgbRegex.test(color) || hslRegex.test(color);
+}
+
+export type ContrastQuality =
+  | "Very poor"
+  | "Poor"
+  | "Good"
+  | "Very good"
+  | "Super";
+
+export interface ContrastInfo {
+  contrast: string;
+  quality: ContrastQuality;
+  starCount: number;
+  palette: string;
+}
+
+function getContrastQuality(contrast: number): {
+  quality: ContrastQuality;
+  starCount: number;
+  palette: string;
+} {
+  if (contrast > 12) {
+    return { quality: "Super", starCount: 5, palette: "positive" };
+  } else if (contrast > 7) {
+    return { quality: "Very good", starCount: 4, palette: "positive" };
+  } else if (contrast > 4.5) {
+    return { quality: "Good", starCount: 3, palette: "warning" };
+  } else if (contrast > 3) {
+    return { quality: "Poor", starCount: 2, palette: "negative" };
+  } else {
+    return { quality: "Very poor", starCount: 1, palette: "negative" };
+  }
+}
+
+export function getContrastInfo(colors: ColorIO[]): ContrastInfo {
+  if (colors.length === 2) {
+    const contrastNumber = colors[0].contrastWCAG21(colors[1]);
+
+    return {
+      contrast: contrastNumber.toFixed(2),
+      ...getContrastQuality(contrastNumber),
+    };
+  } else {
+    return {
+      contrast: "1",
+      palette: "undefined",
+      quality: "Good",
+      starCount: 3,
+    };
+  }
+}
+
+export const STAR_ARRAY = Array.from({ length: 5 }, (_, i) => {
+  return `${i}`;
+});
