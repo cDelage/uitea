@@ -144,11 +144,45 @@ const quotes: Quote[] = [
   },
 ];
 
+export interface QuoteData {
+  index: number;
+  quote: Quote;
+}
+
 /**
  * Renvoie une citation aléatoire avec son index dans le tableau.
  * @returns { index: number; quote: Quote }
  */
-export function getRandomQuote(): { index: number; quote: Quote } {
+export function getRandomQuote(): QuoteData {
   const index = Math.floor(Math.random() * quotes.length);
   return { index: index + 1, quote: quotes[index] };
+}
+
+/**
+ * Renvoie un tableau de `count` citations aléatoires distinctes.
+ * Si `count` dépasse la taille de `quotes`, toutes les citations sont retournées.
+ *
+ * @param count Nombre de citations souhaité
+ * @returns Un tableau d’objets { index: number; quote: Quote }
+ */
+export function getRandomQuotesArray(
+  count: number
+): { index: number; quote: Quote }[] {
+  // Sécurité : on ne dépasse pas la taille disponible
+  const max = Math.min(count, quotes.length);
+
+  // 1. On crée un tableau d’indices [0, 1, 2, ...]
+  const indices = quotes.map((_, i) => i);
+
+  // 2. Shuffle in-place (Fisher–Yates)
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  // 3. On prend les `max` premiers indices mélangés
+  return indices.slice(0, max).map((i) => ({
+    index: i + 1, // 1-based comme dans getRandomQuote
+    quote: quotes[i],
+  }));
 }

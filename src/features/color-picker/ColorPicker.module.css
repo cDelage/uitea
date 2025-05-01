@@ -21,7 +21,7 @@
   overflow-y: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
-  background-color: var(--base-bg);
+  background-color: var(--base-background);
   height: 100%;
   position: relative;
 }
@@ -50,6 +50,12 @@
   position: absolute;
   top: var(--space-3);
   right: var(--space-3);
+}
+
+.leftActionsContainer {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
 }
 
 .sidePanel {
@@ -111,7 +117,6 @@
 .colorsPreview {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  max-height: var(--space-12);
+  max-height: var(--space-16);
   overflow-y: auto;
 }

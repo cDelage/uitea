@@ -1,39 +1,25 @@
-import { MouseEvent, ReactNode, RefObject, useState } from "react";
+import { ReactNode, RefObject, useState } from "react";
 import styles from "./tooltip.module.css";
-import toast from "react-hot-toast";
 import { MdCheck, MdContentCopy } from "react-icons/md";
 import { ICON_SIZE_MD } from "../UiConstants";
 import { createPortal } from "react-dom";
+import { useCopy } from "../../util/CopyUtil";
+import classNames from "classnames";
 
 function CopyableTopTooltip({
   children,
   tooltipValue,
   portalComponent,
+  className
 }: {
   children: ReactNode;
   tooltipValue?: string;
   portalComponent?: RefObject<HTMLDivElement | null>;
+  className?: string
 }) {
-  const [isCopied, setIsCopied] = useState(false);
   const [isHover, setIsHover] = useState(false);
 
-  function copy(e: MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    if (!tooltipValue) return;
-    navigator.clipboard
-      .writeText(tooltipValue)
-      .then(() => {
-        setIsCopied(true);
-        setTimeout(() => {
-          setIsCopied(false);
-        }, 3000);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error(`Fail to copy ${tooltipValue}`);
-      });
-  }
-
+  const { copy, isCopied } = useCopy();
   function handleMouseEnter() {
     if (portalComponent?.current) {
       setIsHover(true);
@@ -46,16 +32,21 @@ function CopyableTopTooltip({
     }
   }
 
+  const tooltipElementStyle = classNames(styles.tooltipElement, className)
+
   return (
     <div
-      className={styles.tooltipElement}
+      className={tooltipElementStyle}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {tooltipValue && !portalComponent && (
         <div
           className={styles.tooltipBody}
-          onClick={copy}
+          onClick={(e) => {
+            e.stopPropagation();
+            copy(tooltipValue);
+          }}
           onMouseDown={(e) => e.stopPropagation()}
         >
           <div className={styles.valueTextContainer}>{tooltipValue}</div>
@@ -73,7 +64,10 @@ function CopyableTopTooltip({
         createPortal(
           <div
             className={styles.tooltipBody}
-            onClick={copy}
+            onClick={(e) => {
+              e.stopPropagation();
+              copy(tooltipValue);
+            }}
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className={styles.valueTextContainer}>{tooltipValue}</div>
@@ -82,7 +76,7 @@ function CopyableTopTooltip({
             ) : (
               <MdContentCopy size={ICON_SIZE_MD} />
             )}
-            <div className={styles.tooltipArrow}/>
+            <div className={styles.tooltipArrow} />
           </div>,
           portalComponent.current
         )}

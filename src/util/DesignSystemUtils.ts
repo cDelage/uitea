@@ -12,6 +12,11 @@ import {
   RadiusItem,
   Effect,
   DesignToken,
+  SemanticColorTokens,
+  TokenFamily,
+  ColorCombinationCollection,
+  ColorCombination,
+  DesignSystem,
 } from "../domain/DesignSystemDomain";
 import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
 import { DEFAULT_BASE } from "../ui/UiConstants";
@@ -388,6 +393,168 @@ export function getPaletteTokens(palette: Palette): DesignToken[] {
     return {
       label: `palette-${palette.paletteName}-${token.label}`,
       value: token.color,
+      category: "color",
     };
   });
+}
+
+export function getPaletteTokenFamily(palette: Palette): TokenFamily {
+  return {
+    label: `palette-${palette.paletteName}`,
+    tokens: getPaletteTokens(palette),
+    category: "color",
+  };
+}
+
+export function getSemanticColorTokens(
+  semantic: SemanticColorTokens,
+  palettesTokens: TokenFamily[]
+): TokenFamily[] {
+  return [
+    {
+      label: "base",
+      tokens: (
+        [
+          {
+            label: "base-background",
+            value: findDesignSystemColor({
+              tokenFamilies: palettesTokens,
+              label: semantic.background,
+            }),
+          },
+          {
+            label: "base-text-light",
+            value: findDesignSystemColor({
+              tokenFamilies: palettesTokens,
+              label: semantic.textLight,
+            }),
+          },
+          {
+            label: "base-text-default",
+            value: findDesignSystemColor({
+              tokenFamilies: palettesTokens,
+              label: semantic.textDefault,
+            }),
+          },
+          {
+            label: "base-text-dark",
+            value: findDesignSystemColor({
+              tokenFamilies: palettesTokens,
+              label: semantic.textDark,
+            }),
+          },
+          {
+            label: "base-border",
+            value: findDesignSystemColor({
+              tokenFamilies: palettesTokens,
+              label: semantic.border,
+            }),
+          },
+        ] as DesignToken[]
+      ).filter((token) => token.value),
+      colorPreview: findDesignSystemColor({
+        tokenFamilies: palettesTokens,
+        label: semantic.background,
+      }),
+      category: "semantic",
+    },
+    ...semantic.colorCombinationCollections.flatMap((collection) =>
+      getCollectionToken(collection, palettesTokens)
+    ),
+  ];
+}
+
+function getCollectionToken(
+  collection: ColorCombinationCollection,
+  palettesTokens: TokenFamily[]
+): TokenFamily {
+  return {
+    label: collection.combinationName ?? "collection",
+    tokens: [
+      ...getColorCombinationTokens(
+        `${collection.combinationName}`,
+        palettesTokens,
+        collection.default
+      ),
+      ...getColorCombinationTokens(
+        `${collection.combinationName}-hover`,
+        palettesTokens,
+        collection.hover
+      ),
+      ...getColorCombinationTokens(
+        `${collection.combinationName}-focus`,
+        palettesTokens,
+        collection.focus
+      ),
+      ...getColorCombinationTokens(
+        `${collection.combinationName}-active`,
+        palettesTokens,
+        collection.active
+      ),
+    ],
+    category: "semantic",
+  };
+}
+
+function getColorCombinationTokens(
+  label: string,
+  palettesTokens: TokenFamily[],
+  colorCombination?: ColorCombination
+): DesignToken[] {
+  if (!colorCombination) return [];
+
+  return (
+    [
+      {
+        label: `${label}-background`,
+        value: findDesignSystemColor({
+          tokenFamilies: palettesTokens,
+          label: colorCombination.background,
+        }),
+      },
+      {
+        label: `${label}-text`,
+        value: findDesignSystemColor({
+          tokenFamilies: palettesTokens,
+          label: colorCombination.text,
+        }),
+      },
+      {
+        label: `${label}-border`,
+        value: findDesignSystemColor({
+          tokenFamilies: palettesTokens,
+          label: colorCombination.border,
+        }),
+      },
+    ] as DesignToken[]
+  ).filter((token) => token.value);
+}
+
+export function getDesignSystemTokens(
+  designSystem?: DesignSystem
+): TokenFamily[] {
+  if (!designSystem) return [];
+  const paletteTokens = designSystem.palettes.map(getPaletteTokenFamily);
+  return [
+    ...paletteTokens,
+    ...getSemanticColorTokens(designSystem.semanticColorTokens, paletteTokens),
+  ];
+}
+
+export function findDesignSystemColor({
+  label,
+  tokenFamilies,
+  defaultValue,
+}: {
+  label?: string;
+  tokenFamilies: TokenFamily[];
+  defaultValue?: string;
+}): string | undefined {
+  return (
+    tokenFamilies
+      ?.flatMap((token) => token.tokens)
+      .find((token) => token.label === label)?.value ??
+    defaultValue ??
+    label
+  );
 }

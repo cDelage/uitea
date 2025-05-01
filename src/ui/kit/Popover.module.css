@@ -18,13 +18,13 @@
 }
 
 .tabDisabled {
-  background-color: var(--base-bg-disabled);
+  background-color: var(--base-background-disabled);
   color: var(--base-text-disabled);
   cursor: not-allowed;
 }
 
 .tabDisabled:hover {
-  background-color: var(--base-bg-disabled);
+  background-color: var(--base-background-disabled);
   color: var(--base-text-disabled);
 }
 

@@ -11,7 +11,6 @@ import {
   Space,
   TextDecoration,
   TextTransform,
-  ThemeColor,
   TypographySpacing,
 } from "../domain/DesignSystemDomain";
 import { CSSProperties } from "styled-components";
@@ -105,24 +104,6 @@ export const DEFAULT_PALETTE: Palette = {
       color: "#DDDDDD",
     },
   ],
-};
-
-export const DEFAULT_THEME: ThemeColor = {
-  themeName: "DEFAULT",
-  default: {
-    background: {
-      default: "#F5F5F5",
-      dark: "#F5F5F5",
-    },
-    border: {
-      default: "#D4D4D4",
-      dark: "#D4D4D4",
-    },
-    text: {
-      default: "#525252",
-      dark: "#525252",
-    },
-  },
 };
 
 export const FONT_WEIGHTS: FontWeight[] = [

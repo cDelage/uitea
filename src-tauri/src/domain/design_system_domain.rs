@@ -7,10 +7,12 @@ use std::path::{Path, PathBuf};
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
     pub palettes: Vec<Palette>,
+    pub themelist: Themes,
+    pub semantic_color_tokens: SemanticColorTokens,
     pub base: Base,
     pub themes: Vec<ThemeColor>,
     pub fonts: Fonts,
-    pub typography: Typography,
+    pub typography: Typographies,
     pub spaces: Vec<Space>,
     pub radius: Radius,
     pub effects: Vec<Effect>,
@@ -175,6 +177,50 @@ pub struct Base {
     pub background_disabled: ColorDarkable,
     pub text_disabled: ColorDarkable,
     pub border_disabled: ColorDarkable,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SemanticColorTokens {
+    pub background: Option<String>,
+    pub border: Option<String>,
+    pub text_light: Option<String>,
+    pub text_default: Option<String>,
+    pub text_dark: Option<String>,
+    pub color_combination_collections: Vec<ColorCombinationCollection>,
+}
+
+impl SemanticColorTokens {
+    pub fn new() -> SemanticColorTokens {
+        SemanticColorTokens {
+            background: None,
+            text_light: None,
+            text_default: None,
+            text_dark: None,
+            border: None,
+            color_combination_collections: vec![],
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ColorCombinationCollection {
+    pub combination_name: String,
+    pub default: Option<ColorCombination>,
+    pub hover: Option<ColorCombination>,
+    pub active: Option<ColorCombination>,
+    pub focus: Option<ColorCombination>,
+    pub context: Option<String>,
+    pub preview_component: Option<String>
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ColorCombination {
+    pub background: Option<String>,
+    pub border: Option<String>,
+    pub text: Option<String>,
 }
 
 impl Base {
@@ -437,7 +483,7 @@ impl Fonts {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Typography {
+pub struct Typographies {
     paragraph: TypographyScale,
     h1: TypographyScale,
     h2: TypographyScale,
@@ -450,9 +496,9 @@ pub struct Typography {
     additionals_scales: Vec<AdditionalTypographyScale>,
 }
 
-impl Typography {
-    pub fn new() -> Typography {
-        Typography {
+impl Typographies {
+    pub fn new() -> Typographies {
+        Typographies {
             h1: TypographyScale {
                 font_size: "32px".to_string(),
                 line_height: "40px".to_string(),
@@ -839,4 +885,18 @@ pub enum EffectType {
     BoxShadow,
     Blur,
     BackdropFilter,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Themes {
+    pub main_theme: Option<Theme>,
+    pub other_themes: Vec<Theme>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Theme {
+    pub name: String,
+    pub background: String,
 }

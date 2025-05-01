@@ -1,0 +1,137 @@
+.modal {
+  width: 90vw;
+  max-width: 90vw;
+  height: 90vh;
+  max-height: 90vh;
+}
+
+.tokenCrafter {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--base-background);
+  height: 100%;
+  width: 100%;
+}
+
+.modalHeader {
+  display: flex;
+  padding: var(--space-3) var(--space-6);
+  gap: var(--space-2);
+  border-bottom: var(--base-border) 1px solid;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.crafterColorCombinationPreview {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  height: 120px;
+  min-height: 120px;
+  max-height: 120px;
+  border-top-left-radius: var(--rounded-md);
+  border-bottom-left-radius: var(--rounded-md);
+  box-sizing: border-box;
+  border: dashed 2px var(--add-base-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.crafterColorCombinationToken {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  box-sizing: border-box;
+  color: var(--add-base-text);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tokenBackground {
+  border-top-right-radius: var(--rounded-md);
+  border-top: dashed 2px var(--add-base-border);
+  border-right: dashed 2px var(--add-base-border);
+}
+
+.tokenText {
+  border-top: dashed 2px var(--add-base-border);
+  border-bottom: dashed 2px var(--add-base-border);
+  border-right: dashed 2px var(--add-base-border);
+}
+
+.tokenBorder {
+  border-bottom: dashed 2px var(--add-base-border);
+  border-right: dashed 2px var(--add-base-border);
+  border-bottom-right-radius: var(--rounded-md);
+}
+
+.tokenBackground:hover {
+  border-top: dashed 2px var(--add-base-hover-border);
+  border-right: dashed 2px var(--add-base-hover-border);
+  box-sizing: border-box;
+  color: var(--add-base-hover-text);
+}
+
+.tokenText:hover {
+  border-top: dashed 2px var(--add-base-hover-border);
+  border-bottom: dashed 2px var(--add-base-hover-border);
+  border-right: dashed 2px var(--add-base-hover-border);
+  color: var(--add-base-hover-text);
+}
+
+.tokenBorder:hover {
+  border-bottom: dashed 2px var(--add-base-hover-border);
+  border-right: dashed 2px var(--add-base-hover-border);
+  color: var(--add-base-hover-text);
+}
+
+.tokenBackground.active {
+  border-top: dashed 2px var(--add-base-active-border);
+  border-right: dashed 2px var(--add-base-active-border);
+  box-sizing: border-box;
+  color: var(--add-base-active-text);
+}
+
+.tokenText.active {
+  border-top: dashed 2px var(--add-base-active-border);
+  border-bottom: dashed 2px var(--add-base-active-border);
+  border-right: dashed 2px var(--add-base-active-border);
+  color: var(--add-base-active-text);
+}
+
+.tokenBorder.active {
+  border-bottom: dashed 2px var(--add-base-active-border);
+  border-right: dashed 2px var(--add-base-active-border);
+  color: var(--add-base-active-text);
+}
+
+.colorCombination {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.colorCombination .actions {
+  opacity: 0;
+}
+
+.colorCombination:hover .actions[data-removable="true"]{
+  opacity: 1;  
+}
+

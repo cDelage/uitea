@@ -7,22 +7,18 @@ export interface Sample {
 
 export interface ColorPickerStoreData {
   colors: string[];
-  currentColorSample?: string;
-  colorSamples: Sample[];
+  samples: Sample[];
 }
 
 export function formatPickerStore({
-  colorSamples,
+  samples,
   colors,
-  currentColorSample,
 }: {
   colors: ColorIO[];
-  currentColorSample?: string;
-  colorSamples: Sample[];
+  samples: Sample[];
 }): ColorPickerStoreData {
   return {
     colors: colors.map((color) => color.toString({ format: "hex" })),
-    colorSamples,
-    currentColorSample,
+    samples,
   };
 }

@@ -4,6 +4,13 @@
   flex-direction: column;
 }
 
+.inputPopoverBox {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+}
+
 .previewContainer {
   height: 100px;
   background-color: var(--tertiary-bg);

@@ -1,4 +1,10 @@
-import { MdAdd, MdPalette } from "react-icons/md";
+import {
+  MdAdd,
+  MdBookmark,
+  MdClose,
+  MdDelete,
+  MdMoreHoriz,
+} from "react-icons/md";
 import { getRectSize, ICON_SIZE_MD } from "../../ui/UiConstants";
 import styles from "./ColorPicker.module.css";
 import { Sample } from "../../domain/ColorPickerDomain";
@@ -13,7 +19,8 @@ import {
 import { moveItem } from "../../util/ArrayMove";
 
 function ColorSample({ sample, index }: { sample: Sample; index: number }) {
-  const { updateColorSample, colors } = useColorPickerStore();
+  const { updateColorSample, colors, removeColorSample } =
+    useColorPickerStore();
   const { register, handleSubmit, getValues, formState, setValue } =
     useForm<Sample>({
       defaultValues: sample,
@@ -30,10 +37,12 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
         const { colors } = getValues();
         const colorsMove = moveItem(colors, dragIndex, hoverIndex);
         setValue("colors", colorsMove);
+        handleSubmit(submitSample)();
       } else {
         const { colors } = getValues();
         colors.splice(dragIndex, 1);
         setValue("colors", colors);
+        handleSubmit(submitSample)();
       }
     }
   );
@@ -77,12 +86,27 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
     }
   }
 
+  function getColorContainerClassname(index: number): string {
+    const classList = "p-2 drag-hover-left-placeholder";
+    if (
+      index === draggableTools.dragIndex &&
+      draggableTools.hoverIndex === "remove"
+    ) {
+      return classList + " remove";
+    } else if (index === draggableTools.dragIndex) {
+      return classList + " draggable";
+    } else if (index === draggableTools.hoverIndex) {
+      return classList + " drag-hover-left";
+    }
+    return classList;
+  }
+
   return (
     <Popover>
       <div className={styles.colorSampling} key={sample.name}>
         <div className="row align-center justify-between">
           <div className="row align-center gap-3">
-            <MdPalette size={ICON_SIZE_MD} />
+            <MdBookmark size={ICON_SIZE_MD} />
             <h5>
               <input
                 {...register("name", { required: "Sample name is required" })}
@@ -91,48 +115,92 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
               />
             </h5>
           </div>
-          <Popover.Toggle
-            id="add-color"
-            positionPayload="top-right"
-            disabled={!colorsAddList.length}
-          >
-            <button
-              className="action-ghost-button"
-              disabled={!colorsAddList.length}
-            >
-              <MdAdd size={ICON_SIZE_MD} />
-            </button>
-          </Popover.Toggle>
-          <Popover.Body id="add-color" zIndex={1000} skipDisableOutside={true}>
-            <Popover.Actions>
-              {colorsAddList.map((colorToAdd, index) => (
-                <Popover.Tab
-                  key={`${colorToAdd.toString({ format: "hex" })}-${index}`}
-                  clickEvent={() => addColor(colorToAdd)}
+          <div className="row align-center gap-3">
+            {!draggableTools.dragIndex && (
+              <>
+                <Popover.Toggle
+                  id="add-color"
+                  positionPayload="top-right"
+                  disabled={!colorsAddList.length}
                 >
-                  <div
-                    className="palette-color"
-                    style={{
-                      ...getRectSize({ height: "var(--space-7)" }),
-                      background: colorToAdd.toString({ format: "hex" }),
-                    }}
-                  ></div>
-                  {colorToAdd.toString({ format: "hex" })}
+                  <button
+                    className="action-ghost-button"
+                    disabled={!colorsAddList.length}
+                  >
+                    <MdAdd size={ICON_SIZE_MD} />
+                  </button>
+                </Popover.Toggle>
+                <Popover.Toggle id="delete-sample" positionPayload="top-right">
+                  <button className="action-ghost-button">
+                    <MdMoreHoriz size={ICON_SIZE_MD} />
+                  </button>
+                </Popover.Toggle>
+              </>
+            )}
+            {draggableTools.dragIndex && (
+              <button
+                className="remove-button"
+                style={{
+                  ...getRectSize({ height: "var(--space-7)" }),
+                }}
+                onMouseEnter={() => draggableTools.setHoverIndex("remove")}
+              >
+                <MdDelete size={ICON_SIZE_MD} />
+              </button>
+            )}
+            <Popover.Body
+              id="add-color"
+              zIndex={1000}
+              skipDisableOutside={true}
+            >
+              <Popover.Actions>
+                {colorsAddList.map((colorToAdd, colorIndex) => (
+                  <Popover.Tab
+                    key={`${colorToAdd.toString({
+                      format: "hex",
+                    })}-${colorIndex}`}
+                    clickEvent={() => addColor(colorToAdd)}
+                  >
+                    <div
+                      className="palette-color"
+                      style={{
+                        ...getRectSize({ height: "var(--space-7)" }),
+                        background: colorToAdd.toString({ format: "hex" }),
+                      }}
+                    ></div>
+                    {colorToAdd.toString({ format: "hex" })}
+                  </Popover.Tab>
+                ))}
+              </Popover.Actions>
+            </Popover.Body>
+            <Popover.Body
+              id="delete-sample"
+              zIndex={1000}
+              skipDisableOutside={true}
+            >
+              <Popover.Actions>
+                <Popover.Tab
+                  theme="alert"
+                  clickEvent={() => removeColorSample(index)}
+                >
+                  <MdDelete size={ICON_SIZE_MD} /> Remove sample
                 </Popover.Tab>
-              ))}
-            </Popover.Actions>
-          </Popover.Body>
+                <Popover.Tab>
+                  <MdClose size={ICON_SIZE_MD} /> Cancel
+                </Popover.Tab>
+              </Popover.Actions>
+            </Popover.Body>
+          </div>
         </div>
         {formState.errors.name?.message && (
           <small className="error">{formState.errors.name?.message}</small>
         )}
-        {!sample.colors.length && <div>No color sampled</div>}
-        {sample.colors.length && (
-          <div className={styles.colorsPreview}>
-            {sample.colors.map((color, index) => (
+        <div className={styles.colorsPreview}>
+          {sample.colors.map((color, index) => (
+            <div className={getColorContainerClassname(index)}>
               <div
-                className="palette-color cursor-pointer"
-                onDragStart={(e) => e.stopPropagation()}
+                className="palette-color"
+                onDragStart={(e) => e.preventDefault()}
                 onMouseDown={() => handleDragColor(index)}
                 onMouseEnter={() => handleMouseEnter(index)}
                 key={`${color}-${index}`}
@@ -141,24 +209,38 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
                   ...getRectSize({ height: "var(--space-7)" }),
                 }}
               ></div>
-            ))}
-            <Popover.Toggle
-              id="add-color"
-              positionPayload="top-right"
-              disabled={!colorsAddList.length}
-            >
-              <button
-                className="add-button"
+            </div>
+          ))}
+          <div className="p-2">
+            {draggableTools.dragIndex === undefined ? (
+              <Popover.Toggle
+                id="add-color"
+                positionPayload="top-right"
                 disabled={!colorsAddList.length}
+              >
+                <button
+                  className="add-button"
+                  disabled={!colorsAddList.length}
+                  style={{
+                    ...getRectSize({ height: "var(--space-7)" }),
+                  }}
+                >
+                  <MdAdd size={ICON_SIZE_MD} />
+                </button>
+              </Popover.Toggle>
+            ) : (
+              <button
+                className="remove-button"
                 style={{
                   ...getRectSize({ height: "var(--space-7)" }),
                 }}
+                onMouseEnter={() => draggableTools.setHoverIndex("remove")}
               >
-                <MdAdd size={ICON_SIZE_MD} />
+                <MdDelete size={ICON_SIZE_MD} />
               </button>
-            </Popover.Toggle>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </Popover>
   );

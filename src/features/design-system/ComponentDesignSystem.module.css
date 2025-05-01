@@ -11,6 +11,20 @@
   user-select: none;
 }
 
+.componentDesignSystemColumnPadding {
+  scroll-margin-top: 36px !important;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  box-sizing: border-box;
+  padding: 18px var(--space-7) 18px var(--space-7);
+  border-bottom: transparent 2px solid;
+  border-top: transparent 2px solid;
+  user-select: none;
+}
+
+
 .componentDesignSystem {
   scroll-margin-top: 36px !important;
   display: flex;
@@ -70,7 +84,36 @@
   gap: var(--space-3);
 }
 
+.sideSettingsContainer {
+  padding-left: var(--space-7);
+  padding-right: var(--space-7);
+}
+
 .previewContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-y: auto;
+  border-radius: var(--rounded-md);
+  box-sizing: border-box;
+  border: var(--base-border) 1px solid;
+  background-color: var(--base-background);
+}
+
+.previewBody {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-y: auto;
+  background-color: var(--base-background);
+  color: var(--base-text-default);
+}
+
+.previewContainerComponent {
   width: 100%;
   height: 100%;
   display: flex;
@@ -78,6 +121,9 @@
   border-radius: var(--rounded-md);
   box-sizing: border-box;
   border: var(--base-border) 1px solid;
+  background-color: var(--base-background);
+  padding: var(--space-7);
+  flex-direction: column;
 }
 
 .previewElement {

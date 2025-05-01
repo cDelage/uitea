@@ -23,7 +23,7 @@
 }
 
 .iconContainer {
-    background-color: var(--base-bg);
+    background-color: var(--base-background);
     width: var(--space-11);
     height: 100%;
     box-shadow: var(--shadow-inset);

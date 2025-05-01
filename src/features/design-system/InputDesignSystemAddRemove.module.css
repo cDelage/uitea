@@ -2,7 +2,6 @@
   border: dashed 2px var(--add-border);
   box-sizing: border-box;
   color: var(--add-text);
-  opacity: 0.7;
   cursor: pointer;
   margin: var(--space-0) var(--space-7);
   padding: var(--space-3);
@@ -10,13 +9,13 @@
 }
 
 .inputAdd:hover {
-  opacity: 1;
+  border: dashed 2px var(--add-hover-border);
+  color: var(--add-hover-text);
 }
 
 .inputRemove {
   border: dashed 2px var(--remove-border);
   color: var(--remove-text);
-  opacity: 0.5;
   cursor: pointer;
   margin: var(--space-0) var(--space-7);
   padding: var(--space-3);
@@ -24,5 +23,6 @@
 }
 
 .inputRemove:hover {
-  opacity: 1;
+  border: dashed 2px var(--remove-hover-border);
+  color: var(--remove-hover-text);
 }

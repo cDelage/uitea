@@ -35,6 +35,7 @@ export type DesignSystemContextType = {
   editMode: boolean;
   colorTokens?: DesignToken[];
   tokenFamilies: TokenFamily[];
+  theme?: string;
 };
 
 export const DesignSystemContext =

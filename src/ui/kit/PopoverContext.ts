@@ -4,7 +4,7 @@ import { PositionAbsolute, PositionPayload } from "./PositionAbsolute.type";
 export type PopoverContextType = {
   position: PositionAbsolute | null;
   openPopover: (pos: PositionAbsolute, id: string, domRect: DOMRect) => void;
-  closePopover: () => void;
+  closePopover: (id: string) => void;
   openPopoverId: string | null;
   setPosition: (pos: PositionAbsolute) => void;
   toggleRect?: DOMRect;

@@ -3,6 +3,7 @@ import LoadDesignSystem from "./LoadDesignSystem";
 import RecentFiles from "./RecentFiles";
 import styles from "./Home.module.css";
 import OpenPaletteBuilder from "./OpenPaletteBuilder";
+import OpenColorPicker from "./OpenColorPicker";
 
 function HomePage() {
   return (
@@ -12,6 +13,7 @@ function HomePage() {
         <CreateDesignSystem />
         <LoadDesignSystem />
         <OpenPaletteBuilder />
+        <OpenColorPicker />
       </div>
       <h1>Recent</h1>
       <RecentFiles />

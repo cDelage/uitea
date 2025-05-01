@@ -6,7 +6,7 @@ import {
   VscChromeMaximize,
   VscChromeRestore,
 } from "react-icons/vsc";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CloseButton, GhostButton, WindowButtons } from "../kit/Buttons";
 import { ICON_SIZE_MD, ICON_SIZE_SM } from "../UiConstants";
 import {
@@ -21,6 +21,8 @@ import {
 } from "../../features/design-system/DesignSystemQueries";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { usePaletteBuilderStore } from "../../features/palette-builder/PaletteBuilderStore";
+import { HeaderTools } from "../../util/HeaderTools";
+import { useColorPickerStore } from "../../features/color-picker/ColorPickerStore";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
@@ -39,44 +41,81 @@ function Header() {
   const isEditMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
   ) as boolean;
-  const paletteBuilderPageActive = pathname === "/palette-builder";
-  const paletteBuilderActive =
-    paletteBuilderPageActive ||
-    searchParams.get("paletteBuilderOpen") === "true";
+  const {
+    canUndoRedo: canUndoRedoColorPicker,
+    undoColorPicker,
+    redoColorPicker,
+  } = useColorPickerStore();
 
-  function getHeaderActiveName(): string {
-    if (pathname === "/") {
-      return "Home";
-    } else if (designSystem) {
-      return designSystem?.metadata.designSystemName ?? "undefined";
-    } else if (pathname === "/palette-builder") {
-      return "palette builder";
-    } else {
-      return "undefined";
+  const headerTools = useMemo<HeaderTools>(() => {
+    if (
+      pathname.startsWith("/palette-builder") ||
+      searchParams.get("paletteBuilderOpen") === "true"
+    ) {
+      return {
+        pageName: "palette builder",
+        canUndoRedo: canUndoRedoPaletteBuilder,
+        undo: undoPaletteBuilder,
+        redo: redoPaletteBuilder,
+      };
+    } else if (
+      pathname.startsWith("/color-picker") ||
+      searchParams.get("colorPickerOpen") === "true"
+    ) {
+      return {
+        pageName: "color picker",
+        canUndoRedo: canUndoRedoColorPicker,
+        undo: undoColorPicker,
+        redo: redoColorPicker,
+      };
+    } else if (pathname.startsWith("/design-system")) {
+      if (!isEditMode) {
+        return {
+          pageName: designSystem?.metadata.designSystemName ?? "design system",
+        };
+      }
+      return {
+        pageName: designSystem?.metadata.designSystemName ?? "design system",
+        canUndoRedo: {
+          canRedo: designSystem?.metadata.canRedo ?? false,
+          canUndo: designSystem?.metadata.canUndo ?? false,
+        },
+        undo: undoDesignSystem,
+        redo: redoDesignSystem,
+        isTmp: designSystem?.metadata.isTmp,
+      };
+    } else if (pathname === "/") {
+      return {
+        pageName: "home",
+        isHome: true
+      };
     }
-  }
 
-  const isHomepageActive: boolean = pathname === "/";
-  const headerName: string = getHeaderActiveName();
-  const isTmp: boolean | undefined = designSystem?.metadata.isTmp;
+    return {
+      pageName: "undefined",
+    };
+  }, [
+    pathname,
+    isEditMode,
+    canUndoRedoColorPicker,
+    canUndoRedoPaletteBuilder,
+    designSystem,
+    redoColorPicker,
+    redoDesignSystem,
+    redoPaletteBuilder,
+    searchParams,
+    undoColorPicker,
+    undoDesignSystem,
+    undoPaletteBuilder,
+  ]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === "z") {
-        if (paletteBuilderActive && canUndoRedoPaletteBuilder.canUndo) {
-          undoPaletteBuilder();
-        } else if (designSystem?.metadata.canUndo) {
-          event.preventDefault(); // Empêche le comportement par défaut du navigateur
-          undoDesignSystem();
-        }
+        headerTools.undo?.();
       }
       if (event.ctrlKey && event.key === "y") {
-        if (paletteBuilderActive && canUndoRedoPaletteBuilder.canRedo) {
-          redoPaletteBuilder();
-        } else if (designSystem?.metadata.canRedo) {
-          event.preventDefault();
-          redoDesignSystem();
-        }
+        headerTools.redo?.();
       }
     };
 
@@ -85,13 +124,7 @@ function Header() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [
-    undoDesignSystem,
-    redoDesignSystem,
-    designSystem,
-    paletteBuilderActive,
-    canUndoRedoPaletteBuilder,
-    undoPaletteBuilder,
-    redoPaletteBuilder,
+    headerTools,
   ]);
 
   useEffect(() => {
@@ -113,7 +146,7 @@ function Header() {
     <header data-tauri-drag-region={true} className={styles.header}>
       <div className="container-start" data-tauri-drag-region={true}>
         <GhostButton onClick={() => navigate("/")}>
-          {isHomepageActive ? (
+          {headerTools.isHome ? (
             <IoHomeSharp size={ICON_SIZE_MD} />
           ) : (
             <IoHomeOutline size={ICON_SIZE_MD} />
@@ -121,42 +154,26 @@ function Header() {
         </GhostButton>
       </div>
       <div className="container-center" data-tauri-drag-region={true}>
-        {isTmp && !isHomepageActive ? (
-          <strong>{headerName}*</strong>
+        {headerTools.isTmp ? (
+          <strong>{headerTools.pageName}*</strong>
         ) : (
-          <>{headerName}</>
+          <>{headerTools.pageName}</>
         )}
       </div>
       <div className={styles.buttons}>
-        {((!isHomepageActive && isEditMode) || paletteBuilderPageActive) && (
+        {headerTools.canUndoRedo && (
           <div className={styles.undoRedoButtons}>
             <button
               className="action-ghost-button"
-              disabled={
-                (!paletteBuilderPageActive &&
-                  !designSystem?.metadata.canUndo) ||
-                (paletteBuilderPageActive && !canUndoRedoPaletteBuilder.canUndo)
-              }
-              onClick={() =>
-                paletteBuilderPageActive
-                  ? undoPaletteBuilder()
-                  : undoDesignSystem()
-              }
+              disabled={!headerTools.canUndoRedo.canUndo}
+              onClick={headerTools.undo}
             >
               <MdArrowBack size={ICON_SIZE_SM} />
             </button>
             <button
               className="action-ghost-button"
-              disabled={
-                (!paletteBuilderPageActive &&
-                  !designSystem?.metadata.canRedo) ||
-                (paletteBuilderPageActive && !canUndoRedoPaletteBuilder.canRedo)
-              }
-              onClick={() =>
-                paletteBuilderPageActive
-                  ? redoPaletteBuilder()
-                  : redoDesignSystem()
-              }
+              disabled={!headerTools.canUndoRedo.canRedo}
+              onClick={headerTools.redo}
             >
               <MdArrowForward size={ICON_SIZE_SM} />
             </button>

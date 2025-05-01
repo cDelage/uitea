@@ -44,7 +44,7 @@ export const ButtonPrimary = styled.button`
   }
 
   &:disabled{
-    background-color: var(--base-bg-disabled);
+    background-color: var(--base-background-disabled);
     color: var(--base-text-disabled);
   }
 `;

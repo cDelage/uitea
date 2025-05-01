@@ -7,7 +7,7 @@ function ColorPickerModal() {
 
   return (
     <div className={styles.modal}>
-      <ColorPickerComponent tokens={tokenFamilies} />
+      <ColorPickerComponent tokens={tokenFamilies} isModal={true} />
     </div>
   );
 }

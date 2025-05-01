@@ -7,9 +7,10 @@ import SidebarDesignSystem from "./SidebarDesignSystem";
 import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
 import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DesignToken, TokenFamily } from "../../domain/DesignSystemDomain";
 import {
+  getDesignSystemTokens,
   getPaletteTokens,
   isValidCssColorOrGradient,
   KEYBOARD_ACTIONS,
@@ -40,13 +41,10 @@ function PageDesignSystem() {
   const colorTokens: DesignToken[] | undefined =
     designSystem?.palettes.flatMap(getPaletteTokens);
 
-  const tokenFamilies: TokenFamily[] =
-    designSystem?.palettes.map((palette) => {
-      return {
-        label: palette.paletteName,
-        tokens: getPaletteTokens(palette),
-      };
-    }) ?? [];
+  const tokenFamilies: TokenFamily[] = useMemo(
+    () => getDesignSystemTokens(designSystem),
+    [designSystem]
+  );
 
   useEffect(() => {
     const clearKeyboardAction = () => {

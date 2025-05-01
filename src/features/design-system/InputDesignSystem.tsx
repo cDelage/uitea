@@ -1,4 +1,4 @@
-import { MdDragIndicator, MdWarning } from "react-icons/md";
+import { MdDragIndicator, MdLock, MdWarning } from "react-icons/md";
 import { ComponentMode, useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./InputDesignSystem.module.css";
 import { ICON_SIZE_SM } from "../../ui/UiConstants";
@@ -8,7 +8,6 @@ import Popover from "../../ui/kit/Popover";
 import classNames from "classnames";
 import { DraggableTools } from "../../util/DraggableContext";
 import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
-import ColorTokenPickerPopover from "./ColorTokenPickerPopover";
 import { useSearchParams } from "react-router-dom";
 
 function InputDesignSystem({
@@ -29,8 +28,8 @@ function InputDesignSystem({
   onRemove,
   keyPopover,
   portalTooltip,
-  setValue,
   editText,
+  isLocked,
 }: {
   label: string;
   value?: string | undefined;
@@ -51,6 +50,7 @@ function InputDesignSystem({
   keyPopover?: string;
   setValue?: (value: string) => void;
   editText?: boolean;
+  isLocked?: boolean;
 }) {
   const [isHover, setIsHover] = useState(false);
 
@@ -153,125 +153,130 @@ function InputDesignSystem({
         onClick={handleClick}
       >
         <div className={styles.middleContainer}>
-          <strong>
-            {registerKey ? (
-              <input
-                className="inherit-input w-full"
-                placeholder="empty"
-                {...registerKey}
-                readOnly={inputDesignSystemMode !== "edit"}
-                onMouseDown={(e) => {
-                  if (e.currentTarget.readOnly) {
-                    e.preventDefault();
-                  }
-                }}
-                onBlur={handleSubmit}
-              />
-            ) : (
-              <input
-                className="inherit-input w-full"
-                placeholder="empty"
-                value={label}
-                readOnly={true}
-                onMouseDown={(e) => {
-                  if (e.currentTarget.readOnly) {
-                    e.preventDefault();
-                  }
-                }}
-                onBlur={handleSubmit}
-              />
-            )}
-          </strong>
-
-          {register && !isColor && !popoverEdit && (
-            <div className="text-color-light">
-              <input
-                className="inherit-input w-full"
-                placeholder="empty"
-                {...register}
-                onBlur={handleSubmit}
-                readOnly={inputDesignSystemMode !== "edit"}
-                onMouseDown={(e) => {
-                  if (e.currentTarget.readOnly) {
-                    e.preventDefault();
-                  }
-                }}
-              />
+          <div className="row w-full">
+            <div className={styles.sideContainer} />
+            <strong className="w-full">
+              {registerKey ? (
+                <input
+                  className="inherit-input w-full"
+                  placeholder="empty"
+                  {...registerKey}
+                  readOnly={inputDesignSystemMode !== "edit"}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onBlur={handleSubmit}
+                />
+              ) : (
+                <input
+                  className="inherit-input w-full"
+                  placeholder="empty"
+                  value={label}
+                  readOnly={true}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onBlur={handleSubmit}
+                />
+              )}
+            </strong>
+          </div>
+          <div className="row w-full">
+            <div className={styles.sideContainer}>
+              {editMode && isAddRemoveDragAllowed && (
+                <button
+                  onMouseDown={handleMouseDown}
+                  type="button"
+                  className="action-button"
+                >
+                  <MdDragIndicator size={ICON_SIZE_SM} />
+                </button>
+              )}
+              {isLocked && (
+                <MdLock size={ICON_SIZE_SM} color="var(--palette-gray-400)" />
+              )}
             </div>
-          )}
-          {(isColor || popoverEdit) && (
-            <Popover onClose={onClosePopover ?? handleSubmit}>
-              <Popover.Toggle
-                id="edit-popover"
-                positionPayload="bottom-left"
-                disableButtonClosure={isColor}
-                keyPopover={keyPopover}
-              >
-                <div className={styles.popoverContainer}>
-                  {register && (isColor || editText) ? (
-                    <input
-                      className="inherit-input empty-border w-full"
-                      placeholder="empty"
-                      {...register}
-                      readOnly={inputDesignSystemMode !== "edit"}
-                      onMouseDown={(e) => {
-                        if (e.currentTarget.readOnly) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
-                  ) : (
-                    <input
-                      className="inherit-input w-full"
-                      placeholder="empty"
-                      value={value}
-                      readOnly={true}
-                      onMouseDown={(e) => {
-                        if (e.currentTarget.readOnly) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
-                  )}
-                  {isColor && (
-                    <Popover.Close>
-                      <div
-                        className={colorRectClassNames}
-                        style={{
-                          background: computedColor,
+            {register && !isColor && !popoverEdit && (
+              <div className="text-color-light w-full">
+                <input
+                  className="inherit-input w-full"
+                  placeholder="empty"
+                  {...register}
+                  onBlur={handleSubmit}
+                  readOnly={inputDesignSystemMode !== "edit"}
+                  onMouseDown={(e) => {
+                    if (e.currentTarget.readOnly) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+            )}
+            {(isColor || popoverEdit) && (
+              <Popover onClose={onClosePopover ?? handleSubmit}>
+                <Popover.Toggle
+                  id={keyPopover ?? "edit-popover"}
+                  positionPayload="bottom-left"
+                >
+                  <div className={styles.popoverContainer}>
+                    {register && (isColor || editText) ? (
+                      <input
+                        className="inherit-input empty-border w-full"
+                        placeholder="empty"
+                        {...register}
+                        readOnly={inputDesignSystemMode !== "edit"}
+                        onMouseDown={(e) => {
+                          if (e.currentTarget.readOnly) {
+                            e.preventDefault();
+                          }
                         }}
-                      >
-                        {!computedColor && (
-                          <MdWarning
-                            size={12}
-                            color="var(--warning-outline-text)"
-                          />
-                        )}
-                      </div>
-                    </Popover.Close>
-                  )}
-                </div>
-              </Popover.Toggle>
-              <Popover.Body id="edit-popover">
-                {popoverEdit}
-                {isColor && (
-                  <ColorTokenPickerPopover setValue={setValue} value={value} />
-                )}
-              </Popover.Body>
-            </Popover>
-          )}
+                      />
+                    ) : (
+                      <input
+                        className="inherit-input w-full"
+                        placeholder="empty"
+                        value={value}
+                        readOnly={true}
+                        onMouseDown={(e) => {
+                          if (e.currentTarget.readOnly) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                    )}
+                    <div className={styles.sideContainerVisible}>
+                      {isColor && (
+                        <Popover.Close>
+                          <div
+                            className={colorRectClassNames}
+                            style={{
+                              background: computedColor,
+                            }}
+                          >
+                            {!computedColor && (
+                              <MdWarning
+                                size={12}
+                                color="var(--warning-outline-text)"
+                              />
+                            )}
+                          </div>
+                        </Popover.Close>
+                      )}
+                    </div>
+                  </div>
+                </Popover.Toggle>
+                <Popover.Body id={keyPopover ?? "edit-popover"} zIndex={100}>
+                  {popoverEdit}
+                </Popover.Body>
+              </Popover>
+            )}
+          </div>
         </div>
-        <div className={styles.sideContainer}>
-          {editMode && isAddRemoveDragAllowed && (
-            <button
-              onMouseDown={handleMouseDown}
-              type="button"
-              className="action-button"
-            >
-              <MdDragIndicator size={ICON_SIZE_SM} />
-            </button>
-          )}
-        </div>
+        <div className={styles.sideContainer}/>
       </div>
     </CopyableTopTooltip>
   );

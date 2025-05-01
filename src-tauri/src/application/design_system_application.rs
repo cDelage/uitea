@@ -8,7 +8,7 @@ use crate::{
     domain::{
         design_system_domain::{
             Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts,
-            Palette, Radius, Space, ThemeColor, Typography,
+            Palette, Radius, SemanticColorTokens, Space, ThemeColor, Typographies,
         },
         home_domain::PresetDressing,
     },
@@ -123,7 +123,7 @@ pub fn find_design_system(
         Ok(font) => Ok(font),
     }?;
 
-    let typography: Typography =
+    let typography: Typographies =
         match design_system_repository::fetch_typography(&design_system_pathbuf) {
             Err(_) => {
                 design_system_repository::init_typography(&design_system_pathbuf)?;
@@ -157,6 +157,17 @@ pub fn find_design_system(
         Ok(radius) => Ok(radius),
     }?;
 
+    let themelist = design_system_repository::fetch_themelist(&design_system_pathbuf);
+
+    let semantic_color_tokens: SemanticColorTokens =
+        match design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf) {
+            Err(_) => {
+                design_system_repository::init_semantic_color_tokens(&design_system_pathbuf)?;
+                design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf)
+            }
+            Ok(tokens) => Ok(tokens),
+        }?;
+
     Ok(DesignSystem {
         metadata,
         palettes,
@@ -167,6 +178,8 @@ pub fn find_design_system(
         spaces,
         radius,
         effects,
+        themelist,
+        semantic_color_tokens,
     })
 }
 

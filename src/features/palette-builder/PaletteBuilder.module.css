@@ -4,7 +4,7 @@
   overflow-y: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
-  background-color: var(--base-bg);
+  background-color: var(--base-background);
   height: 100%;
 }
 
@@ -84,7 +84,7 @@
   padding: var(--space-3);
   text-align: left;
   box-sizing: border-box;
-  background-color: var(--base-bg);
+  background-color: var(--base-background);
 }
 
 .columnTint {

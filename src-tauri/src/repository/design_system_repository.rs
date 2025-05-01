@@ -8,9 +8,7 @@ use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette,
-        PalettesMetadataFile, Radius, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile,
-        ThemesMetadataFile, Typography,
+        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile, Themes, ThemesMetadataFile, Typographies
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -35,6 +33,8 @@ const SPACES_PATH: &str = "spaces.yaml";
 const RADIUS_PATH: &str = "radius.yaml";
 const EFFECTS_PATH: &str = "effects.yaml";
 const IMAGES_PATH: &str = "images";
+const THEMELIST_PATH: &str = "themes.yaml";
+const SEMANTIC_COLOR_TOKENS_PATH: &str = "semantic_color_tokens.yaml";
 
 pub fn create_design_system(design_system_metadata: &mut DesignSystemMetadata) -> Result<()> {
     println!(
@@ -231,6 +231,12 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     let effect_pathbuf: PathBuf = design_system_path.join(EFFECTS_PATH);
     save_to_yaml_file(effect_pathbuf, &design_system.effects)?;
 
+    let themes_pathbuf: PathBuf = design_system_path.join(THEMELIST_PATH);
+    save_to_yaml_file(themes_pathbuf, &design_system.themelist)?;
+
+    let semantic_color_tokens_pathbuf: PathBuf = design_system_path.join(SEMANTIC_COLOR_TOKENS_PATH);
+    save_to_yaml_file(semantic_color_tokens_pathbuf, &design_system.semantic_color_tokens)?;
+
     //Once the save is complete (when is not a tmp save) -> remove the tmp copy
     if !is_tmp {
         let tmp_pathbuf: PathBuf = design_system
@@ -395,16 +401,16 @@ pub fn init_fonts(design_system_path: &PathBuf) -> Result<()> {
     save_to_yaml_file(typo_pathbuf, &typo_file)
 }
 
-pub fn fetch_typography(design_system_path: &PathBuf) -> Result<Typography> {
+pub fn fetch_typography(design_system_path: &PathBuf) -> Result<Typographies> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let typo_pathbuf: PathBuf = fetch_pathbuf.join(TYPOGRAPHY_PATH);
-    load_yaml_from_pathbuf::<Typography>(&typo_pathbuf)
+    load_yaml_from_pathbuf::<Typographies>(&typo_pathbuf)
 }
 
 pub fn init_typography(design_system_path: &PathBuf) -> Result<()> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let typo_pathbuf: PathBuf = fetch_pathbuf.join(TYPOGRAPHY_PATH);
-    let typo_file = Typography::new();
+    let typo_file = Typographies::new();
     save_to_yaml_file(typo_pathbuf, &typo_file)
 }
 
@@ -494,4 +500,30 @@ pub fn is_under_design_system(path: &PathBuf) -> bool {
     }
 
     false
+}
+
+pub fn fetch_themelist(design_system_path: &PathBuf) -> Themes {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let theme_path = fetch_pathbuf.join(THEMELIST_PATH);
+    if theme_path.is_file() {
+        if let Result::Ok(themes) = load_yaml_from_pathbuf::<Themes>(&theme_path) {
+            return themes
+        }
+    }
+    return Themes {
+        main_theme: None,
+        other_themes: vec![]
+    }
+}
+
+pub fn init_semantic_color_tokens(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let semantic_color_tokens_path: PathBuf = fetch_pathbuf.join(SEMANTIC_COLOR_TOKENS_PATH);
+    save_to_yaml_file(semantic_color_tokens_path, &SemanticColorTokens::new())
+}
+
+pub fn fetch_semantic_color_tokens(design_system_path: &PathBuf) -> Result<SemanticColorTokens> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let semantic_color_tokens_path: PathBuf = fetch_pathbuf.join(SEMANTIC_COLOR_TOKENS_PATH);
+    load_yaml_from_pathbuf::<SemanticColorTokens>(&semantic_color_tokens_path)
 }

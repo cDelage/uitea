@@ -9,6 +9,7 @@ import ErrorFallback from "./ui/layout/ErrorFallback";
 import { Suspense } from "react";
 import Loader from "./ui/kit/Loader";
 import PagePaletteBuilder from "./features/palette-builder/PagePaletteBuilder";
+import PageColorPicker from "./features/color-picker/PageColorPicker";
 
 const router = createBrowserRouter([
   {
@@ -32,10 +33,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/palette-builder/",
+        path: "/palette-builder",
         element: (
           <Suspense fallback={<Loader />}>
             <PagePaletteBuilder />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/color-picker",
+        element: (
+          <Suspense fallback={<Loader />}>
+            <PageColorPicker />
           </Suspense>
         ),
       },

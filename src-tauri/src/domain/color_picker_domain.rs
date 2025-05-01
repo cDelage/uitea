@@ -14,19 +14,17 @@ pub struct ColorSample {
 #[serde(rename_all = "camelCase")]
 pub struct ColorPickerStore {
     pub colors: Vec<String>,
-    pub color_samples: Vec<ColorSample>,
-    pub current_color_sample: Option<String>,
+    pub samples: Vec<ColorSample>,
 }
 
 impl Default for ColorPickerStore {
     fn default() -> Self {
         ColorPickerStore {
             colors: vec![String::from("#bfdbfe"),String::from("#1e3a8a")],
-            color_samples: vec![ColorSample {
+            samples: vec![ColorSample {
                 name: String::from("sample-1"),
                 colors: vec![],
             }],
-            current_color_sample: Some(String::from("sample-1")),
         }
     }
 }

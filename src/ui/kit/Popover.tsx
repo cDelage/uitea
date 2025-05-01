@@ -37,28 +37,30 @@ function Popover({
   onClose?: () => void;
 }): JSX.Element {
   const [position, setPosition] = useState<PositionAbsolute | null>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
   const [toggleRect, setToggleRect] = useState<DOMRect | undefined>(undefined);
 
-  function open(pos: PositionAbsolute, id: string, domRect: DOMRect) {
+  function openPopover(pos: PositionAbsolute, id: string, domRect: DOMRect) {
     setPosition(pos);
-    setOpenId(id);
+    setOpenPopoverId(id);
     setToggleRect(domRect);
   }
 
-  function close() {
-    onClose?.();
-    setPosition(null);
-    setOpenId(null);
+  function closePopover(id: string) {
+    if (id === openPopoverId) {
+      onClose?.();
+      setPosition(null);
+      setOpenPopoverId(null);
+    }
   }
 
   return (
     <PopoverContext.Provider
       value={{
         position,
-        openPopover: open,
-        closePopover: close,
-        openPopoverId: openId,
+        openPopover,
+        closePopover,
+        openPopoverId,
         setPosition,
         toggleRect,
         setToggleRect,
@@ -83,13 +85,25 @@ function Body({
   const { position, closePopover, openPopoverId, toggleRect } =
     usePopoverContext();
   const popoverRef = useDivClickOutside(handleClose, true, skipDisableOutside);
+  const [toClose, setToClose] = useState(false);
   const [positionVisible, setPositionVisible] = useState<
     PositionAbsolute | undefined
   >(undefined);
 
   function handleClose() {
-    closePopover();
+    if (openPopoverId === id) {
+      setToClose(true);
+    }
   }
+
+  useEffect(() => {
+    if (toClose) {
+      setToClose(false);
+      if (openPopoverId === id) {
+        closePopover(id);
+      }
+    }
+  }, [toClose, id, closePopover, openPopoverId]);
 
   const shouldRender = position !== null && openPopoverId === id;
 
@@ -132,7 +146,6 @@ function Toggle({
   children,
   id,
   positionPayload,
-  disableButtonClosure,
   keyPopover,
   disabled,
 }: {
@@ -140,7 +153,6 @@ function Toggle({
   id: string;
   positionPayload?: PositionPayload;
   scrollListener?: string[];
-  disableButtonClosure?: boolean;
   keyPopover?: string;
   disabled?: boolean;
 }): JSX.Element {
@@ -175,8 +187,6 @@ function Toggle({
               }
             )
           );
-        } else if (!disableButtonClosure) {
-          closePopover();
         }
       }
     }
@@ -202,7 +212,7 @@ function Toggle({
   useEffect(() => {
     function handleClose(e: ClosePopoverEvent) {
       if (e.detail.keyPopover && e.detail.keyPopover !== keyPopover) {
-        closePopover();
+        closePopover(id);
       }
     }
 
@@ -251,7 +261,7 @@ function Close({
   function handleClick() {
     if (openPopoverId) {
       closeCallback?.();
-      closePopover();
+      closePopover(openPopoverId);
     }
   }
 
@@ -287,14 +297,14 @@ function Tab({
   disableClose?: boolean;
   theme?: "alert" | "disabled";
 }) {
-  const { closePopover } = usePopoverContext();
+  const { closePopover, openPopoverId } = usePopoverContext();
 
   const handleClick = (e: MouseEvent) => {
     if (theme !== "disabled") {
       //When action trigger a modal opening, then do not close.
       e.stopPropagation();
       clickEvent?.();
-      if (!disableClose) closePopover();
+      if (!disableClose) closePopover(openPopoverId ?? "");
     }
   };
 

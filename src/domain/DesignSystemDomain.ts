@@ -3,8 +3,10 @@ export interface DesignSystem {
   palettes: Palette[];
   base: Base;
   themes: ThemeColor[];
+  themelist: Themes;
+  semanticColorTokens: SemanticColorTokens;
   fonts: Fonts;
-  typography: Typography;
+  typography: Typographies;
   spaces: Space[];
   radius: Radius;
   effects: Effect[];
@@ -15,7 +17,7 @@ export interface DesignSystemCreationPayload {
   folderPath: string;
   darkMode: boolean;
   banner?: string;
-  logo?:string;
+  logo?: string;
 }
 
 export type DesignSystemMetadataHome = DesignSystemMetadata & {
@@ -63,6 +65,18 @@ export interface DesignToken {
 export interface TokenFamily {
   label: string;
   tokens: DesignToken[];
+  colorPreview?: string;
+  category: "color" | "semantic";
+}
+
+export interface Themes {
+  mainTheme?: Theme;
+  otherThemes: Theme[];
+}
+
+export interface Theme {
+  name: string;
+  background: string;
 }
 
 export interface ThemeColor {
@@ -100,7 +114,7 @@ export interface AdditionalFont {
   value: string;
 }
 
-export interface Typography {
+export interface Typographies {
   paragraph: TypographyScale;
   h1: TypographyScale;
   h2: TypographyScale;
@@ -194,3 +208,34 @@ export interface EffectItem {
 }
 
 export type EffectType = "BoxShadow" | "Blur" | "BackdropFilter";
+
+export interface SemanticColorTokens {
+  background?: string;
+  textLight?: string;
+  textDefault?: string;
+  textDark?: string;
+  border?: string;
+  colorCombinationCollections: ColorCombinationCollection[];
+}
+
+export type ColorCombinationType = "default" | "hover" | "active" | "focus";
+
+export type PreviewComponent = "quote" | "border" | "button" | "label";
+
+export interface ColorCombinationCollection {
+  combinationName?: string;
+  default?: ColorCombination;
+  hover?: ColorCombination;
+  active?: ColorCombination;
+  focus?: ColorCombination;
+  context?: string;
+  previewComponent?: string;
+}
+
+export type TokenColorCategory = "background" | "border" | "text";
+
+export interface ColorCombination {
+  background?: string;
+  border?: string;
+  text?: string;
+}

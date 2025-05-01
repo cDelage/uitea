@@ -1,6 +1,6 @@
 .inputDesignSystem {
   display: flex;
-  padding: var(--space-3) var(--space-0) var(--space-3) var(--space-7);
+  padding: var(--space-3) var(--space-0) var(--space-3) var(--space-0);
   border-top: transparent 2px solid;
   border-bottom: transparent 2px solid;
   height: fit-content;
@@ -24,12 +24,11 @@
 
 .middleContainer {
   flex: 1;
-  display: grid;
+  display: flex;
   flex-direction: column;
   gap: var(--space-1);
   box-sizing: border-box;
   overflow: hidden;
-  padding: var(--space-1) var(--space-1);
 }
 
 .sideContainer {
@@ -38,6 +37,19 @@
   justify-content: center;
   align-items: center;
   width: var(--space-7);
+  min-width: var(--space-7);
+  max-width: var(--space-7);
+  box-sizing: border-box;
+}
+
+.sideContainerVisible {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: var(--space-7);
+  min-width: var(--space-7);
+  max-width: var(--space-7);
   box-sizing: border-box;
 }
 
@@ -82,6 +94,7 @@
   gap: var(--space-2);
   cursor: pointer;
   height: 32px;
+  width: 100%;
 }
 
 .popoverContainer:hover {

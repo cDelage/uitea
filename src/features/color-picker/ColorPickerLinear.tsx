@@ -18,7 +18,7 @@ import ColorIO from "colorjs.io";
 function ColorPickerLinear({
   color,
   onChange,
-  onChangeComplete
+  onChangeComplete,
 }: {
   color: ColorIO;
   onChange: (color: ColorIO) => void;
@@ -45,8 +45,9 @@ function ColorPickerLinear({
     if (color.toString({ format: "hex" }) !== lastColorHex) {
       setColorHex(color.toString({ format: "hex" }));
       setLastColorHex(color.toString({ format: "hex" }));
+      onChangeComplete?.()
     }
-  }, [color, lastColorHex]);
+  }, [color, lastColorHex, onChangeComplete]);
 
   useEffect(() => {
     if (colorHex !== lastColorHex && isValidColor(colorHex)) {

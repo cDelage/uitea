@@ -11,18 +11,20 @@ import {
 interface ColorPickerStore {
   colors: ColorIO[];
   canUndoRedo: CanUndoRedo;
-  currentColorSample?: string;
-  colorSamples: Sample[];
+  samples: Sample[];
   setColor: (color: ColorIO, index: number) => void;
   initColorPickerStore: () => void;
   registerColorPicker: () => void;
   updateColorSample: (index: number, sample: Sample) => void;
+  createColorSample: () => void;
+  removeColorSample: (index: number) => void;
+  undoColorPicker: () => void;
+  redoColorPicker: () => void;
 }
 
 export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
   colors: [],
-  currentColorSample: undefined,
-  colorSamples: [],
+  samples: [],
   canUndoRedo: {
     canRedo: false,
     canUndo: false,
@@ -39,11 +41,9 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
     get().registerColorPicker();
   },
   initColorPickerStore: async () => {
-    console.log("init");
     const colorPickerStore = await invoke<ColorPickerStoreData>(
       "fetch_color_picker_store"
     );
-    console.log("color picker store", colorPickerStore);
     set((state) => {
       return {
         ...state,
@@ -53,22 +53,80 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
     });
   },
   registerColorPicker: async () => {
-    const { colors, colorSamples, currentColorSample } = get();
+    const { colors, samples } = get();
     await invoke<ColorPickerStoreData>("save_color_picker_store", {
       colorStore: {
-        ...formatPickerStore({ colors, colorSamples, currentColorSample }),
+        ...formatPickerStore({ colors, samples }),
       },
+    });
+    const canUndoRedo = await invoke<CanUndoRedo>("can_undo_redo_color_picker");
+    set((state) => {
+      return {
+        ...state,
+        canUndoRedo,
+      };
     });
   },
   updateColorSample(index: number, sample: Sample) {
     set((state) => {
-      const colorSamples = state.colorSamples;
-      colorSamples[index] = sample;
+      const samples = state.samples;
+      samples[index] = sample;
       return {
         ...state,
-        colorSamples,
+        samples,
       };
     });
     get().registerColorPicker();
+  },
+  createColorSample() {
+    set((state) => {
+      return {
+        ...state,
+        samples: [
+          ...state.samples,
+          {
+            name: `sample-${state.samples.length + 1}`,
+            colors: [],
+          },
+        ],
+      };
+    });
+    get().registerColorPicker();
+  },
+  removeColorSample(index: number) {
+    set((state) => {
+      const samples = state.samples;
+      samples.splice(index, 1);
+      return {
+        ...state,
+        samples,
+      };
+    });
+    get().registerColorPicker();
+  },
+  undoColorPicker: async () => {
+    const colorPicker = await invoke<ColorPickerStoreData>("undo_color_picker");
+    const canUndoRedo = await invoke<CanUndoRedo>("can_undo_redo_color_picker");
+    set((state) => {
+      return {
+        ...state,
+        samples: colorPicker.samples,
+        canUndoRedo,
+        colors: colorPicker.colors.map((color) => new ColorIO(color)),
+      };
+    });
+  },
+  redoColorPicker: async () => {
+    const colorPicker = await invoke<ColorPickerStoreData>("redo_color_picker");
+    const canUndoRedo = await invoke<CanUndoRedo>("can_undo_redo_color_picker");
+    set((state) => {
+      return {
+        ...state,
+        ...colorPicker,
+        samples: colorPicker.samples,
+        canUndoRedo,
+        colors: colorPicker.colors.map((color) => new ColorIO(color)),
+      };
+    });
   },
 }));

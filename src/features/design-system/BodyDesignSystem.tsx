@@ -4,30 +4,30 @@ import HeaderDesignSystem from "./HeaderDesignSystem";
 import IconColors from "../../ui/icons/IconColors";
 import {
   DEFAULT_PALETTE,
-  DEFAULT_THEME,
   ICON_SIZE_MD,
   ICON_SIZE_XL,
 } from "../../ui/UiConstants";
-import PaletteComponent from "./PaletteComponent";
-import BaseComponent from "./BaseComponent";
+import PaletteComponent from "./palette/PaletteComponent";
 import { useDesignSystemContext } from "./DesignSystemContext";
-import ThemeComponent from "./ThemeComponent";
 import DraggableList from "./DraggableList";
 import FontIcon from "../../ui/icons/FontIcon";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { useParams, useSearchParams } from "react-router-dom";
-import FontsComponent from "./FontsComponent";
-import TypographyComponent from "./TypographyComponent";
+import FontsComponent from "./fonts/FontsComponent";
+import TypographyComponent from "./typography/TypographyComponent";
 import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
 import SpacesIcon from "../../ui/icons/SpacesIcon";
-import SpacesComponent from "./SpacesComponent";
-import RadiusComponent from "./RadiusComponent";
-import EffectsComponent from "./EffectsComponent";
+import SpacesComponent from "./spaces/SpacesComponent";
+import RadiusComponent from "./radius/RadiusComponent";
+import EffectsComponent from "./effects/EffectsComponent";
 import Modal from "../../ui/kit/Modal";
-import { MdConstruction, MdPalette } from "react-icons/md";
+import { MdBrush, MdConstruction, MdPalette } from "react-icons/md";
 import PaletteBuilderModal from "../palette-builder/PaletteBuilderModal";
 import { useEffect, useState } from "react";
 import ColorPickerModal from "../color-picker/ColorPickerModal";
+import ThemelistComponent from "./themes/ThemelistComponent";
+import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorTokensComponent";
+import TokenCrafterModal from "../token-crafter/TokenCrafterModal";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -35,6 +35,7 @@ function BodyDesignSystem() {
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { scrollRef } = useScrollTriggerRefresh();
   const [isPaletteBuilderOpen, setIsPaletteBuilderOpen] = useState(false);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   function initPalette() {
@@ -42,16 +43,6 @@ function BodyDesignSystem() {
       designSystem: {
         ...designSystem,
         palettes: [...designSystem.palettes, DEFAULT_PALETTE],
-      },
-      isTmp: true,
-    });
-  }
-
-  function initTheme() {
-    saveDesignSystem({
-      designSystem: {
-        ...designSystem,
-        themes: [...designSystem.themes, DEFAULT_THEME],
       },
       isTmp: true,
     });
@@ -65,37 +56,43 @@ function BodyDesignSystem() {
     setSearchParams(searchParams);
   }, [isPaletteBuilderOpen, searchParams, setSearchParams]);
 
+  useEffect(() => {
+    searchParams.set("colorPickerOpen", isColorPickerOpen ? "true" : "false");
+    setSearchParams(searchParams);
+  }, [isColorPickerOpen, searchParams, setSearchParams]);
+
   return (
-    <div
-      className={styles.bodyDesignSystem}
-      id="body-design-system"
-      key={designSystem.metadata.designSystemId}
-      ref={scrollRef}
-    >
-      <HeaderDesignSystem />
-      <Section
-        sectionName="colors"
-        sectionTitle={
-          <>
-            <IconColors size={ICON_SIZE_XL} /> Colors
-          </>
-        }
+    <Modal>
+      <div
+        className={styles.bodyDesignSystem}
+        id="body-design-system"
+        key={designSystem.metadata.designSystemId}
+        ref={scrollRef}
       >
-        <Section.Subsection
-          subSectionName="Palettes"
-          actions={
+        <HeaderDesignSystem />
+        <Section
+          sectionName="colors"
+          sectionTitle={
             <>
-              <Modal
-                isOpenToSync={isPaletteBuilderOpen}
-                setIsOpenToSync={setIsPaletteBuilderOpen}
-              >
+              <IconColors size={ICON_SIZE_XL} /> Colors
+            </>
+          }
+        >
+          <Section.Subsection
+            subSectionName="Palettes"
+            actions={
+              <>
                 <Modal.Toggle id="palette-builder">
                   <button className="action-ghost-button" type="button">
                     <MdConstruction size={ICON_SIZE_MD} />
                     Palette builder
                   </button>
                 </Modal.Toggle>
-                <Modal.Body id="palette-builder">
+                <Modal.Body
+                  id="palette-builder"
+                  isOpenToSync={isPaletteBuilderOpen}
+                  setIsOpenToSync={setIsPaletteBuilderOpen}
+                >
                   <PaletteBuilderModal />
                 </Modal.Body>
                 <Modal.Toggle id="color-picker">
@@ -104,90 +101,92 @@ function BodyDesignSystem() {
                     Color picker
                   </button>
                 </Modal.Toggle>
-                <Modal.Body id="color-picker">
+                <Modal.Body
+                  id="color-picker"
+                  isOpenToSync={isColorPickerOpen}
+                  setIsOpenToSync={setIsColorPickerOpen}
+                >
                   <ColorPickerModal />
                 </Modal.Body>
-              </Modal>
+              </>
+            }
+          >
+            <>
+              <Section.EmptySection
+                sectionName="palettes"
+                itemToInsert="palette"
+                onInsert={initPalette}
+                sectionLength={designSystem.palettes.length}
+                mediumHeight={true}
+              />
+              <DraggableList keyList="palettes">
+                {designSystem.palettes.map((colorPalette, index) => (
+                  <PaletteComponent
+                    key={colorPalette.paletteName}
+                    colorPalette={colorPalette}
+                    index={index}
+                  />
+                ))}
+              </DraggableList>
+            </>
+          </Section.Subsection>
+          <Section.Subsection subSectionName="Themes">
+            <ThemelistComponent />
+          </Section.Subsection>
+          <Section.Subsection
+            subSectionName="Semantic color tokens"
+            actions={
+              <>
+                <Modal.Toggle id="token-crafter">
+                  <button className="action-ghost-button" type="button">
+                    <MdBrush size={ICON_SIZE_MD} />
+                    Token crafter
+                  </button>
+                </Modal.Toggle>
+                <Modal.Body id="token-crafter">
+                  <TokenCrafterModal />
+                </Modal.Body>
+              </>
+            }
+          >
+            <SemanticColorTokensComponent />
+          </Section.Subsection>
+        </Section>
+        <Section
+          sectionName="texts"
+          sectionTitle={
+            <>
+              <FontIcon size={ICON_SIZE_XL} /> Texts
             </>
           }
         >
-          <>
-            <Section.EmptySection
-              sectionName="palettes"
-              itemToInsert="palette"
-              onInsert={initPalette}
-              sectionLength={designSystem.palettes.length}
-              mediumHeight={true}
-            />
-            <DraggableList keyList="palettes">
-              {designSystem.palettes.map((colorPalette, index) => (
-                <PaletteComponent
-                  key={colorPalette.paletteName}
-                  colorPalette={colorPalette}
-                  index={index}
-                />
-              ))}
-            </DraggableList>
-          </>
-        </Section.Subsection>
-        <Section.Subsection subSectionName="Base">
-          <BaseComponent />
-        </Section.Subsection>
-        <Section.Subsection subSectionName="Themes">
-          <>
-            <Section.EmptySection
-              sectionName="themes"
-              itemToInsert="theme"
-              onInsert={initTheme}
-              sectionLength={designSystem.themes.length}
-              mediumHeight={true}
-            />
-            <DraggableList keyList="themes">
-              {designSystem.themes.map((theme, index) => (
-                <ThemeComponent
-                  key={theme.themeName}
-                  theme={theme}
-                  index={index}
-                />
-              ))}
-            </DraggableList>
-          </>
-        </Section.Subsection>
-      </Section>
-      <Section
-        sectionName="texts"
-        sectionTitle={
-          <>
-            <FontIcon size={ICON_SIZE_XL} /> Texts
-          </>
-        }
-      >
-        <Section.Subsection subSectionName="Fonts">
-          <FontsComponent />
-        </Section.Subsection>
-        <Section.Subsection subSectionName="Typography">
-          <TypographyComponent />
-        </Section.Subsection>
-      </Section>
-      <Section
-        sectionName="layout"
-        sectionTitle={
-          <>
-            <SpacesIcon size={ICON_SIZE_XL} /> Layout
-          </>
-        }
-      >
-        <Section.Subsection subSectionName="Spaces">
-          <SpacesComponent />
-        </Section.Subsection>
-        <Section.Subsection subSectionName="Radius">
-          <RadiusComponent />
-        </Section.Subsection>
-        <Section.Subsection subSectionName="Effects">
-          <EffectsComponent />
-        </Section.Subsection>
-      </Section>
-    </div>
+          <Section.Subsection subSectionName="Fonts">
+            <FontsComponent />
+          </Section.Subsection>
+          <Section.Subsection subSectionName="Typography">
+            <TypographyComponent />
+          </Section.Subsection>
+        </Section>
+        <Section
+          sectionName="layout"
+          sectionTitle={
+            <>
+              <SpacesIcon size={ICON_SIZE_XL} /> Layout
+            </>
+          }
+        >
+          <Section.Subsection subSectionName="Spaces">
+            <SpacesComponent />
+          </Section.Subsection>
+          <Section.Subsection subSectionName="Radius">
+            <RadiusComponent />
+          </Section.Subsection>
+          <Section.Subsection subSectionName="Effects">
+            <EffectsComponent />
+          </Section.Subsection>
+        </Section>
+      </div>
+    </Modal>
   );
 }
 

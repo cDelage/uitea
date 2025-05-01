@@ -17,15 +17,7 @@ import {
   useModalContext,
 } from "./ModalContext";
 
-function Modal({
-  children,
-  isOpenToSync,
-  setIsOpenToSync,
-}: {
-  children: ReactNode;
-  isOpenToSync?: boolean;
-  setIsOpenToSync?: (value: boolean) => void;
-}) {
+function Modal({ children }: { children: ReactNode }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   function open(id: string) {
@@ -35,14 +27,6 @@ function Modal({
   function close() {
     setOpenId(null);
   }
-
-  useEffect(() => {
-    if (isOpenToSync && !openId && setIsOpenToSync) {
-      setIsOpenToSync(false);
-    } else if (!isOpenToSync && openId && setIsOpenToSync) {
-      setIsOpenToSync(true);
-    }
-  }, [openId, isOpenToSync, setIsOpenToSync]);
 
   return (
     <ModalContext.Provider
@@ -64,10 +48,14 @@ function Toggle({ children, id }: { children: ReactNode; id: string }) {
 function Body({
   children,
   id,
+  isOpenToSync,
+  setIsOpenToSync,
 }: {
   children: ReactNode;
   id: string;
   isFull?: boolean;
+  isOpenToSync?: boolean;
+  setIsOpenToSync?: (value: boolean) => void;
 }): JSX.Element | null {
   const { openModalId: openId, closeModal: close } = useContext(
     ModalContext
@@ -75,6 +63,15 @@ function Body({
   const RefModalBody = useDivClickOutside(() => {
     close();
   });
+
+  useEffect(() => {
+    if (isOpenToSync && (!openId || openId !== id) && setIsOpenToSync) {
+      setIsOpenToSync(false);
+    } else if (!isOpenToSync && openId === id && setIsOpenToSync) {
+      setIsOpenToSync(true);
+    }
+  }, [openId, isOpenToSync, setIsOpenToSync, id]);
+
   if (id !== openId) return null;
 
   function handleClickOverlay(e: MouseEvent<HTMLDivElement>) {
