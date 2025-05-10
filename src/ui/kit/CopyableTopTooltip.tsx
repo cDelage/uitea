@@ -10,12 +10,14 @@ function CopyableTopTooltip({
   children,
   tooltipValue,
   portalComponent,
-  className
+  className,
+  transformBody,
 }: {
   children: ReactNode;
   tooltipValue?: string;
   portalComponent?: RefObject<HTMLDivElement | null>;
-  className?: string
+  className?: string;
+  transformBody?: string;
 }) {
   const [isHover, setIsHover] = useState(false);
 
@@ -32,7 +34,7 @@ function CopyableTopTooltip({
     }
   }
 
-  const tooltipElementStyle = classNames(styles.tooltipElement, className)
+  const tooltipElementStyle = classNames(styles.tooltipElement, className);
 
   return (
     <div
@@ -48,6 +50,9 @@ function CopyableTopTooltip({
             copy(tooltipValue);
           }}
           onMouseDown={(e) => e.stopPropagation()}
+          style={{
+            transform: transformBody,
+          }}
         >
           <div className={styles.valueTextContainer}>{tooltipValue}</div>
           {isCopied ? (

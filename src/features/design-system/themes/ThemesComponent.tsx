@@ -22,14 +22,14 @@ import {
 } from "../../../util/DraggableContext";
 import MainThemeTokenPopover from "./MainThemeTokenPopover";
 
-function ThemelistComponent() {
+function ThemesComponent() {
   const { designSystem, tokenFamilies, editMode } = useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [expandIndex, setExpandIndex] = useState<number | undefined>(undefined);
   const { handleSubmit, reset, control, watch, setValue, register } =
     useForm<Themes>({
-      defaultValues: designSystem.themelist,
+      defaultValues: designSystem.themes,
     });
   const { fields, append, move, remove } = useFieldArray({
     control,
@@ -42,7 +42,7 @@ function ThemelistComponent() {
   });
   useRefreshDesignSystemFormsEvent({
     reset,
-    originalValue: designSystem.themelist,
+    originalValue: designSystem.themes,
   });
   useSidebarComponentVisible(themesRef, "themes");
 
@@ -69,11 +69,11 @@ function ThemelistComponent() {
   );
 
   function submitThemes(newTheme: Themes) {
-    if (isEqual(designSystem.themelist, newTheme)) return;
+    if (isEqual(designSystem.themes, newTheme)) return;
     saveDesignSystem({
       designSystem: {
         ...designSystem,
-        themelist: newTheme,
+        themes: newTheme,
       },
       isTmp: true,
     });
@@ -133,9 +133,7 @@ function ThemelistComponent() {
               </Popover.Toggle>
               <Popover.Body id="main-picker" zIndex={100}>
                 <MainThemeTokenPopover
-                  onConfirm={(color: string) =>
-                    handleCreateMainTheme(color)
-                  }
+                  onConfirm={(color: string) => handleCreateMainTheme(color)}
                 />
               </Popover.Body>
             </div>
@@ -170,6 +168,7 @@ function ThemelistComponent() {
                 {fields.map((theme, index) => (
                   <InputDesignSystem
                     label={theme.name}
+                    key={`${theme.name}${index}`}
                     value={theme.background}
                     isColor={true}
                     computedColor={theme.background}
@@ -226,7 +225,7 @@ function ThemelistComponent() {
             </>
           )}
         </div>
-        <PreviewComponentDesignSystem maxHeight="500px">
+        <PreviewComponentDesignSystem maxHeight="600px">
           {!mainTheme && <h5 className="p-7">No themes defined</h5>}
           {mainTheme && (
             <ThemePreview
@@ -240,6 +239,7 @@ function ThemelistComponent() {
           {fields.map((theme, index) => (
             <ThemePreview
               theme={theme}
+              key={`${theme.name}${index}`}
               expandIndex={expandIndex}
               setExpandIndex={setExpandIndex}
               mainTheme={mainTheme}
@@ -253,4 +253,4 @@ function ThemelistComponent() {
   );
 }
 
-export default ThemelistComponent;
+export default ThemesComponent;

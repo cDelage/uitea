@@ -197,7 +197,7 @@ function InputDesignSystem({
                 </button>
               )}
               {isLocked && (
-                <MdLock size={ICON_SIZE_SM} color="var(--palette-gray-400)" />
+                <MdLock size={ICON_SIZE_SM} color="var(--uidt-palette-gray-400)" />
               )}
             </div>
             {register && !isColor && !popoverEdit && (
@@ -260,7 +260,7 @@ function InputDesignSystem({
                             {!computedColor && (
                               <MdWarning
                                 size={12}
-                                color="var(--warning-outline-text)"
+                                color="var(--uidt-warning-outline-text)"
                               />
                             )}
                           </div>

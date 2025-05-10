@@ -61,7 +61,7 @@ function PaletteComponent({
 
   const shadesFieldArray = useFieldArray({
     control,
-    name: "shades",
+    name: "tints",
   });
   useTriggerScroll({
     ref: colorPaletteRef,
@@ -107,7 +107,7 @@ function PaletteComponent({
         designSystem.palettes,
         `palette-${newIndex + 1}`
       ),
-      shades: shadesFieldArray.fields.map((shade) => {
+      tints: shadesFieldArray.fields.map((shade) => {
         return {
           ...shade,
           color: "#DDDDDD",
@@ -248,7 +248,7 @@ function PaletteComponent({
               setValue={setValue}
               shades={shadesFieldArray.fields}
               submitEvent={handleSubmit(submitPalette)}
-              error={errors.shades?.[index]?.label?.message}
+              error={errors.tints?.[index]?.label?.message}
               paletteName={paletteName}
               shadesFieldArray={shadesFieldArray}
             />

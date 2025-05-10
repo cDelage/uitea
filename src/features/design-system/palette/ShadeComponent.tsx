@@ -38,7 +38,7 @@ function ShadeComponent({
   setValue: UseFormSetValue<Palette>;
   shades: Tint[];
   error?: string;
-  shadesFieldArray: UseFieldArrayReturn<Palette, "shades", "id">;
+  shadesFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
 }) {
   const { editMode } = useDesignSystemContext();
 
@@ -47,7 +47,7 @@ function ShadeComponent({
     useDraggableContext();
 
   const shadeToken: string = `palette-${paletteName}-${getValues(
-    `shades.${index}.label`
+    `tints.${index}.label`
   )}`;
 
   const [searchParams] = useSearchParams();
@@ -151,13 +151,13 @@ function ShadeComponent({
         <div
           className={colorPreviewClassname}
           style={{
-            background: getValues(`shades.${index}.color`),
+            background: getValues(`tints.${index}.color`),
           }}
         />
         <div className="column" onMouseDown={stopPropagation}>
           <strong className={strongClassname}>
             <input
-              {...register(`shades.${index}.label`, {
+              {...register(`tints.${index}.label`, {
                 required: true,
                 validate: (label: string) => {
                   const duplicates = shades.filter(
@@ -181,13 +181,10 @@ function ShadeComponent({
             />
           </strong>
           <Popover>
-            <Popover.Toggle
-              id="color-picker"
-              keyPopover={shadeToken}
-            >
+            <Popover.Toggle id="color-picker" keyPopover={shadeToken}>
               <small className="text-color-light">
                 <input
-                  {...register(`shades.${index}.color`)}
+                  {...register(`tints.${index}.color`)}
                   type="text"
                   className="inherit-input"
                   autoComplete="off"
@@ -205,9 +202,9 @@ function ShadeComponent({
               <div className="popover-body">
                 <ColorPickerOld
                   setColor={(color: string) => {
-                    if (editMode) setValue(`shades.${index}.color`, color);
+                    if (editMode) setValue(`tints.${index}.color`, color);
                   }}
-                  color={getValues(`shades.${index}.color`)}
+                  color={getValues(`tints.${index}.color`)}
                 />
               </div>
             </Popover.Body>

@@ -1,28 +1,28 @@
 .inputAdd {
-  border: dashed 2px var(--add-border);
+  border: dashed 2px var(--uidt-add-border);
   box-sizing: border-box;
-  color: var(--add-text);
+  color: var(--uidt-add-text);
   cursor: pointer;
-  margin: var(--space-0) var(--space-7);
-  padding: var(--space-3);
-  border-radius: var(--rounded-md);
+  margin: var(--uidt-space-0) var(--uidt-space-7);
+  padding: var(--uidt-space-3);
+  border-radius: var(--uidt-rounded-md);
 }
 
 .inputAdd:hover {
-  border: dashed 2px var(--add-hover-border);
-  color: var(--add-hover-text);
+  border: dashed 2px var(--uidt-add-hover-border);
+  color: var(--uidt-add-hover-text);
 }
 
 .inputRemove {
-  border: dashed 2px var(--remove-border);
-  color: var(--remove-text);
+  border: dashed 2px var(--uidt-remove-border);
+  color: var(--uidt-remove-text);
   cursor: pointer;
-  margin: var(--space-0) var(--space-7);
-  padding: var(--space-3);
-  border-radius: var(--rounded-md);
+  margin: var(--uidt-space-0) var(--uidt-space-7);
+  padding: var(--uidt-space-3);
+  border-radius: var(--uidt-rounded-md);
 }
 
 .inputRemove:hover {
-  border: dashed 2px var(--remove-hover-border);
-  color: var(--remove-hover-text);
+  border: dashed 2px var(--uidt-remove-hover-border);
+  color: var(--uidt-remove-hover-text);
 }

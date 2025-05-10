@@ -8,7 +8,11 @@ import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
 import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useMemo, useState } from "react";
-import { DesignToken, TokenFamily } from "../../domain/DesignSystemDomain";
+import {
+  DesignToken,
+  Theme,
+  TokenFamily,
+} from "../../domain/DesignSystemDomain";
 import {
   getDesignSystemTokens,
   getPaletteTokens,
@@ -16,6 +20,7 @@ import {
   KEYBOARD_ACTIONS,
 } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
+import { recolorPalettes } from "../../util/ThemeGenerator";
 
 function PageDesignSystem() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
@@ -28,6 +33,7 @@ function PageDesignSystem() {
   const editMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
   ) as boolean;
+  const [theme, setTheme] = useState<Theme | undefined>(undefined);
 
   function handleSetActiveComponent(newActiveComponent?: ActiveComponent) {
     setActiveComponent((active) =>
@@ -45,6 +51,21 @@ function PageDesignSystem() {
     () => getDesignSystemTokens(designSystem),
     [designSystem]
   );
+
+  const themeTokenFamilies: TokenFamily[] = useMemo(() => {
+    return theme !== undefined && designSystem !== undefined
+      ? getDesignSystemTokens({
+          ...designSystem,
+          palettes: recolorPalettes({
+            palettes: designSystem?.palettes,
+            defaultBackground:
+              designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
+            newBackground: theme?.background ?? "#DDDDDD",
+            recolorLog: true
+          }),
+        })
+      : tokenFamilies;
+  }, [designSystem, theme, tokenFamilies]);
 
   useEffect(() => {
     const clearKeyboardAction = () => {
@@ -146,6 +167,9 @@ function PageDesignSystem() {
         editMode,
         colorTokens,
         tokenFamilies,
+        theme,
+        setTheme,
+        themeTokenFamilies,
       }}
     >
       <div className={styles.designSystemPage}>

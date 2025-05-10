@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import styles from "../ComponentDesignSystem.module.css";
-import { DEFAULT_BASE, DEFAULT_EFFECT } from "../../../ui/UiConstants";
+import { DEFAULT_EFFECT } from "../../../ui/UiConstants";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Effect } from "../../../domain/DesignSystemDomain";
@@ -21,11 +21,11 @@ import EffectsPreview from "./EffectsPreview";
 import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 
 function EffectsComponent() {
-  const { designSystem, findDesignSystemColor, editMode } =
-    useDesignSystemContext();
-  const { base, effects } = designSystem;
+  const { designSystem, editMode } = useDesignSystemContext();
+  const { effects } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
@@ -159,22 +159,13 @@ function EffectsComponent() {
           </div>
         </div>
       </div>
-      <div className={styles.previewContainer}>
-        <div
-          className={styles.previewElementWrap}
-          ref={scrollableRight}
-          style={{
-            background: findDesignSystemColor({
-              label: base.background.default,
-              defaultValue: DEFAULT_BASE.background.default,
-            }),
-          }}
-        >
+      <PreviewComponentDesignSystem maxHeight="400px">
+        <div className={styles.previewElementWrap} ref={scrollableRight}>
           {watch(`effects`).map((effect) => (
             <EffectsPreview key={effect.effectName} effect={effect} />
           ))}
         </div>
-      </div>
+      </PreviewComponentDesignSystem>
       <div className={styles.darkPreviewPlaceholder} />
     </form>
   );

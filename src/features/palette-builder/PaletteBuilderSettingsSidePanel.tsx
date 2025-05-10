@@ -366,7 +366,7 @@ function PaletteBuilderSettingsSidePanel({
                             format: "hex",
                           }),
                         ...getRectSize({
-                          height: "var(--space-10)",
+                          height: "var(--uidt-space-10)",
                         }),
                       }}
                     ></div>

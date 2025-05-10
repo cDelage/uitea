@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-0);
+  padding: var(--uidt-space-4) var(--uidt-space-0);
   box-sizing: border-box;
   user-select: none; /* Empêche la sélection de texte */
 }
@@ -13,14 +13,14 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
 }
 
 
 .topMenu {
   display: flex;
-  padding: var(--space-4);
-  gap: var(--space-3);
+  padding: var(--uidt-space-4);
+  gap: var(--uidt-space-3);
   box-sizing: border-box;
   align-items: center;
   justify-content: space-between;
@@ -29,7 +29,7 @@
 .bottomContainer {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--base-border);
-  padding: var(--space-4);
-  gap: var(--space-3);
+  border-top: 1px solid var(--uidt-base-border);
+  padding: var(--uidt-space-4);
+  gap: var(--uidt-space-3);
 }

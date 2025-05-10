@@ -1,9 +1,7 @@
-import { CSSProperties, MouseEvent } from "react";
+import { CSSProperties, MouseEvent, RefObject } from "react";
 import {
-  Base,
   Palette,
   Tint,
-  ThemeColor,
   ThemeItem,
   ThemeStateCategory,
   AdditionalFont,
@@ -17,21 +15,20 @@ import {
   ColorCombinationCollection,
   ColorCombination,
   DesignSystem,
+  ColorCombinationCollectionGroup,
 } from "../domain/DesignSystemDomain";
-import { useDesignSystemContext } from "../features/design-system/DesignSystemContext";
-import { DEFAULT_BASE } from "../ui/UiConstants";
 import { ColorResult } from "react-color";
 import { PaletteBuilderMetadata } from "../domain/PaletteBuilderDomain";
 import { getFilenameDate } from "./DateUtil";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
- * @param shades - Le tableau contenant les shades existants.
+ * @param tints - Le tableau contenant les shades existants.
  * @param baseKey - Le nom de la clé à insérer.
  * @returns Un nom unique pour la clé.
  */
 export const generateUniqueTintKey = (
-  shades: Tint[],
+  tints: Tint[],
   baseKey: string
 ): string => {
   let uniqueKey = baseKey;
@@ -39,7 +36,7 @@ export const generateUniqueTintKey = (
 
   // Tant que la clé existe déjà (on compare avec le premier élément du tuple),
   // on incrémente le "counter" pour générer une nouvelle clé.
-  while (shades.filter((shade) => shade.label === uniqueKey).length) {
+  while (tints.filter((shade) => shade.label === uniqueKey).length) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -49,12 +46,12 @@ export const generateUniqueTintKey = (
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
- * @param shades - Le tableau contenant les shades existants.
+ * @param effects - Le tableau contenant les shades existants.
  * @param baseKey - Le nom de la clé à insérer.
  * @returns Un nom unique pour la clé.
  */
 export const generateUniqueEffectsKey = (
-  shades: Effect[],
+  effects: Effect[],
   baseKey: string
 ): string => {
   let uniqueKey = baseKey;
@@ -62,7 +59,7 @@ export const generateUniqueEffectsKey = (
 
   // Tant que la clé existe déjà (on compare avec le premier élément du tuple),
   // on incrémente le "counter" pour générer une nouvelle clé.
-  while (shades.filter((shade) => shade.effectName === uniqueKey).length) {
+  while (effects.filter((shade) => shade.effectName === uniqueKey).length) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -106,41 +103,6 @@ export function isValidCssColorOrGradient(value?: string): string | undefined {
   // c'est que le navigateur a reconnu la syntaxe comme valide.
   return element.style.background.length > 0 ? value : undefined;
 }
-
-export const getDefaultTheme = (themeName: string): ThemeColor => {
-  return {
-    default: {
-      background: {
-        default: "#f4f4f5",
-        dark: "#18181b",
-      },
-      border: {
-        default: "#d4d4d8",
-        dark: "#3f3f46",
-      },
-      text: {
-        default: "#27272a",
-        dark: "#e4e4e7",
-      },
-    },
-    themeName,
-  };
-};
-
-export const generateUniqueThemesKey = (
-  themes: ThemeColor[],
-  baseKey: string
-): string => {
-  let uniqueKey = baseKey;
-  let counter = 1;
-
-  while (themes.find((theme) => theme.themeName === uniqueKey)) {
-    uniqueKey = `${baseKey}-${counter}`;
-    counter++;
-  }
-
-  return uniqueKey;
-};
 
 export const generateUniqueFontKey = (
   fonts: AdditionalFont[],
@@ -252,91 +214,6 @@ export function getClosestToPercentage<T>({
   return array[targetIndex];
 }
 
-export function useBaseColors() {
-  const {
-    designSystem: { base },
-    findDesignSystemColor,
-  } = useDesignSystemContext();
-
-  const background = findDesignSystemColor({
-    label: base.background.default,
-    defaultValue: DEFAULT_BASE.background.default,
-  });
-  const border = findDesignSystemColor({
-    label: base.border.default,
-    defaultValue: DEFAULT_BASE.border.default,
-  });
-  const textLight = findDesignSystemColor({
-    label: base.textLight.default,
-    defaultValue: DEFAULT_BASE.textLight.default,
-  });
-  const textDefault = findDesignSystemColor({
-    label: base.textDefault.default,
-    defaultValue: DEFAULT_BASE.textDefault.default,
-  });
-  const textDark = findDesignSystemColor({
-    label: base.textDark.default,
-    defaultValue: DEFAULT_BASE.textDark.default,
-  });
-
-  const computedBase: Base = {
-    background: {
-      default: background,
-    },
-    border: {
-      default: border,
-    },
-    textDefault: {
-      default: textDefault,
-    },
-    textLight: {
-      default: textLight,
-    },
-    textDark: {
-      default: textDark,
-    },
-    backgroundDisabled: {},
-    borderDisabled: {},
-    textDisabled: {},
-  };
-
-  return computedBase;
-}
-
-export function useThemeColors({ theme }: { theme: ThemeColor }) {
-  const { findDesignSystemColor } = useDesignSystemContext();
-
-  const background = findDesignSystemColor({
-    label: theme.default.background.default,
-    defaultValue: DEFAULT_BASE.background.default,
-  });
-  const border = findDesignSystemColor({
-    label: theme.default.border.default,
-    defaultValue: DEFAULT_BASE.border.default,
-  });
-  const text = findDesignSystemColor({
-    label: theme.default.text.default,
-    defaultValue: DEFAULT_BASE.textLight.default,
-  });
-
-  const computedTheme: ThemeColor = {
-    default: {
-      background: {
-        default: background,
-      },
-      border: {
-        default: border,
-      },
-      text: {
-        default: text,
-      },
-    },
-    themeName: theme.themeName,
-  };
-
-  return computedTheme;
-}
-
 export function getEffectCss(effect: Effect): CSSProperties {
   const cssProps: CSSProperties = {};
   const boxShadows = effect.items.filter(
@@ -389,7 +266,7 @@ export function colorToString(color: ColorResult): string {
 export const KEYBOARD_ACTIONS = ["i", "d"];
 
 export function getPaletteTokens(palette: Palette): DesignToken[] {
-  return palette.shades.map((token) => {
+  return palette.tints.map((token) => {
     return {
       label: `palette-${palette.paletteName}-${token.label}`,
       value: token.color,
@@ -407,8 +284,7 @@ export function getPaletteTokenFamily(palette: Palette): TokenFamily {
 }
 
 export function getSemanticColorTokens(
-  semantic: SemanticColorTokens,
-  palettesTokens: TokenFamily[]
+  semantic: SemanticColorTokens
 ): TokenFamily[] {
   return [
     {
@@ -417,78 +293,55 @@ export function getSemanticColorTokens(
         [
           {
             label: "base-background",
-            value: findDesignSystemColor({
-              tokenFamilies: palettesTokens,
-              label: semantic.background,
-            }),
+            value: semantic.background,
           },
           {
             label: "base-text-light",
-            value: findDesignSystemColor({
-              tokenFamilies: palettesTokens,
-              label: semantic.textLight,
-            }),
+            value: semantic.textLight,
           },
           {
             label: "base-text-default",
-            value: findDesignSystemColor({
-              tokenFamilies: palettesTokens,
-              label: semantic.textDefault,
-            }),
+            value: semantic.textDefault,
           },
           {
             label: "base-text-dark",
-            value: findDesignSystemColor({
-              tokenFamilies: palettesTokens,
-              label: semantic.textDark,
-            }),
+            value: semantic.textDark,
           },
           {
             label: "base-border",
-            value: findDesignSystemColor({
-              tokenFamilies: palettesTokens,
-              label: semantic.border,
-            }),
+            value: semantic.border,
           },
         ] as DesignToken[]
       ).filter((token) => token.value),
-      colorPreview: findDesignSystemColor({
-        tokenFamilies: palettesTokens,
-        label: semantic.background,
-      }),
+      colorPreview: `var(--${semantic.background})`,
       category: "semantic",
     },
     ...semantic.colorCombinationCollections.flatMap((collection) =>
-      getCollectionToken(collection, palettesTokens)
+      getCollectionToken(collection)
     ),
   ];
 }
 
 function getCollectionToken(
-  collection: ColorCombinationCollection,
-  palettesTokens: TokenFamily[]
+  collection: ColorCombinationCollection
 ): TokenFamily {
   return {
     label: collection.combinationName ?? "collection",
     tokens: [
       ...getColorCombinationTokens(
         `${collection.combinationName}`,
-        palettesTokens,
         collection.default
       ),
       ...getColorCombinationTokens(
         `${collection.combinationName}-hover`,
-        palettesTokens,
         collection.hover
       ),
       ...getColorCombinationTokens(
         `${collection.combinationName}-focus`,
-        palettesTokens,
         collection.focus
       ),
       ...getColorCombinationTokens(
         `${collection.combinationName}-active`,
-        palettesTokens,
         collection.active
       ),
     ],
@@ -498,7 +351,6 @@ function getCollectionToken(
 
 function getColorCombinationTokens(
   label: string,
-  palettesTokens: TokenFamily[],
   colorCombination?: ColorCombination
 ): DesignToken[] {
   if (!colorCombination) return [];
@@ -507,24 +359,15 @@ function getColorCombinationTokens(
     [
       {
         label: `${label}-background`,
-        value: findDesignSystemColor({
-          tokenFamilies: palettesTokens,
-          label: colorCombination.background,
-        }),
+        value: colorCombination.background,
       },
       {
         label: `${label}-text`,
-        value: findDesignSystemColor({
-          tokenFamilies: palettesTokens,
-          label: colorCombination.text,
-        }),
+        value: colorCombination.text,
       },
       {
         label: `${label}-border`,
-        value: findDesignSystemColor({
-          tokenFamilies: palettesTokens,
-          label: colorCombination.border,
-        }),
+        value: colorCombination.border,
       },
     ] as DesignToken[]
   ).filter((token) => token.value);
@@ -537,7 +380,7 @@ export function getDesignSystemTokens(
   const paletteTokens = designSystem.palettes.map(getPaletteTokenFamily);
   return [
     ...paletteTokens,
-    ...getSemanticColorTokens(designSystem.semanticColorTokens, paletteTokens),
+    ...getSemanticColorTokens(designSystem.semanticColorTokens),
   ];
 }
 
@@ -557,4 +400,122 @@ export function findDesignSystemColor({
     defaultValue ??
     label
   );
+}
+
+// Les clés de ColorCombinationCollection qu'on veut vraiment tester.
+const COMBINATION_KEYS = ["default", "hover", "active", "focus"] as const;
+
+type CombinationKey = (typeof COMBINATION_KEYS)[number];
+
+/**
+ * Renvoie true si l'une des quatre combinaisons possède
+ * un background, border ou text défini.
+ */
+export function hasAnyColor(collection: ColorCombinationCollection): boolean {
+  return COMBINATION_KEYS.some((key: CombinationKey) => {
+    const combo = collection[key];
+    // combo peut être undefined : d'où l'optional chaining
+    return (
+      !!combo?.background?.trim() ||
+      !!combo?.border?.trim() ||
+      !!combo?.text?.trim()
+    );
+  });
+}
+
+/**
+ * Renvoie true si l'une des quatre combinaisons possède
+ * un background, border ou text défini.
+ */
+export function combinationHasAnyColor(
+  combination?: ColorCombination
+): boolean {
+  return (
+    (combination?.background || combination?.text || combination?.border) !==
+    undefined
+  );
+}
+
+export function getCssVariableValue(
+  variableName: string,
+  element?: RefObject<HTMLDivElement | null>
+): string | undefined {
+  const root = element?.current ?? document.body;
+  return getComputedStyle(root).getPropertyValue(`--${variableName}`).trim();
+}
+
+/**
+ * Construit l’arborescence des ColorCombinationCollectionGroup
+ * @param collections la liste plate d’éléments
+ * @returns tableau des racines, chacun avec son champ `childs` (récursif)
+ */
+export function buildCombinationHierarchy(
+  collections: ColorCombinationCollection[]
+): ColorCombinationCollectionGroup[] {
+  // fonction récursive qui trouve les enfants d’un parent donné
+  const findChildren = (
+    parentName?: string
+  ): ColorCombinationCollectionGroup[] =>
+    collections
+      // on ne garde que ceux dont c.group === parentName
+      .filter((c) => c.group === parentName)
+      // et pour chacun on étend l’élément avec ses propres childs
+      .map((c) => ({
+        ...c,
+        childs: findChildren(c.combinationName),
+      }));
+
+  // on démarre sur les racines : ceux qui n’ont pas de parent défini
+  return collections
+    .filter((c) => c.group == null)
+    .map((root) => ({
+      ...root,
+      childs: findChildren(root.combinationName),
+    }));
+}
+
+export function getTokenAvailableGroups({
+  combinationName,
+  collections,
+}: {
+  combinationName: string | undefined;
+  collections: ColorCombinationCollection[];
+}) {
+  const toExcludes = combinationName ? findCollectionTree(combinationName, collections) : [];
+  return collections.filter(
+    (combination) =>
+      !toExcludes.includes(combination.combinationName) &&
+      combination.default?.background
+  );
+}
+
+export function findCollectionTree(
+  rootName: string,
+  collections: ColorCombinationCollection[]
+): (string | undefined)[] {
+  const result = new Set<ColorCombinationCollection>();
+  const visitedNames = new Set<string>();
+
+  function recurse(currentName: string) {
+    // On évite de repasser plusieurs fois sur le même nom
+    if (visitedNames.has(currentName)) return;
+    visitedNames.add(currentName);
+
+    for (const col of collections) {
+      // 1) Si c’est le nœud « racine », on l’ajoute
+      if (col.combinationName === currentName) {
+        result.add(col);
+      }
+      // 2) Si c’est un enfant direct, on l’ajoute et on parcourt ses enfants
+      if (col.group === currentName) {
+        result.add(col);
+        if (col.combinationName) {
+          recurse(col.combinationName);
+        }
+      }
+    }
+  }
+
+  recurse(rootName);
+  return Array.from(result).map((result) => result.combinationName);
 }

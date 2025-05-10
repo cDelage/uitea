@@ -8,7 +8,9 @@ use anyhow::{anyhow, Result};
 
 use crate::{
     domain::design_system_domain::{
-        Base, DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, ShadesFile, Space, SpacesFile, ThemeColor, ThemeColorFile, Themes, ThemesMetadataFile, Typographies
+        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette,
+        PalettesMetadataFile, Radius, SemanticColorTokens, TintsFile, Space, SpacesFile, Themes,
+        Typographies,
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -23,12 +25,8 @@ use super::{
 const PALETTES_PATH: &str = "palettes";
 const NEUTRAL_PALETTE_PATH: &str = "neutral.yaml";
 const PALETTES_METADATA_PATH: &str = "palettes_metadata.yaml";
-const BASE_PATH: &str = "base_colors.yaml";
 const FONTS_PATH: &str = "fonts.yaml";
 const TYPOGRAPHY_PATH: &str = "typography.yaml";
-const THEMES_PATH: &str = "themes";
-const THEMES_METADATA_PATH: &str = "themes_metadata.yaml";
-const NEUTRAL_THEME_PATH: &str = "neutral.yaml";
 const SPACES_PATH: &str = "spaces.yaml";
 const RADIUS_PATH: &str = "radius.yaml";
 const EFFECTS_PATH: &str = "effects.yaml";
@@ -118,11 +116,11 @@ pub fn fetch_palettes(design_system_path: &PathBuf) -> Result<Vec<Palette>> {
             }
 
             let file_name: &str = path.file_stem().and_then(|name| name.to_str())?;
-            let shades_file: ShadesFile = load_yaml_from_pathbuf::<ShadesFile>(path).ok()?;
+            let shades_file: TintsFile = load_yaml_from_pathbuf::<TintsFile>(path).ok()?;
             Some(Palette {
                 palette_name: String::from(file_name),
                 palette_path: Some(path.into()),
-                shades: ShadesFile::to(&shades_file),
+                tints: TintsFile::to(&shades_file),
             })
         })
         .collect::<Vec<Palette>>();
@@ -149,7 +147,7 @@ pub fn init_palettes(design_system_path: &PathBuf) -> Result<()> {
     let palettes_path: PathBuf = design_system_path.join(PALETTES_PATH);
     fs::create_dir_all(&palettes_path)?;
     let primary_palette_path: PathBuf = palettes_path.join(NEUTRAL_PALETTE_PATH);
-    let shade_file: ShadesFile = ShadesFile::new();
+    let shade_file: TintsFile = TintsFile::new();
     save_to_yaml_file(primary_palette_path, &shade_file)
 }
 
@@ -165,7 +163,7 @@ pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf)
     for color_palette in &design_system.palettes {
         let color_palette_pathbuf: PathBuf =
             compute_path_with_extension(&palettes_path, &color_palette.palette_name, &"yaml");
-        let shades_file: ShadesFile = ShadesFile::from(&color_palette.shades);
+        let shades_file: TintsFile = TintsFile::from(&color_palette.tints);
         save_to_yaml_file(color_palette_pathbuf, &shades_file)?;
     }
 
@@ -212,11 +210,6 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
 
     save_palettes(&design_system, &design_system_path)?;
 
-    let base_pathbuf: PathBuf = design_system_path.join(BASE_PATH);
-    save_to_yaml_file(base_pathbuf, &design_system.base)?;
-
-    save_themes(&design_system, &design_system_path)?;
-
     let fonts_pathbuf: PathBuf = design_system_path.join(FONTS_PATH);
     save_to_yaml_file(fonts_pathbuf, &design_system.fonts)?;
 
@@ -232,10 +225,14 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     save_to_yaml_file(effect_pathbuf, &design_system.effects)?;
 
     let themes_pathbuf: PathBuf = design_system_path.join(THEMELIST_PATH);
-    save_to_yaml_file(themes_pathbuf, &design_system.themelist)?;
+    save_to_yaml_file(themes_pathbuf, &design_system.themes)?;
 
-    let semantic_color_tokens_pathbuf: PathBuf = design_system_path.join(SEMANTIC_COLOR_TOKENS_PATH);
-    save_to_yaml_file(semantic_color_tokens_pathbuf, &design_system.semantic_color_tokens)?;
+    let semantic_color_tokens_pathbuf: PathBuf =
+        design_system_path.join(SEMANTIC_COLOR_TOKENS_PATH);
+    save_to_yaml_file(
+        semantic_color_tokens_pathbuf,
+        &design_system.semantic_color_tokens,
+    )?;
 
     //Once the save is complete (when is not a tmp save) -> remove the tmp copy
     if !is_tmp {
@@ -288,104 +285,6 @@ pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetada
     design_system_file.banner = String::from(banner_filename);
     design_system_file.logo = String::from(logo_filename);
     save_to_yaml_file(design_system_metadata_path, &design_system_file)
-}
-
-pub fn save_themes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
-    let themes_path: PathBuf = design_system_path.join(THEMES_PATH);
-    if themes_path.is_dir() {
-        fs::remove_dir_all(&themes_path)?;
-    }
-    fs::create_dir_all(&themes_path)?;
-
-    for theme in &design_system.themes {
-        let theme_pathbuf: PathBuf =
-            compute_path_with_extension(&themes_path, &theme.theme_name, &"yaml");
-        let theme_file: ThemeColorFile = ThemeColorFile::from(&theme);
-        save_to_yaml_file(&theme_pathbuf, &theme_file)?;
-    }
-
-    let themes_order: Vec<String> = design_system
-        .themes
-        .clone()
-        .into_iter()
-        .map(|theme| return theme.theme_name)
-        .collect::<Vec<String>>();
-    let themes_metadata_file: ThemesMetadataFile = ThemesMetadataFile { themes_order };
-    save_to_yaml_file(
-        themes_path.join(THEMES_METADATA_PATH),
-        &themes_metadata_file,
-    )?;
-    Ok(())
-}
-
-pub fn fetch_base_colors(design_system_path: &PathBuf) -> Result<Base> {
-    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
-    let base_pathbuf: PathBuf = fetch_pathbuf.join(BASE_PATH);
-    load_yaml_from_pathbuf::<Base>(&base_pathbuf)
-}
-
-pub fn init_base_colors(design_system_path: &PathBuf) -> Result<()> {
-    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
-    let base_pathbuf: PathBuf = fetch_pathbuf.join(BASE_PATH);
-    let base_file = Base::new();
-    save_to_yaml_file(base_pathbuf, &base_file)
-}
-
-pub fn fetch_themes(design_system_path: &PathBuf) -> Result<Vec<ThemeColor>> {
-    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
-    let themes_pathbuf: PathBuf = fetch_pathbuf.join(THEMES_PATH);
-
-    let read_dir = fs::read_dir(&themes_pathbuf)?;
-
-    let mut themes: Vec<ThemeColor> = read_dir
-        .into_iter()
-        .filter_map(|dir_entry| {
-            let dir: fs::DirEntry = dir_entry.ok()?;
-            let path: &PathBuf = &dir.path();
-            if filename_equals(path, THEMES_METADATA_PATH) {
-                return None;
-            }
-            let extension: &str = path
-                .extension()
-                .and_then(|ext: &std::ffi::OsStr| ext.to_str())?;
-            if extension != "yaml" && extension != "yml" {
-                return None;
-            }
-
-            let file_name: &str = path.file_stem().and_then(|name| name.to_str())?;
-            let theme_file: ThemeColorFile = load_yaml_from_pathbuf::<ThemeColorFile>(path).ok()?;
-            Some(ThemeColorFile::to(&theme_file, file_name))
-        })
-        .collect::<Vec<ThemeColor>>();
-
-    let order: PathBuf = themes_pathbuf.join(THEMES_METADATA_PATH);
-
-    if order.is_file() {
-        let themes_metadata: ThemesMetadataFile =
-            load_yaml_from_pathbuf::<ThemesMetadataFile>(&order)?;
-        let order_map: HashMap<_, _> = themes_metadata
-            .themes_order
-            .iter()
-            .enumerate()
-            .map(|(i, name)| (name.clone(), i))
-            .collect();
-        themes.sort_by_key(|item| *order_map.get(&item.theme_name).unwrap_or(&usize::MAX));
-    }
-
-    Ok(themes)
-}
-
-pub fn init_themes(design_system_path: &PathBuf) -> Result<()> {
-    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
-
-    let themes_pathbuf: PathBuf = fetch_pathbuf.join(THEMES_PATH);
-    fs::create_dir_all(&themes_pathbuf)?;
-    let theme_neutral_path: PathBuf = themes_pathbuf.join(NEUTRAL_THEME_PATH);
-
-    let theme_neutral: ThemeColor = ThemeColor::new();
-
-    let theme_file = ThemeColorFile::from(&theme_neutral);
-    save_to_yaml_file(theme_neutral_path, &theme_file)
 }
 
 pub fn fetch_fonts(design_system_path: &PathBuf) -> Result<Fonts> {
@@ -507,13 +406,13 @@ pub fn fetch_themelist(design_system_path: &PathBuf) -> Themes {
     let theme_path = fetch_pathbuf.join(THEMELIST_PATH);
     if theme_path.is_file() {
         if let Result::Ok(themes) = load_yaml_from_pathbuf::<Themes>(&theme_path) {
-            return themes
+            return themes;
         }
     }
     return Themes {
         main_theme: None,
-        other_themes: vec![]
-    }
+        other_themes: vec![],
+    };
 }
 
 pub fn init_semantic_color_tokens(design_system_path: &PathBuf) -> Result<()> {

@@ -141,7 +141,7 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
               <button
                 className="remove-button"
                 style={{
-                  ...getRectSize({ height: "var(--space-7)" }),
+                  ...getRectSize({ height: "var(--uidt-space-7)" }),
                 }}
                 onMouseEnter={() => draggableTools.setHoverIndex("remove")}
               >
@@ -164,7 +164,7 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
                     <div
                       className="palette-color"
                       style={{
-                        ...getRectSize({ height: "var(--space-7)" }),
+                        ...getRectSize({ height: "var(--uidt-space-7)" }),
                         background: colorToAdd.toString({ format: "hex" }),
                       }}
                     ></div>
@@ -206,7 +206,7 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
                 key={`${color}-${index}`}
                 style={{
                   background: color,
-                  ...getRectSize({ height: "var(--space-7)" }),
+                  ...getRectSize({ height: "var(--uidt-space-7)" }),
                 }}
               ></div>
             </div>
@@ -222,7 +222,7 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
                   className="add-button"
                   disabled={!colorsAddList.length}
                   style={{
-                    ...getRectSize({ height: "var(--space-7)" }),
+                    ...getRectSize({ height: "var(--uidt-space-7)" }),
                   }}
                 >
                   <MdAdd size={ICON_SIZE_MD} />
@@ -232,7 +232,7 @@ function ColorSample({ sample, index }: { sample: Sample; index: number }) {
               <button
                 className="remove-button"
                 style={{
-                  ...getRectSize({ height: "var(--space-7)" }),
+                  ...getRectSize({ height: "var(--uidt-space-7)" }),
                 }}
                 onMouseEnter={() => draggableTools.setHoverIndex("remove")}
               >

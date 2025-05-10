@@ -7,7 +7,7 @@ use crate::{
         home_domain::{
             PresetDressing, RecentFile,
             RecentFileCategory::{DesignSystemCategory, PaletteBuilderCategory},
-            RemoveRecentFilesPayload,
+            RemoveRecentFilesPayload, UserSettings,
         },
         palette_builder_domain::PaletteBuilderFile,
     },
@@ -128,4 +128,17 @@ pub fn fetch_presets_dressing() -> Result<PresetDressing> {
     let banners: Vec<String> = fetch_image_folder(BANNERS_PATH)?;
     let logos: Vec<String> = fetch_image_folder(LOGOS_PATH)?;
     Ok(PresetDressing { banners, logos })
+}
+
+pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings) -> Result<()> {
+    let mut db = state.user_settings_db.lock().unwrap();
+    db.set("userSettings", &user_settings)
+        .map_err(|e| anyhow!(e.to_string()))?;
+    Ok(())
+}
+
+pub fn fetch_user_settings(state: State<AppState>) -> Result<UserSettings> {
+    let db = state.user_settings_db.lock().unwrap();
+    let user_settings: UserSettings = db.get("userSettings").unwrap_or_default();
+    Ok(user_settings)
 }

@@ -6,7 +6,7 @@ use tauri::State;
 use crate::{
     application::home_application,
     domain::{
-        home_domain::{PresetDressing, RecentFile, RecentFilesMetadata, RemoveRecentFilesPayload},
+        home_domain::{PresetDressing, RecentFile, RecentFilesMetadata, RemoveRecentFilesPayload, UserSettings},
         image_domain::ImageLocal,
     },
     AppState,
@@ -54,4 +54,14 @@ pub fn fetch_presets_dressing() -> TAResult<PresetDressing> {
 #[tauri::command]
 pub fn encode_image_base64(path: String) -> TAResult<ImageLocal> {
     home_application::encode_image_base64(path).into_ta_result()
+}
+
+#[tauri::command]
+pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings) -> TAResult<()> {
+    home_application::update_user_settings(state, user_settings).into_ta_result()
+}
+
+#[tauri::command]
+pub fn fetch_user_settings(state: State<AppState>) -> TAResult<UserSettings> {
+    home_application::fetch_user_settings(state).into_ta_result()
 }

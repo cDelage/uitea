@@ -24,3 +24,9 @@ export interface PresetDressing {
   banners: string[];
   logos: string[];
 }
+
+export interface UserSettings {
+  pluginDisplayMode: PluginDisplayMode;
+}
+
+export type PluginDisplayMode = "fullscreen" | "modal";

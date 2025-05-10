@@ -74,7 +74,7 @@ function PickerToolSidepanel({ tokens }: { tokens?: TokenFamily[] }) {
                 height: "140px",
                 flex: true,
               }),
-              padding: "var(--space-6) var(--space-6)",
+              padding: "var(--uidt-space-6) var(--uidt-space-6)",
             }}
           >
             <div className={styles.actionsContainer}>
@@ -91,8 +91,8 @@ function PickerToolSidepanel({ tokens }: { tokens?: TokenFamily[] }) {
           </div>
           <div
             style={{
-              backgroundColor: `var(--palette-${contrastInfo.palette}-100)`,
-              color: `var(--palette-${contrastInfo.palette}-900)`,
+              backgroundColor: `var(--uidt-palette-${contrastInfo.palette}-100)`,
+              color: `var(--uidt-palette-${contrastInfo.palette}-900)`,
             }}
             className="row justify-between align-center p-4 rounded-md shadow-md"
           >
@@ -135,7 +135,7 @@ function PickerToolSidepanel({ tokens }: { tokens?: TokenFamily[] }) {
               style={{
                 background: color.hex,
                 ...getRectSize({
-                  height: "var(--space-7)",
+                  height: "var(--uidt-space-7)",
                 }),
               }}
             ></div>

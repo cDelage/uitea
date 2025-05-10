@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ColorSlider from "./ColorSlider";
 import {
   DEFAULT_PICKER_MODE,
@@ -8,12 +8,12 @@ import {
   PickerSpace,
   updateColor,
   updateColorFromString,
-  isValidColor,
 } from "../../util/PickerUtil";
 import styles from "./ColorPickerLinear.module.css";
 import InputNumber from "./InputNumber";
 import FormComponent from "../../ui/kit/FormComponent";
 import ColorIO from "colorjs.io";
+import { isEqual } from "lodash";
 
 function ColorPickerLinear({
   color,
@@ -25,9 +25,7 @@ function ColorPickerLinear({
   onChangeComplete?: () => void;
 }) {
   const [colorHex, setColorHex] = useState(color.toString({ format: "hex" }));
-  const [lastColorHex, setLastColorHex] = useState(
-    color.toString({ format: "hex" })
-  );
+
   const [pickerMode, setPickerMode] = useState<ColorSpace>(DEFAULT_PICKER_MODE);
   const pickerData = useMemo(
     () => getPickerData({ color, pickerMode }),
@@ -41,19 +39,24 @@ function ColorPickerLinear({
     );
   }
 
-  useEffect(() => {
-    if (color.toString({ format: "hex" }) !== lastColorHex) {
-      setColorHex(color.toString({ format: "hex" }));
-      setLastColorHex(color.toString({ format: "hex" }));
-      onChangeComplete?.()
+  function handleBlur() {
+    const newColor = updateColorFromString({
+      value: colorHex,
+      color,
+      pickerMode,
+    });
+    if (
+      !isEqual(
+        newColor.toString({ format: "hex" }),
+        color.toString({ format: "hex" })
+      )
+    ) {
+      onChange(newColor);
+      setTimeout(() => {
+        onChangeComplete?.();
+      }, 0);
     }
-  }, [color, lastColorHex, onChangeComplete]);
-
-  useEffect(() => {
-    if (colorHex !== lastColorHex && isValidColor(colorHex)) {
-      onChange(updateColorFromString({ value: colorHex, color, pickerMode }));
-    }
-  }, [colorHex, lastColorHex, color, onChange, pickerMode]);
+  }
 
   return (
     <div className={styles.picker}>
@@ -72,6 +75,7 @@ function ColorPickerLinear({
         <div className={styles.hexContainer}>
           <input
             value={colorHex}
+            onBlur={handleBlur}
             onChange={(e) => setColorHex(e.target.value)}
             className="inherit-input text-align-right"
           />

@@ -6,7 +6,7 @@ use crate::{
         home_domain::{
             PresetDressing, RecentFile,
             RecentFileCategory::{DesignSystemCategory, PaletteBuilderCategory},
-            RecentFilesMetadata, RemoveRecentFilesPayload,
+            RecentFilesMetadata, RemoveRecentFilesPayload, UserSettings,
         },
         image_domain::ImageLocal,
     },
@@ -67,4 +67,13 @@ pub fn fetch_presets_dressing() -> Result<PresetDressing> {
 
 pub fn encode_image_base64(path: String) -> Result<ImageLocal> {
     repository::encode_image_base64(path)
+}
+
+
+pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings) -> Result<()> {
+    home_repository::update_user_settings(state, user_settings)
+}
+
+pub fn fetch_user_settings(state: State<AppState>) -> Result<UserSettings> {
+    home_repository::fetch_user_settings(state)
 }

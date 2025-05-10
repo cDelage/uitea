@@ -1,13 +1,13 @@
 .borderPreview {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-  padding: var(--space-4);
+  gap: var(--uidt-space-4);
+  padding: var(--uidt-space-4);
   height: 100%;
   box-sizing: border-box;
 }
 
 .borderItem {
-  border-radius: var(--rounded-md);
+  border-radius: var(--uidt-rounded-md);
   box-sizing: border-box;
 }

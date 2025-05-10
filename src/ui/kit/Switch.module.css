@@ -8,11 +8,11 @@
 .switch {
   width: 32px;
   height: 16px;
-  background: var(--palette-primary-200);
+  background: var(--uidt-palette-primary-200);
   border-radius: 10px;
   position: relative;
   transition: background 0.3s;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--uidt-shadow-md);
 }
 
 .switch::before {
@@ -33,7 +33,7 @@
 }
 
 .input:checked + .switch {
-  background: var(--palette-primary-800);
+  background: var(--uidt-palette-primary-800);
 }
 
 .input:checked + .switch::before {

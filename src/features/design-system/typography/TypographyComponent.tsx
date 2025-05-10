@@ -1,10 +1,6 @@
 import classNames from "classnames";
 import styles from "../ComponentDesignSystem.module.css";
-import {
-  DEFAULT_BASE,
-  DEFAULT_TYPOGRAPHIES,
-  DEFAULT_TYPOGRAPHY_SCALE,
-} from "../../../ui/UiConstants";
+import { DEFAULT_TYPOGRAPHIES, DEFAULT_TYPOGRAPHY_SCALE } from "../../../ui/UiConstants";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import InputDesignSystem from "../InputDesignSystem";
@@ -27,11 +23,11 @@ import { isEqual } from "lodash";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 
 function TypographyComponent() {
-  const { designSystem, findDesignSystemColor, editMode } =
-    useDesignSystemContext();
-  const { base, typography } = designSystem;
+  const { designSystem, editMode } = useDesignSystemContext();
+  const { typography } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
@@ -76,7 +72,6 @@ function TypographyComponent() {
   useSidebarComponentVisible(typographyRef, "typography");
 
   function handleAddAdditionalScale(index: number) {
-
     const key = generateUniqueTypographyKey(
       additionalsScales,
       `additional-${index + 2}`
@@ -87,7 +82,6 @@ function TypographyComponent() {
     };
     insert(index + 1, newScale, { shouldFocus: false });
     handleSubmit(submitTypography)();
-
   }
 
   function submitTypography(newTypo: Typographies) {
@@ -104,7 +98,7 @@ function TypographyComponent() {
 
   const formClassNames = classNames(
     styles.componentDesignSystem,
-    styles.mediumHeight
+    styles.bigHeight
   );
 
   const sideSettingsClass = classNames(
@@ -115,7 +109,6 @@ function TypographyComponent() {
   function handleRemove(index: number) {
     remove(index);
     handleSubmit(submitTypography)();
-
   }
 
   return (
@@ -145,7 +138,9 @@ function TypographyComponent() {
                   scaleName={typoScale}
                 />
               }
-              tooltipValue={`typography-${typoScale === "paragraph" ? "p" : typoScale}`}
+              tooltipValue={`typography-${
+                typoScale === "paragraph" ? "p" : typoScale
+              }`}
               keyPopover={typoScale}
             />
           ))}
@@ -194,16 +189,10 @@ function TypographyComponent() {
           )}
         </div>
       </div>
-      <div className={styles.previewContainer}>
-        <div
-          className={styles.previewElement}
-          style={{
-            background: findDesignSystemColor({
-              label: base.background.default,
-              defaultValue: DEFAULT_BASE.background.default,
-            }),
-          }}
-        >
+      <PreviewComponentDesignSystem maxHeight="600px">
+        <div className={styles.previewElement} style={{
+          minHeight:"600px"
+        }}>
           {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
             <TypographyPreview
               key={typoScale}
@@ -219,7 +208,7 @@ function TypographyComponent() {
             />
           ))}
         </div>
-      </div>
+      </PreviewComponentDesignSystem>
       <div className={styles.darkPreviewPlaceholder} />
     </form>
   );

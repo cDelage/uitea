@@ -1,14 +1,56 @@
 import styled, { css } from "styled-components";
 import { TokenFamily } from "../../../domain/DesignSystemDomain";
 
-export const PreviewStyle = styled.div<{tokenFamilies: TokenFamily[]}>`
-  width: 100%;
-  height: 100%;
+export const PreviewStyle = styled.div<{ $tokenFamilies: TokenFamily[] }>`
   display: flex;
   flex-direction: column;
   overflow: hidden;
   overflow-y: auto;
-  ${(props) => props.tokenFamilies.flatMap(tokenFamily => tokenFamily.tokens).map(token => css`
-    --${token.label}:${token.value};
-  `)}
+  height: 100%;
+  ${(props) =>
+    props.$tokenFamilies.flatMap((tokenFamily) => {
+      return tokenFamily.tokens.map(
+        (token) => css`
+    --${token.label}:${
+          tokenFamily.category === "color"
+            ? token.value
+            : `var(--${token.value})`
+        };
+  `
+      );
+    })};
+
+  color: var(--base-text-default);
+
+  .text-color-light {
+    color: var(--base-text-light);
+  }
+
+  .text-color-default {
+    color: var(--base-text-default);
+  }
+
+  .text-color-dark {
+    color: var(--base-text-dark);
+  }
+`;
+
+export const PreviewEmptyStyle = styled.div<{
+  $tokenFamilies: TokenFamily[];
+  $height?: string;
+}>`
+  ${(props) =>
+    props.$tokenFamilies.flatMap((tokenFamily) => {
+      return tokenFamily.tokens.map(
+        (token) => css`
+    --${token.label}:${
+          tokenFamily.category === "color"
+            ? token.value
+            : `var(--${token.value})`
+        };
+  `
+      );
+    })};
+
+  height: ${(props) => props.$height};
 `;

@@ -1,9 +1,22 @@
+import { ComponentType } from "react";
+import { IconType } from "react-icons/lib";
+import {
+  MdFormatQuote,
+  MdLabelOutline,
+  MdOutlinePlayArrow,
+  MdOutlineTableRows,
+  MdOutlineViewList,
+} from "react-icons/md";
+import QuoteCombinationPreview from "../features/design-system/previews/combination-preview/QuoteCombinationPreview";
+import ButtonCombinationPreview from "../features/design-system/previews/combination-preview/ButtonCombinationPreview";
+import LabelCombinationPreview from "../features/design-system/previews/combination-preview/LabelCombinationPreview";
+import ArrayRowCombinationPreview from "../features/design-system/previews/combination-preview/ArrayRowCombinationPreview";
+import ArrayHeaderCombinationPreview from "../features/design-system/previews/combination-preview/ArrayHeaderCombinationPreview";
+import ColorIO from "colorjs.io";
 export interface DesignSystem {
   metadata: DesignSystemMetadata;
   palettes: Palette[];
-  base: Base;
-  themes: ThemeColor[];
-  themelist: Themes;
+  themes: Themes;
   semanticColorTokens: SemanticColorTokens;
   fonts: Fonts;
   typography: Typographies;
@@ -38,23 +51,12 @@ export interface DesignSystemMetadata {
 
 export interface Palette {
   paletteName: string;
-  shades: Tint[];
+  tints: Tint[];
 }
 
 export interface Tint {
   label: string;
   color: string;
-}
-
-export interface Base {
-  background: ColorDarkable;
-  border: ColorDarkable;
-  textLight: ColorDarkable;
-  textDefault: ColorDarkable;
-  textDark: ColorDarkable;
-  backgroundDisabled: ColorDarkable;
-  borderDisabled: ColorDarkable;
-  textDisabled: ColorDarkable;
 }
 
 export interface DesignToken {
@@ -79,21 +81,7 @@ export interface Theme {
   background: string;
 }
 
-export interface ThemeColor {
-  themeName: string;
-  default: ThemeColorState;
-  hover?: ThemeColorState;
-  active?: ThemeColorState;
-  focus?: ThemeColorState;
-}
-
 export type ThemeStateCategory = "default" | "hover" | "active" | "focus";
-
-export interface ThemeColorState {
-  background: ColorDarkable;
-  border: ColorDarkable;
-  text: ColorDarkable;
-}
 
 export type ThemeItem = "background" | "border" | "text";
 
@@ -101,8 +89,6 @@ export interface ColorDarkable {
   default?: string;
   dark?: string;
 }
-
-export type DarkableCategory = "default" | "dark";
 
 export interface Fonts {
   default: string;
@@ -218,9 +204,48 @@ export interface SemanticColorTokens {
   colorCombinationCollections: ColorCombinationCollection[];
 }
 
-export type ColorCombinationType = "default" | "hover" | "active" | "focus";
+export type ColorCombinationState = "default" | "hover" | "active" | "focus";
 
-export type PreviewComponent = "quote" | "border" | "button" | "label";
+export type PreviewComponent =
+  | "quote"
+  | "button"
+  | "label"
+  | "array-header"
+  | "array-row";
+
+export type PreviewComponentIcon = {
+  icon: IconType;
+  previewComponent: PreviewComponent;
+  component: ComponentType<{ combination: ColorCombinationCollection }>;
+};
+
+export const PREVIEW_COMPONENT_ICONS: PreviewComponentIcon[] = [
+  {
+    previewComponent: "button",
+    icon: MdOutlinePlayArrow,
+    component: ButtonCombinationPreview,
+  },
+  {
+    previewComponent: "label",
+    icon: MdLabelOutline,
+    component: LabelCombinationPreview,
+  },
+  {
+    previewComponent: "array-header",
+    icon: MdOutlineViewList,
+    component: ArrayHeaderCombinationPreview,
+  },
+  {
+    previewComponent: "array-row",
+    icon: MdOutlineTableRows,
+    component: ArrayRowCombinationPreview,
+  },
+  {
+    previewComponent: "quote",
+    icon: MdFormatQuote,
+    component: QuoteCombinationPreview,
+  },
+];
 
 export interface ColorCombinationCollection {
   combinationName?: string;
@@ -228,14 +253,63 @@ export interface ColorCombinationCollection {
   hover?: ColorCombination;
   active?: ColorCombination;
   focus?: ColorCombination;
-  context?: string;
-  previewComponent?: string;
+  group?: string;
+  previewComponent?: PreviewComponent;
 }
 
-export type TokenColorCategory = "background" | "border" | "text";
+export interface ColorCombinationCollectionGroup {
+  combinationName?: string;
+  default?: ColorCombination;
+  hover?: ColorCombination;
+  active?: ColorCombination;
+  focus?: ColorCombination;
+  group?: string;
+  previewComponent?: PreviewComponent;
+  childs: ColorCombinationCollectionGroup[];
+}
+
+export interface ColorCombinationCollectionAndGroup {
+  collection: ColorCombinationCollection;
+  group?: ColorCombination;
+}
+
+export type TokenColorUsage = "background" | "border" | "text";
 
 export interface ColorCombination {
   background?: string;
   border?: string;
   text?: string;
+}
+
+export interface RecommandationRow {
+  label: string;
+  combinations: RecommandationMetadata[];
+}
+
+export interface RecommandationMetadata {
+  combinationName: ColorCombination;
+  combinationTokens: ColorCombination;
+  contrasts: CombinationContrasts;
+  backgroundRgba: string;
+}
+
+export interface CombinationContrasts {
+  backgroundText?: number;
+  backgroundBorder?: number;
+}
+
+export interface RecommandationContrastPayload {
+  text: number;
+  border: number;
+}
+
+export interface PaletteAndColor {
+  mainColor: ColorIO;
+  palette: Palette;
+}
+
+export interface HandleUpdateColorPayload {
+  usage: TokenColorUsage;
+  state: ColorCombinationState;
+  value: string | undefined;
 }

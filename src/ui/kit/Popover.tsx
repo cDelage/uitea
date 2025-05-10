@@ -26,7 +26,7 @@ import {
 import styles from "./Popover.module.css";
 import classNames from "classnames";
 import { useDivClickOutside } from "../../util/DivClickOutside";
-import { MdChevronRight } from "react-icons/md";
+import { MdChevronLeft, MdChevronRight, MdClose } from "react-icons/md";
 import { ICON_SIZE_SM } from "../UiConstants";
 
 function Popover({
@@ -76,11 +76,15 @@ function Body({
   id,
   zIndex,
   skipDisableOutside,
+  isOpenToSync,
+  setIsOpenToSync,
 }: {
   children: ReactNode;
   id: string;
   zIndex?: number;
   skipDisableOutside?: boolean;
+  isOpenToSync?: boolean;
+  setIsOpenToSync?: (value: boolean) => void;
 }): JSX.Element | null {
   const { position, closePopover, openPopoverId, toggleRect } =
     usePopoverContext();
@@ -89,6 +93,14 @@ function Body({
   const [positionVisible, setPositionVisible] = useState<
     PositionAbsolute | undefined
   >(undefined);
+
+  useEffect(() => {
+    if (isOpenToSync && !openPopoverId && setIsOpenToSync) {
+      setIsOpenToSync(false);
+    } else if (!isOpenToSync && openPopoverId === id && setIsOpenToSync) {
+      setIsOpenToSync(true);
+    }
+  }, [openPopoverId, isOpenToSync, setIsOpenToSync, id]);
 
   function handleClose() {
     if (openPopoverId === id) {
@@ -148,6 +160,7 @@ function Toggle({
   positionPayload,
   keyPopover,
   disabled,
+  disableClosure,
 }: {
   children: ReactNode;
   id: string;
@@ -155,6 +168,7 @@ function Toggle({
   scrollListener?: string[];
   keyPopover?: string;
   disabled?: boolean;
+  disableClosure?: boolean;
 }): JSX.Element {
   const {
     openPopover,
@@ -187,6 +201,8 @@ function Toggle({
               }
             )
           );
+        } else if (!disableClosure) {
+          closePopover(id);
         }
       }
     }
@@ -278,9 +294,15 @@ function Close({
   );
 }
 
-function Actions({ children }: { children: ReactNode }) {
+function Actions({ children, width }: { children: ReactNode; width?: string }) {
   return (
-    <div className="column" data-disableoutside={true}>
+    <div
+      className="column"
+      style={{
+        width,
+      }}
+      data-disableoutside={true}
+    >
       {children}
     </div>
   );
@@ -419,6 +441,56 @@ function SelectorChildren({ children }: { children: ReactNode }) {
   );
 }
 
+function SelectorButton({
+  width,
+  value,
+  placeholder,
+  onRemove,
+  id,
+  disabled,
+}: {
+  width?: string;
+  value?: ReactNode;
+  placeholder?: string;
+  onRemove?: () => void;
+  disabled?: boolean;
+  id?: string;
+}) {
+  const { openPopoverId } = usePopoverContext();
+  return (
+    <div
+      className={`popover-selector-button ${disabled ? "disabled" : ""}`}
+      style={{ width, minWidth: width, maxWidth: width }}
+    >
+      {value ? (
+        <div className="text-color-default">{value}</div>
+      ) : (
+        <div className="text-color-light">{placeholder}</div>
+      )}
+      <div className="row gap-2 align-center">
+        {onRemove && (
+          <button
+            className="action-ghost-button"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
+            <MdClose size={ICON_SIZE_SM} />
+          </button>
+        )}
+        <MdChevronLeft
+          size={ICON_SIZE_SM}
+          style={{
+            rotate: id === openPopoverId ? "-90deg" : "",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 Popover.Toggle = Toggle;
 Popover.Body = Body;
 Popover.Actions = Actions;
@@ -426,4 +498,5 @@ Popover.Tab = Tab;
 Popover.Close = Close;
 Popover.Selector = Selector;
 Popover.SelectorTab = SelectorTab;
+Popover.SelectorButton = SelectorButton;
 export default Popover;

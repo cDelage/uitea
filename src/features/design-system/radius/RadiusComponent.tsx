@@ -18,16 +18,15 @@ import RadiusPreview from "./RadiusPreview";
 
 import { Radius, RadiusItem } from "../../../domain/DesignSystemDomain";
 import { generateUniqueRadiusKey } from "../../../util/DesignSystemUtils";
-import { DEFAULT_BASE } from "../../../ui/UiConstants";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 
 function RadiusComponent() {
-  const { designSystem, findDesignSystemColor, editMode } =
-    useDesignSystemContext();
-  const { base, radius } = designSystem;
+  const { designSystem, editMode } = useDesignSystemContext();
+  const { radius } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
@@ -167,17 +166,8 @@ function RadiusComponent() {
         )}
       </div>
 
-      <div className={styles.previewContainer}>
-        <div
-          className={styles.previewElementWrap}
-          ref={scrollableRight}
-          style={{
-            background: findDesignSystemColor({
-              label: base.background.default,
-              defaultValue: DEFAULT_BASE.background.default,
-            }),
-          }}
-        >
+      <PreviewComponentDesignSystem maxHeight="400px">
+        <div className={styles.previewElementWrap} ref={scrollableRight}>
           <RadiusPreview label="default" radiusValue={watch("default")} />
           {additionalsRadiusArray.map((field, index) => (
             <RadiusPreview
@@ -187,7 +177,7 @@ function RadiusComponent() {
             />
           ))}
         </div>
-      </div>
+      </PreviewComponentDesignSystem>
       <div className={styles.darkPreviewPlaceholder} />
     </form>
   );

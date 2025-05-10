@@ -4,18 +4,19 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--modal-bg);
+  background-color: var(--uidt-modal-bg);
 }
 
 .sidePanelBody {
   position: absolute;
   right: 0;
   top: 0;
-  background-color: var(--component-bg);
+  background-color: var(--uidt-component-bg);
   width: 700px;
   height: 100%;
-  border-left: 1px solid var(--component-border);
+  border-left: 1px solid var(--uidt-component-border);
   display: flex;
   flex-direction: column;
   z-index: 50;
+  box-sizing: border-box;
 }

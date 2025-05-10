@@ -3,9 +3,9 @@
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--uidt-space-6);
   box-sizing: border-box;
-  padding: 18px var(--space-1) 18px var(--space-0);
+  padding: 18px var(--uidt-space-1) 18px var(--uidt-space-0);
   border-bottom: transparent 2px solid;
   border-top: transparent 2px solid;
   user-select: none;
@@ -16,20 +16,21 @@
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--uidt-space-6);
   box-sizing: border-box;
-  padding: 18px var(--space-7) 18px var(--space-7);
+  padding: 18px var(--uidt-space-7) 18px var(--uidt-space-7);
   border-bottom: transparent 2px solid;
   border-top: transparent 2px solid;
   user-select: none;
 }
 
-
 .componentDesignSystem {
   scroll-margin-top: 36px !important;
   display: flex;
-  padding: var(--space-6) var(--space-1) var(--space-6) var(--space-0);
+  padding: var(--uidt-space-6) var(--uidt-space-1) var(--uidt-space-6)
+    var(--uidt-space-0);
   box-sizing: border-box;
+  height: fit-content;
 }
 
 .mediumHeight {
@@ -38,10 +39,16 @@
   max-height: 400px;
 }
 
+.bigHeight {
+  min-height: 600px;
+  height: 600px;
+  max-height: 600px;
+}
+
 .componentHead {
   display: flex;
-  padding: var(--space-0) var(--space-7);
-  color: var(--base-text-light);
+  padding: var(--uidt-space-0) var(--uidt-space-7);
+  color: var(--uidt-base-text-light);
   justify-content: space-between;
   align-items: center;
 }
@@ -49,7 +56,7 @@
 .sideSettings {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--uidt-space-5);
   width: 280px;
   min-width: 280px;
   max-width: 280px;
@@ -59,12 +66,12 @@
 .scrollableSettings {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--uidt-space-5);
   height: 100%;
   overflow: auto;
 }
 
-.themeScrollableSizing{
+.themeScrollableSizing {
   max-height: 270px;
 }
 
@@ -76,17 +83,17 @@
 }
 
 .sideSettingsTitle {
-  color: var(--base-text-light);
-  padding-left: var(--space-7);
-  padding-right: var(--space-7);
+  color: var(--uidt-base-text-light);
+  padding-left: var(--uidt-space-7);
+  padding-right: var(--uidt-space-7);
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
 }
 
 .sideSettingsContainer {
-  padding-left: var(--space-7);
-  padding-right: var(--space-7);
+  padding-left: var(--uidt-space-7);
+  padding-right: var(--uidt-space-7);
 }
 
 .previewContainer {
@@ -96,10 +103,11 @@
   flex-direction: column;
   overflow: hidden;
   overflow-y: auto;
-  border-radius: var(--rounded-md);
+  border-radius: var(--uidt-rounded-md);
   box-sizing: border-box;
   border: var(--base-border) 1px solid;
   background-color: var(--base-background);
+  position: relative;
 }
 
 .previewBody {
@@ -118,31 +126,31 @@
   height: 100%;
   display: flex;
   overflow: hidden;
-  border-radius: var(--rounded-md);
+  border-radius: var(--uidt-rounded-md);
   box-sizing: border-box;
-  border: var(--base-border) 1px solid;
-  background-color: var(--base-background);
-  padding: var(--space-7);
+  border: var(--uidt-base-border) 1px solid;
+  background-color: var(--uidt-base-background);
+  padding: var(--uidt-space-7);
   flex-direction: column;
 }
 
 .previewElement {
   flex: 1;
   height: 100%;
-  box-shadow: var(--shadow-inset);
-  padding: var(--space-7);
+  box-shadow: var(--uidt-shadow-inset);
+  padding: var(--uidt-space-7);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--uidt-space-8);
   overflow: auto;
 }
 
 .previewElementWrap {
   flex: 1;
   height: 100%;
-  box-shadow: var(--shadow-inset);
-  padding: var(--space-7);
+  box-shadow: var(--uidt-shadow-inset);
+  padding: var(--uidt-space-7);
   box-sizing: border-box;
   display: flex;
   gap: 24px;
@@ -165,14 +173,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3);
+  padding: var(--uidt-space-3);
 }
 
 .shadesContainer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   align-content: space-between;
-  padding: var(--space-0) var(--space-7);
+  padding: var(--uidt-space-0) var(--uidt-space-7);
   min-height: 110px;
 }
 
@@ -182,14 +190,14 @@
   height: fit-content;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
 }
 
 .darkPreviewPlaceholder {
-  width: var(--space-9);
+  width: var(--uidt-space-9);
 }
 
 .primaryTheme {
-  background-color: var(--primary-bg);
-  color: var(--primary-text);
+  background-color: var(--uidt-primary-bg);
+  color: var(--uidt-primary-text);
 }

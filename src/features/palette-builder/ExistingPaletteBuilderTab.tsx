@@ -60,7 +60,7 @@ function ExistingPaletteBuilderTab({
                 className="palette-color"
                 key={color}
                 style={{
-                  ...getRectSize({ height: "var(--space-6)" }),
+                  ...getRectSize({ height: "var(--uidt-space-6)" }),
                   background: color,
                 }}
               ></div>

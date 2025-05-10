@@ -209,7 +209,7 @@ function PaletteSidePanel({
                   className="palette-color"
                   style={{
                     background: centerTint?.color.toString({ format: "hex" }),
-                    ...getRectSize({ height: "var(--space-10)" }),
+                    ...getRectSize({ height: "var(--uidt-space-10)" }),
                   }}
                 ></div>
                 <h2 className="text-color-dark">
@@ -267,10 +267,10 @@ function PaletteSidePanel({
                       position: "relative",
                       border:
                         selectedTint?.name === tint.name
-                          ? `2px solid var(--primary-border)`
+                          ? `2px solid var(--uidt-primary-border)`
                           : undefined,
                       ...getRectSize({
-                        height: "var(--space-9)",
+                        height: "var(--uidt-space-9)",
                         flex: true,
                       }),
                     }}
@@ -278,7 +278,7 @@ function PaletteSidePanel({
                     {selectedTint?.name === tint.name && (
                       <MdLocationPin
                         size={ICON_SIZE_XL}
-                        color="var(--primary-bg)"
+                        color="var(--uidt-primary-bg)"
                         style={{
                           position: "absolute",
                           top: 0,
@@ -435,7 +435,7 @@ function PaletteSidePanel({
                           background: selectedTint.color.toString({
                             format: "hex",
                           }),
-                          ...getRectSize({ height: "var(--space-10)" }),
+                          ...getRectSize({ height: "var(--uidt-space-10)" }),
                         }}
                       ></div>
                       <div className="column gap-2">
@@ -477,7 +477,7 @@ function PaletteSidePanel({
                             ].color.toString({
                               format: "hex",
                             }),
-                            ...getRectSize({ height: "var(--space-10)" }),
+                            ...getRectSize({ height: "var(--uidt-space-10)" }),
                           }}
                         ></div>
                         <div className="column gap-2">
@@ -521,7 +521,7 @@ function PaletteSidePanel({
                                   background: centerTint?.color.toString({
                                     format: "hex",
                                   }),
-                                  ...getRectSize({ height: "var(--space-5)" }),
+                                  ...getRectSize({ height: "var(--uidt-space-5)" }),
                                 }}
                               ></div>
                               {paletteToCompare.name}
@@ -562,7 +562,7 @@ function PaletteSidePanel({
                               background: color.color.toString({
                                 format: "hex",
                               }),
-                              ...getRectSize({ height: "var(--space-7)" }),
+                              ...getRectSize({ height: "var(--uidt-space-7)" }),
                             }}
                           ></div>
                           {color.name}

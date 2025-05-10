@@ -26,7 +26,7 @@ function Cursor({
         border:  `var(--${theme}-border) 1px solid`,
         color:  `var(--${theme}-text)`,
         borderRadius: "50%",
-        padding: "var(--space-2)"
+        padding: "var(--uidt-space-2)"
       }}
     >
       {children}

@@ -1,9 +1,9 @@
 .header{
   display: flex;
-  height: var(--space-7);
+  height: var(--uidt-space-7);
   user-select: none;
-  padding: var(--space-0);
-  margin: var(--space-0);
+  padding: var(--uidt-space-0);
+  margin: var(--uidt-space-0);
   align-items: center;
   -webkit-app-region: drag;
 }
@@ -11,7 +11,7 @@
 .buttons{
   display: flex;
   justify-content: end;
-  gap: var(--space-6);
+  gap: var(--uidt-space-6);
   align-items: center;
 }
 
@@ -22,7 +22,7 @@
 
 .undoRedoButtons {
   display: flex;
-  gap: var(--space-3)
+  gap: var(--uidt-space-3)
 }
 
 .undoRedoButton {

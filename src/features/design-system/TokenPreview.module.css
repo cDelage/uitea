@@ -3,10 +3,10 @@
     height: 120px;
     max-height: 120px;
     overflow: hidden;
-    background-color: var(--component-bg);
-    box-shadow: var(--shadow-inset);
-    border-radius: var(--rounded-md);
-    padding: var(--space-4);
+    background-color: var(--base-background);
+    box-shadow: var(--uidt-shadow-inset);
+    border-radius: var(--uidt-rounded-md);
+    padding: var(--uidt-space-4);
     box-sizing: border-box;
     border: 1px solid var(--base-border);
 }

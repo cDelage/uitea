@@ -9,8 +9,8 @@ use exposition::design_system_exposition::{
     undo_design_system,
 };
 use exposition::home_exposition::{
-    encode_image_base64, fetch_presets_dressing, find_all_recent_files, insert_recent_file,
-    remove_recent_file, update_recent_file,
+    encode_image_base64, fetch_presets_dressing, fetch_user_settings, find_all_recent_files,
+    insert_recent_file, remove_recent_file, update_recent_file, update_user_settings,
 };
 use exposition::palette_builder_exposition::{
     can_undo_redo_palette_builder, do_palette_builder, fetch_design_system_palette_builders,
@@ -23,6 +23,9 @@ use pickledb::{PickleDb, PickleDbDumpPolicy, SerializationMethod};
 use exposition::color_picker_exposition::{
     can_undo_redo_color_picker, fetch_color_picker_store, redo_color_picker,
     save_color_picker_store, undo_color_picker,
+};
+use exposition::token_crafter_exposition::{
+    can_undo_redo_token_crafter, do_token_crafter, redo_token_crafter, undo_token_crafter,
 };
 
 mod application;
@@ -116,7 +119,13 @@ fn main() {
             save_color_picker_store,
             undo_color_picker,
             redo_color_picker,
-            can_undo_redo_color_picker
+            can_undo_redo_color_picker,
+            can_undo_redo_token_crafter,
+            do_token_crafter,
+            redo_token_crafter,
+            undo_token_crafter,
+            fetch_user_settings,
+            update_user_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

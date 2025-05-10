@@ -1,9 +1,12 @@
-import { createContext, useContext } from "react";
+import { createContext, RefObject, useContext } from "react";
 import { DesignSystem, TokenFamily } from "../../domain/DesignSystemDomain";
 
 export type TokenCrafterContextType = {
   designSystem: DesignSystem;
   paletteTokens: TokenFamily[];
+  semanticTokens: TokenFamily[];
+  tokenFamilies: TokenFamily[];
+  styleRef: RefObject<HTMLDivElement | null>;
 };
 
 export const TokenCrafterContext = createContext<

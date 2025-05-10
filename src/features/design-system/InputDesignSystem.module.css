@@ -1,6 +1,6 @@
 .inputDesignSystem {
   display: flex;
-  padding: var(--space-3) var(--space-0) var(--space-3) var(--space-0);
+  padding: var(--uidt-space-3) var(--uidt-space-0) var(--uidt-space-3) var(--uidt-space-0);
   border-top: transparent 2px solid;
   border-bottom: transparent 2px solid;
   height: fit-content;
@@ -26,7 +26,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--uidt-space-1);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -36,9 +36,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: var(--space-7);
-  min-width: var(--space-7);
-  max-width: var(--space-7);
+  width: var(--uidt-space-7);
+  min-width: var(--uidt-space-7);
+  max-width: var(--uidt-space-7);
   box-sizing: border-box;
 }
 
@@ -47,9 +47,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: var(--space-7);
-  min-width: var(--space-7);
-  max-width: var(--space-7);
+  width: var(--uidt-space-7);
+  min-width: var(--uidt-space-7);
+  max-width: var(--uidt-space-7);
   box-sizing: border-box;
 }
 
@@ -66,19 +66,19 @@
 }
 
 .colorPreviewContainer {
-  width: var(--space-5);
-  min-width: var(--space-5);
-  max-width: var(--space-5);
-  height: var(--space-5);
-  min-height: var(--space-5);
-  max-height: var(--space-5);
-  border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-md);
-  border: var(--base-border) 1px solid;
+  width: var(--uidt-space-5);
+  min-width: var(--uidt-space-5);
+  max-width: var(--uidt-space-5);
+  height: var(--uidt-space-5);
+  min-height: var(--uidt-space-5);
+  max-height: var(--uidt-space-5);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+  border: var(--uidt-base-border) 1px solid;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-base);
+  transition: var(--uidt-transition-base);
 }
 
 .colorPreviewContainerHover {
@@ -91,12 +91,12 @@
   align-items: center;
   box-sizing: border-box;
   border-bottom: transparent 1px solid;
-  gap: var(--space-2);
+  gap: var(--uidt-space-2);
   cursor: pointer;
   height: 32px;
   width: 100%;
 }
 
 .popoverContainer:hover {
-  border-bottom: var(--base-border) 1px solid;
+  border-bottom: var(--uidt-base-border) 1px solid;
 }

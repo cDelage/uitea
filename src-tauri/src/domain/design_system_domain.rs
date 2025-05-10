@@ -7,10 +7,8 @@ use std::path::{Path, PathBuf};
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
     pub palettes: Vec<Palette>,
-    pub themelist: Themes,
+    pub themes: Themes,
     pub semantic_color_tokens: SemanticColorTokens,
-    pub base: Base,
-    pub themes: Vec<ThemeColor>,
     pub fonts: Fonts,
     pub typography: Typographies,
     pub spaces: Vec<Space>,
@@ -158,25 +156,12 @@ impl DesignSystemMetadata {
 pub struct Palette {
     pub palette_name: String,
     pub palette_path: Option<PathBuf>,
-    pub shades: Vec<Shade>,
+    pub tints: Vec<Tint>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PalettesMetadataFile {
     pub palettes_order: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Base {
-    pub background: ColorDarkable,
-    pub border: ColorDarkable,
-    pub text_light: ColorDarkable,
-    pub text_default: ColorDarkable,
-    pub text_dark: ColorDarkable,
-    pub background_disabled: ColorDarkable,
-    pub text_disabled: ColorDarkable,
-    pub border_disabled: ColorDarkable,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -206,12 +191,12 @@ impl SemanticColorTokens {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ColorCombinationCollection {
-    pub combination_name: String,
+    pub combination_name: Option<String>,
     pub default: Option<ColorCombination>,
     pub hover: Option<ColorCombination>,
     pub active: Option<ColorCombination>,
     pub focus: Option<ColorCombination>,
-    pub context: Option<String>,
+    pub group: Option<String>,
     pub preview_component: Option<String>
 }
 
@@ -223,239 +208,94 @@ pub struct ColorCombination {
     pub text: Option<String>,
 }
 
-impl Base {
-    pub fn new() -> Base {
-        Base {
-            background: ColorDarkable {
-                default: Some(String::from("palette-neutral-50")),
-                dark: Some(String::from("palette-neutral-950")),
-            },
-            border: ColorDarkable {
-                default: Some(String::from("palette-neutral-300")),
-                dark: Some(String::from("palette-neutral-700")),
-            },
-            text_dark: ColorDarkable {
-                default: Some(String::from("palette-neutral-900")),
-                dark: Some(String::from("palette-neutral-100")),
-            },
-            text_default: ColorDarkable {
-                default: Some(String::from("palette-neutral-700")),
-                dark: Some(String::from("palette-neutral-300")),
-            },
-            text_light: ColorDarkable {
-                default: Some(String::from("palette-neutral-500")),
-                dark: Some(String::from("palette-neutral-500")),
-            },
-            background_disabled: ColorDarkable {
-                default: Some(String::from("palette-neutral-200")),
-                dark: Some(String::from("palette-neutral-700")),
-            },
-            border_disabled: ColorDarkable {
-                default: Some(String::from("palette-neutral-300")),
-                dark: Some(String::from("palette-neutral-600")),
-            },
-            text_disabled: ColorDarkable {
-                default: Some(String::from("palette-neutral-500")),
-                dark: Some(String::from("palette-neutral-500")),
-            },
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Shade {
+pub struct Tint {
     pub label: String,
     pub color: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ShadesFile(pub IndexMap<String, String>);
+pub struct TintsFile(pub IndexMap<String, String>);
 
-impl ShadesFile {
-    pub fn from(shades: &Vec<Shade>) -> ShadesFile {
+impl TintsFile {
+    pub fn from(tints: &Vec<Tint>) -> TintsFile {
         use indexmap::IndexMap;
         let mut map = IndexMap::new();
 
-        for shade in shades {
-            map.insert(shade.label.clone(), shade.color.clone());
+        for tint in tints {
+            map.insert(tint.label.clone(), tint.color.clone());
         }
 
-        ShadesFile(map)
+        TintsFile(map)
     }
 
-    pub fn new() -> ShadesFile {
-        let neutral_palette: Vec<Shade> = vec![
-            Shade {
+    pub fn new() -> TintsFile {
+        let neutral_palette: Vec<Tint> = vec![
+            Tint {
                 label: "50".to_string(),
                 color: "#FAFAFA".to_string(),
             },
-            Shade {
+            Tint {
                 label: "100".to_string(),
                 color: "#F5F5F5".to_string(),
             },
-            Shade {
+            Tint {
                 label: "200".to_string(),
                 color: "#E5E5E5".to_string(),
             },
-            Shade {
+            Tint {
                 label: "300".to_string(),
                 color: "#D4D4D4".to_string(),
             },
-            Shade {
+            Tint {
                 label: "400".to_string(),
                 color: "#A3A3A3".to_string(),
             },
-            Shade {
+            Tint {
                 label: "500".to_string(),
                 color: "#737373".to_string(),
             },
-            Shade {
+            Tint {
                 label: "600".to_string(),
                 color: "#525252".to_string(),
             },
-            Shade {
+            Tint {
                 label: "700".to_string(),
                 color: "#404040".to_string(),
             },
-            Shade {
+            Tint {
                 label: "800".to_string(),
                 color: "#262626".to_string(),
             },
-            Shade {
+            Tint {
                 label: "900".to_string(),
                 color: "#171717".to_string(),
             },
-            Shade {
+            Tint {
                 label: "950".to_string(),
                 color: "#0A0A0A".to_string(),
             },
         ];
 
-        ShadesFile::from(&neutral_palette)
+        TintsFile::from(&neutral_palette)
     }
 
-    pub fn to(shades_file: &ShadesFile) -> Vec<Shade> {
-        shades_file
+    pub fn to(tints_file: &TintsFile) -> Vec<Tint> {
+        tints_file
             .0
             .iter()
-            .map(|(key, value)| Shade {
+            .map(|(key, value)| Tint {
                 label: key.clone(),
                 color: value.clone(),
             })
-            .collect::<Vec<Shade>>()
+            .collect::<Vec<Tint>>()
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThemesMetadataFile {
     pub themes_order: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeColor {
-    pub theme_name: String,
-    pub default: ThemeColorSet,
-    pub hover: Option<ThemeColorSet>,
-    pub active: Option<ThemeColorSet>,
-    pub focus: Option<ThemeColorSet>,
-}
-
-impl ThemeColor {
-    pub fn new() -> ThemeColor {
-        ThemeColor {
-            theme_name: String::from("neutral"),
-            default: ThemeColorSet {
-                background: ColorDarkable {
-                    default: Some(String::from("palette-neutral-50")),
-                    dark: Some(String::from("palette-neutral-950")),
-                },
-                border: ColorDarkable {
-                    default: Some(String::from("palette-neutral-300")),
-                    dark: Some(String::from("palette-neutral-700")),
-                },
-                text: ColorDarkable {
-                    default: Some(String::from("palette-neutral-700")),
-                    dark: Some(String::from("palette-neutral-300")),
-                },
-            },
-            hover: Some(ThemeColorSet {
-                background: ColorDarkable {
-                    default: Some(String::from("palette-neutral-200")),
-                    dark: Some(String::from("palette-neutral-800")),
-                },
-                border: ColorDarkable {
-                    default: Some(String::from("palette-neutral-300")),
-                    dark: Some(String::from("palette-neutral-700")),
-                },
-                text: ColorDarkable {
-                    default: Some(String::from("palette-neutral-700")),
-                    dark: Some(String::from("palette-neutral-100")),
-                },
-            }),
-            active: None,
-            focus: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeColorFile {
-    pub default_state: ThemeColorSet,
-    pub hover: Option<ThemeColorSet>,
-    pub active: Option<ThemeColorSet>,
-    pub focus: Option<ThemeColorSet>,
-}
-
-impl ThemeColorFile {
-    pub fn from(theme_color: &ThemeColor) -> ThemeColorFile {
-        let ThemeColor {
-            default: default_state,
-            hover,
-            active,
-            focus,
-            ..
-        } = theme_color;
-        ThemeColorFile {
-            default_state: default_state.to_owned(),
-            hover: hover.to_owned(),
-            active: active.to_owned(),
-            focus: focus.to_owned(),
-        }
-    }
-
-    pub fn to(theme_file: &ThemeColorFile, theme_name: &str) -> ThemeColor {
-        let ThemeColorFile {
-            default_state,
-            hover,
-            active,
-            focus,
-        } = theme_file;
-        ThemeColor {
-            default: default_state.to_owned(),
-            hover: hover.to_owned(),
-            active: active.to_owned(),
-            focus: focus.to_owned(),
-            theme_name: String::from(theme_name),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeColorSet {
-    pub background: ColorDarkable,
-    pub border: ColorDarkable,
-    pub text: ColorDarkable,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ColorDarkable {
-    pub default: Option<String>,
-    pub dark: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -18,17 +18,16 @@ import SpacePreview from "./SpacePreview"; // le composant créé plus haut
 
 import { DesignSystem, Space } from "../../../domain/DesignSystemDomain";
 import { generateUniqueSpacesKey } from "../../../util/DesignSystemUtils";
-import { DEFAULT_BASE } from "../../../ui/UiConstants";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 // import { DEFAULT_SPACES } from "../../domain/DesignSystemDomain"; // si tu veux les defaults
 
 function SpacesComponent() {
-  const { designSystem, findDesignSystemColor, editMode } =
-    useDesignSystemContext();
-  const { base, spaces } = designSystem;
+  const { designSystem, editMode } = useDesignSystemContext();
+  const { spaces } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
@@ -104,7 +103,7 @@ function SpacesComponent() {
 
   const formClassNames = classNames(
     styles.componentDesignSystem,
-    styles.mediumHeight
+    styles.bigHeight
   );
   const sideSettingsClass = classNames(
     styles.sideSettings,
@@ -153,17 +152,8 @@ function SpacesComponent() {
         </div>
       </div>
 
-      <div className={styles.previewContainer}>
-        <div
-          className={styles.previewElement}
-          ref={scrollableRight}
-          style={{
-            background: findDesignSystemColor({
-              label: base.background.default,
-              defaultValue: DEFAULT_BASE.background.default,
-            }),
-          }}
-        >
+      <PreviewComponentDesignSystem maxHeight="600px">
+        <div className={styles.previewElement} ref={scrollableRight}>
           {spacesArray.map((field, index) => (
             <SpacePreview
               key={field.id}
@@ -174,7 +164,7 @@ function SpacesComponent() {
             />
           ))}
         </div>
-      </div>
+      </PreviewComponentDesignSystem>
 
       <div className={styles.darkPreviewPlaceholder} />
     </form>

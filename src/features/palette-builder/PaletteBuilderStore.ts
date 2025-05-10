@@ -835,7 +835,7 @@ export function paletteBuildToDesignSystemPalette(
 ): Palette {
   return {
     paletteName: palette.name,
-    shades: palette.tints.map((tint) => {
+    tints: palette.tints.map((tint) => {
       return {
         label: tint.name,
         color: tint.color.toString({ format: "hex" }),

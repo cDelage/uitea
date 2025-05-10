@@ -47,7 +47,7 @@ function MainThemeTokenPopover({
                 style={{
                   background: token.value,
                   ...getRectSize({
-                    height: "var(--space-9)",
+                    height: "var(--uidt-space-9)",
                   }),
                 }}
               ></div>
@@ -60,7 +60,7 @@ function MainThemeTokenPopover({
               className="palette-color"
               style={{
                 background: color,
-                ...getRectSize({ height: "var(--space-10)" }),
+                ...getRectSize({ height: "var(--uidt-space-10)" }),
               }}
             ></div>
             <div className="row align-center gap-2" onClick={() => copy(color)}>

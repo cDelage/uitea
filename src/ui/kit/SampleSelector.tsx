@@ -20,7 +20,7 @@ function SamplesSelector({ onSelect }: { onSelect?: (value: string) => void }) {
                       <div
                         className="palette-color"
                         style={{
-                          ...getRectSize({ height: "var(--space-5)" }),
+                          ...getRectSize({ height: "var(--uidt-space-5)" }),
                           background: color,
                         }}
                       ></div>
@@ -35,7 +35,7 @@ function SamplesSelector({ onSelect }: { onSelect?: (value: string) => void }) {
               <div
                 className="palette-color"
                 style={{
-                  ...getRectSize({ height: "var(--space-5)" }),
+                  ...getRectSize({ height: "var(--uidt-space-5)" }),
                   background: sample.colors[0],
                 }}
               ></div>

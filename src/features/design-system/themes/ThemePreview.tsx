@@ -61,7 +61,7 @@ function ThemePreview({
           <div className="column w-full gap-3" key={palette.paletteName}>
             <div>{palette.paletteName}</div>
             <div className="row w-full gap-3 align-center ">
-              {palette.shades.map((tint) => (
+              {palette.tints.map((tint) => (
                 <div key={tint.label} className="flex-1">
                   <CopyableTopTooltip tooltipValue={tint.color}>
                     <div className="py-3">
@@ -71,11 +71,11 @@ function ThemePreview({
                           background: tint.color,
                           border: "none",
                           ...getRectSize({
-                            height: "var(--space-9)",
+                            height: "var(--uidt-space-9)",
                             flex: true,
                           }),
                         }}
-                      ></div>
+                      />
                     </div>
                   </CopyableTopTooltip>
                 </div>

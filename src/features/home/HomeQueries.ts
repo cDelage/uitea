@@ -6,6 +6,7 @@ import {
   PresetDressing,
   RecentFilesMetadata,
   RemoveRecentFilesPayload,
+  UserSettings,
 } from "../../domain/HomeDomain";
 import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
 import { PaletteBuilderMetadata } from "../../domain/PaletteBuilderDomain";
@@ -124,4 +125,42 @@ export function usePresetDressing() {
     });
 
   return { presetDressing, isLoadingPresetDressing };
+}
+
+export function useUserSettings() {
+  const { data: userSettings, isLoading: isLoadingUserSettings } =
+    useQuery<UserSettings>({
+      queryKey: ["user-settings"],
+      queryFn: async () => await invoke("fetch_user_settings"),
+    });
+
+  return {
+    userSettings,
+    isLoadingUserSettings,
+  };
+}
+
+export function useUpdateUserSettings() {
+  const queryClient = useQueryClient();
+
+  const { mutate: updateUserSettings, isPending: isUpdatingUserSettings } =
+    useMutation({
+      mutationFn: async (userSettings: UserSettings) =>
+        await invoke("update_user_settings", {
+          userSettings,
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["user-settings"],
+        });
+      },
+      onError: (err) => {
+        toast.error(err);
+      },
+    });
+
+  return {
+    updateUserSettings,
+    isUpdatingUserSettings,
+  };
 }

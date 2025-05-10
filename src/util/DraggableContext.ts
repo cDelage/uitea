@@ -9,7 +9,6 @@ export type DraggableTools = {
   setHoverIndex: (dragId: number | undefined | "remove") => void;
 };
 
-
 export const DraggableContext = createContext<DraggableTools | null>(null);
 
 export const ParentDraggableContext = createContext<DraggableTools | null>(
@@ -59,3 +58,5 @@ export function useDraggableFeatures(
   }, [dragIndex, dragEvent, hoverIndex]);
   return { draggableTools };
 }
+
+

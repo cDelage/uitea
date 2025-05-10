@@ -25,11 +25,11 @@ function TokenPreview({
         tooltipValue={tooltipValue}
         className={flex ? "flex-1" : "w-fit"}
       >
-        <div className="row align-center gap-2 p-2 py-3 w-fit">
+        <div className="row align-center gap-3 p-2 py-3 w-fit">
           <div
             className="palette-color w-full"
             style={{
-              ...getRectSize({ height: "var(--space-7)" }),
+              ...getRectSize({ height: "var(--uidt-space-7)" }),
               background: `var(--${value})`,
             }}
           ></div>

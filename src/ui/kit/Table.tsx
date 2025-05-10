@@ -13,29 +13,29 @@ export const Table = styled.table`
     tr {
       font-size: 14px;
       line-height: 20px;
-      font-weight: var(--font-weight-bold);
-      color: var(--base-text-light);
+      font-weight: var(--uidt-font-weight-bold);
+      color: var(--uidt-base-text-light);
       td {
-        padding: var(--space-3);
+        padding: var(--uidt-space-3);
       }
 
       td.shrink {
         width: 1%; /* La cellule de droite occupe le minimum nécessaire */
         white-space: nowrap; /* Empêche la cellule de réduire son contenu sur plusieurs lignes */
-        padding: var(--space-5) var(--space-2); /* Applique le padding ici */
+        padding: var(--uidt-space-5) var(--uidt-space-2); /* Applique le padding ici */
       }
     }
   }
 
   tbody {
-    background-color: var(--component-bg);
+    background-color: var(--uidt-component-bg);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--uidt-shadow-md);
 
     .hoverable {
       &:hover {
-        background-color: var(--component-hover-bg);
-        color: var(--component-hover-text);
+        background-color: var(--uidt-component-hover-bg);
+        color: var(--uidt-component-hover-text);
       }
     }
 
@@ -43,13 +43,13 @@ export const Table = styled.table`
       cursor: pointer;
 
       td {
-        padding: var(--space-5); /* Applique le padding ici */
+        padding: var(--uidt-space-5); /* Applique le padding ici */
       }
 
       td.shrink {
         width: 1%; /* La cellule de droite occupe le minimum nécessaire */
         white-space: nowrap; /* Empêche la cellule de réduire son contenu sur plusieurs lignes */
-        padding: var(--space-5) var(--space-2); /* Applique le padding ici */
+        padding: var(--uidt-space-5) var(--uidt-space-2); /* Applique le padding ici */
       }
     }
   }

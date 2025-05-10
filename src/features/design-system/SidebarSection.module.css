@@ -1,20 +1,20 @@
 .sidebarSection {
   display: flex;
-  padding: var(--space-3) var(--space-5);
-  gap: var(--space-3);
+  padding: var(--uidt-space-3) var(--uidt-space-5);
+  gap: var(--uidt-space-3);
   box-sizing: border-box;
   align-items: center;
   user-select: none;
   cursor: pointer;
-  border-radius: var(--rounded-md);
+  border-radius: var(--uidt-rounded-md);
 }
 
 .sidebarSection:hover {
-  background-color: var(--base-button-hover-bg);
+  background-color: var(--uidt-base-button-hover-bg);
 }
 
 .sidebarSectionVisible {
-  background: var(--base-button-active-bg);
+  background: var(--uidt-base-button-active-bg);
 }
 
 .sidebarSectionVisibleFirst {
@@ -23,12 +23,12 @@
 }
 
 .fileUnderFolder {
-  padding-left: var(--space-8);
+  padding-left: var(--uidt-space-8);
 }
 
 .iconChevronContainer {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--uidt-space-1);
   transition: transform 300ms linear;
 }

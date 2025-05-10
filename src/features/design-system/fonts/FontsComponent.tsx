@@ -5,7 +5,6 @@ import { Fonts } from "../../../domain/DesignSystemDomain";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
-import { DEFAULT_BASE } from "../../../ui/UiConstants";
 import InputDesignSystem from "../InputDesignSystem";
 import { generateUniqueFontKey } from "../../../util/DesignSystemUtils";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
@@ -19,11 +18,11 @@ import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import FontsPopover from "./FontsPopover";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 
 function FontsComponent() {
-  const { designSystem, findDesignSystemColor, editMode } =
-    useDesignSystemContext();
-  const { fonts, base } = designSystem;
+  const { designSystem, editMode } = useDesignSystemContext();
+  const { fonts } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { handleSubmit, watch, control, register, reset, setValue } =
@@ -167,15 +166,12 @@ function FontsComponent() {
           <div className="row justify-center">Empty</div>
         )}
       </div>
-      <div className={styles.previewContainer}>
+      <PreviewComponentDesignSystem maxHeight="600px">
         <div
           className={styles.previewElement}
           style={{
-            background: findDesignSystemColor({
-              label: base.background.default,
-              defaultValue: DEFAULT_BASE.background.default,
-            }),
             fontFamily: watch("default"),
+            minHeight: "100%"
           }}
         >
           <div className="column">
@@ -193,7 +189,7 @@ function FontsComponent() {
             ))}
           </div>
         </div>
-      </div>
+      </PreviewComponentDesignSystem>
       <div className={styles.darkPreviewPlaceholder} />
     </form>
   );

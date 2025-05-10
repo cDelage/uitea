@@ -1,13 +1,13 @@
 .spacePreviewItem {
   display: flex;
   align-items: center;
-  background-color: var(--primary-bg);
-  color: var(--primary-text);
+  background-color: var(--uidt-primary-bg);
+  color: var(--uidt-primary-text);
   overflow: show;
   justify-content: center;
 }
 
 .textPreview {
-  background-color: var(--primary-bg);
-  border-radius: var(--space-2);
+  background-color: var(--uidt-primary-bg);
+  border-radius: var(--uidt-space-2);
 }

@@ -7,8 +7,8 @@ use crate::{
     application::home_application::fetch_presets_dressing,
     domain::{
         design_system_domain::{
-            Base, DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts,
-            Palette, Radius, SemanticColorTokens, Space, ThemeColor, Typographies,
+            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts,
+            Palette, Radius, SemanticColorTokens, Space, Typographies,
         },
         home_domain::PresetDressing,
     },
@@ -98,21 +98,15 @@ pub fn find_design_system(
             Ok(colors) => Ok(colors),
         }?;
 
-    let base: Base = match design_system_repository::fetch_base_colors(&design_system_pathbuf) {
-        Err(_) => {
-            design_system_repository::init_base_colors(&design_system_pathbuf)?;
-            design_system_repository::fetch_base_colors(&design_system_pathbuf)
-        }
-        Ok(base) => Ok(base),
-    }?;
+    let themes = design_system_repository::fetch_themelist(&design_system_pathbuf);
 
-    let themes: Vec<ThemeColor> =
-        match design_system_repository::fetch_themes(&design_system_pathbuf) {
+    let semantic_color_tokens: SemanticColorTokens =
+        match design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf) {
             Err(_) => {
-                design_system_repository::init_themes(&design_system_pathbuf)?;
-                design_system_repository::fetch_themes(&design_system_pathbuf)
+                design_system_repository::init_semantic_color_tokens(&design_system_pathbuf)?;
+                design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf)
             }
-            Ok(theme) => Ok(theme),
+            Ok(tokens) => Ok(tokens),
         }?;
 
     let fonts: Fonts = match design_system_repository::fetch_fonts(&design_system_pathbuf) {
@@ -157,28 +151,15 @@ pub fn find_design_system(
         Ok(radius) => Ok(radius),
     }?;
 
-    let themelist = design_system_repository::fetch_themelist(&design_system_pathbuf);
-
-    let semantic_color_tokens: SemanticColorTokens =
-        match design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf) {
-            Err(_) => {
-                design_system_repository::init_semantic_color_tokens(&design_system_pathbuf)?;
-                design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf)
-            }
-            Ok(tokens) => Ok(tokens),
-        }?;
-
     Ok(DesignSystem {
         metadata,
         palettes,
-        base,
-        themes,
         fonts,
         typography,
         spaces,
         radius,
         effects,
-        themelist,
+        themes,
         semantic_color_tokens,
     })
 }

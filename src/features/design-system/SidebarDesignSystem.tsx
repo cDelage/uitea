@@ -3,21 +3,23 @@ import { useSaveDesignSystem } from "./DesignSystemQueries";
 import styles from "./SidebarDesignSystem.module.css";
 import SidebarSection from "./SidebarSection";
 import IconColors from "../../ui/icons/IconColors";
-import SidebarFolder from "./SidebarFolder";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import SidebarFile from "./SidebarFile";
 import {
   MdAbc,
   MdContrast,
   MdEdit,
+  MdFormatColorFill,
+  MdLightMode,
   MdLineWeight,
   MdRoundedCorner,
   MdSave,
   MdSettings,
+  MdSunny,
   MdTextFields,
   MdVisibility,
 } from "react-icons/md";
-import { ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
+import { getRectSize, ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
 import Popover from "../../ui/kit/Popover";
 import SidebarSettings from "./SidebarSettings";
 import Switch from "../../ui/kit/Switch";
@@ -26,14 +28,11 @@ import { RecentFile } from "../../domain/HomeDomain";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import PaletteIcon from "../../ui/icons/PaletteIcon";
-import BaseIcon from "../../ui/icons/BaseIcon";
-import { useBaseColors } from "../../util/DesignSystemUtils";
-import ThemeIcon from "../../ui/icons/ThemeIcon";
 import FontIcon from "../../ui/icons/FontIcon";
 import SpacesIcon from "../../ui/icons/SpacesIcon";
 
 function SidebarDesignSystem() {
-  const { designSystem, setActiveComponent, editMode } =
+  const { designSystem, setActiveComponent, editMode, theme, setTheme } =
     useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
@@ -41,8 +40,6 @@ function SidebarDesignSystem() {
   function handleSave() {
     saveDesignSystem({ designSystem, isTmp: false });
   }
-
-  const base = useBaseColors();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -124,40 +121,31 @@ function SidebarDesignSystem() {
           scrollName="colors"
         >
           <>
-            <SidebarFolder name="Palettes">
-              {designSystem?.palettes.map((palette) => (
-                <SidebarFile
-                  key={palette.paletteName}
-                  filename={palette.paletteName}
-                  underFolder={true}
-                  id={`palette-${palette.paletteName}`}
-                  icon={<PaletteIcon palette={palette} size={ICON_SIZE_SM} />}
-                  visible={visible}
-                />
-              ))}
-            </SidebarFolder>
-            <SidebarFolder name="Base">
+            {designSystem?.palettes.map((palette) => (
               <SidebarFile
-                filename="Base"
-                id="base"
+                key={palette.paletteName}
+                filename={palette.paletteName}
                 underFolder={true}
-                icon={<BaseIcon base={base} size={ICON_SIZE_SM} />}
+                id={`palette-${palette.paletteName}`}
+                icon={<PaletteIcon palette={palette} size={ICON_SIZE_SM} />}
                 visible={visible}
               />
-            </SidebarFolder>
-            <SidebarFolder name="Themes">
-              {designSystem?.themes.map((theme) => (
-                <SidebarFile
-                  key={theme.themeName}
-                  filename={theme.themeName}
-                  underFolder={true}
-                  id={`theme-${theme.themeName}`}
-                  icon={<ThemeIcon size={ICON_SIZE_SM} theme={theme} />}
-                  visible={visible}
-                />
-              ))}
-            </SidebarFolder>
+            ))}
           </>
+          <SidebarFile
+            filename="Themes"
+            id="themes"
+            underFolder={true}
+            icon={<MdLightMode size={ICON_SIZE_SM} />}
+            visible={visible}
+          />
+          <SidebarFile
+            filename={"Semantic color tokens"}
+            underFolder={true}
+            id={"semantic-color-tokens"}
+            icon={<MdFormatColorFill size={ICON_SIZE_SM} />}
+            visible={visible}
+          />
         </SidebarSection>
         <SidebarSection SectionIcon={FontIcon} name="Texts" scrollName="texts">
           <>
@@ -207,7 +195,64 @@ function SidebarDesignSystem() {
           </>
         </SidebarSection>
       </div>
-      <div className={styles.bottomContainer}></div>
+      <div className={styles.bottomContainer}>
+        <div className="row align-center gap-3">
+          <MdSunny size={ICON_SIZE_SM} />
+          <Popover>
+            <Popover.Toggle
+              id="theme-selector"
+              disabled={!designSystem.themes.otherThemes.length}
+            >
+              <div className="row w-full">
+                <Popover.SelectorButton
+                  disabled={!designSystem.themes.otherThemes.length}
+                  width="200px"
+                  value={
+                    theme ? (
+                      <>{theme.name}</>
+                    ) : (
+                      <>{designSystem.themes.mainTheme?.name ?? "default"}</>
+                    )
+                  }
+                  onRemove={theme ? () => setTheme(undefined) : undefined}
+                />
+              </div>
+            </Popover.Toggle>
+            <Popover.Body id="theme-selector">
+              <Popover.Actions width="200px">
+                <Popover.Tab
+                  key={designSystem.themes.mainTheme?.name}
+                  clickEvent={() => setTheme(undefined)}
+                >
+                  <div
+                    className="palette-color"
+                    style={{
+                      background: designSystem.themes.mainTheme?.background,
+                      ...getRectSize({ height: "var(--uidt-space-5)" }),
+                    }}
+                  />
+                  {designSystem.themes.mainTheme?.name}
+                </Popover.Tab>
+                {designSystem.themes.otherThemes.map((theme) => (
+                  <Popover.Tab
+                    key={theme.name}
+                    clickEvent={() => setTheme(theme)}
+                  >
+                    <div
+                      className="palette-color"
+                      style={{
+                        background: theme.background,
+                        ...getRectSize({ height: "var(--uidt-space-5)" }),
+                      }}
+                    />
+                    {theme.name}
+                  </Popover.Tab>
+                ))}
+              </Popover.Actions>
+            </Popover.Body>
+          </Popover>
+        </div>
+      </div>
     </div>
   );
 }

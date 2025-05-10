@@ -12,7 +12,7 @@ import { useDesignSystemContext } from "./DesignSystemContext";
 import DraggableList from "./DraggableList";
 import FontIcon from "../../ui/icons/FontIcon";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import FontsComponent from "./fonts/FontsComponent";
 import TypographyComponent from "./typography/TypographyComponent";
 import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
@@ -25,9 +25,11 @@ import { MdBrush, MdConstruction, MdPalette } from "react-icons/md";
 import PaletteBuilderModal from "../palette-builder/PaletteBuilderModal";
 import { useEffect, useState } from "react";
 import ColorPickerModal from "../color-picker/ColorPickerModal";
-import ThemelistComponent from "./themes/ThemelistComponent";
+import ThemesComponent from "./themes/ThemesComponent";
 import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorTokensComponent";
 import TokenCrafterModal from "../token-crafter/TokenCrafterModal";
+import { useTokenCrafterStore } from "../token-crafter/TokenCrafterStore";
+import { useUserSettings } from "../home/HomeQueries";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -36,7 +38,13 @@ function BodyDesignSystem() {
   const { scrollRef } = useScrollTriggerRefresh();
   const [isPaletteBuilderOpen, setIsPaletteBuilderOpen] = useState(false);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const [isTokenCrafterOpen, setIsTokenCrafterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { generateRecommandations } = useTokenCrafterStore();
+  const navigate = useNavigate();
+  const { userSettings } = useUserSettings();
+
+  const pluginDisplayMode = userSettings?.pluginDisplayMode ?? "fullscreen";
 
   function initPalette() {
     saveDesignSystem({
@@ -61,6 +69,11 @@ function BodyDesignSystem() {
     setSearchParams(searchParams);
   }, [isColorPickerOpen, searchParams, setSearchParams]);
 
+  useEffect(() => {
+    searchParams.set("tokenCrafterOpen", isTokenCrafterOpen ? "true" : "false");
+    setSearchParams(searchParams);
+  }, [isTokenCrafterOpen, searchParams, setSearchParams]);
+
   return (
     <Modal>
       <div
@@ -82,7 +95,17 @@ function BodyDesignSystem() {
             subSectionName="Palettes"
             actions={
               <>
-                <Modal.Toggle id="palette-builder">
+                <Modal.Toggle
+                  id="palette-builder"
+                  replaceOpen={
+                    pluginDisplayMode === "fullscreen"
+                      ? () =>
+                          navigate(
+                            `/palette-builder?currentDesignSystem=${designSystemPath}`
+                          )
+                      : undefined
+                  }
+                >
                   <button className="action-ghost-button" type="button">
                     <MdConstruction size={ICON_SIZE_MD} />
                     Palette builder
@@ -95,7 +118,17 @@ function BodyDesignSystem() {
                 >
                   <PaletteBuilderModal />
                 </Modal.Body>
-                <Modal.Toggle id="color-picker">
+                <Modal.Toggle
+                  id="color-picker"
+                  replaceOpen={
+                    pluginDisplayMode === "fullscreen"
+                      ? () =>
+                          navigate(
+                            `/color-picker?currentDesignSystem=${designSystemPath}`
+                          )
+                      : undefined
+                  }
+                >
                   <button className="action-ghost-button" type="button">
                     <MdPalette size={ICON_SIZE_MD} />
                     Color picker
@@ -131,19 +164,36 @@ function BodyDesignSystem() {
             </>
           </Section.Subsection>
           <Section.Subsection subSectionName="Themes">
-            <ThemelistComponent />
+            <ThemesComponent />
           </Section.Subsection>
           <Section.Subsection
             subSectionName="Semantic color tokens"
             actions={
               <>
-                <Modal.Toggle id="token-crafter">
+                <Modal.Toggle
+                  id="token-crafter"
+                  openCallback={() => generateRecommandations(designSystem)}
+                  replaceOpen={
+                    pluginDisplayMode === "fullscreen"
+                      ? () => {
+                          generateRecommandations(designSystem);
+                          navigate(
+                            `/token-crafter?currentDesignSystem=${designSystemPath}`
+                          );
+                        }
+                      : undefined
+                  }
+                >
                   <button className="action-ghost-button" type="button">
                     <MdBrush size={ICON_SIZE_MD} />
                     Token crafter
                   </button>
                 </Modal.Toggle>
-                <Modal.Body id="token-crafter">
+                <Modal.Body
+                  id="token-crafter"
+                  isOpenToSync={isTokenCrafterOpen}
+                  setIsOpenToSync={setIsTokenCrafterOpen}
+                >
                   <TokenCrafterModal />
                 </Modal.Body>
               </>

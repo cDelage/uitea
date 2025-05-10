@@ -37,11 +37,28 @@ function Modal({ children }: { children: ReactNode }) {
   );
 }
 
-function Toggle({ children, id }: { children: ReactNode; id: string }) {
+function Toggle({
+  children,
+  id,
+  openCallback,
+  replaceOpen,
+}: {
+  children: ReactNode;
+  id: string;
+  replaceOpen?: () => void;
+  openCallback?: () => void;
+}) {
   const { openModal: open } = useContext(ModalContext) as ModalContextType;
-
+  function handleOpen() {
+    if (replaceOpen) {
+      replaceOpen?.();
+    } else {
+      open(id);
+      setTimeout(() => openCallback?.(), 0);
+    }
+  }
   return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
-    onClick: () => open(id),
+    onClick: handleOpen,
   });
 }
 

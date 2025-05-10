@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import Loader from "./ui/kit/Loader";
 import PagePaletteBuilder from "./features/palette-builder/PagePaletteBuilder";
 import PageColorPicker from "./features/color-picker/PageColorPicker";
+import PageTokenCrafter from "./features/token-crafter/PageTokenCrafter";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "/token-crafter",
+        element: (
+          <Suspense fallback={<Loader />}>
+            <PageTokenCrafter />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);
@@ -77,8 +86,8 @@ function App() {
             fontSize: "16px",
             maxWidth: "500px",
             padding: "16px 24px",
-            backgroundColor: "var(--component-bg)",
-            color: "--base-text",
+            backgroundColor: "var(--uidt-component-bg)",
+            color: "--uidt-base-text",
           },
         }}
       />

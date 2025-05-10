@@ -411,11 +411,16 @@ export const PICKER_MODES: ColorSpace[] = [
 export const WHITE = new ColorIO("#ffffff");
 export const BLACK = new ColorIO("#000000");
 
-export function getContrastColor(hex: string) {
-  const baseColor = new ColorIO(hex);
-  const whiteContrast = baseColor.contrastWCAG21(WHITE);
-  const blackContrast = baseColor.contrastWCAG21(BLACK);
-  return whiteContrast > blackContrast ? "#ffffff" : "#000000";
+export function getContrastColor(hex?: string) {
+  if (!hex) return "#000000";
+  try {
+    const baseColor = new ColorIO(hex);
+    const whiteContrast = baseColor.contrastWCAG21(WHITE);
+    const blackContrast = baseColor.contrastWCAG21(BLACK);
+    return whiteContrast > blackContrast ? "#ffffff" : "#000000";
+  } catch {
+    return "#000000";
+  }
 }
 
 export function isValidColor(color: string) {

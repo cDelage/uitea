@@ -34,18 +34,6 @@ function recolor({
   });
 
   const result = new ColorIO("okhsl", [h, s, l]);
-  
-  console.log({
-    initialCenter: defaultCenter.okhsl,
-    newCenter: newCenter.okhsl,
-    initialValue: defaultColor.okhsl,
-    newValue: [h, s, l],
-    result: defaultColor.okhsl,
-    hex:{
-      initial: defaultColor.toString({format:"hex"}),
-      new: defaultColor.toString({format: "hex"})
-    }
-  });
 
   return result;
 }
@@ -54,29 +42,32 @@ export function recolorPalettes({
   palettes,
   defaultBackground,
   newBackground,
+  recolorLog,
 }: {
   palettes: Palette[];
   defaultBackground: string;
   newBackground: string;
+  recolorLog?: boolean;
 }): Palette[] {
+  if (recolorLog) {
+    console.log("recolor");
+  }
   const palettesToUpdate = [...palettes];
   let defaultBgColor = new ColorIO(defaultBackground);
   const newBgColor = new ColorIO(newBackground);
   const isReversed: boolean =
     defaultBgColor.okhsl[2] >= 0.5 !== newBgColor.okhsl[2] >= 0.5;
-  console.log(`${newBackground} is reversed : ${isReversed}`);
   if (isReversed) {
-    console.log("before reverse", defaultBgColor.toString({ format: "hex" }));
     const [paletteMin, paletteMax] = palettes.reduce<ColorIO[]>(
       (acc, current) => {
-        const paletteMin = new ColorIO(current.shades[0].color);
+        const paletteMin = new ColorIO(current.tints[0].color);
         if (
           !acc.length ||
           defaultBgColor.deltaE76(acc[0]) > defaultBgColor.deltaE76(paletteMin)
         ) {
           return [
-            new ColorIO(current.shades[0].color),
-            new ColorIO(current.shades[current.shades.length - 1].color),
+            new ColorIO(current.tints[0].color),
+            new ColorIO(current.tints[current.tints.length - 1].color),
           ];
         } else {
           return acc;
@@ -84,33 +75,27 @@ export function recolorPalettes({
       },
       []
     );
-    console.log({
-      paletteMin: paletteMin.toString({ format: "hex" }),
-      paletteMax: paletteMax.toString({ format: "hex" }),
-    });
     defaultBgColor = recolor({
       defaultColor: defaultBgColor,
       newCenter: paletteMax,
       defaultCenter: paletteMin,
     });
-    console.log("after reverse", defaultBgColor.toString({ format: "hex" }));
   }
 
   return palettesToUpdate.map((palette) => {
-    const newTints = [...palette.shades];
+    let newTints = [...palette.tints];
     if (isReversed) {
-      newTints.reverse();
+      newTints.reverse()
+      newTints = newTints.map((tint, index) => {
+        return {
+          ...tint,
+          label: palette.tints[index].label
+        }
+      });
     }
-    console.log(
-      `compute palette ${palette.paletteName} on background: ${newBackground}`
-    );
-    console.log({
-      defaultBgColor: defaultBgColor.okhsl,
-      newBgColor: newBgColor.okhsl,
-    });
     return {
       ...palette,
-      shades: newTints.map((tint) => {
+      tints: newTints.map((tint) => {
         return {
           ...tint,
           color: recolor({

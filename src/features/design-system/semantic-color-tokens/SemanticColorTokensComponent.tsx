@@ -9,17 +9,33 @@ import { isEqual } from "lodash";
 import { SemanticColorTokens } from "../../../domain/DesignSystemDomain";
 import { useForm } from "react-hook-form";
 import SemanticBaseInput from "./SemanticBaseInput";
+import { useRef } from "react";
+import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
+import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
+import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 
 function SemanticColorTokensComponent() {
-  const { designSystem, tokenFamilies } =
-    useDesignSystemContext();
+  const { designSystem, tokenFamilies } = useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const { watch, setValue, handleSubmit } = useForm({
+  const { watch, setValue, handleSubmit, reset } = useForm({
     defaultValues: designSystem.semanticColorTokens,
   });
 
-  const tokenFamiliesAccessible = tokenFamilies.filter(family => family.category === "color");
+  const semanticTokensRef = useRef<HTMLFormElement | null>(null);
+  useTriggerScroll({
+    ref: semanticTokensRef,
+    triggerId: `semantic-color-tokens`,
+  });
+  useRefreshDesignSystemFormsEvent({
+    reset,
+    originalValue: designSystem.semanticColorTokens,
+  });
+  useSidebarComponentVisible(semanticTokensRef, "semantic-color-tokens");
+
+  const tokenFamiliesAccessible = tokenFamilies.filter(
+    (family) => family.category === "color"
+  );
 
   const sideSettingsClassNames = classNames(
     styles.sideSettings,
@@ -38,7 +54,7 @@ function SemanticColorTokensComponent() {
   }
 
   return (
-    <form className={styles.componentDesignSystem}>
+    <form ref={semanticTokensRef} className={styles.componentDesignSystem}>
       <div className={sideSettingsClassNames} style={{ maxHeight: "500px" }}>
         <div className={styles.sideSettingsTitle}>
           <h5>Base</h5>
@@ -86,7 +102,7 @@ function SemanticColorTokensComponent() {
           />
         </div>
       </div>
-      <PreviewComponentDesignSystem maxHeight="500px">
+      <PreviewComponentDesignSystem maxHeight="600px">
         <SemanticPreview />
       </PreviewComponentDesignSystem>
       <div className={styles.darkPreviewPlaceholder} />

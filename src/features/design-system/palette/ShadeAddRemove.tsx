@@ -11,10 +11,10 @@ import { MouseEvent } from "react";
 function ShadeAddRemove({
   draggableTools,
   shadesFieldArray,
-  handleSubmit
+  handleSubmit,
 }: {
   draggableTools: DraggableTools;
-  shadesFieldArray: UseFieldArrayReturn<Palette, "shades", "id">;
+  shadesFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
   handleSubmit: () => void;
 }) {
   const shadeClassNames = classNames(
@@ -28,8 +28,8 @@ function ShadeAddRemove({
   );
 
   const background = !draggableTools.dragIndex
-    ? "var(--add-bg)"
-    : "var(--remove-bg)";
+    ? "var(--uidt-add-bg)"
+    : "var(--uidt-remove-bg)";
 
   function handleMouseEnter() {
     if (draggableTools.dragIndex) {

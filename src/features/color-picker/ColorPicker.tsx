@@ -104,7 +104,7 @@ function ColorPicker({
                   background: color.toString({
                     format: "hex",
                   }),
-                  ...getRectSize({ height: "var(--space-10)" }),
+                  ...getRectSize({ height: "var(--uidt-space-10)" }),
                 }}
               ></div>
               <div

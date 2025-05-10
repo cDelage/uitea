@@ -8,6 +8,7 @@ import {
   FontStyle,
   FontWeight,
   Palette,
+  RecommandationContrastPayload,
   Space,
   TextDecoration,
   TextTransform,
@@ -15,6 +16,7 @@ import {
 } from "../domain/DesignSystemDomain";
 import { CSSProperties } from "styled-components";
 
+export const ICON_SIZE_XS = "12";
 export const ICON_SIZE_SM = "16";
 export const ICON_SIZE_MD = "20";
 export const ICON_SIZE_LG = "24";
@@ -23,42 +25,42 @@ export const ICON_SIZE_XXL = "52";
 
 export const DEFAULT_BASE: Base = {
   background: {
-    default: "var(--palette-gray-50)",
-    dark: "var(--palette-gray-950)",
+    default: "var(--uidt-palette-gray-50)",
+    dark: "var(--uidt-palette-gray-950)",
   },
   border: {
-    default: "var(--palette-gray-300)",
-    dark: "var(--palette-gray-700)",
+    default: "var(--uidt-palette-gray-300)",
+    dark: "var(--uidt-palette-gray-700)",
   },
   textLight: {
-    default: "var(--palette-gray-500)",
-    dark: "var(--palette-gray-500)",
+    default: "var(--uidt-palette-gray-500)",
+    dark: "var(--uidt-palette-gray-500)",
   },
   textDefault: {
-    default: "var(--palette-gray-700)",
-    dark: "var(--palette-gray-400)",
+    default: "var(--uidt-palette-gray-700)",
+    dark: "var(--uidt-palette-gray-400)",
   },
   textDark: {
-    default: "var(--palette-gray-900)",
-    dark: "var(--palette-gray-50)",
+    default: "var(--uidt-palette-gray-900)",
+    dark: "var(--uidt-palette-gray-50)",
   },
   backgroundDisabled: {
-    default: "var(--palette-gray-200)",
-    dark: "var(--palette-gray-700)",
+    default: "var(--uidt-palette-gray-200)",
+    dark: "var(--uidt-palette-gray-700)",
   },
   borderDisabled: {
-    default: "var(--palette-gray-300)",
-    dark: "var(--palette-gray-600)",
+    default: "var(--uidt-palette-gray-300)",
+    dark: "var(--uidt-palette-gray-600)",
   },
   textDisabled: {
-    default: "var(--palette-gray-500)",
-    dark: "var(--palette-gray-400)",
+    default: "var(--uidt-palette-gray-500)",
+    dark: "var(--uidt-palette-gray-400)",
   },
 };
 
 export const DEFAULT_PALETTE: Palette = {
   paletteName: "palette-1",
-  shades: [
+  tints: [
     {
       label: "50",
       color: "#DDDDDD",
@@ -231,15 +233,15 @@ export const WEB_SAFE_FONTS: string[] = [
 
 export const SLIDER_STYLE: SliderStyles = {
   handle: {
-    backgroundColor: "var(--palette-primary-800)",
+    backgroundColor: "var(--uidt-palette-primary-800)",
     border: "white 2px solid",
-    boxShadow: "var(--shadow-md)",
+    boxShadow: "var(--uidt-shadow-md)",
   },
   rail: {
-    backgroundColor: "var(--palette-gray-300)",
+    backgroundColor: "var(--uidt-palette-gray-300)",
   },
   track: {
-    backgroundColor: "var(--palette-primary-300)",
+    backgroundColor: "var(--uidt-palette-primary-300)",
   },
 };
 
@@ -258,22 +260,22 @@ export const HANDLE_SLIDER_HORIZONTAL: CSSProperties = {
   borderRadius: "2px",
   height: "24px",
   width: "10px",
-  boxShadow: "var(--shadow-md)",
-  border: "var(--base-border) 1px solid",
+  boxShadow: "var(--uidt-shadow-md)",
+  border: "var(--uidt-base-border) 1px solid",
   bottom: 0,
 };
 
 export const RAIL_SLIDER_HORIZONTAL: CSSProperties = {
   height: "16px",
   borderRadius: "4px",
-  boxShadow: "var(--shadow-md)",
+  boxShadow: "var(--uidt-shadow-md)",
   bottom: 4,
 };
 
 export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
   opacity: 1,
-  border: "1px solid var(--base-border)",
-  boxShadow: "var(--shadow-md)",
+  border: "1px solid var(--uidt-base-border)",
+  boxShadow: "var(--uidt-shadow-md)",
   borderRadius: "4px",
   height: "12px",
   width: "24px",
@@ -282,7 +284,7 @@ export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
 export const RAIL_SLIDER_VERTICAL: CSSProperties = {
   width: "12px",
   borderRadius: "4px",
-  boxShadow: "var(--shadow-md)",
+  boxShadow: "var(--uidt-shadow-md)",
   left: "6px",
 };
 
@@ -305,3 +307,19 @@ export function getRectSize({
     flex: flex ? 1 : 0,
   };
 }
+
+
+export const DEFAULT_RECOMMANDATIONS : RecommandationContrastPayload[] = [
+  {
+    text: 6,
+    border: 3
+  },
+  {
+    text: 9,
+    border: 5
+  },
+  {
+    text: 14,
+    border: 5
+  }
+]

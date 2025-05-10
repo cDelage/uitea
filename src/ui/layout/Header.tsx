@@ -23,6 +23,7 @@ import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { usePaletteBuilderStore } from "../../features/palette-builder/PaletteBuilderStore";
 import { HeaderTools } from "../../util/HeaderTools";
 import { useColorPickerStore } from "../../features/color-picker/ColorPickerStore";
+import { useTokenCrafterStore } from "../../features/token-crafter/TokenCrafterStore";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
@@ -38,6 +39,11 @@ function Header() {
     redoPaletteBuilder,
   } = usePaletteBuilderStore();
   const [searchParams] = useSearchParams();
+  const {
+    canUndoRedo: canUndoRedoTokenCrafter,
+    undoTokenCrafter,
+    redoTokenCrafter,
+  } = useTokenCrafterStore();
   const isEditMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
   ) as boolean;
@@ -68,6 +74,16 @@ function Header() {
         undo: undoColorPicker,
         redo: redoColorPicker,
       };
+    } else if (
+      pathname.startsWith("/token-crafter") ||
+      searchParams.get("tokenCrafterOpen") === "true"
+    ) {
+      return {
+        pageName: "token crafter",
+        canUndoRedo: canUndoRedoTokenCrafter,
+        undo: undoTokenCrafter,
+        redo: redoTokenCrafter,
+      };
     } else if (pathname.startsWith("/design-system")) {
       if (!isEditMode) {
         return {
@@ -87,7 +103,7 @@ function Header() {
     } else if (pathname === "/") {
       return {
         pageName: "home",
-        isHome: true
+        isHome: true,
       };
     }
 
@@ -107,6 +123,9 @@ function Header() {
     undoColorPicker,
     undoDesignSystem,
     undoPaletteBuilder,
+    canUndoRedoTokenCrafter,
+    undoTokenCrafter,
+    redoTokenCrafter,
   ]);
 
   useEffect(() => {
@@ -123,9 +142,7 @@ function Header() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    headerTools,
-  ]);
+  }, [headerTools]);
 
   useEffect(() => {
     const updateMaximizedState = async () => {

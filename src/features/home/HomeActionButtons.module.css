@@ -1,13 +1,13 @@
 .homeActionButton {
-    height: var(--space-14);
-    width: var(--space-14);
-    background-color: var(--component-bg);
+    height: var(--uidt-space-14);
+    width: var(--uidt-space-14);
+    background-color: var(--uidt-component-bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: var(--space-2);
-    box-shadow: var(--shadow-md);
-    border-radius: var(--rounded-md);
+    padding: var(--uidt-space-2);
+    box-shadow: var(--uidt-shadow-md);
+    border-radius: var(--uidt-rounded-md);
     cursor: pointer;
     overflow: hidden;
     border: none;
@@ -18,16 +18,16 @@
 }
 
 .homeActionButton:hover{
-    background-color: var(--component-hover-bg);
-    color: var(--component-hover-text);
+    background-color: var(--uidt-component-hover-bg);
+    color: var(--uidt-component-hover-text);
 }
 
 .iconContainer {
-    background-color: var(--base-background);
-    width: var(--space-11);
+    background-color: var(--uidt-base-background);
+    width: var(--uidt-space-11);
     height: 100%;
-    box-shadow: var(--shadow-inset);
-    border-radius: var(--rounded-md);
+    box-shadow: var(--uidt-shadow-inset);
+    border-radius: var(--uidt-rounded-md);
     display: flex;
     align-items: center;
     justify-content: center;

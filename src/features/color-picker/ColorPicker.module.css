@@ -7,9 +7,9 @@
 
 .modalHeader {
   display: flex;
-  padding: var(--space-3) var(--space-6);
-  gap: var(--space-2);
-  border-bottom: var(--base-border) 1px solid;
+  padding: var(--uidt-space-3) var(--uidt-space-6);
+  gap: var(--uidt-space-2);
+  border-bottom: var(--uidt-base-border) 1px solid;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
@@ -21,7 +21,7 @@
   overflow-y: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
-  background-color: var(--base-background);
+  background-color: var(--uidt-base-background);
   height: 100%;
   position: relative;
 }
@@ -35,10 +35,10 @@
 }
 
 .colorPickerBody {
-  background-color: var(--component-bg);
-  padding: var(--space-6);
-  border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-md);
+  background-color: var(--uidt-component-bg);
+  padding: var(--uidt-space-6);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
   transform: translateY(-10%);
 }
 
@@ -48,21 +48,21 @@
 
 .actionsContainer {
   position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  top: var(--uidt-space-3);
+  right: var(--uidt-space-3);
 }
 
 .leftActionsContainer {
   position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
+  top: var(--uidt-space-3);
+  left: var(--uidt-space-3);
 }
 
 .sidePanel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-0) var(--space-0) var(--space-8) var(--space-0);
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-0) var(--uidt-space-8) var(--uidt-space-0);
   overflow-y: auto;
   position: relative;
 }
@@ -70,7 +70,7 @@
 .sidePanelHeader {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
+  gap: var(--uidt-space-6);
   position: sticky;
   top: -1px;
   z-index: 100;
@@ -78,21 +78,21 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #fff;
   z-index: 2;
-  padding: var(--space-4) var(--space-4);
+  padding: var(--uidt-space-4) var(--uidt-space-4);
   justify-content: space-between;
 }
 
 .sidePanelBodyContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-0) var(--space-4);
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-4);
 }
 
 .sidePanelContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
 }
 
 .separator {
@@ -100,23 +100,23 @@
   height: 1px;
   min-height: 1px;
   max-height: 1px;
-  background-color: var(--base-border);
+  background-color: var(--uidt-base-border);
   box-sizing: border-box;
 }
 
 .colorSampling {
-  padding: var(--space-4);
-  background-color: var(--component-bg);
-  border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-md);
+  padding: var(--uidt-space-4);
+  background-color: var(--uidt-component-bg);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
 }
 
 .colorsPreview {
   display: flex;
   flex-wrap: wrap;
-  max-height: var(--space-16);
+  max-height: var(--uidt-space-16);
   overflow-y: auto;
 }

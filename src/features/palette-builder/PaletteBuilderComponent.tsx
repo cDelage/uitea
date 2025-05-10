@@ -329,7 +329,30 @@ function PaletteBuilderComponent({
           )}
           <div className={styles.builderBodyContainer}>
             <div className={builderBodyContainerChild}>
-              <div className="row align-center justify-between gap-8">
+              <div className="column gap-6">
+                {!isModal && (
+                  <div className="row justify-between align-center gap-4">
+                    {currentDesignSystem && (
+                      <ButtonTertiary
+                        onClick={() =>
+                          navigate(
+                            `/design-system/${encodeURIComponent(
+                              currentDesignSystem
+                            )}?editMode=true`
+                          )
+                        }
+                      >
+                        <MdChevronLeft size={ICON_SIZE_MD} /> Back to design
+                        system
+                      </ButtonTertiary>
+                    )}
+                    <SidePanel.Button id="settings">
+                      <ButtonTertiary>
+                        <MdSettings size={ICON_SIZE_MD} /> Advanced settings
+                      </ButtonTertiary>
+                    </SidePanel.Button>
+                  </div>
+                )}
                 <div className="row align-center gap-8">
                   <div>
                     <FormComponent label="Tints naming mode" className="flex-1">
@@ -383,29 +406,6 @@ function PaletteBuilderComponent({
                     </button>
                   </FormComponent>
                 </div>
-                <div className="row align-center gap-4">
-                  {currentDesignSystem && (
-                    <ButtonTertiary
-                      onClick={() =>
-                        navigate(
-                          `/design-system/${encodeURIComponent(
-                            currentDesignSystem
-                          )}?editMode=true`
-                        )
-                      }
-                    >
-                      <MdChevronLeft size={ICON_SIZE_MD} /> Back to design
-                      system
-                    </ButtonTertiary>
-                  )}
-                  {!isModal && (
-                    <SidePanel.Button id="settings">
-                      <ButtonTertiary>
-                        <MdSettings size={ICON_SIZE_MD} /> Advanced settings
-                      </ButtonTertiary>
-                    </SidePanel.Button>
-                  )}
-                </div>
               </div>
               <div className={styles.tablePaletteBuilder}>
                 <table className="table-builder">
@@ -454,7 +454,7 @@ function PaletteBuilderComponent({
                                     .find((palette) => palette.isCenter)
                                     ?.color.toString({ format: "hex" }),
                                   ...getRectSize({
-                                    height: "var(--space-5)",
+                                    height: "var(--uidt-space-5)",
                                   }),
                                 }}
                               ></div>
@@ -501,17 +501,18 @@ function PaletteBuilderComponent({
                                   <>
                                     <MdLocationPin
                                       size={ICON_SIZE_XL}
-                                      color="var(--palette-primary-200)"
+                                      color="var(--uidt-palette-primary-200)"
                                       style={{
                                         position: "absolute",
                                         top: 0,
                                         left: "50%",
-                                        transform: "translate(-50%, -95%) scale(130%)",
+                                        transform:
+                                          "translate(-50%, -95%) scale(130%)",
                                       }}
                                     />
                                     <MdLocationPin
                                       size={ICON_SIZE_XL}
-                                      color="var(--primary-bg)"
+                                      color="var(--uidt-primary-bg)"
                                       style={{
                                         position: "absolute",
                                         top: 0,
@@ -559,7 +560,7 @@ function PaletteBuilderComponent({
                               background: colorCreatePalette.toString({
                                 format: "hex",
                               }),
-                              ...getRectSize({ height: "var(--space-9)" }),
+                              ...getRectSize({ height: "var(--uidt-space-9)" }),
                             }}
                           ></div>
                           <strong>

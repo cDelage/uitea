@@ -1,23 +1,23 @@
 .dsSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-9);
+  gap: var(--uidt-space-9);
 }
 
 .sectionTitle {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
   align-items: center;
-  padding: var(--space-3) var(--space-6);
-  color: var(--base-text-dark);
+  padding: var(--uidt-space-3) var(--uidt-space-6);
+  color: var(--uidt-base-text-dark);
 }
 
 .subSectionHeader {
   display: flex;
-  padding: var(--space-3) var(--space-7);
+  padding: var(--uidt-space-3) var(--uidt-space-7);
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
   position: sticky;
   top: -1px;
   background: linear-gradient(
@@ -34,25 +34,25 @@
 
 .subSectionHeaderRight {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
 }
 
 .subSectionTitle {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
 }
 
 .subSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-0);
+  gap: var(--uidt-space-0);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--uidt-space-3);
 }
 
 .emptyContentContainer {
@@ -60,7 +60,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
 }
 
 .mediumHeight {
