@@ -78,7 +78,7 @@ function SemanticPreview() {
             flex={true}
             value={semanticColorTokens.border}
             tooltipValue="base-border"
-            preview={<BorderPreview color="var(--uidt-base-border)" />}
+            preview={<BorderPreview color="var(--base-border)" />}
           />
         </div>
       </div>

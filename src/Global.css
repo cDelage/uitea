@@ -620,6 +620,10 @@ p {
   color: var(--uidt-base-text-dark);
 }
 
+.text-color-primary {
+  color: var(--uidt-primary-outline-text);
+}
+
 .h-100 {
   height: 100%;
 }

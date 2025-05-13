@@ -52,6 +52,7 @@ function TokenCrafterComponent({
         <div className={styles.tokenCrafter}>
           <PreviewStyle
             $tokenFamilies={tokenFamilies}
+            $designSystem={designSystem}
             ref={styleRef}
           >
             {isModal && (

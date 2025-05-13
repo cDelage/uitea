@@ -1,6 +1,9 @@
 import classNames from "classnames";
 import styles from "../ComponentDesignSystem.module.css";
-import { DEFAULT_TYPOGRAPHIES, DEFAULT_TYPOGRAPHY_SCALE } from "../../../ui/UiConstants";
+import {
+  DEFAULT_TYPOGRAPHIES,
+  DEFAULT_TYPOGRAPHY_SCALE,
+} from "../../../ui/UiConstants";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
 import InputDesignSystem from "../InputDesignSystem";
@@ -24,6 +27,7 @@ import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSys
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
+import Popover from "../../../ui/kit/Popover";
 
 function TypographyComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -112,105 +116,110 @@ function TypographyComponent() {
   }
 
   return (
-    <form
-      className={formClassNames}
-      onSubmit={handleSubmit(submitTypography)}
-      ref={typographyRef}
-    >
-      <div className={sideSettingsClass}>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Typography scales</h5>
+    <Popover>
+      <form
+        className={formClassNames}
+        onSubmit={handleSubmit(submitTypography)}
+        ref={typographyRef}
+      >
+        <div className={sideSettingsClass}>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Typography scales</h5>
+          </div>
+          <div className="column">
+            {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
+              <InputDesignSystem
+                key={typoScale}
+                label={typoScale}
+                handleSubmit={handleSubmit(submitTypography)}
+                value={`${watch(`${typoScale}.fontSize`)}/${watch(
+                  `${typoScale}.lineHeight`
+                )}`}
+                popoverEdit={
+                  <TypographyPopover
+                    register={register}
+                    fieldPath={typoScale}
+                    watch={watch}
+                    scaleName={typoScale}
+                  />
+                }
+                tooltipValue={`typography-${
+                  typoScale === "paragraph" ? "p" : typoScale
+                }`}
+                popoverId={typoScale}
+              />
+            ))}
+          </div>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Additionals scales</h5>
+          </div>
+          <div className="column">
+            {additionalsScales.map((scale, index) => (
+              <InputDesignSystem
+                label={scale.scaleName}
+                key={scale.scaleName}
+                handleSubmit={handleSubmit(submitTypography)}
+                isAddRemoveDragAllowed={true}
+                onAdd={() => handleAddAdditionalScale(index)}
+                onRemove={() => handleRemove(index)}
+                value={`${watch(
+                  `additionalsScales.${index}.scale.fontSize`
+                )}/${watch(`additionalsScales.${index}.scale.fontSize`)}`}
+                registerKey={register(`additionalsScales.${index}.scaleName`)}
+                draggableTools={draggableTools}
+                index={index}
+                popoverEdit={
+                  <TypographyPopover
+                    register={register}
+                    fieldPath={`additionalsScales.${index}.scale`}
+                    watch={watch}
+                    scaleName={scale.scaleName}
+                  />
+                }
+                popoverId={scale.scaleName}
+                tooltipValue={`typography-${scale.scaleName}`}
+              />
+            ))}
+            {editMode && (
+              <InputDesignSystemAddRemove
+                draggableTools={draggableTools}
+                itemName="typography"
+                onAppend={() =>
+                  handleAddAdditionalScale(additionalsScales.length - 1)
+                }
+              />
+            )}
+            {!editMode && !additionalsScales.length && (
+              <div className="row justify-center">Empty</div>
+            )}
+          </div>
         </div>
-        <div className="column">
-          {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
-            <InputDesignSystem
-              key={typoScale}
-              label={typoScale}
-              handleSubmit={handleSubmit(submitTypography)}
-              value={`${watch(`${typoScale}.fontSize`)}/${watch(
-                `${typoScale}.lineHeight`
-              )}`}
-              popoverEdit={
-                <TypographyPopover
-                  register={register}
-                  fieldPath={typoScale}
-                  watch={watch}
-                  scaleName={typoScale}
-                />
-              }
-              tooltipValue={`typography-${
-                typoScale === "paragraph" ? "p" : typoScale
-              }`}
-              keyPopover={typoScale}
-            />
-          ))}
-        </div>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Additionals scales</h5>
-        </div>
-        <div className="column">
-          {additionalsScales.map((scale, index) => (
-            <InputDesignSystem
-              label={scale.scaleName}
-              key={scale.scaleName}
-              handleSubmit={handleSubmit(submitTypography)}
-              isAddRemoveDragAllowed={true}
-              onAdd={() => handleAddAdditionalScale(index)}
-              onRemove={() => handleRemove(index)}
-              value={`${watch(
-                `additionalsScales.${index}.scale.fontSize`
-              )}/${watch(`additionalsScales.${index}.scale.fontSize`)}`}
-              registerKey={register(`additionalsScales.${index}.scaleName`)}
-              draggableTools={draggableTools}
-              index={index}
-              popoverEdit={
-                <TypographyPopover
-                  register={register}
-                  fieldPath={`additionalsScales.${index}.scale`}
-                  watch={watch}
-                  scaleName={scale.scaleName}
-                />
-              }
-              keyPopover={scale.scaleName}
-              tooltipValue={`typography-${scale.scaleName}`}
-            />
-          ))}
-          {editMode && (
-            <InputDesignSystemAddRemove
-              draggableTools={draggableTools}
-              itemName="typography"
-              onAppend={() =>
-                handleAddAdditionalScale(additionalsScales.length - 1)
-              }
-            />
-          )}
-          {!editMode && !additionalsScales.length && (
-            <div className="row justify-center">Empty</div>
-          )}
-        </div>
-      </div>
-      <PreviewComponentDesignSystem maxHeight="600px">
-        <div className={styles.previewElement} style={{
-          minHeight:"600px"
-        }}>
-          {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
-            <TypographyPreview
-              key={typoScale}
-              keyScale={typoScale}
-              typographyScale={typography[typoScale]}
-            />
-          ))}
-          {additionalsScales.map((scale) => (
-            <TypographyPreview
-              key={scale.scaleName}
-              keyScale={scale.scaleName}
-              typographyScale={scale.scale}
-            />
-          ))}
-        </div>
-      </PreviewComponentDesignSystem>
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+        <PreviewComponentDesignSystem maxHeight="600px">
+          <div
+            className={styles.previewElement}
+            style={{
+              minHeight: "600px",
+            }}
+          >
+            {DEFAULT_TYPOGRAPHIES.map((typoScale) => (
+              <TypographyPreview
+                key={typoScale}
+                keyScale={typoScale}
+                typographyScale={typography[typoScale]}
+              />
+            ))}
+            {additionalsScales.map((scale) => (
+              <TypographyPreview
+                key={scale.scaleName}
+                keyScale={scale.scaleName}
+                typographyScale={scale.scale}
+              />
+            ))}
+          </div>
+        </PreviewComponentDesignSystem>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 

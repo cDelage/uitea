@@ -19,6 +19,8 @@ import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSys
 import FontsPopover from "./FontsPopover";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
+import Popover from "../../../ui/kit/Popover";
+import FontDisplay from "./FontDisplay";
 
 function FontsComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -106,92 +108,108 @@ function FontsComponent() {
   );
 
   return (
-    <form
-      className={formClassNames}
-      ref={fontsRef}
-      onSubmit={handleSubmit(submitFonts)}
-    >
-      <div className={sideSettingsClassNames}>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Default font</h5>
-        </div>
-        <InputDesignSystem
-          handleSubmit={handleSubmit(submitFonts)}
-          label="default"
-          register={register("default", { required: true })}
-          value={watch("default")}
-          tooltipValue="font-default"
-        />
-        <div className={styles.sideSettingsTitle}>
-          <h5>Additionals</h5>
-        </div>
-        <div className="column">
-          {fontAdditionals.map((typo, index) => (
-            <InputDesignSystem
-              handleSubmit={handleSubmit(submitFonts)}
-              key={typo.fontName}
-              label={watch(`additionals.${index}.fontName`)}
-              register={register(`additionals.${index}.value`, {
-                required: true,
-              })}
-              registerKey={register(`additionals.${index}.fontName`, {
-                required: true,
-              })}
-              onAdd={() => handleAddFonts(index)}
-              onRemove={() => remove(index)}
-              isAddRemoveDragAllowed={true}
-              draggableTools={draggableTools}
-              index={index}
-              editText={true}
-              tooltipValue={`font-${watch(`additionals.${index}.fontName`)}`}
-              popoverEdit={
-                <FontsPopover
-                  value={watch(`additionals.${index}.value`)}
-                  setValue={(value) =>
-                    setValue(`additionals.${index}.value`, value)
-                  }
-                />
-              }
-            />
-          ))}
-          {editMode && (
-            <InputDesignSystemAddRemove
-              itemName="font"
-              draggableTools={draggableTools}
-              onAppend={() => handleAddFonts(fontAdditionals.length - 1)}
-            />
+    <Popover onClose={handleSubmit(submitFonts)}>
+      <form
+        className={formClassNames}
+        ref={fontsRef}
+        onSubmit={handleSubmit(submitFonts)}
+      >
+        <div className={sideSettingsClassNames}>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Default font</h5>
+          </div>
+          <InputDesignSystem
+            handleSubmit={handleSubmit(submitFonts)}
+            label="default"
+            value={watch("default")}
+            tooltipValue="font-default"
+            popoverId={`default`}
+            popoverEdit={
+              <FontsPopover
+                value={watch(`default`)}
+                setValue={(value) => setValue(`default`, value)}
+              />
+            }
+          />
+          <div className={styles.sideSettingsTitle}>
+            <h5>Additionals</h5>
+          </div>
+          <div className="column">
+            {fontAdditionals.map((font, index) => (
+              <InputDesignSystem
+                handleSubmit={handleSubmit(submitFonts)}
+                key={font.fontName}
+                label={watch(`additionals.${index}.fontName`)}
+                registerKey={register(`additionals.${index}.fontName`, {
+                  required: true,
+                })}
+                value={font.value}
+                onAdd={() => handleAddFonts(index)}
+                onRemove={() => remove(index)}
+                isAddRemoveDragAllowed={true}
+                draggableTools={draggableTools}
+                index={index}
+                editText={true}
+                tooltipValue={`font-${watch(`additionals.${index}.fontName`)}`}
+                popoverId={`additionals.${index}`}
+                popoverEdit={
+                  <FontsPopover
+                    value={watch(`additionals.${index}.value`)}
+                    setValue={(value) =>
+                      setValue(`additionals.${index}.value`, value)
+                    }
+                  />
+                }
+              />
+            ))}
+            {editMode && (
+              <InputDesignSystemAddRemove
+                itemName="font"
+                draggableTools={draggableTools}
+                onAppend={() => handleAddFonts(fontAdditionals.length - 1)}
+              />
+            )}
+          </div>
+          {!editMode && !fontAdditionals.length && (
+            <div className="row justify-center">Empty</div>
           )}
         </div>
-        {!editMode && !fontAdditionals.length && (
-          <div className="row justify-center">Empty</div>
-        )}
-      </div>
-      <PreviewComponentDesignSystem maxHeight="600px">
-        <div
-          className={styles.previewElement}
-          style={{
-            fontFamily: watch("default"),
-            minHeight: "100%"
-          }}
-        >
-          <div className="column">
-            <p>default : {watch("default")}</p>
-            {fontAdditionals.map((typo, index) => (
-              <p
-                key={typo.fontName}
-                style={{
-                  fontFamily: watch(`additionals.${index}.value`),
-                }}
-              >
-                {watch(`additionals.${index}.fontName`)} :{" "}
-                {watch(`additionals.${index}.value`)}
-              </p>
-            ))}
+        <PreviewComponentDesignSystem maxHeight="600px">
+          <div
+            className={styles.previewElement}
+            style={{
+              fontFamily: watch("default"),
+              minHeight: "100%",
+            }}
+          >
+            <div className="column gap-8">
+              <div>
+                <FontDisplay
+                  font={watch(`default`)}
+                  fontSize="28px"
+                  lineHeight="32px"
+                  display={`default : ${watch(`default`)}`}
+                />
+              </div>
+              {fontAdditionals.map((font, index) => (
+                <div>
+                  <FontDisplay
+                    key={font.fontName}
+                    font={watch(`additionals.${index}.value`)}
+                    fontSize="28px"
+                    lineHeight="32px"
+                    display={`${watch(
+                      `additionals.${index}.fontName`
+                    )} : ${watch(`additionals.${index}.value`)}`}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </PreviewComponentDesignSystem>
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+        </PreviewComponentDesignSystem>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 

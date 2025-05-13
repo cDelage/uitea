@@ -130,10 +130,10 @@ function Header() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === "z") {
+      if (event.ctrlKey && event.key === "z" && headerTools.canUndoRedo?.canUndo) {
         headerTools.undo?.();
       }
-      if (event.ctrlKey && event.key === "y") {
+      if (event.ctrlKey && event.key === "y" && headerTools.canUndoRedo?.canRedo) {
         headerTools.redo?.();
       }
     };

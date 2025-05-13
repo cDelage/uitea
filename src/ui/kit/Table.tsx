@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Table = styled.table`
   border-spacing: 0;
   table-layout: fixed;
+  position: relative;
   width: 100%; /* La cellule de gauche s'étend automatiquement */
   td.expand {
     overflow-x: hidden;
@@ -10,6 +11,9 @@ export const Table = styled.table`
   }
 
   thead {
+    position: sticky;
+    top: 0;
+    left: 0;
     tr {
       font-size: 14px;
       line-height: 20px;

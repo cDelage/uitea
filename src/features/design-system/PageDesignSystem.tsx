@@ -13,19 +13,15 @@ import {
   Theme,
   TokenFamily,
 } from "../../domain/DesignSystemDomain";
-import {
-  getDesignSystemTokens,
-  getPaletteTokens,
-  isValidCssColorOrGradient,
-  KEYBOARD_ACTIONS,
-} from "../../util/DesignSystemUtils";
+import { getDesignSystemTokens, getPaletteTokens, KEYBOARD_ACTIONS } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 import { recolorPalettes } from "../../util/ThemeGenerator";
 
 function PageDesignSystem() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
   const { designSystemPath } = useParams();
-  const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
+  const { saveDesignSystem, isSavingDesignSystem } =
+    useSaveDesignSystem(designSystemPath);
   const [activeComponent, setActiveComponent] = useState<
     ActiveComponent | undefined
   >(undefined);
@@ -61,7 +57,6 @@ function PageDesignSystem() {
             defaultBackground:
               designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
             newBackground: theme?.background ?? "#DDDDDD",
-            recolorLog: true
           }),
         })
       : tokenFamilies;
@@ -121,24 +116,10 @@ function PageDesignSystem() {
     };
   }, [setSearchParams]);
 
-  function findDesignSystemColor({
-    label,
-    defaultValue,
-  }: {
-    label?: string;
-    defaultValue?: string;
-  }) {
-    return (
-      colorTokens?.find((token) => token.label === label)?.value ??
-      isValidCssColorOrGradient(label) ??
-      defaultValue
-    );
-  }
-
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-        if (designSystem?.metadata.isTmp) {
+        if (designSystem?.metadata.isTmp && !isSavingDesignSystem) {
           saveDesignSystem({
             designSystem,
             isTmp: false,
@@ -152,7 +133,7 @@ function PageDesignSystem() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [designSystem, saveDesignSystem]);
+  }, [designSystem, saveDesignSystem, isSavingDesignSystem]);
 
   if (isLoadingDesignSystem) return <Loader />;
   if (!designSystem) return null;
@@ -162,7 +143,6 @@ function PageDesignSystem() {
       value={{
         activeComponent,
         setActiveComponent: handleSetActiveComponent,
-        findDesignSystemColor,
         designSystem,
         editMode,
         colorTokens,

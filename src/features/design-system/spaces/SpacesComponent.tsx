@@ -23,6 +23,7 @@ import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
+import Popover from "../../../ui/kit/Popover";
 // import { DEFAULT_SPACES } from "../../domain/DesignSystemDomain"; // si tu veux les defaults
 
 function SpacesComponent() {
@@ -111,63 +112,65 @@ function SpacesComponent() {
   );
 
   return (
-    <form
-      className={formClassNames}
-      onSubmit={handleSubmit(submitSpaces)}
-      ref={spacesRef}
-    >
-      <div className={sideSettingsClass} ref={scrollableLeft}>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Spaces</h5>
+    <Popover>
+      <form
+        className={formClassNames}
+        onSubmit={handleSubmit(submitSpaces)}
+        ref={spacesRef}
+      >
+        <div className={sideSettingsClass} ref={scrollableLeft}>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Spaces</h5>
+          </div>
+          <div className="column">
+            {spacesArray.map((field, index) => (
+              <InputDesignSystem
+                key={field.id}
+                label={watch(`spaces.${index}.spaceKey`)}
+                handleSubmit={handleSubmit(submitSpaces)}
+                isAddRemoveDragAllowed={true}
+                onAdd={() => handleAddSpace(index)}
+                onRemove={() => {
+                  remove(index);
+                  handleSubmit(submitSpaces)();
+                }}
+                draggableTools={draggableTools}
+                index={index}
+                registerKey={register(`spaces.${index}.spaceKey`)}
+                register={register(`spaces.${index}.spaceValue`)}
+                tooltipValue={`space-${watch(`spaces.${index}.spaceKey`)}`}
+              />
+            ))}
+            {editMode && (
+              <InputDesignSystemAddRemove
+                draggableTools={draggableTools}
+                itemName="space"
+                onAppend={() => handleAddSpace(spacesArray.length - 1)}
+              />
+            )}
+            {!editMode && !spacesArray.length && (
+              <div className="row justify-center">Empty</div>
+            )}
+          </div>
         </div>
-        <div className="column">
-          {spacesArray.map((field, index) => (
-            <InputDesignSystem
-              key={field.id}
-              label={watch(`spaces.${index}.spaceKey`)}
-              handleSubmit={handleSubmit(submitSpaces)}
-              isAddRemoveDragAllowed={true}
-              onAdd={() => handleAddSpace(index)}
-              onRemove={() => {
-                remove(index);
-                handleSubmit(submitSpaces)();
-              }}
-              draggableTools={draggableTools}
-              index={index}
-              registerKey={register(`spaces.${index}.spaceKey`)}
-              register={register(`spaces.${index}.spaceValue`)}
-              tooltipValue={`space-${watch(`spaces.${index}.spaceKey`)}`}
-            />
-          ))}
-          {editMode && (
-            <InputDesignSystemAddRemove
-              draggableTools={draggableTools}
-              itemName="space"
-              onAppend={() => handleAddSpace(spacesArray.length - 1)}
-            />
-          )}
-          {!editMode && !spacesArray.length && (
-            <div className="row justify-center">Empty</div>
-          )}
-        </div>
-      </div>
 
-      <PreviewComponentDesignSystem maxHeight="600px">
-        <div className={styles.previewElement} ref={scrollableRight}>
-          {spacesArray.map((field, index) => (
-            <SpacePreview
-              key={field.id}
-              space={{
-                spaceKey: watch(`spaces.${index}.spaceKey`),
-                spaceValue: watch(`spaces.${index}.spaceValue`),
-              }}
-            />
-          ))}
-        </div>
-      </PreviewComponentDesignSystem>
+        <PreviewComponentDesignSystem maxHeight="600px">
+          <div className={styles.previewElement} ref={scrollableRight}>
+            {spacesArray.map((field, index) => (
+              <SpacePreview
+                key={field.id}
+                space={{
+                  spaceKey: watch(`spaces.${index}.spaceKey`),
+                  spaceValue: watch(`spaces.${index}.spaceValue`),
+                }}
+              />
+            ))}
+          </div>
+        </PreviewComponentDesignSystem>
 
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 

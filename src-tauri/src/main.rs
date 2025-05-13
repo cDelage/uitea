@@ -5,8 +5,8 @@ use std::sync::Mutex;
 
 use application::undo_application::remove_undo_repository;
 use exposition::design_system_exposition::{
-    create_design_system, find_design_system, redo_design_system, save_design_system,
-    undo_design_system,
+    create_design_system, find_design_system, redo_design_system, register_export,
+    save_design_system, undo_design_system,
 };
 use exposition::home_exposition::{
     encode_image_base64, fetch_presets_dressing, fetch_user_settings, find_all_recent_files,
@@ -125,7 +125,8 @@ fn main() {
             redo_token_crafter,
             undo_token_crafter,
             fetch_user_settings,
-            update_user_settings
+            update_user_settings,
+            register_export
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

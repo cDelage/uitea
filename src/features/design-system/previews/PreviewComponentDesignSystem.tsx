@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import styles from "../ComponentDesignSystem.module.css";
 import { PreviewStyle } from "./PreviewStyle";
 import { useDesignSystemContext } from "../DesignSystemContext";
@@ -13,12 +13,9 @@ function PreviewComponentDesignSystem({
   maxHeight?: string;
   height?: string;
 }) {
-  const { themeTokenFamilies, tokenFamilies } = useDesignSystemContext();
+  const { themeTokenFamilies, tokenFamilies, designSystem } = useDesignSystemContext();
   const styleRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    console.log("updt", themeTokenFamilies);
-  }, [themeTokenFamilies]);
   return (
     <PreviewContext.Provider value={{ styleRef, tokenFamilies }}>
       <div
@@ -28,7 +25,7 @@ function PreviewComponentDesignSystem({
           height,
         }}
       >
-        <PreviewStyle $tokenFamilies={themeTokenFamilies} ref={styleRef}>
+        <PreviewStyle $tokenFamilies={themeTokenFamilies} ref={styleRef} $designSystem={designSystem}>
           <div className={styles.previewBody}>{children}</div>
         </PreviewStyle>
       </div>

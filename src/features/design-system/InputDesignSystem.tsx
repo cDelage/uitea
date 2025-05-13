@@ -22,11 +22,10 @@ function InputDesignSystem({
   popoverEdit,
   draggableTools,
   index,
-  onClosePopover,
   tooltipValue,
   onAdd,
   onRemove,
-  keyPopover,
+  popoverId,
   portalTooltip,
   editText,
   isLocked,
@@ -44,10 +43,9 @@ function InputDesignSystem({
   onRemove?: () => void;
   draggableTools?: DraggableTools;
   index?: number;
-  onClosePopover?: () => void;
   tooltipValue?: string;
   portalTooltip?: RefObject<HTMLDivElement | null>;
-  keyPopover?: string;
+  popoverId?: string;
   setValue?: (value: string) => void;
   editText?: boolean;
   isLocked?: boolean;
@@ -217,9 +215,9 @@ function InputDesignSystem({
               </div>
             )}
             {(isColor || popoverEdit) && (
-              <Popover onClose={onClosePopover ?? handleSubmit}>
+              <>
                 <Popover.Toggle
-                  id={keyPopover ?? "edit-popover"}
+                  id={popoverId ?? "edit-popover"}
                   positionPayload="bottom-left"
                 >
                   <div className={styles.popoverContainer}>
@@ -269,10 +267,10 @@ function InputDesignSystem({
                     </div>
                   </div>
                 </Popover.Toggle>
-                <Popover.Body id={keyPopover ?? "edit-popover"} zIndex={100}>
+                <Popover.Body id={popoverId ?? "edit-popover"} zIndex={100}>
                   {popoverEdit}
                 </Popover.Body>
-              </Popover>
+              </>
             )}
           </div>
         </div>

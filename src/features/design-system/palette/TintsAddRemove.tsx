@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./ShadeComponent.module.css";
+import styles from "./TintsComponent.module.css";
 import { MdAdd, MdDelete } from "react-icons/md";
 import { DraggableTools } from "../../../util/DraggableContext";
 import { ICON_SIZE_MD } from "../../../ui/UiConstants";
@@ -8,7 +8,7 @@ import { Palette } from "../../../domain/DesignSystemDomain";
 import { generateUniqueTintKey } from "../../../util/DesignSystemUtils";
 import { MouseEvent } from "react";
 
-function ShadeAddRemove({
+function TintsAddRemove({
   draggableTools,
   shadesFieldArray,
   handleSubmit,
@@ -80,4 +80,4 @@ function ShadeAddRemove({
   );
 }
 
-export default ShadeAddRemove;
+export default TintsAddRemove;

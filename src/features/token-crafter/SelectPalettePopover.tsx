@@ -14,7 +14,7 @@ function SelectPalettePopover({
     setCustomRowRecommandation,
     palettesAndColors,
   } = useTokenCrafterStore();
-  const { tokenFamilies } = useTokenCrafterContext();
+  const { tokenFamilies, designSystem } = useTokenCrafterContext();
 
   const selectedPalette =
     customRowRecommandation[target] !== undefined
@@ -66,7 +66,7 @@ function SelectPalettePopover({
         </div>
       </Popover.Toggle>
       <Popover.Body id={target} zIndex={2000}>
-        <PreviewStyle $tokenFamilies={tokenFamilies}>
+        <PreviewStyle $tokenFamilies={tokenFamilies} $designSystem={designSystem}>
           <Popover.Actions>
             {palettesAndColors.map((palette, index) => (
               <Popover.Tab

@@ -12,14 +12,14 @@ import { open } from "@tauri-apps/api/dialog";
 import toast from "react-hot-toast";
 import { usePresetDressing } from "./HomeQueries";
 import { useEffect } from "react";
-import styles from "./CreateDesignSystem.module.css";
+import styles from "./ModalCreateDesignSystem.module.css";
 import Loader from "../../ui/kit/Loader";
 import ImageLocalComponent from "../../ui/kit/ImageLocal";
 import Popover from "../../ui/kit/Popover";
 import ImageSelectorPopover from "./ImageSelectorPopover";
 import ButtonImagePicker from "../../ui/kit/ButtonImagePicker";
 
-function CreateDesignSystem() {
+function ModalCreateDesignSystem() {
   const { createDesignSystem } = useCreateDesignSystem();
   const {
     register,
@@ -30,7 +30,6 @@ function CreateDesignSystem() {
   } = useForm<DesignSystemCreationPayload>({
     defaultValues: {
       name: undefined,
-      darkMode: true,
       folderPath: undefined,
     },
   });
@@ -142,12 +141,6 @@ function CreateDesignSystem() {
                   {folderPath || "No location selected"}
                 </div>
               </FormComponent>
-              <FormComponent label="Dark mode" error={errors.darkMode?.message}>
-                <div className="checkbox-container">
-                  <input type="checkbox" {...register("darkMode")} />
-                  Dark mode
-                </div>
-              </FormComponent>
             </Modal.Md>
           </Modal.Custom>
           <Modal.Footer>
@@ -162,4 +155,4 @@ function CreateDesignSystem() {
   );
 }
 
-export default CreateDesignSystem;
+export default ModalCreateDesignSystem;

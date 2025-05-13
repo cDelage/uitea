@@ -120,7 +120,7 @@ function ThemesComponent() {
         className={styles.componentDesignSystem}
         ref={themesRef}
       >
-        <div className={sideSettingsClassNames} style={{ maxHeight: "500px" }}>
+        <div className={sideSettingsClassNames} style={{ maxHeight: "600px" }}>
           <div className={styles.sideSettingsTitle}>
             <h5>Default</h5>
           </div>
@@ -147,6 +147,7 @@ function ThemesComponent() {
                 computedColor={mainTheme.background}
                 registerKey={register("mainTheme.name", { required: true })}
                 isLocked={fields.length > 0}
+                handleSubmit={handleSubmit(submitThemes)}
                 popoverEdit={
                   !fields.length ? (
                     <MainThemeTokenPopover
@@ -167,9 +168,10 @@ function ThemesComponent() {
               <div className="column">
                 {fields.map((theme, index) => (
                   <InputDesignSystem
-                    label={theme.name}
+                    label={watch(`otherThemes.${index}.name`)}
                     key={`${theme.name}${index}`}
                     value={theme.background}
+                    handleSubmit={handleSubmit(submitThemes)}
                     isColor={true}
                     computedColor={theme.background}
                     registerKey={register(`otherThemes.${index}.name`, {
@@ -178,6 +180,7 @@ function ThemesComponent() {
                     draggableTools={draggableTools}
                     isAddRemoveDragAllowed={true}
                     index={index}
+                    editText={true}
                     popoverEdit={
                       <ColorPickerDesignSystem
                         changeComplete={(color) =>

@@ -21,7 +21,6 @@ pub struct DesignSystem {
 pub struct DesignSystemCreationPayload {
     pub name: String,
     pub folder_path: String,
-    pub dark_mode: bool,
     pub banner: String,
     pub logo: String,
 }
@@ -31,7 +30,6 @@ pub struct DesignSystemCreationPayload {
 pub struct DesignSystemMetadataHome {
     pub design_system_id: String,
     pub design_system_name: String,
-    pub dark_mode: bool,
     pub design_system_path: PathBuf,
     pub is_tmp: bool,
     pub edit_mode: Option<bool>,
@@ -45,7 +43,6 @@ impl DesignSystemMetadataHome {
         edit_mode: Option<bool>,
     ) -> DesignSystemMetadataHome {
         let DesignSystemMetadata {
-            dark_mode,
             design_system_id,
             design_system_name,
             design_system_path,
@@ -56,7 +53,6 @@ impl DesignSystemMetadataHome {
         } = metadata;
 
         DesignSystemMetadataHome {
-            dark_mode,
             design_system_id,
             design_system_name,
             design_system_path,
@@ -73,7 +69,6 @@ impl DesignSystemMetadataHome {
 pub struct DesignSystemMetadata {
     pub design_system_id: String,
     pub design_system_name: String,
-    pub dark_mode: bool,
     pub design_system_path: PathBuf,
     pub is_tmp: bool,
     pub can_undo: bool,
@@ -86,7 +81,6 @@ pub struct DesignSystemMetadata {
 pub struct DesignSystemMetadataFile {
     pub design_system_id: String,
     pub design_system_name: String,
-    pub dark_mode: bool,
     #[serde(default = "default_string")]
     pub banner: String,
     #[serde(default = "default_string")]
@@ -102,7 +96,6 @@ impl DesignSystemMetadataFile {
         let DesignSystemMetadata {
             design_system_id,
             design_system_name,
-            dark_mode,
             banner,
             logo,
             ..
@@ -111,7 +104,6 @@ impl DesignSystemMetadataFile {
         let logo_filename: &str = Path::new(logo).file_name().unwrap().to_str().unwrap();
         DesignSystemMetadataFile {
             design_system_id: design_system_id.to_string(),
-            dark_mode: dark_mode.to_owned(),
             design_system_name: design_system_name.to_string(),
             banner: String::from(banner_filename),
             logo: String::from(logo_filename),
@@ -129,7 +121,6 @@ impl DesignSystemMetadata {
         let DesignSystemMetadataFile {
             design_system_id,
             design_system_name,
-            dark_mode,
             banner,
             logo,
         } = design_system_file;
@@ -138,7 +129,6 @@ impl DesignSystemMetadata {
         let logo_path: PathBuf = image_pathbuf.join(logo);
 
         DesignSystemMetadata {
-            dark_mode: dark_mode.to_owned(),
             design_system_id: design_system_id.to_string(),
             design_system_name: design_system_name.to_string(),
             design_system_path: path.to_owned(),
@@ -197,7 +187,7 @@ pub struct ColorCombinationCollection {
     pub active: Option<ColorCombination>,
     pub focus: Option<ColorCombination>,
     pub group: Option<String>,
-    pub preview_component: Option<String>
+    pub preview_component: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -228,57 +218,6 @@ impl TintsFile {
         }
 
         TintsFile(map)
-    }
-
-    pub fn new() -> TintsFile {
-        let neutral_palette: Vec<Tint> = vec![
-            Tint {
-                label: "50".to_string(),
-                color: "#FAFAFA".to_string(),
-            },
-            Tint {
-                label: "100".to_string(),
-                color: "#F5F5F5".to_string(),
-            },
-            Tint {
-                label: "200".to_string(),
-                color: "#E5E5E5".to_string(),
-            },
-            Tint {
-                label: "300".to_string(),
-                color: "#D4D4D4".to_string(),
-            },
-            Tint {
-                label: "400".to_string(),
-                color: "#A3A3A3".to_string(),
-            },
-            Tint {
-                label: "500".to_string(),
-                color: "#737373".to_string(),
-            },
-            Tint {
-                label: "600".to_string(),
-                color: "#525252".to_string(),
-            },
-            Tint {
-                label: "700".to_string(),
-                color: "#404040".to_string(),
-            },
-            Tint {
-                label: "800".to_string(),
-                color: "#262626".to_string(),
-            },
-            Tint {
-                label: "900".to_string(),
-                color: "#171717".to_string(),
-            },
-            Tint {
-                label: "950".to_string(),
-                color: "#0A0A0A".to_string(),
-            },
-        ];
-
-        TintsFile::from(&neutral_palette)
     }
 
     pub fn to(tints_file: &TintsFile) -> Vec<Tint> {
@@ -739,4 +678,13 @@ pub struct Themes {
 pub struct Theme {
     pub name: String,
     pub background: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ExportPayload {
+    pub design_system_path: PathBuf,
+    pub export_name: String,
+    pub value: String,
+    pub extension: String
 }

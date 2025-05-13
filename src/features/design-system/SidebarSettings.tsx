@@ -3,7 +3,6 @@ import { useDesignSystemContext } from "./DesignSystemContext";
 import styles from "./SidebarSettings.module.css";
 import FormComponent from "../../ui/kit/FormComponent";
 import InputText from "../../ui/kit/InputText";
-import Switch from "../../ui/kit/Switch";
 import { useParams } from "react-router-dom";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
 import { DesignSystemMetadata } from "../../domain/DesignSystemDomain";
@@ -13,6 +12,10 @@ import Popover from "../../ui/kit/Popover";
 import ButtonImagePicker from "../../ui/kit/ButtonImagePicker";
 import ImageSelectorPopover from "../home/ImageSelectorPopover";
 import { usePresetDressing } from "../home/HomeQueries";
+import { ButtonTertiary } from "../../ui/kit/Buttons";
+import { MdFileDownload } from "react-icons/md";
+import { ICON_SIZE_MD } from "../../ui/UiConstants";
+import { useModalContext } from "../../ui/kit/ModalContext";
 
 function SidebarSettings() {
   const { designSystem } = useDesignSystemContext();
@@ -29,6 +32,7 @@ function SidebarSettings() {
   });
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
+  const { openModal } = useModalContext();
 
   function handleSaveMetadata(newMetadata: DesignSystemMetadata) {
     if (isEqual(newMetadata, designSystem.metadata)) return;
@@ -53,7 +57,7 @@ function SidebarSettings() {
             <ImageLocalComponent srcPath={watch("banner")} />
           </div>
         </Popover.Toggle>
-        <Popover.Body id="banner-selector">
+        <Popover.Body id="banner-selector" zIndex={200}>
           <ImageSelectorPopover
             width="398px"
             setValue={(value: string) => {
@@ -74,7 +78,7 @@ function SidebarSettings() {
                 <ImageLocalComponent srcPath={watch("logo")} />
               </div>
             </Popover.Toggle>
-            <Popover.Body id="logo-selector">
+            <Popover.Body id="logo-selector" zIndex={200}>
               <ImageSelectorPopover
                 width="180px"
                 setValue={(value: string) => {
@@ -98,18 +102,13 @@ function SidebarSettings() {
             </FormComponent>
           </div>
         </div>
-        <FormComponent
-          label="Dark mode"
-          error={errors.designSystemName?.message}
-        >
-          <Switch
-            checked={watch("darkMode")}
-            onChange={(e) => {
-              setValue("darkMode", e?.target.checked ?? false);
-              handleSubmit(handleSaveMetadata)();
-            }}
-          />
-        </FormComponent>
+        <div className="row justify-end">
+          <Popover.Close closeCallback={() => openModal("exports")}>
+            <ButtonTertiary>
+              <MdFileDownload size={ICON_SIZE_MD} /> Exports management
+            </ButtonTertiary>
+          </Popover.Close>
+        </div>
       </div>
     </form>
   );

@@ -1,7 +1,10 @@
 import styled, { css } from "styled-components";
-import { TokenFamily } from "../../../domain/DesignSystemDomain";
+import { DesignSystem, TokenFamily } from "../../../domain/DesignSystemDomain";
 
-export const PreviewStyle = styled.div<{ $tokenFamilies: TokenFamily[] }>`
+export const PreviewStyle = styled.div<{
+  $tokenFamilies: TokenFamily[];
+  $designSystem: DesignSystem;
+}>`
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -21,6 +24,7 @@ export const PreviewStyle = styled.div<{ $tokenFamilies: TokenFamily[] }>`
     })};
 
   color: var(--base-text-default);
+  font-family: ${(props) => props.$designSystem.fonts.default};
 
   .text-color-light {
     color: var(--base-text-light);
@@ -53,4 +57,16 @@ export const PreviewEmptyStyle = styled.div<{
     })};
 
   height: ${(props) => props.$height};
+
+  .text-color-light {
+    color: var(--base-text-light);
+  }
+
+  .text-color-default {
+    color: var(--base-text-default);
+  }
+
+  .text-color-dark {
+    color: var(--base-text-dark);
+  }
 `;

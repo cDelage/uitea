@@ -58,6 +58,11 @@ function ColorPickerLinear({
     }
   }
 
+  function handleSliderComplete() {
+    onChangeComplete?.();
+    setColorHex(color.toString({ format: "hex" }));
+  }
+
   return (
     <div className={styles.picker}>
       <div className={styles.settingsContainer}>
@@ -109,7 +114,7 @@ function ColorPickerLinear({
               max={axe.max}
               min={axe.min}
               step={axe.steps}
-              onChangeComplete={onChangeComplete}
+              onChangeComplete={handleSliderComplete}
               onChange={(value: number) => {
                 onChange(
                   updateColor({

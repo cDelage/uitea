@@ -313,11 +313,13 @@ function Tab({
   clickEvent,
   disableClose,
   theme,
+  width,
 }: {
   children: ReactNode;
   clickEvent?: () => void;
   disableClose?: boolean;
-  theme?: "alert" | "disabled";
+  theme?: "alert" | "disabled" | "primary";
+  width?: string;
 }) {
   const { closePopover, openPopoverId } = usePopoverContext();
 
@@ -333,9 +335,17 @@ function Tab({
   const tabStyle = classNames(styles.tab, {
     [styles.tabAlert]: theme === "alert",
     [styles.tabDisabled]: theme === "disabled",
+    [styles.tabPrimary]: theme === "primary",
   });
   return (
-    <div className={tabStyle} onClick={handleClick} data-disableoutside={true}>
+    <div
+      className={tabStyle}
+      style={{
+        width,
+      }}
+      onClick={handleClick}
+      data-disableoutside={true}
+    >
       {children}
     </div>
   );
@@ -371,11 +381,13 @@ function SelectorTab({
   selectNode,
   id,
   position = "top-right",
+  childWidth,
 }: {
   children: ReactNode;
   id: number;
   selectNode: ReactNode;
   position?: PositionPayload;
+  childWidth?: string;
 }) {
   const {
     setActiveSelectTab,
@@ -403,14 +415,20 @@ function SelectorTab({
       {active && (
         <>
           <MdChevronRight size={ICON_SIZE_SM} />
-          <SelectorChildren>{selectNode}</SelectorChildren>
+          <SelectorChildren width={childWidth}>{selectNode}</SelectorChildren>
         </>
       )}
     </div>
   );
 }
 
-function SelectorChildren({ children }: { children: ReactNode }) {
+function SelectorChildren({
+  children,
+  width,
+}: {
+  children: ReactNode;
+  width?: string;
+}) {
   const childrenRef = useRef<HTMLDivElement>(null);
   const { position, setPosition, initialPosition } =
     usePopoverSelectorContext();
@@ -432,6 +450,7 @@ function SelectorChildren({ children }: { children: ReactNode }) {
       style={{
         position: "absolute",
         ...getOutsideAbsolutePosition(position),
+        width,
       }}
       ref={childrenRef}
       data-disableoutside={true}

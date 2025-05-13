@@ -18,7 +18,12 @@ export type RemoveRecentFilesPayload = {
 export interface RecentFile {
   filePath: string;
   editMode: string;
+  category: RecentFileCategory;
 }
+
+export type RecentFileCategory =
+  | "PaletteBuilderCategory"
+  | "DesignSystemCategory";
 
 export interface PresetDressing {
   banners: string[];

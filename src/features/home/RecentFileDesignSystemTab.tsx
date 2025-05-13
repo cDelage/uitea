@@ -9,8 +9,10 @@ import ModalRemoveRecentFile from "./ModalRemoveRecentFile";
 
 function RecentFileDesignSystemTab({
   designSystemMetadata: { designSystemName, designSystemPath, editMode },
+  index,
 }: {
   designSystemMetadata: DesignSystemMetadataHome;
+  index: number;
 }) {
   const navigate = useNavigate();
 
@@ -35,23 +37,24 @@ function RecentFileDesignSystemTab({
         </div>
       </td>
       <td className="shrink">
-        <Popover>
-          <Popover.Toggle id="file-actions" positionPayload="bottom-right">
-            <GhostButton>
-              <MdMoreHoriz size={ICON_SIZE_MD} />
-            </GhostButton>
-          </Popover.Toggle>
-          <Popover.Body id="file-actions">
-            <Popover.Actions>
-              <Popover.Tab clickEvent={() => navigate(getPath())}>
-                <MdOpenInNew /> Open
-              </Popover.Tab>
-              <Modal>
-                <ModalRemoveRecentFile recentFilePath={designSystemPath} />
-              </Modal>
-            </Popover.Actions>
-          </Popover.Body>
-        </Popover>
+        <Popover.Toggle
+          id={`file-actions-design-${index}`}
+          positionPayload="bottom-right"
+        >
+          <GhostButton>
+            <MdMoreHoriz size={ICON_SIZE_MD} />
+          </GhostButton>
+        </Popover.Toggle>
+        <Popover.Body id={`file-actions-design-${index}`}>
+          <Popover.Actions>
+            <Popover.Tab clickEvent={() => navigate(getPath())}>
+              <MdOpenInNew /> Open
+            </Popover.Tab>
+            <Modal>
+              <ModalRemoveRecentFile recentFilePath={designSystemPath} />
+            </Modal>
+          </Popover.Actions>
+        </Popover.Body>
       </td>
     </>
   );

@@ -1,5 +1,5 @@
-import { MouseEvent, useRef } from "react";
-import styles from "./ShadeComponent.module.css";
+import { MouseEvent, useRef, useState } from "react";
+import styles from "./TintsComponent.module.css";
 import { ComponentMode, useDesignSystemContext } from "../DesignSystemContext";
 import classNames from "classnames";
 import { Palette, Tint } from "../../../domain/DesignSystemDomain";
@@ -16,19 +16,21 @@ import {
 } from "../../../util/DesignSystemUtils";
 import CopyableTopTooltip from "../../../ui/kit/CopyableTopTooltip";
 import Popover from "../../../ui/kit/Popover";
-import ColorPickerOld from "../ColorPickerOld";
 import { useSearchParams } from "react-router-dom";
+import ColorPickerLinear from "../../color-picker/ColorPickerLinear";
+import ColorIO from "colorjs.io";
+import { getRectSize } from "../../../ui/UiConstants";
 
-function ShadeComponent({
+function TintComponent({
   index,
   register,
   getValues,
   submitEvent,
-  shades,
+  tints,
   error,
   paletteName,
   setValue,
-  shadesFieldArray,
+  tintsFieldArray,
 }: {
   paletteName: string;
   index: number;
@@ -36,9 +38,9 @@ function ShadeComponent({
   getValues: UseFormGetValues<Palette>;
   submitEvent: () => void;
   setValue: UseFormSetValue<Palette>;
-  shades: Tint[];
+  tints: Tint[];
   error?: string;
-  shadesFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
+  tintsFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
 }) {
   const { editMode } = useDesignSystemContext();
 
@@ -49,6 +51,10 @@ function ShadeComponent({
   const shadeToken: string = `palette-${paletteName}-${getValues(
     `tints.${index}.label`
   )}`;
+
+  const [colorIo, setColorIo] = useState(
+    new ColorIO(getValues(`tints.${index}.color`))
+  );
 
   const [searchParams] = useSearchParams();
 
@@ -118,10 +124,10 @@ function ShadeComponent({
   function handleClick() {
     if (shadeComponentMode === "add") {
       const label = generateUniqueTintKey(
-        shadesFieldArray.fields,
+        tintsFieldArray.fields,
         `palette-${index + 1}`
       );
-      shadesFieldArray.insert(
+      tintsFieldArray.insert(
         index,
         {
           label,
@@ -131,7 +137,7 @@ function ShadeComponent({
       );
       submitEvent();
     } else if (shadeComponentMode === "remove") {
-      shadesFieldArray.remove(index);
+      tintsFieldArray.remove(index);
       submitEvent();
     }
   }
@@ -151,7 +157,7 @@ function ShadeComponent({
         <div
           className={colorPreviewClassname}
           style={{
-            background: getValues(`tints.${index}.color`),
+            background: colorIo.toString({ format: "hex" }),
           }}
         />
         <div className="column" onMouseDown={stopPropagation}>
@@ -160,8 +166,8 @@ function ShadeComponent({
               {...register(`tints.${index}.label`, {
                 required: true,
                 validate: (label: string) => {
-                  const duplicates = shades.filter(
-                    (_, i) => i !== index && shades[i].label === label
+                  const duplicates = tints.filter(
+                    (_, i) => i !== index && tints[i].label === label
                   );
                   return (
                     duplicates.length === 0 || "Shades key can't be duplicated"
@@ -180,7 +186,15 @@ function ShadeComponent({
               }}
             />
           </strong>
-          <Popover>
+          <Popover
+            onClose={() => {
+              setValue(
+                `tints.${index}.color`,
+                colorIo.toString({ format: "hex" })
+              );
+              submitEvent();
+            }}
+          >
             <Popover.Toggle id="color-picker" keyPopover={shadeToken}>
               <small className="text-color-light">
                 <input
@@ -198,14 +212,31 @@ function ShadeComponent({
                 />
               </small>
             </Popover.Toggle>
-            <Popover.Body id="color-picker">
-              <div className="popover-body">
-                <ColorPickerOld
-                  setColor={(color: string) => {
-                    if (editMode) setValue(`tints.${index}.color`, color);
-                  }}
-                  color={getValues(`tints.${index}.color`)}
-                />
+            <Popover.Body id="color-picker" zIndex={100}>
+              <div
+                className="popover-body"
+                data-disableoutside={true}
+                style={{
+                  width: "280px",
+                }}
+              >
+                <ColorPickerLinear color={colorIo} onChange={setColorIo} />
+                <div className="row justify-center align-center gap-2">
+                  <div
+                    className="palette-color"
+                    style={{
+                      background: colorIo.toString({
+                        format: "hex",
+                      }),
+                      ...getRectSize({ height: "var(--uidt-space-9)" }),
+                    }}
+                  ></div>
+                  <strong>
+                    {colorIo.toString({
+                      format: "hex",
+                    })}
+                  </strong>
+                </div>
               </div>
             </Popover.Body>
           </Popover>
@@ -215,4 +246,4 @@ function ShadeComponent({
   );
 }
 
-export default ShadeComponent;
+export default TintComponent;

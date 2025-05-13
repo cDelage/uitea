@@ -7,8 +7,7 @@ use crate::{
     application::home_application::fetch_presets_dressing,
     domain::{
         design_system_domain::{
-            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, Fonts,
-            Palette, Radius, SemanticColorTokens, Space, Typographies,
+            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, ExportPayload, Fonts, Palette, Radius, SemanticColorTokens, Space, Typographies
         },
         home_domain::PresetDressing,
     },
@@ -24,7 +23,6 @@ pub fn create_design_system(payload: DesignSystemCreationPayload) -> Result<Desi
     let DesignSystemCreationPayload {
         name,
         folder_path,
-        dark_mode,
         banner,
         logo,
         ..
@@ -32,7 +30,6 @@ pub fn create_design_system(payload: DesignSystemCreationPayload) -> Result<Desi
     let folder_pathbuf: PathBuf = PathBuf::from(folder_path);
     let design_system_path: PathBuf = compute_path(&folder_pathbuf, &name);
     let mut design_system: DesignSystemMetadata = DesignSystemMetadata {
-        dark_mode: dark_mode,
         design_system_id: generate_uuid(),
         design_system_name: name,
         design_system_path,
@@ -98,7 +95,7 @@ pub fn find_design_system(
             Ok(colors) => Ok(colors),
         }?;
 
-    let themes = design_system_repository::fetch_themelist(&design_system_pathbuf);
+    let themes = design_system_repository::fetch_themes(&design_system_pathbuf);
 
     let semantic_color_tokens: SemanticColorTokens =
         match design_system_repository::fetch_semantic_color_tokens(&design_system_pathbuf) {
@@ -201,12 +198,22 @@ pub fn undo_design_system(state: &State<AppState>, design_system_path: &String) 
     println!("undo design system");
     let design_system: DesignSystem =
         undo_repository::undo::<DesignSystem>(state, design_system_path)?;
-    save_design_system(&state, &design_system, true, false)
+    println!("undo : {:?}", design_system);
+    save_design_system(&state, &design_system, true, false)?;
+    println!("undo success");
+    Ok(())
 }
 
 pub fn redo_design_system(state: &State<AppState>, design_system_path: &String) -> Result<()> {
     println!("redo design system");
     let design_system: DesignSystem =
-        undo_repository::redo::<DesignSystem>(state, design_system_path)?;
-    save_design_system(&state, &design_system, true, false)
+    undo_repository::redo::<DesignSystem>(state, design_system_path)?;
+    println!("redo : {:?}", design_system);
+    save_design_system(&state, &design_system, true, false)?;
+    println!("redo success");
+    Ok(())
+}
+
+pub fn register_export(payload: ExportPayload) -> Result<()> {
+    design_system_repository::register_export(payload)
 }

@@ -4,6 +4,7 @@ import {
   DesignSystem,
   DesignSystemCreationPayload,
   DesignSystemMetadata,
+  GenerateExportPayload,
 } from "../../domain/DesignSystemDomain";
 import toast from "react-hot-toast";
 import { useInsertRecentFile } from "../home/HomeQueries";
@@ -74,29 +75,30 @@ export function useCurrentDesignSystem() {
 export function useSaveDesignSystem(designSystemPath?: string) {
   const queryClient = useQueryClient();
 
-  const { mutate: saveDesignSystem } = useMutation({
-    mutationFn: async ({
-      designSystem,
-      isTmp,
-    }: {
-      designSystem: DesignSystem;
-      isTmp: boolean;
-    }): Promise<DesignSystem> =>
-      await invoke("save_design_system", {
+  const { mutate: saveDesignSystem, isPending: isSavingDesignSystem } =
+    useMutation({
+      mutationFn: async ({
         designSystem,
         isTmp,
-      }),
-    onError: (error) => {
-      toast.error(error);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["design-system", designSystemPath],
-      });
-    },
-  });
+      }: {
+        designSystem: DesignSystem;
+        isTmp: boolean;
+      }): Promise<DesignSystem> =>
+        await invoke("save_design_system", {
+          designSystem,
+          isTmp,
+        }),
+      onError: (error) => {
+        toast.error(error);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["design-system", designSystemPath],
+        });
+      },
+    });
 
-  return { saveDesignSystem };
+  return { saveDesignSystem, isSavingDesignSystem };
 }
 
 export function useUndoRedoDesignSystem(designSystemPath?: string) {
@@ -132,4 +134,25 @@ export function useUndoRedoDesignSystem(designSystemPath?: string) {
   });
 
   return { undoDesignSystem, redoDesignSystem };
+}
+
+export function useGenerateExport() {
+  const { mutate: generateExport, isPending: isGeneratingExport } = useMutation(
+    {
+      mutationFn: async (payload: GenerateExportPayload) => {
+        await invoke("register_export", {
+          payload,
+        });
+      },
+      onSuccess: () => {
+        toast.success("export successfull");
+      },
+      onError: (err) => {
+        toast.error("fail to generate export");
+        console.error(err)
+      },
+    }
+  );
+
+  return { generateExport, isGeneratingExport };
 }

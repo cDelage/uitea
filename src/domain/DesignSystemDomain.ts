@@ -13,6 +13,7 @@ import LabelCombinationPreview from "../features/design-system/previews/combinat
 import ArrayRowCombinationPreview from "../features/design-system/previews/combination-preview/ArrayRowCombinationPreview";
 import ArrayHeaderCombinationPreview from "../features/design-system/previews/combination-preview/ArrayHeaderCombinationPreview";
 import ColorIO from "colorjs.io";
+
 export interface DesignSystem {
   metadata: DesignSystemMetadata;
   palettes: Palette[];
@@ -28,7 +29,6 @@ export interface DesignSystem {
 export interface DesignSystemCreationPayload {
   name: string;
   folderPath: string;
-  darkMode: boolean;
   banner?: string;
   logo?: string;
 }
@@ -40,7 +40,6 @@ export type DesignSystemMetadataHome = DesignSystemMetadata & {
 export interface DesignSystemMetadata {
   designSystemId: string;
   designSystemName: string;
-  darkMode: boolean;
   designSystemPath: string;
   isTmp: boolean;
   canUndo: boolean;
@@ -312,4 +311,11 @@ export interface HandleUpdateColorPayload {
   usage: TokenColorUsage;
   state: ColorCombinationState;
   value: string | undefined;
+}
+
+export interface GenerateExportPayload {
+  designSystemPath: string;
+  exportName: string;
+  value: string;
+  extension: string;
 }

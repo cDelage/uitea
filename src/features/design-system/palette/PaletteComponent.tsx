@@ -3,7 +3,7 @@ import styles from "../ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import classNames from "classnames";
 import { useRef } from "react";
-import ShadeComponent from "./ShadeComponent";
+import TintComponent from "./TintsComponent";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ import {
 import { getAllErrorMessages } from "../../../util/HookFormUtils";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
-import ShadeAddRemove from "./ShadeAddRemove";
+import TintsAddRemove from "./TintsAddRemove";
 import Popover from "../../../ui/kit/Popover";
 import {
   MdArrowDownward,
@@ -59,7 +59,7 @@ function PaletteComponent({
     defaultValues: colorPalette,
   });
 
-  const shadesFieldArray = useFieldArray({
+  const tintsFieldArray = useFieldArray({
     control,
     name: "tints",
   });
@@ -80,10 +80,10 @@ function PaletteComponent({
         dragIndex !== hoverIndex &&
         hoverIndex !== "remove"
       ) {
-        shadesFieldArray.move(dragIndex, hoverIndex);
+        tintsFieldArray.move(dragIndex, hoverIndex);
       }
       if (dragIndex !== undefined && hoverIndex === "remove") {
-        shadesFieldArray.remove(dragIndex);
+        tintsFieldArray.remove(dragIndex);
       }
       handleSubmit(submitPalette)();
     }
@@ -107,7 +107,7 @@ function PaletteComponent({
         designSystem.palettes,
         `palette-${newIndex + 1}`
       ),
-      tints: shadesFieldArray.fields.map((shade) => {
+      tints: tintsFieldArray.fields.map((shade) => {
         return {
           ...shade,
           color: "#DDDDDD",
@@ -239,24 +239,24 @@ function PaletteComponent({
       </div>
       <DraggableContext.Provider value={draggableTools}>
         <div className={styles.shadesContainer}>
-          {shadesFieldArray.fields.map((shade, shadeIndex) => (
-            <ShadeComponent
+          {tintsFieldArray.fields.map((shade, shadeIndex) => (
+            <TintComponent
               key={shade.id}
               getValues={getValues}
               index={shadeIndex}
               register={register}
               setValue={setValue}
-              shades={shadesFieldArray.fields}
+              tints={tintsFieldArray.fields}
               submitEvent={handleSubmit(submitPalette)}
               error={errors.tints?.[index]?.label?.message}
               paletteName={paletteName}
-              shadesFieldArray={shadesFieldArray}
+              tintsFieldArray={tintsFieldArray}
             />
           ))}
           {editMode && (
-            <ShadeAddRemove
+            <TintsAddRemove
               draggableTools={draggableTools}
-              shadesFieldArray={shadesFieldArray}
+              shadesFieldArray={tintsFieldArray}
               handleSubmit={handleSubmit(submitPalette)}
             />
           )}

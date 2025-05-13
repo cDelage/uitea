@@ -11,6 +11,7 @@ use std::io::Read;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::Command;
 
 use crate::domain::image_domain::ImageLocal;
 
@@ -40,7 +41,8 @@ fn filename_equals(path: &PathBuf, filename: &str) -> bool {
 
 pub fn compute_fetch_pathbuf(original_pathbuf: &PathBuf) -> FetchPath {
     let tmp_path: PathBuf = original_pathbuf.clone().join(TMP_PATH);
-    let fetch_pathbuf: PathBuf = if tmp_path.is_dir() {
+    let metadata_path: PathBuf = tmp_path.join(DESIGN_SYSTEM_METADATA_PATH);
+    let fetch_pathbuf: PathBuf = if tmp_path.is_dir() && metadata_path.is_file() {
         tmp_path
     } else {
         original_pathbuf.clone()
@@ -234,4 +236,18 @@ pub fn assert_file_in_directory(filepath: &String, folder: &PathBuf) -> Result<S
     }
 
     Ok(filepath.to_string())
+}
+
+pub fn open_folder<P: AsRef<Path>>(path: P) -> std::io::Result<()> {
+    #[cfg(target_os = "windows")]
+    { Command::new("explorer").arg(path.as_ref()).spawn()?; }
+
+    #[cfg(target_os = "macos")]
+    { Command::new("open").arg(path.as_ref()).spawn()?; }
+
+    // Sur la plupart des desktops Linux / *BSD
+    #[cfg(all(unix, not(target_os = "macos")))]
+    { Command::new("xdg-open").arg(path.as_ref()).spawn()?; }
+
+    Ok(())
 }

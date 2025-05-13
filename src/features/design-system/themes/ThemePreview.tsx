@@ -5,6 +5,7 @@ import { useDesignSystemContext } from "../DesignSystemContext";
 import { recolorPalettes } from "../../../util/ThemeGenerator";
 import CopyableTopTooltip from "../../../ui/kit/CopyableTopTooltip";
 import { MdChevronRight } from "react-icons/md";
+import { getContrastColor } from "../../../util/PickerUtil";
 
 function ThemePreview({
   theme,
@@ -53,6 +54,7 @@ function ThemePreview({
       className="column gap-5 p-7"
       style={{
         background: theme.background,
+        color: getContrastColor(theme.background)
       }}
     >
       <h4>{theme.name}</h4>

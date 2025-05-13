@@ -78,7 +78,7 @@ function Recommandations() {
       <Popover>
         {dragTools.dragIndex !== undefined && (
           <CursorPortal>
-            <PreviewStyle $tokenFamilies={tokenFamilies} ref={styleRef}>
+            <PreviewStyle $tokenFamilies={tokenFamilies} ref={styleRef} $designSystem={designSystem}>
               <div className="cursor-body column gap-2">
                 {dragTools.hoverIndex && (
                   <div className="row gap-2 align-center">

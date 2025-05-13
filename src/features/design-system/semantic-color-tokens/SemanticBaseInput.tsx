@@ -42,7 +42,7 @@ function SemanticBaseInput({
           }}
         />
       }
-      keyPopover={label}
+      popoverId={label}
     />
   );
 }

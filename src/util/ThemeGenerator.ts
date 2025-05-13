@@ -42,16 +42,11 @@ export function recolorPalettes({
   palettes,
   defaultBackground,
   newBackground,
-  recolorLog,
 }: {
   palettes: Palette[];
   defaultBackground: string;
   newBackground: string;
-  recolorLog?: boolean;
 }): Palette[] {
-  if (recolorLog) {
-    console.log("recolor");
-  }
   const palettesToUpdate = [...palettes];
   let defaultBgColor = new ColorIO(defaultBackground);
   const newBgColor = new ColorIO(newBackground);

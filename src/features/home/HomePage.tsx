@@ -1,4 +1,4 @@
-import CreateDesignSystem from "./CreateDesignSystem";
+import ModalCreateDesignSystem from "./ModalCreateDesignSystem";
 import LoadDesignSystem from "./LoadDesignSystem";
 import RecentFiles from "./RecentFiles";
 import styles from "./Home.module.css";
@@ -25,13 +25,19 @@ function HomePage() {
           </SidePanel.BodyRelative>
         </div>
         <div className="row gap-4">
-          <CreateDesignSystem />
+          <ModalCreateDesignSystem />
           <LoadDesignSystem />
           <OpenPaletteBuilder />
           <OpenColorPicker />
         </div>
         <h1>Recent</h1>
-        <RecentFiles />
+        <div
+          style={{
+            overflowY: "auto",
+          }}
+        >
+          <RecentFiles />
+        </div>
       </div>
     </SidePanel>
   );

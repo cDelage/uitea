@@ -12,6 +12,7 @@ import RecentFilePaletteBuilderTab from "./RecentFilePaletteBuilderTab";
 import { useNavigate } from "react-router-dom";
 import { usePaletteBuilderStore } from "../palette-builder/PaletteBuilderStore";
 import { invoke } from "@tauri-apps/api";
+import Popover from "../../ui/kit/Popover";
 
 function RecentFiles() {
   const { recentFiles, isLoadingRecentFiles } = useFindAllRecentFiles();
@@ -54,43 +55,56 @@ function RecentFiles() {
   if (isLoadingRecentFiles) return <Loader />;
 
   return (
-    <Table>
-      <colgroup>
-        <col style={{ width: "95%" }} />
-        <col style={{ width: "5%" }} />
-      </colgroup>
-      <thead>
-        <tr>
-          <td>Recent file</td>
-          <td>Actions</td>
-        </tr>
-      </thead>
-      <tbody>
-        {recentFiles?.map((recentFile) => (
-          <tr
-            key={`${
-              isDesignSystem(recentFile)
-                ? recentFile.designSystemId
-                : recentFile.paletteBuilderName
-            }`}
-            className="hoverable"
-            onClick={() => handleFileClick(recentFile)}
-          >
-            {isDesignSystem(recentFile) && (
-              <RecentFileDesignSystemTab
-                designSystemMetadata={recentFile}
-              />
-            )}
-            {isPaletteBuilder(recentFile) && (
-              <RecentFilePaletteBuilderTab
-                paletteBuilderMetadata={recentFile}
-                open={handleFileClick}
-              />
-            )}
+    <Popover>
+      <Table>
+        <colgroup>
+          <col style={{ width: "95%" }} />
+          <col style={{ width: "5%" }} />
+        </colgroup>
+        <thead>
+          <tr>
+            <td
+              style={{
+                background: "var(--uidt-base-background)",
+              }}
+            >
+              Recent file
+            </td>
+            <td
+              style={{
+                background: "var(--uidt-base-background)",
+              }}
+            >
+              Actions
+            </td>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {recentFiles?.map((recentFile, index) => (
+            <tr
+              key={`${
+                isDesignSystem(recentFile)
+                  ? recentFile.designSystemId
+                  : recentFile.paletteBuilderName
+              }`}
+              className="hoverable"
+              onClick={() => handleFileClick(recentFile)}
+            >
+              {isDesignSystem(recentFile) && (
+                <RecentFileDesignSystemTab designSystemMetadata={recentFile} index={index}/>
+              )}
+              {isPaletteBuilder(recentFile) && (
+                <RecentFilePaletteBuilderTab
+                  paletteBuilderMetadata={recentFile}
+                  open={handleFileClick}
+                  index={index}
+                />
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Popover>
   );
 }
 

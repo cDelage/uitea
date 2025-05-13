@@ -4,13 +4,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Result, Context};
 
 use crate::{
     domain::design_system_domain::{
-        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, Fonts, Palette,
-        PalettesMetadataFile, Radius, SemanticColorTokens, TintsFile, Space, SpacesFile, Themes,
-        Typographies,
+        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, ExportPayload, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, Space, SpacesFile, Themes, TintsFile, Typographies
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -18,18 +16,17 @@ use crate::{
 };
 
 use super::{
-    assert_file_in_directory, copy_file, load_yaml_from_pathbuf, save_to_yaml_file,
-    DESIGN_SYSTEM_METADATA_PATH,
+    assert_file_in_directory, copy_file, load_yaml_from_pathbuf, open_folder, save_to_yaml_file, DESIGN_SYSTEM_METADATA_PATH
 };
 
 const PALETTES_PATH: &str = "palettes";
-const NEUTRAL_PALETTE_PATH: &str = "neutral.yaml";
 const PALETTES_METADATA_PATH: &str = "palettes_metadata.yaml";
 const FONTS_PATH: &str = "fonts.yaml";
 const TYPOGRAPHY_PATH: &str = "typography.yaml";
 const SPACES_PATH: &str = "spaces.yaml";
 const RADIUS_PATH: &str = "radius.yaml";
 const EFFECTS_PATH: &str = "effects.yaml";
+const EXPORTS_PATH: &str = "exports";
 const IMAGES_PATH: &str = "images";
 const THEMELIST_PATH: &str = "themes.yaml";
 const SEMANTIC_COLOR_TOKENS_PATH: &str = "semantic_color_tokens.yaml";
@@ -85,7 +82,7 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
     Ok(DesignSystemMetadata::from(
         &file,
         &original_pathbuf,
-        design_system_path.join(TMP_PATH).is_dir(),
+        design_system_path.join(TMP_PATH).join(DESIGN_SYSTEM_METADATA_PATH).is_file(),
         &get_images_path(&fetch_pathbuf),
     ))
 }
@@ -146,9 +143,7 @@ pub fn fetch_palettes(design_system_path: &PathBuf) -> Result<Vec<Palette>> {
 pub fn init_palettes(design_system_path: &PathBuf) -> Result<()> {
     let palettes_path: PathBuf = design_system_path.join(PALETTES_PATH);
     fs::create_dir_all(&palettes_path)?;
-    let primary_palette_path: PathBuf = palettes_path.join(NEUTRAL_PALETTE_PATH);
-    let shade_file: TintsFile = TintsFile::new();
-    save_to_yaml_file(primary_palette_path, &shade_file)
+    Ok(())
 }
 
 pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf) -> Result<()> {
@@ -197,6 +192,8 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     } else {
         design_system.metadata.clone().design_system_path
     };
+
+    println!("save is tmp: {:?}, path: {:?}", is_tmp, design_system_path);
 
     if !design_system_path.is_dir() {
         return Err(anyhow!(
@@ -277,11 +274,24 @@ pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetada
         }
     };
 
+    println!("banner: {:?} , logo: {:?}", &banner, &logo);
+
     //Save metadata
     let design_system_metadata_path: PathBuf = design_system_path.join(DESIGN_SYSTEM_METADATA_PATH);
     let mut design_system_file = DesignSystemMetadataFile::from(metadata);
-    let banner_filename: &str = Path::new(&banner).file_name().unwrap().to_str().unwrap();
-    let logo_filename: &str = Path::new(&logo).file_name().unwrap().to_str().unwrap();
+    let banner_filename = Path::new(&banner)
+        .file_name()
+        .context("Fail to read banner")?
+        .to_str()
+        .context("Fail to read banner")?
+        .to_owned();
+
+    let logo_filename = Path::new(&logo)
+        .file_name()
+        .context("Fail to read logo")?
+        .to_str()
+        .context("Fail to read logo")?
+        .to_owned();
     design_system_file.banner = String::from(banner_filename);
     design_system_file.logo = String::from(logo_filename);
     save_to_yaml_file(design_system_metadata_path, &design_system_file)
@@ -401,7 +411,7 @@ pub fn is_under_design_system(path: &PathBuf) -> bool {
     false
 }
 
-pub fn fetch_themelist(design_system_path: &PathBuf) -> Themes {
+pub fn fetch_themes(design_system_path: &PathBuf) -> Themes {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let theme_path = fetch_pathbuf.join(THEMELIST_PATH);
     if theme_path.is_file() {
@@ -425,4 +435,16 @@ pub fn fetch_semantic_color_tokens(design_system_path: &PathBuf) -> Result<Seman
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let semantic_color_tokens_path: PathBuf = fetch_pathbuf.join(SEMANTIC_COLOR_TOKENS_PATH);
     load_yaml_from_pathbuf::<SemanticColorTokens>(&semantic_color_tokens_path)
+}
+
+pub fn register_export(payload: ExportPayload) -> Result<()> {
+    let ExportPayload {design_system_path, export_name, value, extension} = payload;
+    let export_pathbuf = design_system_path.join(EXPORTS_PATH);
+    if !&export_pathbuf.is_dir(){
+        fs::create_dir(&export_pathbuf)?;
+    };
+    let file_path = compute_path_with_extension(&export_pathbuf, &export_name, &extension);
+    fs::write(file_path, value)?;
+    open_folder(export_pathbuf)?;
+    Ok(())
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import styles from "../InputPopover.module.css";
-import { WEB_SAFE_FONTS } from "../../../ui/UiConstants";
 import InputText from "../../../ui/kit/InputText";
+import { FONT_CATEGORIES } from "../../../ui/FontsConstants";
+import Popover from "../../../ui/kit/Popover";
+import FontCategorySelectorTab from "./FontCategorySelectorTab";
 
 function FontsPopover({
   value,
@@ -12,38 +13,29 @@ function FontsPopover({
 }) {
   const [searchField, setSearchField] = useState("");
 
-  const filteredFonts = searchField
-    ? WEB_SAFE_FONTS?.filter((font) => font.includes(searchField))
-    : WEB_SAFE_FONTS;
-
   return (
-    <div className={styles.inputPopover}>
+    <div className="column" data-disableoutside={true}>
       <div className="column w-full border-box">
-        <div className="row p-3">
+        <div className="row p-2">
           <InputText
             value={searchField}
             className="w-full"
+            placeholder="font name"
             onChange={(e) => setSearchField(e.target.value)}
           />
         </div>
       </div>
-      <div className={styles.keyValueMenuContainer}>
-        {filteredFonts?.map((font) => (
-          <div
-            className={styles.selectionTab}
-            key={font}
-            onClick={() => setValue?.(font)}
-            data-active={value && value === font}
-            style={{
-              fontFamily: font,
-            }}
-          >
-            <div className="column gap-1">
-              <strong>{font}</strong>
-            </div>
-          </div>
+      <Popover.Selector>
+        {FONT_CATEGORIES.map((category, index) => (
+          <FontCategorySelectorTab
+            category={category}
+            index={index}
+            value={value}
+            setValue={setValue}
+            searchField={searchField}
+          />
         ))}
-      </div>
+      </Popover.Selector>
     </div>
   );
 }

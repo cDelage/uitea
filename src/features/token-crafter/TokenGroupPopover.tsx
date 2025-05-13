@@ -12,10 +12,10 @@ function TokenGroupPopover({
   handleSetGroup: (group: string | undefined) => void;
   colorCombinationCollections: ColorCombinationCollection[];
 }) {
-  const { tokenFamilies } = useTokenCrafterContext();
+  const { tokenFamilies, designSystem } = useTokenCrafterContext();
 
   return (
-    <PreviewStyle $tokenFamilies={tokenFamilies}>
+    <PreviewStyle $tokenFamilies={tokenFamilies} $designSystem={designSystem}>
       <Popover.Actions>
         {colorCombinationCollections.map((collection) => (
           <Popover.Tab

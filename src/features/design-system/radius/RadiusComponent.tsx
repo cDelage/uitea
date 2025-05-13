@@ -23,6 +23,7 @@ import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
+import Popover from "../../../ui/kit/Popover";
 
 function RadiusComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -111,75 +112,79 @@ function RadiusComponent() {
   );
 
   return (
-    <form
-      className={formClassNames}
-      onSubmit={handleSubmit(submitRadius)}
-      ref={radiusRef}
-    >
-      <div className={sideSettingsClass} ref={scrollableLeft}>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Default radius</h5>
-        </div>
-        <InputDesignSystem
-          key="defaultRadius"
-          label="default"
-          handleSubmit={handleSubmit(submitRadius)}
-          value={watch("default")}
-          register={register("default")}
-          tooltipValue="radius-default"
-        />
-        <div className={styles.sideSettingsTitle}>
-          <h5>Additionals radius</h5>
-        </div>
-        <div className="column">
-          {additionalsRadiusArray.map((field, index) => (
-            <InputDesignSystem
-              key={field.id}
-              label={watch(`additionalsRadius.${index}.radiusKey`)}
-              handleSubmit={handleSubmit(submitRadius)}
-              isAddRemoveDragAllowed={true}
-              onAdd={() => handleAddRadius(index)}
-              onRemove={() => {
-                remove(index);
-                handleSubmit(submitRadius)();
-              }}
-              draggableTools={draggableTools}
-              index={index}
-              registerKey={register(`additionalsRadius.${index}.radiusKey`)}
-              register={register(`additionalsRadius.${index}.radiusValue`)}
-              tooltipValue={`radius-${watch(
-                `additionalsRadius.${index}.radiusKey`
-              )}`}
-            />
-          ))}
-        </div>
-        {editMode && (
-          <InputDesignSystemAddRemove
-            draggableTools={draggableTools}
-            itemName="radius"
-            onAppend={() => handleAddRadius(additionalsRadiusArray.length - 1)}
+    <Popover>
+      <form
+        className={formClassNames}
+        onSubmit={handleSubmit(submitRadius)}
+        ref={radiusRef}
+      >
+        <div className={sideSettingsClass} ref={scrollableLeft}>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Default radius</h5>
+          </div>
+          <InputDesignSystem
+            key="defaultRadius"
+            label="default"
+            handleSubmit={handleSubmit(submitRadius)}
+            value={watch("default")}
+            register={register("default")}
+            tooltipValue="radius-default"
           />
-        )}
-
-        {!editMode && !additionalsRadiusArray.length && (
-          <div className="row justify-center">Empty</div>
-        )}
-      </div>
-
-      <PreviewComponentDesignSystem maxHeight="400px">
-        <div className={styles.previewElementWrap} ref={scrollableRight}>
-          <RadiusPreview label="default" radiusValue={watch("default")} />
-          {additionalsRadiusArray.map((field, index) => (
-            <RadiusPreview
-              key={field.id}
-              label={watch(`additionalsRadius.${index}.radiusKey`)}
-              radiusValue={watch(`additionalsRadius.${index}.radiusValue`)}
+          <div className={styles.sideSettingsTitle}>
+            <h5>Additionals radius</h5>
+          </div>
+          <div className="column">
+            {additionalsRadiusArray.map((field, index) => (
+              <InputDesignSystem
+                key={field.id}
+                label={watch(`additionalsRadius.${index}.radiusKey`)}
+                handleSubmit={handleSubmit(submitRadius)}
+                isAddRemoveDragAllowed={true}
+                onAdd={() => handleAddRadius(index)}
+                onRemove={() => {
+                  remove(index);
+                  handleSubmit(submitRadius)();
+                }}
+                draggableTools={draggableTools}
+                index={index}
+                registerKey={register(`additionalsRadius.${index}.radiusKey`)}
+                register={register(`additionalsRadius.${index}.radiusValue`)}
+                tooltipValue={`radius-${watch(
+                  `additionalsRadius.${index}.radiusKey`
+                )}`}
+              />
+            ))}
+          </div>
+          {editMode && (
+            <InputDesignSystemAddRemove
+              draggableTools={draggableTools}
+              itemName="radius"
+              onAppend={() =>
+                handleAddRadius(additionalsRadiusArray.length - 1)
+              }
             />
-          ))}
+          )}
+
+          {!editMode && !additionalsRadiusArray.length && (
+            <div className="row justify-center">Empty</div>
+          )}
         </div>
-      </PreviewComponentDesignSystem>
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+
+        <PreviewComponentDesignSystem maxHeight="400px">
+          <div className={styles.previewElementWrap} ref={scrollableRight}>
+            <RadiusPreview label="default" radiusValue={watch("default")} />
+            {additionalsRadiusArray.map((field, index) => (
+              <RadiusPreview
+                key={field.id}
+                label={watch(`additionalsRadius.${index}.radiusKey`)}
+                radiusValue={watch(`additionalsRadius.${index}.radiusValue`)}
+              />
+            ))}
+          </div>
+        </PreviewComponentDesignSystem>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 

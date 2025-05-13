@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { autoRangeNumber } from "../palette-builder/PaletteBuilderStore";
 import styles from "./InputNumber.module.css";
 import classNames from "classnames";
@@ -16,9 +16,11 @@ function InputNumber({
   max: number;
   step?: number;
 }) {
+  const [valueInput, setValueInput] = useState(value);
+
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!Number.isNaN(e.target.value)) {
-      setValue(autoRangeNumber(Number(e.target.value), min, max));
+      setValueInput(autoRangeNumber(Number(e.target.value), min, max));
     }
   }
   const inputStyle = classNames("inherit-input", styles.inputContainer);
@@ -27,9 +29,10 @@ function InputNumber({
       <input
         className={inputStyle}
         type="number"
-        value={value}
+        value={valueInput}
         step={step}
         onChange={handleChange}
+        onBlur={() => setValue(valueInput)}
       />
     </div>
   );

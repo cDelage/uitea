@@ -1,7 +1,6 @@
 import { SliderStyles } from "rc-slider/lib/interface";
 import {
   AdditionalTypographyScale,
-  Base,
   DefaultTypography,
   Effect,
   EffectType,
@@ -22,41 +21,6 @@ export const ICON_SIZE_MD = "20";
 export const ICON_SIZE_LG = "24";
 export const ICON_SIZE_XL = "32";
 export const ICON_SIZE_XXL = "52";
-
-export const DEFAULT_BASE: Base = {
-  background: {
-    default: "var(--uidt-palette-gray-50)",
-    dark: "var(--uidt-palette-gray-950)",
-  },
-  border: {
-    default: "var(--uidt-palette-gray-300)",
-    dark: "var(--uidt-palette-gray-700)",
-  },
-  textLight: {
-    default: "var(--uidt-palette-gray-500)",
-    dark: "var(--uidt-palette-gray-500)",
-  },
-  textDefault: {
-    default: "var(--uidt-palette-gray-700)",
-    dark: "var(--uidt-palette-gray-400)",
-  },
-  textDark: {
-    default: "var(--uidt-palette-gray-900)",
-    dark: "var(--uidt-palette-gray-50)",
-  },
-  backgroundDisabled: {
-    default: "var(--uidt-palette-gray-200)",
-    dark: "var(--uidt-palette-gray-700)",
-  },
-  borderDisabled: {
-    default: "var(--uidt-palette-gray-300)",
-    dark: "var(--uidt-palette-gray-600)",
-  },
-  textDisabled: {
-    default: "var(--uidt-palette-gray-500)",
-    dark: "var(--uidt-palette-gray-400)",
-  },
-};
 
 export const DEFAULT_PALETTE: Palette = {
   paletteName: "palette-1",
@@ -229,6 +193,9 @@ export const WEB_SAFE_FONTS: string[] = [
   "Segoe UI Emoji",
   "Segoe UI Symbol",
   "Noto Color Emoji",
+  "Droid Sans",
+  "Chilanka",
+  "Roboto"
 ];
 
 export const SLIDER_STYLE: SliderStyles = {
@@ -308,18 +275,17 @@ export function getRectSize({
   };
 }
 
-
-export const DEFAULT_RECOMMANDATIONS : RecommandationContrastPayload[] = [
+export const DEFAULT_RECOMMANDATIONS: RecommandationContrastPayload[] = [
   {
     text: 6,
-    border: 3
+    border: 3,
   },
   {
     text: 9,
-    border: 5
+    border: 5,
   },
   {
     text: 14,
-    border: 5
-  }
-]
+    border: 5,
+  },
+];

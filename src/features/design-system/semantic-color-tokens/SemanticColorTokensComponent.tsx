@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
+import Popover from "../../../ui/kit/Popover";
 
 function SemanticColorTokensComponent() {
   const { designSystem, tokenFamilies } = useDesignSystemContext();
@@ -54,59 +55,61 @@ function SemanticColorTokensComponent() {
   }
 
   return (
-    <form ref={semanticTokensRef} className={styles.componentDesignSystem}>
-      <div className={sideSettingsClassNames} style={{ maxHeight: "500px" }}>
-        <div className={styles.sideSettingsTitle}>
-          <h5>Base</h5>
+    <Popover>
+      <form ref={semanticTokensRef} className={styles.componentDesignSystem}>
+        <div className={sideSettingsClassNames} style={{ maxHeight: "600px" }}>
+          <div className={styles.sideSettingsTitle}>
+            <h5>Base</h5>
+          </div>
+          <div className="column">
+            <SemanticBaseInput
+              token="background"
+              label="background"
+              watch={watch}
+              setValue={setValue}
+              onSubmit={handleSubmit(submitSemanticColorTokens)}
+              tokenFamilies={tokenFamiliesAccessible}
+            />
+            <SemanticBaseInput
+              token="textLight"
+              label="text-light"
+              watch={watch}
+              setValue={setValue}
+              onSubmit={handleSubmit(submitSemanticColorTokens)}
+              tokenFamilies={tokenFamiliesAccessible}
+            />
+            <SemanticBaseInput
+              token="textDefault"
+              label="text-default"
+              watch={watch}
+              setValue={setValue}
+              onSubmit={handleSubmit(submitSemanticColorTokens)}
+              tokenFamilies={tokenFamiliesAccessible}
+            />
+            <SemanticBaseInput
+              token="textDark"
+              label="text-dark"
+              watch={watch}
+              setValue={setValue}
+              onSubmit={handleSubmit(submitSemanticColorTokens)}
+              tokenFamilies={tokenFamiliesAccessible}
+            />
+            <SemanticBaseInput
+              token="border"
+              label="border"
+              watch={watch}
+              setValue={setValue}
+              onSubmit={handleSubmit(submitSemanticColorTokens)}
+              tokenFamilies={tokenFamiliesAccessible}
+            />
+          </div>
         </div>
-        <div className="column">
-          <SemanticBaseInput
-            token="background"
-            label="background"
-            watch={watch}
-            setValue={setValue}
-            onSubmit={handleSubmit(submitSemanticColorTokens)}
-            tokenFamilies={tokenFamiliesAccessible}
-          />
-          <SemanticBaseInput
-            token="textLight"
-            label="text-light"
-            watch={watch}
-            setValue={setValue}
-            onSubmit={handleSubmit(submitSemanticColorTokens)}
-            tokenFamilies={tokenFamiliesAccessible}
-          />
-          <SemanticBaseInput
-            token="textDefault"
-            label="text-default"
-            watch={watch}
-            setValue={setValue}
-            onSubmit={handleSubmit(submitSemanticColorTokens)}
-            tokenFamilies={tokenFamiliesAccessible}
-          />
-          <SemanticBaseInput
-            token="textDark"
-            label="text-dark"
-            watch={watch}
-            setValue={setValue}
-            onSubmit={handleSubmit(submitSemanticColorTokens)}
-            tokenFamilies={tokenFamiliesAccessible}
-          />
-          <SemanticBaseInput
-            token="border"
-            label="border"
-            watch={watch}
-            setValue={setValue}
-            onSubmit={handleSubmit(submitSemanticColorTokens)}
-            tokenFamilies={tokenFamiliesAccessible}
-          />
-        </div>
-      </div>
-      <PreviewComponentDesignSystem maxHeight="600px">
-        <SemanticPreview />
-      </PreviewComponentDesignSystem>
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+        <PreviewComponentDesignSystem maxHeight="600px">
+          <SemanticPreview />
+        </PreviewComponentDesignSystem>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 

@@ -27,10 +27,6 @@ export type ActiveComponent = {
 export type DesignSystemContextType = {
   activeComponent?: ActiveComponent;
   setActiveComponent: (activeComponent: ActiveComponent) => void;
-  findDesignSystemColor: (props: {
-    label?: string;
-    defaultValue?: string;
-  }) => string | undefined;
   designSystem: DesignSystem;
   editMode: boolean;
   colorTokens?: DesignToken[];

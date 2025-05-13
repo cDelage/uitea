@@ -10,9 +10,11 @@ import ModalRemoveRecentFile from "./ModalRemoveRecentFile";
 function RecentFilePaletteBuilderTab({
   paletteBuilderMetadata,
   open,
+  index
 }: {
   paletteBuilderMetadata: PaletteBuilderMetadata;
   open: (recentFile: DesignSystemMetadataHome | PaletteBuilderMetadata) => void;
+  index: number;
 }) {
   return (
     <>
@@ -31,13 +33,12 @@ function RecentFilePaletteBuilderTab({
         </div>
       </td>
       <td className="shrink">
-        <Popover>
-          <Popover.Toggle id="file-actions" positionPayload="bottom-right">
+          <Popover.Toggle id={`file-actions-${paletteBuilderMetadata.paletteBuilderName}-${index}`} positionPayload="bottom-right">
             <GhostButton>
               <MdMoreHoriz size={ICON_SIZE_MD} />
             </GhostButton>
           </Popover.Toggle>
-          <Popover.Body id="file-actions">
+          <Popover.Body id={`file-actions-${paletteBuilderMetadata.paletteBuilderName}-${index}`}>
             <Popover.Actions>
               <Popover.Tab clickEvent={() => open(paletteBuilderMetadata)}>
                 <MdOpenInNew /> Open
@@ -49,7 +50,6 @@ function RecentFilePaletteBuilderTab({
               </Modal>
             </Popover.Actions>
           </Popover.Body>
-        </Popover>
       </td>
     </>
   );

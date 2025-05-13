@@ -22,6 +22,7 @@ import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
+import Popover from "../../../ui/kit/Popover";
 
 function EffectsComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -103,71 +104,73 @@ function EffectsComponent() {
   );
 
   return (
-    <form
-      className={formClassNames}
-      onSubmit={handleSubmit(submitEffects)}
-      ref={effectsRef}
-    >
-      <div>
-        <div ref={topTooltipRef} className="relative" />
-        <div className={sideSettingsClass} ref={scrollableLeft}>
-          <div className="column">
-            {effectsFields.map((effect, index) => (
-              <InputDesignSystem
-                key={effect.effectName}
-                keyPopover={`effect-${index}`}
-                label={watch(`effects.${index}.effectName`)}
-                draggableTools={draggableTools}
-                isAddRemoveDragAllowed={true}
-                index={index}
-                onAdd={() => handleAddEffect(index)}
-                onRemove={() => {
-                  remove(index);
-                  handleSubmit(submitEffects);
-                }}
-                value={effect.items.map((item) => item.effectValue).join(",")}
-                registerKey={register(`effects.${index}.effectName`, {
-                  required: true,
-                })}
-                handleSubmit={handleSubmit(submitEffects)}
-                popoverEdit={
-                  <EffectsPopover
-                    effect={effect}
-                    register={register}
-                    index={index}
-                    control={control}
-                    watch={watch}
-                    setValue={setValue}
-                    getValue={getValues}
-                    handleSubmit={handleSubmit(submitEffects)}
-                  />
-                }
-                tooltipValue={`effect-${effect.effectName}`}
-                portalTooltip={index === 0 ? topTooltipRef : undefined}
-              />
-            ))}
-            {editMode && (
-              <InputDesignSystemAddRemove
-                draggableTools={draggableTools}
-                itemName="effect"
-                onAppend={() => handleAddEffect(effectsFields.length - 1)}
-              />
-            )}
-            {!editMode && !effectsFields.length && (
-              <div className="row justify-center">Empty</div>
-            )}
+    <Popover>
+      <form
+        className={formClassNames}
+        onSubmit={handleSubmit(submitEffects)}
+        ref={effectsRef}
+      >
+        <div>
+          <div ref={topTooltipRef} className="relative" />
+          <div className={sideSettingsClass} ref={scrollableLeft}>
+            <div className="column">
+              {effectsFields.map((effect, index) => (
+                <InputDesignSystem
+                  key={effect.effectName}
+                  popoverId={`effect-${index}`}
+                  label={watch(`effects.${index}.effectName`)}
+                  draggableTools={draggableTools}
+                  isAddRemoveDragAllowed={true}
+                  index={index}
+                  onAdd={() => handleAddEffect(index)}
+                  onRemove={() => {
+                    remove(index);
+                    handleSubmit(submitEffects);
+                  }}
+                  value={effect.items.map((item) => item.effectValue).join(",")}
+                  registerKey={register(`effects.${index}.effectName`, {
+                    required: true,
+                  })}
+                  handleSubmit={handleSubmit(submitEffects)}
+                  popoverEdit={
+                    <EffectsPopover
+                      effect={effect}
+                      register={register}
+                      index={index}
+                      control={control}
+                      watch={watch}
+                      setValue={setValue}
+                      getValue={getValues}
+                      handleSubmit={handleSubmit(submitEffects)}
+                    />
+                  }
+                  tooltipValue={`effect-${effect.effectName}`}
+                  portalTooltip={index === 0 ? topTooltipRef : undefined}
+                />
+              ))}
+              {editMode && (
+                <InputDesignSystemAddRemove
+                  draggableTools={draggableTools}
+                  itemName="effect"
+                  onAppend={() => handleAddEffect(effectsFields.length - 1)}
+                />
+              )}
+              {!editMode && !effectsFields.length && (
+                <div className="row justify-center">Empty</div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <PreviewComponentDesignSystem maxHeight="400px">
-        <div className={styles.previewElementWrap} ref={scrollableRight}>
-          {watch(`effects`).map((effect) => (
-            <EffectsPreview key={effect.effectName} effect={effect} />
-          ))}
-        </div>
-      </PreviewComponentDesignSystem>
-      <div className={styles.darkPreviewPlaceholder} />
-    </form>
+        <PreviewComponentDesignSystem maxHeight="400px">
+          <div className={styles.previewElementWrap} ref={scrollableRight}>
+            {watch(`effects`).map((effect) => (
+              <EffectsPreview key={effect.effectName} effect={effect} />
+            ))}
+          </div>
+        </PreviewComponentDesignSystem>
+        <div className={styles.darkPreviewPlaceholder} />
+      </form>
+    </Popover>
   );
 }
 
