@@ -254,7 +254,7 @@ pub struct AdditionalFont {
 impl Fonts {
     pub fn new() -> Fonts {
         Fonts {
-            default: String::from("'Helvetica', 'Arial', sans-serif"),
+            default: String::from("Roboto"),
             additionals: vec![],
         }
     }
@@ -263,6 +263,7 @@ impl Fonts {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Typographies {
+    root: TypographyScale,
     paragraph: TypographyScale,
     h1: TypographyScale,
     h2: TypographyScale,
@@ -272,7 +273,7 @@ pub struct Typographies {
     h6: TypographyScale,
     small: TypographyScale,
     strong: TypographyScale,
-    additionals_scales: Vec<AdditionalTypographyScale>,
+    additionals_scales: Vec<CustomTypographyScale>,
 }
 
 impl Typographies {
@@ -393,7 +394,7 @@ impl Typographies {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AdditionalTypographyScale {
+pub struct CustomTypographyScale {
     scale_name: String,
     scale: TypographyScale,
 }
@@ -408,16 +409,30 @@ pub struct AdditionalFontWeight {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TypographyScale {
-    font_size: String,
-    line_height: String,
+    font_size: Measurement,
+    line_height: Measurement,
     font_weight: FontWeight,
     letter_spacing: TypographySpacing,
     word_spacing: TypographySpacing,
     font_style: FontStyle,
     text_transform: TextTransform,
     text_decoration: TextDecoration,
-    padding: String,
-    margin: String,
+    padding: Measurement,
+    margin: Measurement,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Measurement {
+    pub unit:UnitOfMeasurement,
+    pub value: u64
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum UnitOfMeasurement {
+    REM,
+    PX
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
