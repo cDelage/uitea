@@ -5,7 +5,7 @@ import {
   ThemeItem,
   ThemeStateCategory,
   AdditionalFont,
-  AdditionalTypographyScale,
+  CustomTypographyScale,
   Space,
   RadiusItem,
   Effect,
@@ -120,7 +120,7 @@ export const generateUniqueFontKey = (
 };
 
 export const generateUniqueTypographyKey = (
-  fonts: AdditionalTypographyScale[],
+  fonts: CustomTypographyScale[],
   baseKey: string
 ): string => {
   let uniqueKey = baseKey;

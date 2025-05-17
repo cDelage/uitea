@@ -1,6 +1,6 @@
 import { SliderStyles } from "rc-slider/lib/interface";
 import {
-  AdditionalTypographyScale,
+  CustomTypographyScale,
   DefaultTypography,
   Effect,
   EffectType,
@@ -85,12 +85,23 @@ export const FONT_WEIGHTS: FontWeight[] = [
 ];
 
 export const TYPOGRAPHY_SPACING: TypographySpacing[] = [
+  "-0.5em",
+  "-0.4em",
+  "-0.3em",
+  "-0.2em",
+  "-0.1em",
+  "-0.08em",
   "-0.05em",
   "-0.02em",
   "0em",
+  "0.02em",
+  "0.05em",
+  "0.08em",
   "0.1em",
   "0.2em",
   "0.3em",
+  "0.4em",
+  "0.5em",
 ];
 
 export const FONT_STYLES: FontStyle[] = ["normal", "italic", "oblique"];
@@ -109,19 +120,31 @@ export const TEXT_DECORATIONS: TextDecoration[] = [
   "line-through",
 ];
 
-export const DEFAULT_TYPOGRAPHY_SCALE: AdditionalTypographyScale = {
+export const DEFAULT_TYPOGRAPHY_SCALE: CustomTypographyScale = {
   scaleName: "additional-1",
   scale: {
-    fontSize: "14px",
-    lineHeight: "20px",
+    fontSize: {
+      value: 16,
+      unit: "PX",
+    },
+    lineHeight: {
+      value: 16,
+      unit: "PX",
+    },
     fontWeight: "400",
     letterSpacing: "0em",
     wordSpacing: "0em",
     fontStyle: "normal",
     textTransform: "none",
     textDecoration: "none",
-    padding: "0",
-    margin: "0",
+    padding: {
+      value: 0,
+      unit: "PX",
+    },
+    margin: {
+      value: 0,
+      unit: "PX",
+    },
   },
 };
 
@@ -195,7 +218,7 @@ export const WEB_SAFE_FONTS: string[] = [
   "Noto Color Emoji",
   "Droid Sans",
   "Chilanka",
-  "Roboto"
+  "Roboto",
 ];
 
 export const SLIDER_STYLE: SliderStyles = {
@@ -237,6 +260,22 @@ export const RAIL_SLIDER_HORIZONTAL: CSSProperties = {
   borderRadius: "4px",
   boxShadow: "var(--uidt-shadow-md)",
   bottom: 4,
+};
+
+export const HANDLE_SLIDER_LIST: CSSProperties = {
+  boxShadow: "var(--uidt-shadow-md)",
+  border: "var(--uidt-primary-outline-light-border) 1px solid",
+  backgroundColor: "var(--uidt-primary-outline-bg)",
+};
+
+export const RAIL_SLIDER_LIST: CSSProperties = {
+  borderRadius: "12px",
+  backgroundColor: "var(--uidt-base-border)",
+  boxShadow: "var(--uidt-shadow-md)",
+};
+
+export const TRACK_SLIDER_LIST: CSSProperties = {
+  backgroundColor: "var(--uidt-primary-outline-light-border)",
 };
 
 export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
@@ -288,4 +327,34 @@ export const DEFAULT_RECOMMANDATIONS: RecommandationContrastPayload[] = [
     text: 14,
     border: 5,
   },
+];
+
+export interface ResponsiveDimensionDevice {
+  width: number;
+  height: number;
+  name: string;
+}
+
+export const RESPONSIVE_DIMENSIONS: ResponsiveDimensionDevice[] = [
+  // --- Mobiles ----------------------------------------------------------------
+  { width: 320, height: 568, name: "Mobile XS  - iPhone SE (2022)" },
+  { width: 360, height: 640, name: "Mobile S  - Android 5″ (ex. Pixel 3a)" },
+  { width: 375, height: 667, name: "Mobile M  - iPhone 8" },
+  { width: 414, height: 896, name: "Mobile L  - iPhone 11 Pro Max" },
+  { width: 480, height: 800, name: "Phablet  - Android 6″/6.5″" },
+
+  // --- Tablettes --------------------------------------------------------------
+  { width: 600, height: 960, name: "Tablet XS  - petite tablette 7″" },
+  { width: 768, height: 1024, name: "Tablet S  - iPad 9,7″ portrait" },
+  { width: 834, height: 1112, name: "Tablet M  - iPad Air 10,9″ portrait" },
+  { width: 1024, height: 1366, name: "Tablet L  - iPad Pro 12,9″ portrait" },
+
+  // --- Laptops / Desktops -----------------------------------------------------
+  { width: 1280, height: 800, name: "Laptop S  - 13″ (MacBook Air)" },
+  { width: 1366, height: 768, name: "Laptop M  - PC 14″/15″ courant" },
+  { width: 1440, height: 900, name: "Desktop S  - 15″ Retina / 1440p" },
+  { width: 1680, height: 1050, name: "Desktop M  - 20″ Widescreen" },
+  { width: 1920, height: 1080, name: "Desktop L  - Full HD 1080p" },
+  { width: 2560, height: 1440, name: "Desktop XL  - 2K/QHD" },
+  { width: 3840, height: 2160, name: "Desktop XXL  - 4K/UHD" },
 ];

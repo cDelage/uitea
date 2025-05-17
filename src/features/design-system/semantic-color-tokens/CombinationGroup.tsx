@@ -105,7 +105,7 @@ function CombinationGroup({
             zIndex: 0,
           }}
         >
-          <div className="column gap-3">
+          <div className="column gap-3 w-full">
             <h4>{combinationGroup.combinationName}</h4>
             <div className="tokens-grid">
               {shouldDisplayCombination(combinationGroup.default) && (

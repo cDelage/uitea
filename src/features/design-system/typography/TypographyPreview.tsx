@@ -12,7 +12,7 @@ function TypographyPreview({
     designSystem: { fonts },
   } = useDesignSystemContext();
   return (
-    <div style={{ ...typographyScale, fontFamily: fonts.default }}>
+    <div style={{ fontFamily: fonts.default }}>
       {keyScale} - Lorem ipsum dolor sit amet
     </div>
   );

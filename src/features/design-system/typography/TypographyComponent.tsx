@@ -9,8 +9,9 @@ import { useFieldArray, useForm } from "react-hook-form";
 import InputDesignSystem from "../InputDesignSystem";
 import TypographyPopover from "./TypographyPopover";
 import {
-  AdditionalTypographyScale,
+  CustomTypographyScale,
   Typographies,
+  TypographyScale,
 } from "../../../domain/DesignSystemDomain";
 import { generateUniqueTypographyKey } from "../../../util/DesignSystemUtils";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
@@ -35,17 +36,17 @@ function TypographyComponent() {
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
-  const { register, watch, control, handleSubmit, reset } = useForm({
+  const { register, watch, control, handleSubmit, reset, setValue } = useForm({
     defaultValues: typography,
   });
   const {
-    fields: additionalsScales,
+    fields: customScales,
     insert,
     remove,
     move,
   } = useFieldArray({
     control,
-    name: "additionalsScales",
+    name: "customScales",
   });
   const { draggableTools } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: RemovableIndex) => {
@@ -77,10 +78,10 @@ function TypographyComponent() {
 
   function handleAddAdditionalScale(index: number) {
     const key = generateUniqueTypographyKey(
-      additionalsScales,
+      customScales,
       `additional-${index + 2}`
     );
-    const newScale: AdditionalTypographyScale = {
+    const newScale: CustomTypographyScale = {
       ...DEFAULT_TYPOGRAPHY_SCALE,
       scaleName: key,
     };
@@ -115,8 +116,16 @@ function TypographyComponent() {
     handleSubmit(submitTypography)();
   }
 
+  function getTypoName(typographyScale: TypographyScale) {
+    return `${
+      typographyScale.fontSize.value
+    } ${typographyScale.fontSize.unit.toLocaleLowerCase()} / ${
+      typographyScale.lineHeight.value
+    } ${typographyScale.lineHeight.unit.toLocaleLowerCase()}`;
+  }
+
   return (
-    <Popover>
+    <Popover onClose={handleSubmit(submitTypography)}>
       <form
         className={formClassNames}
         onSubmit={handleSubmit(submitTypography)}
@@ -132,14 +141,13 @@ function TypographyComponent() {
                 key={typoScale}
                 label={typoScale}
                 handleSubmit={handleSubmit(submitTypography)}
-                value={`${watch(`${typoScale}.fontSize`)}/${watch(
-                  `${typoScale}.lineHeight`
-                )}`}
+                value={getTypoName(watch(typoScale))}
                 popoverEdit={
                   <TypographyPopover
                     register={register}
                     fieldPath={typoScale}
                     watch={watch}
+                    setValue={setValue}
                     scaleName={typoScale}
                   />
                 }
@@ -154,7 +162,7 @@ function TypographyComponent() {
             <h5>Additionals scales</h5>
           </div>
           <div className="column">
-            {additionalsScales.map((scale, index) => (
+            {customScales.map((scale, index) => (
               <InputDesignSystem
                 label={scale.scaleName}
                 key={scale.scaleName}
@@ -163,16 +171,17 @@ function TypographyComponent() {
                 onAdd={() => handleAddAdditionalScale(index)}
                 onRemove={() => handleRemove(index)}
                 value={`${watch(
-                  `additionalsScales.${index}.scale.fontSize`
-                )}/${watch(`additionalsScales.${index}.scale.fontSize`)}`}
-                registerKey={register(`additionalsScales.${index}.scaleName`)}
+                  `customScales.${index}.scale.fontSize.value`
+                )}/${watch(`customScales.${index}.scale.fontSize.value`)}`}
+                registerKey={register(`customScales.${index}.scaleName`)}
                 draggableTools={draggableTools}
                 index={index}
                 popoverEdit={
                   <TypographyPopover
                     register={register}
-                    fieldPath={`additionalsScales.${index}.scale`}
+                    fieldPath={`customScales.${index}.scale`}
                     watch={watch}
+                    setValue={setValue}
                     scaleName={scale.scaleName}
                   />
                 }
@@ -185,11 +194,11 @@ function TypographyComponent() {
                 draggableTools={draggableTools}
                 itemName="typography"
                 onAppend={() =>
-                  handleAddAdditionalScale(additionalsScales.length - 1)
+                  handleAddAdditionalScale(customScales.length - 1)
                 }
               />
             )}
-            {!editMode && !additionalsScales.length && (
+            {!editMode && !customScales.length && (
               <div className="row justify-center">Empty</div>
             )}
           </div>
@@ -208,7 +217,7 @@ function TypographyComponent() {
                 typographyScale={typography[typoScale]}
               />
             ))}
-            {additionalsScales.map((scale) => (
+            {customScales.map((scale) => (
               <TypographyPreview
                 key={scale.scaleName}
                 keyScale={scale.scaleName}

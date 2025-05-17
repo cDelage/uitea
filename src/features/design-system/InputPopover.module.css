@@ -67,6 +67,12 @@
   height: 150px;
 }
 
+.defaultValuesContainer {
+  display: flex;
+  flex-direction: column;
+  padding: var(--uidt-space-0) var(--uidt-space-3);
+}
+
 .tabsContainer {
   display: flex;
   padding: var(--uidt-space-5) var(--uidt-space-3);

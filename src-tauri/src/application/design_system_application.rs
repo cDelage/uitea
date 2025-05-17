@@ -113,7 +113,7 @@ pub fn find_design_system(
         }
         Ok(font) => Ok(font),
     }?;
-
+    
     let typography: Typographies =
         match design_system_repository::fetch_typography(&design_system_pathbuf) {
             Err(_) => {
