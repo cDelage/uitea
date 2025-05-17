@@ -7,8 +7,8 @@ import {
   FontStyle,
   FontWeight,
   Palette,
+  PresetSpaces,
   RecommandationContrastPayload,
-  Space,
   TextDecoration,
   TextTransform,
   TypographySpacing,
@@ -85,23 +85,39 @@ export const FONT_WEIGHTS: FontWeight[] = [
 ];
 
 export const TYPOGRAPHY_SPACING: TypographySpacing[] = [
+  "-1em",
+  "-0.9em",
+  "-0.8em",
+  "-0.7em",
+  "-0.6em",
   "-0.5em",
   "-0.4em",
   "-0.3em",
   "-0.2em",
   "-0.1em",
+  "-0.09em",
   "-0.08em",
+  "-0.07em",
+  "-0.06em",
   "-0.05em",
   "-0.02em",
   "0em",
   "0.02em",
   "0.05em",
+  "0.06em",
+  "0.07em",
   "0.08em",
+  "0.09em",
   "0.1em",
   "0.2em",
   "0.3em",
   "0.4em",
   "0.5em",
+  "0.6em",
+  "0.7em",
+  "0.8em",
+  "0.9em",
+  "1em",
 ];
 
 export const FONT_STYLES: FontStyle[] = ["normal", "italic", "oblique"];
@@ -149,6 +165,7 @@ export const DEFAULT_TYPOGRAPHY_SCALE: CustomTypographyScale = {
 };
 
 export const DEFAULT_TYPOGRAPHIES: DefaultTypography[] = [
+  "root",
   "paragraph",
   "h1",
   "h2",
@@ -158,19 +175,6 @@ export const DEFAULT_TYPOGRAPHIES: DefaultTypography[] = [
   "h6",
   "strong",
   "small",
-];
-
-export const DEFAULT_SPACES: Space[] = [
-  { spaceKey: "1", spaceValue: "2px" },
-  { spaceKey: "2", spaceValue: "4px" },
-  { spaceKey: "3", spaceValue: "8px" },
-  { spaceKey: "4", spaceValue: "12px" },
-  { spaceKey: "5", spaceValue: "16px" },
-  { spaceKey: "6", spaceValue: "20px" },
-  { spaceKey: "7", spaceValue: "24px" },
-  { spaceKey: "8", spaceValue: "32px" },
-  { spaceKey: "9", spaceValue: "52px" },
-  { spaceKey: "10", spaceValue: "64px" },
 ];
 
 export const DEFAULT_EFFECT: Effect = {
@@ -357,4 +361,97 @@ export const RESPONSIVE_DIMENSIONS: ResponsiveDimensionDevice[] = [
   { width: 1920, height: 1080, name: "Desktop L  - Full HD 1080p" },
   { width: 2560, height: 1440, name: "Desktop XL  - 2K/QHD" },
   { width: 3840, height: 2160, name: "Desktop XXL  - 4K/UHD" },
+];
+
+export const SPACES_PRESETS: PresetSpaces[] = [
+  /* default */
+  {
+    presetName: "default (0,2,4,8,...,80)",
+    spaces: [
+      { spaceKey: "0", spaceValue: { unit: "PX", value: 0 } },
+      { spaceKey: "1", spaceValue: { unit: "PX", value: 2 } },
+      { spaceKey: "2", spaceValue: { unit: "PX", value: 4 } },
+      { spaceKey: "3", spaceValue: { unit: "PX", value: 8 } },
+      { spaceKey: "4", spaceValue: { unit: "PX", value: 12 } },
+      { spaceKey: "5", spaceValue: { unit: "PX", value: 16 } },
+      { spaceKey: "6", spaceValue: { unit: "PX", value: 20 } },
+      { spaceKey: "7", spaceValue: { unit: "PX", value: 28 } },
+      { spaceKey: "8", spaceValue: { unit: "PX", value: 32 } },
+      { spaceKey: "9", spaceValue: { unit: "PX", value: 40 } },
+      { spaceKey: "10", spaceValue: { unit: "PX", value: 52 } },
+      { spaceKey: "11", spaceValue: { unit: "PX", value: 64 } },
+      { spaceKey: "12", spaceValue: { unit: "PX", value: 80 } },
+    ],
+  },
+  /* 1. Pas de 4 px */
+  {
+    presetName: "step-4px (0,4,8,...,40)",
+    spaces: [
+      { spaceKey: "0", spaceValue: { unit: "PX", value: 0 } },
+      { spaceKey: "1", spaceValue: { unit: "PX", value: 4 } },
+      { spaceKey: "2", spaceValue: { unit: "PX", value: 8 } },
+      { spaceKey: "3", spaceValue: { unit: "PX", value: 12 } },
+      { spaceKey: "4", spaceValue: { unit: "PX", value: 16 } },
+      { spaceKey: "5", spaceValue: { unit: "PX", value: 20 } },
+      { spaceKey: "6", spaceValue: { unit: "PX", value: 24 } },
+      { spaceKey: "7", spaceValue: { unit: "PX", value: 28 } },
+      { spaceKey: "8", spaceValue: { unit: "PX", value: 32 } },
+      { spaceKey: "9", spaceValue: { unit: "PX", value: 36 } },
+      { spaceKey: "10", spaceValue: { unit: "PX", value: 40 } },
+    ],
+  },
+
+  /* 2. Pas de 8 px */
+  {
+    presetName: "step-8px (0,8,16,...,80)",
+    spaces: [
+      { spaceKey: "0", spaceValue: { unit: "PX", value: 0 } },
+      { spaceKey: "1", spaceValue: { unit: "PX", value: 8 } },
+      { spaceKey: "2", spaceValue: { unit: "PX", value: 16 } },
+      { spaceKey: "3", spaceValue: { unit: "PX", value: 24 } },
+      { spaceKey: "4", spaceValue: { unit: "PX", value: 32 } },
+      { spaceKey: "5", spaceValue: { unit: "PX", value: 40 } },
+      { spaceKey: "6", spaceValue: { unit: "PX", value: 48 } },
+      { spaceKey: "7", spaceValue: { unit: "PX", value: 56 } },
+      { spaceKey: "8", spaceValue: { unit: "PX", value: 64 } },
+      { spaceKey: "9", spaceValue: { unit: "PX", value: 72 } },
+      { spaceKey: "10", spaceValue: { unit: "PX", value: 80 } },
+    ],
+  },
+
+  /* 3. Puissances de 2 */
+  {
+    presetName: "powers-of-two (0,2,4,8,16,...,1028)",
+    spaces: [
+      { spaceKey: "0", spaceValue: { unit: "PX", value: 0 } },
+      { spaceKey: "1", spaceValue: { unit: "PX", value: 2 } },
+      { spaceKey: "2", spaceValue: { unit: "PX", value: 4 } },
+      { spaceKey: "3", spaceValue: { unit: "PX", value: 8 } },
+      { spaceKey: "4", spaceValue: { unit: "PX", value: 16 } },
+      { spaceKey: "5", spaceValue: { unit: "PX", value: 32 } },
+      { spaceKey: "6", spaceValue: { unit: "PX", value: 64 } },
+      { spaceKey: "7", spaceValue: { unit: "PX", value: 128 } },
+      { spaceKey: "8", spaceValue: { unit: "PX", value: 256 } },
+      { spaceKey: "9", spaceValue: { unit: "PX", value: 512 } },
+      { spaceKey: "10", spaceValue: { unit: "PX", value: 1028 } },
+    ],
+  },
+
+  /* 5. Fibonacci / ratio φ */
+  {
+    presetName: "fibonacci-phi (0,4,6,10,16,...,288)",
+    spaces: [
+      { spaceKey: "0", spaceValue: { unit: "PX", value: 0 } },
+      { spaceKey: "1", spaceValue: { unit: "PX", value: 4 } },
+      { spaceKey: "2", spaceValue: { unit: "PX", value: 6 } },
+      { spaceKey: "3", spaceValue: { unit: "PX", value: 10 } },
+      { spaceKey: "4", spaceValue: { unit: "PX", value: 16 } },
+      { spaceKey: "5", spaceValue: { unit: "PX", value: 26 } },
+      { spaceKey: "6", spaceValue: { unit: "PX", value: 42 } },
+      { spaceKey: "7", spaceValue: { unit: "PX", value: 68 } },
+      { spaceKey: "8", spaceValue: { unit: "PX", value: 110 } },
+      { spaceKey: "9", spaceValue: { unit: "PX", value: 178 } },
+      { spaceKey: "10", spaceValue: { unit: "PX", value: 288 } },
+    ],
+  },
 ];

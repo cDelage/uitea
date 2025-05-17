@@ -15,7 +15,7 @@ function OpenColorPicker() {
           <MdPalette size={ICON_SIZE_XXL} />
         </div>
       </div>
-      <div>Color picker</div>
+      <div>Color <br/>picker</div>
     </button>
   );
 }

@@ -187,7 +187,7 @@ pub struct ColorCombinationCollection {
     pub active: Option<ColorCombination>,
     pub focus: Option<ColorCombination>,
     pub group: Option<String>,
-    pub preview_component: Option<String>,
+    pub default_combination: Option<bool>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -275,131 +275,180 @@ pub struct Typographies {
     strong: TypographyScale,
     custom_scales: Vec<CustomTypographyScale>,
 }
-
 impl Typographies {
+    /// Standard web‑app typographic scale — pixel‑based, multiples of 4 px
     pub fn new() -> Typographies {
         Typographies {
+            // ----- Root (body / html) -----
             root: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::PX, value: 16.0 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.2 },
-                font_weight: FontWeight::Seven,
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0, // base 16 px
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0, // 1.5× → 24 px
+                },
+                font_weight: FontWeight::Four,
                 letter_spacing: TypographySpacing::Zero,
                 word_spacing: TypographySpacing::Zero,
                 font_style: FontStyle::Normal,
                 text_transform: TextTransform::None,
                 text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                padding: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 0.0,
+                },
+                margin: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 0.0,
+                },
+                font: None,
+                color: None,
             },
+
+            // ----- Headings -----
             h1: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::PX, value: 2.0},
-                line_height: Measurement { unit: UnitOfMeasurement::PX, value: 2.25 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 32.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 40.0,
+                },
                 font_weight: FontWeight::Seven,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             h2: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.75 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 2.0 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 28.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 36.0,
+                },
                 font_weight: FontWeight::Six,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             h3: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.50 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.75 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 32.0,
+                },
                 font_weight: FontWeight::Five,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             h4: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.25 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.75 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 20.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 28.0,
+                },
                 font_weight: FontWeight::Five,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             h5: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.0 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.25 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0,
+                },
                 font_weight: FontWeight::Five,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             h6: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.0 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.0 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0, // duplicate size, lower hierarchy conveyed by style/weight
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0,
+                },
                 font_weight: FontWeight::Five,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
+            // ----- Paragraph -----
             paragraph: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0,
+                },
                 font_weight: FontWeight::Four,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
+            // ----- Small text -----
             small: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 0.5 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 0.75 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 12.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0,
+                },
                 font_weight: FontWeight::Four,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
+            // ----- Strong text -----
             strong: TypographyScale {
-                font_size: Measurement { unit: UnitOfMeasurement::REM, value: 1.0 },
-                line_height: Measurement { unit: UnitOfMeasurement::REM, value: 1.25 },
+                font_size: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 16.0,
+                },
+                line_height: Measurement {
+                    unit: UnitOfMeasurement::PX,
+                    value: 24.0,
+                },
                 font_weight: FontWeight::Seven,
-                letter_spacing: TypographySpacing::Zero,
-                word_spacing: TypographySpacing::Zero,
-                font_style: FontStyle::Normal,
-                text_transform: TextTransform::None,
-                text_decoration: TextDecoration::None,
-                padding: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
-                margin: Measurement { unit: UnitOfMeasurement::REM, value: 0.0 },
+                ..Default::default()
             },
+
             custom_scales: vec![],
+        }
+    }
+}
+
+// Provide sensible defaults for fields we leave unchanged
+impl Default for TypographyScale {
+    fn default() -> Self {
+        TypographyScale {
+            font_size: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            line_height: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            font_weight: FontWeight::Four,
+            letter_spacing: TypographySpacing::Zero,
+            word_spacing: TypographySpacing::Zero,
+            font_style: FontStyle::Normal,
+            text_transform: TextTransform::None,
+            text_decoration: TextDecoration::None,
+            padding: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            margin: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            font: None,
+            color: None,
         }
     }
 }
@@ -413,7 +462,7 @@ pub struct CustomTypographyScale {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AdditionalFontWeight {
+pub struct AdditionalFontWeight { 
     weight_name: String,
     font_weight: FontWeight,
 }
@@ -431,19 +480,21 @@ pub struct TypographyScale {
     text_decoration: TextDecoration,
     padding: Measurement,
     margin: Measurement,
+    font: Option<String>,
+    color: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Measurement {
-    pub unit:UnitOfMeasurement,
-    pub value: f64
+    pub unit: UnitOfMeasurement,
+    pub value: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum UnitOfMeasurement {
     REM,
-    PX
+    PX,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -509,34 +560,91 @@ pub enum FontWeight {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-#[repr(u16)]
+#[repr(u8)]
 pub enum TypographySpacing {
+    #[serde(rename = "-1em")]
+    Neg1_0,
+    #[serde(rename = "-0.9em")]
+    Neg0_9,
+    #[serde(rename = "-0.8em")]
+    Neg0_8,
+    #[serde(rename = "-0.7em")]
+    Neg0_7,
+    #[serde(rename = "-0.6em")]
+    Neg0_6,
+    #[serde(rename = "-0.5em")]
+    Neg0_5,
+    #[serde(rename = "-0.4em")]
+    Neg0_4,
+    #[serde(rename = "-0.3em")]
+    Neg0_3,
+    #[serde(rename = "-0.2em")]
+    Neg0_2,
+    #[serde(rename = "-0.1em")]
+    Neg0_1,
+    #[serde(rename = "-0.09em")]
+    Neg0_09,
+    #[serde(rename = "-0.08em")]
+    Neg0_08,
+    #[serde(rename = "-0.07em")]
+    Neg0_07,
+    #[serde(rename = "-0.06em")]
+    Neg0_06,
     #[serde(rename = "-0.05em")]
-    MinusTwo,
+    Neg0_05,
     #[serde(rename = "-0.02em")]
-    MinusOne,
+    Neg0_02,
     #[serde(rename = "0em")]
     Zero,
+    #[serde(rename = "0.02em")]
+    Pos0_02,
+    #[serde(rename = "0.05em")]
+    Pos0_05,
+    #[serde(rename = "0.06em")]
+    Pos0_06,
+    #[serde(rename = "0.07em")]
+    Pos0_07,
+    #[serde(rename = "0.08em")]
+    Pos0_08,
+    #[serde(rename = "0.09em")]
+    Pos0_09,
     #[serde(rename = "0.1em")]
-    One,
+    Pos0_1,
     #[serde(rename = "0.2em")]
-    Two,
+    Pos0_2,
     #[serde(rename = "0.3em")]
-    Three,
+    Pos0_3,
+    #[serde(rename = "0.4em")]
+    Pos0_4,
+    #[serde(rename = "0.5em")]
+    Pos0_5,
+    #[serde(rename = "0.6em")]
+    Pos0_6,
+    #[serde(rename = "0.7em")]
+    Pos0_7,
+    #[serde(rename = "0.8em")]
+    Pos0_8,
+    #[serde(rename = "0.9em")]
+    Pos0_9,
+    #[serde(rename = "1em")]
+    Pos1_0,
 }
 
+/// Un espace (token de spacing) : clé + mesure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Space {
     pub space_key: String,
-    pub space_value: String,
+    pub space_value: Measurement,
 }
 
+/// Fichier regroupant tous les spacings
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpacesFile(pub IndexMap<String, String>);
+pub struct SpacesFile(pub IndexMap<String, Measurement>);
 
 impl SpacesFile {
-    pub fn from(spaces: &Vec<Space>) -> SpacesFile {
+    /// Construit un `SpacesFile` à partir d’une liste de `Space`
+    pub fn from(spaces: &[Space]) -> SpacesFile {
         let mut map = IndexMap::new();
         for space in spaces {
             map.insert(space.space_key.clone(), space.space_value.clone());
@@ -544,78 +652,35 @@ impl SpacesFile {
         SpacesFile(map)
     }
 
+    /// Valeurs par défaut (mêmes paliers qu’avant, exprimés en `PX`)
     pub fn new() -> SpacesFile {
-        // Valeurs par défaut
-        let default_spaces: Vec<Space> = vec![
-            Space {
-                space_key: "0".to_string(),
-                space_value: "0px".to_string(),
-            },
-            Space {
-                space_key: "1".to_string(),
-                space_value: "2px".to_string(),
-            },
-            Space {
-                space_key: "2".to_string(),
-                space_value: "4px".to_string(),
-            },
-            Space {
-                space_key: "3".to_string(),
-                space_value: "8px".to_string(),
-            },
-            Space {
-                space_key: "4".to_string(),
-                space_value: "12px".to_string(),
-            },
-            Space {
-                space_key: "5".to_string(),
-                space_value: "16px".to_string(),
-            },
-            Space {
-                space_key: "6".to_string(),
-                space_value: "20px".to_string(),
-            },
-            Space {
-                space_key: "7".to_string(),
-                space_value: "28px".to_string(),
-            },
-            Space {
-                space_key: "8".to_string(),
-                space_value: "32px".to_string(),
-            },
-            Space {
-                space_key: "9".to_string(),
-                space_value: "40px".to_string(),
-            },
-            Space {
-                space_key: "10".to_string(),
-                space_value: "52px".to_string(),
-            },
-            Space {
-                space_key: "11".to_string(),
-                space_value: "64px".to_string(),
-            },
-            Space {
-                space_key: "12".to_string(),
-                space_value: "80px".to_string(),
-            },
-            Space {
-                space_key: "13".to_string(),
-                space_value: "100px".to_string(),
-            },
-            Space {
-                space_key: "14".to_string(),
-                space_value: "120px".to_string(),
-            },
-            Space {
-                space_key: "15".to_string(),
-                space_value: "160px".to_string(),
-            },
-        ];
+        use UnitOfMeasurement::PX;
+
+        let default_spaces = vec![
+            ("0", 0.0),
+            ("1", 2.0),
+            ("2", 4.0),
+            ("3", 8.0),
+            ("4", 12.0),
+            ("5", 16.0),
+            ("6", 20.0),
+            ("7", 28.0),
+            ("8", 32.0),
+            ("9", 40.0),
+            ("10", 52.0),
+            ("11", 64.0),
+            ("12", 80.0),
+        ]
+        .into_iter()
+        .map(|(k, v)| Space {
+            space_key: k.to_string(),
+            space_value: Measurement { unit: PX, value: v },
+        })
+        .collect::<Vec<_>>();
 
         SpacesFile::from(&default_spaces)
     }
-
+    
     pub fn to(spaces_file: &SpacesFile) -> Vec<Space> {
         spaces_file
             .0
@@ -631,14 +696,14 @@ impl SpacesFile {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Radius {
-    default: String,
+    default: Measurement,
     additionals_radius: Vec<RadiusItem>,
 }
 
 impl Radius {
     pub fn new() -> Radius {
         Radius {
-            default: "0px".to_string(),
+            default: Measurement { unit: UnitOfMeasurement::PX, value: 4.0 },
             additionals_radius: vec![],
         }
     }
@@ -648,7 +713,7 @@ impl Radius {
 #[serde(rename_all = "camelCase")]
 pub struct RadiusItem {
     pub radius_key: String,
-    pub radius_value: String,
+    pub radius_value: Measurement,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -712,5 +777,5 @@ pub struct ExportPayload {
     pub design_system_path: PathBuf,
     pub export_name: String,
     pub value: String,
-    pub extension: String
+    pub extension: String,
 }

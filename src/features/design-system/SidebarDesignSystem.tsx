@@ -212,6 +212,7 @@ function SidebarDesignSystem() {
                 <div className="row w-full">
                   <Popover.SelectorButton
                     disabled={!designSystem.themes.otherThemes.length}
+                    id="theme-selector"
                     width="200px"
                     value={
                       theme ? (

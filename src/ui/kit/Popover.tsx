@@ -165,7 +165,6 @@ function Toggle({
   children: ReactNode;
   id: string;
   positionPayload?: PositionPayload;
-  scrollListener?: string[];
   keyPopover?: string;
   disabled?: boolean;
   disableClosure?: boolean;
@@ -297,9 +296,10 @@ function Close({
 function Actions({ children, width }: { children: ReactNode; width?: string }) {
   return (
     <div
-      className="column"
+      className="column overflow-hidden"
       style={{
         width,
+        maxWidth: width,
       }}
       data-disableoutside={true}
     >
@@ -342,6 +342,7 @@ function Tab({
       className={tabStyle}
       style={{
         width,
+        maxWidth: width,
       }}
       onClick={handleClick}
       data-disableoutside={true}
@@ -479,6 +480,8 @@ function SelectorButton({
   return (
     <div
       className={`popover-selector-button ${disabled ? "disabled" : ""}`}
+      data-focus={openPopoverId === id}
+      data-disabled={disabled ? true : false}
       style={{ width, minWidth: width, maxWidth: width }}
     >
       {value ? (

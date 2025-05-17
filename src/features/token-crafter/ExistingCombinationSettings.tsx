@@ -1,11 +1,8 @@
-import { ComponentType } from "react";
 import {
   ColorCombination,
   ColorCombinationCollection,
   ColorCombinationCollectionAndGroup,
   HandleUpdateColorPayload,
-  PREVIEW_COMPONENT_ICONS,
-  PreviewComponent,
 } from "../../domain/DesignSystemDomain";
 import CombinationPreview from "../design-system/semantic-color-tokens/CombinationPreview";
 import Popover from "../../ui/kit/Popover";
@@ -15,6 +12,8 @@ import {
   MdDragIndicator,
   MdFolder,
   MdOpenInNew,
+  MdStar,
+  MdStarOutline,
 } from "react-icons/md";
 import { ICON_SIZE_MD } from "../../ui/UiConstants";
 import { useForm } from "react-hook-form";
@@ -24,7 +23,8 @@ import { useTokenCrafterContext } from "./TokenCrafterContext";
 import TokenGroupPopover from "./TokenGroupPopover";
 import { getTokenAvailableGroups } from "../../util/DesignSystemUtils";
 import { useTokenCrafterStore } from "./TokenCrafterStore";
-import TokenPreviewPopover from "./TokenPreviewPopover";
+import CombinationComponentPlaceholder from "../design-system/previews/combination-preview/CombinationComponentPlaceholder";
+import { useMemo } from "react";
 
 function ExistingCombinationSettings({
   collectionAndGroup: { collection, group },
@@ -33,6 +33,7 @@ function ExistingCombinationSettings({
   handleRenameCollection,
   handleUpdateCollection,
   draggableTools,
+  handleUpdateAllCollections,
 }: {
   collectionAndGroup: ColorCombinationCollectionAndGroup;
   index: number;
@@ -47,6 +48,7 @@ function ExistingCombinationSettings({
     value: ColorCombinationCollection
   ) => void;
   draggableTools: DraggableTools;
+  handleUpdateAllCollections: (newValue: ColorCombinationCollection[]) => void;
 }) {
   const { register, handleSubmit, setValue } =
     useForm<ColorCombinationCollection>({
@@ -59,15 +61,22 @@ function ExistingCombinationSettings({
       (token) => token.default?.background
     );
 
-  const PreviewElement:
-    | ComponentType<{
-        combination: ColorCombinationCollection;
-      }>
-    | undefined = collection
-    ? PREVIEW_COMPONENT_ICONS.find(
-        (preview) => collection.previewComponent === preview.previewComponent
-      )?.component
-    : undefined;
+  const countEmpty = useMemo(() => {
+    let empty = 0;
+    if (!collection.default) {
+      empty++;
+    }
+    if (!collection.hover) {
+      empty++;
+    }
+    if (!collection.focus) {
+      empty++;
+    }
+    if (!collection.active) {
+      empty++;
+    }
+    return empty;
+  }, [collection]);
 
   const { setCollection } = useTokenCrafterStore();
 
@@ -94,6 +103,19 @@ function ExistingCombinationSettings({
       ...collection,
       [state]: { ...collection[state], [usage]: value },
     });
+  }
+
+  function handleSetDefaultComponent() {
+    handleUpdateAllCollections(
+      designSystem.semanticColorTokens.colorCombinationCollections.map(
+        (col, i) => {
+          return {
+            ...col,
+            defaultCombination: i === index,
+          };
+        }
+      )
+    );
   }
 
   function submitCollection(newCollection: ColorCombinationCollection) {
@@ -130,11 +152,6 @@ function ExistingCombinationSettings({
     handleSubmit(submitCollection)();
   }
 
-  function handleSetPreview(preview: PreviewComponent | undefined) {
-    setValue("previewComponent", preview);
-    handleSubmit(submitCollection)();
-  }
-
   const tokenAvailableGroups = getTokenAvailableGroups({
     combinationName: collection.combinationName,
     collections: designSystem.semanticColorTokens.colorCombinationCollections,
@@ -164,32 +181,6 @@ function ExistingCombinationSettings({
           />
         </h4>
         <div className="row align-center gap-3">
-          <Popover.Toggle
-            id={`component-preview-${index}`}
-            positionPayload="bottom-right"
-          >
-            <div>
-              <Popover.SelectorButton
-                value={collection.previewComponent}
-                placeholder="none"
-                width="160px"
-                id="component"
-                onRemove={
-                  collection.previewComponent &&
-                  (() => {
-                    handleSetPreview(undefined);
-                  })
-                }
-              />
-            </div>
-          </Popover.Toggle>
-          <Popover.Body id={`component-preview-${index}`} zIndex={2000}>
-            <TokenPreviewPopover
-              handleSetPreview={(p) => {
-                handleSetPreview(p);
-              }}
-            />
-          </Popover.Body>
           <div className="row align-center gap-2">
             <Popover.Toggle
               id={`group-${index}`}
@@ -232,6 +223,18 @@ function ExistingCombinationSettings({
               style={{ transform: "scaleX(-1)" }}
             />
           </button>
+          <button
+            className={`action-button ${
+              collection.defaultCombination ? "active" : ""
+            }`}
+            onClick={handleSetDefaultComponent}
+          >
+            {collection.defaultCombination ? (
+              <MdStar size={ICON_SIZE_MD} />
+            ) : (
+              <MdStarOutline size={ICON_SIZE_MD} />
+            )}
+          </button>
           <Popover.Toggle
             id={`delete-combination-${index}`}
             positionPayload="bottom-right"
@@ -257,7 +260,7 @@ function ExistingCombinationSettings({
           </Popover.Body>
         </div>
       </div>
-      <div className="tokens-grid">
+      <div className="tokens-grid-sidepanel">
         {shouldDisplayCombination(collection.default) && (
           <CombinationPreview
             combination={collection.default}
@@ -290,11 +293,12 @@ function ExistingCombinationSettings({
             handleUpdateColor={handleUpdateColor}
           />
         )}
-        {PreviewElement && (
-          <div className="row h-full align-center">
-            <PreviewElement combination={collection} />
-          </div>
-        )}
+        {Array.from({ length: countEmpty }, (_, i) => (
+          <div key={`${i}`}></div>
+        ))}
+        <div className="row h-full align-center last-sidepanel-child">
+          <CombinationComponentPlaceholder combination={collection} />
+        </div>
       </div>
     </div>
   );

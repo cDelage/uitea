@@ -11,15 +11,10 @@ import {
 } from "react-icons/md";
 import { ICON_SIZE_MD, ICON_SIZE_SM } from "../../ui/UiConstants";
 import { useTokenCrafterStore } from "./TokenCrafterStore";
-import TokenPreviewPopover from "./TokenPreviewPopover";
-import {
-  ColorCombinationCollection,
-  PREVIEW_COMPONENT_ICONS,
-  PreviewComponent,
-} from "../../domain/DesignSystemDomain";
+import { ColorCombinationCollection } from "../../domain/DesignSystemDomain";
 import TokenGroupPopover from "./TokenGroupPopover";
 import InputText from "../../ui/kit/InputText";
-import { ComponentType, useMemo } from "react";
+import { useMemo } from "react";
 import CombinationComponentPlaceholder from "../design-system/previews/combination-preview/CombinationComponentPlaceholder";
 import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
 import {
@@ -43,13 +38,6 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
     return hasAnyColor(collection);
   }, [collection]);
 
-  const PreviewElement: ComponentType<{
-    combination: ColorCombinationCollection;
-  }> =
-    PREVIEW_COMPONENT_ICONS.find(
-      (preview) => collection.previewComponent === preview.previewComponent
-    )?.component ?? CombinationComponentPlaceholder;
-
   const contextCombination: ColorCombinationCollection | undefined =
     collection.group
       ? designSystem.semanticColorTokens.colorCombinationCollections.find(
@@ -61,13 +49,6 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
     designSystem.semanticColorTokens.colorCombinationCollections.filter(
       (token) => token.default?.background
     );
-
-  function handleSetPreview(previewComponent: PreviewComponent | undefined) {
-    setCollection({
-      ...collection,
-      previewComponent,
-    });
-  }
 
   function handleSetGroup(context: string | undefined) {
     setCollection({
@@ -111,6 +92,11 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
     collections: designSystem.semanticColorTokens.colorCombinationCollections,
   });
 
+  const existingToken =
+    designSystem.semanticColorTokens.colorCombinationCollections.find(
+      (e) => e.combinationName === collection.combinationName
+    );
+
   return (
     <Popover>
       <div
@@ -140,48 +126,53 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
           </div>
         )}
         <div className={styles.tokenCrafterGrid}>
-          <CrafterColorCombination combination="default" />
-          <CrafterColorCombination combination="hover" />
-          <CrafterColorCombination combination="active" />
-          <CrafterColorCombination combination="focus" />
-          <div className="column gap-2 h-full">
-            <FormComponent label="semantic name">
-              <InputText
-                type="text"
-                value={collection.combinationName ?? ""}
-                onChange={(e) => updateName(e.target.value)}
-                style={{
-                  width: "160px",
-                }}
-              />
-            </FormComponent>
-            <FormComponent label="component preview">
-              <Popover.Toggle id="component" positionPayload="bottom-right">
-                <div>
-                  <Popover.SelectorButton
-                    value={collection.previewComponent}
-                    placeholder="none"
-                    width="160px"
-                    id="component"
-                    onRemove={
-                      collection.previewComponent &&
-                      (() => {
-                        handleSetPreview(undefined);
-                      })
-                    }
-                  />
+          <div className="row gap-4">
+            <div className="column h-fit gap-4 justify-between">
+              <FormComponent label="combination-name">
+                <InputText
+                  type="text"
+                  value={collection.combinationName ?? ""}
+                  onChange={(e) => updateName(e.target.value)}
+                />
+              </FormComponent>
+              <FormComponent label="group">
+                <div className="row align-center gap-2">
+                  <Popover.Toggle
+                    id="context"
+                    positionPayload="bottom-right"
+                    disabled={!semanticWithBackground.length}
+                  >
+                    <button className="action-ghost-button">
+                      <MdFolder size={ICON_SIZE_SM} />
+                      {collection.group || "base"}
+                    </button>
+                  </Popover.Toggle>
+                  <Popover.Body id="context" zIndex={2000}>
+                    <TokenGroupPopover
+                      handleSetGroup={handleSetGroup}
+                      colorCombinationCollections={tokenAvailableGroups}
+                    />
+                  </Popover.Body>
+                  {collection.group && (
+                    <button
+                      className="action-ghost-button"
+                      onClick={() => handleSetGroup(undefined)}
+                    >
+                      <MdClose size={ICON_SIZE_SM} />
+                    </button>
+                  )}
                 </div>
-              </Popover.Toggle>
-              <Popover.Body id="component" zIndex={2000}>
-                <TokenPreviewPopover handleSetPreview={handleSetPreview} />
-              </Popover.Body>
-            </FormComponent>
+              </FormComponent>
+            </div>
+            <CrafterColorCombination combination="default" />
+            <CrafterColorCombination combination="hover" />
+            <CrafterColorCombination combination="active" />
+            <CrafterColorCombination combination="focus" />
           </div>
           <div className="column justify-center">
             <MdArrowForward size={ICON_SIZE_MD} color="text-color-dark" />
           </div>
-          <div className="column h-full">
-            <label>result</label>
+          <FormComponent label="result">
             <div
               className={styles.tokenPreviewContainer}
               style={
@@ -196,46 +187,22 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
               }
             >
               {isCreatable ? (
-                <PreviewElement combination={collection} />
+                <div className="row w-full flex-1">
+                  <CombinationComponentPlaceholder combination={collection} />
+                </div>
               ) : (
                 <div>Fill a color combination</div>
               )}
             </div>
-            <div className="row w-full align-center gap-4 justify-between">
-              <div className="row align-center gap-2">
-                <Popover.Toggle
-                  id="context"
-                  positionPayload="bottom-right"
-                  disabled={!semanticWithBackground.length}
-                >
-                  <button className="action-ghost-button">
-                    <MdFolder size={ICON_SIZE_SM} />
-                    {collection.group || "base"}
-                  </button>
-                </Popover.Toggle>
-                <Popover.Body id="context" zIndex={2000}>
-                  <TokenGroupPopover
-                    handleSetGroup={handleSetGroup}
-                    colorCombinationCollections={tokenAvailableGroups}
-                  />
-                </Popover.Body>
-                {collection.group && (
-                  <button
-                    className="action-ghost-button"
-                    onClick={() => handleSetGroup(undefined)}
-                  >
-                    <MdClose size={ICON_SIZE_SM} />
-                  </button>
-                )}
-              </div>
+            <div className="row w-full justify-end">
               <ButtonPrimary
                 disabled={!isCreatable || !collection.combinationName}
                 onClick={handleCreateColorCombination}
               >
-                Confirm creation
+                {existingToken ? "Overwrite" : "Confirm Creation"}
               </ButtonPrimary>
             </div>
-          </div>
+          </FormComponent>
         </div>
       </div>
     </Popover>

@@ -81,6 +81,19 @@ function TokenCrafterSidepanel() {
     }
   );
 
+  function handleUpdateAllCollections(newValue: ColorCombinationCollection[]) {
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        semanticColorTokens: {
+          ...designSystem.semanticColorTokens,
+          colorCombinationCollections: newValue,
+        },
+      },
+      isTmp: true,
+    });
+  }
+
   function handleUpdateCollection(
     index: number,
     newValue: ColorCombinationCollection
@@ -141,7 +154,7 @@ function TokenCrafterSidepanel() {
     <PreviewContext
       value={{
         styleRef,
-        tokenFamilies
+        tokenFamilies,
       }}
     >
       <Popover>
@@ -170,6 +183,7 @@ function TokenCrafterSidepanel() {
                   handleUpdateCollection={handleUpdateCollection}
                   draggableTools={draggableTools}
                   handleRenameCollection={handleRenameCollection}
+                  handleUpdateAllCollections={handleUpdateAllCollections}
                 />
               ))}
             </div>

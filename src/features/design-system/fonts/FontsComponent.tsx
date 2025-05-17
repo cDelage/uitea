@@ -192,7 +192,7 @@ function FontsComponent() {
                 />
               </div>
               {fontAdditionals.map((font, index) => (
-                <div>
+                <div key={font.fontName}>
                   <FontDisplay
                     key={font.fontName}
                     font={watch(`additionals.${index}.value`)}

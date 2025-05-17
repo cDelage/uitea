@@ -21,7 +21,7 @@ import SpacesComponent from "./spaces/SpacesComponent";
 import RadiusComponent from "./radius/RadiusComponent";
 import EffectsComponent from "./effects/EffectsComponent";
 import Modal from "../../ui/kit/Modal";
-import { MdBrush, MdConstruction, MdPalette } from "react-icons/md";
+import { MdBrush, MdConstruction, MdPalette, MdStore } from "react-icons/md";
 import PaletteBuilderModal from "../palette-builder/PaletteBuilderModal";
 import { useEffect, useState } from "react";
 import ColorPickerModal from "../color-picker/ColorPickerModal";
@@ -30,6 +30,8 @@ import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorT
 import TokenCrafterModal from "../token-crafter/TokenCrafterModal";
 import { useTokenCrafterStore } from "../token-crafter/TokenCrafterStore";
 import { useUserSettings } from "../home/HomeQueries";
+import Popover from "../../ui/kit/Popover";
+import SpacesPresetPopover from "./spaces/SpacesPresetPopover";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -75,168 +77,191 @@ function BodyDesignSystem() {
   }, [isTokenCrafterOpen, searchParams, setSearchParams]);
 
   return (
-    <Modal>
-      <div
-        className={styles.bodyDesignSystem}
-        id="body-design-system"
-        key={designSystem.metadata.designSystemId}
-        ref={scrollRef}
-      >
-        <HeaderDesignSystem />
-        <Section
-          sectionName="colors"
-          sectionTitle={
-            <>
-              <IconColors size={ICON_SIZE_XL} /> Colors
-            </>
-          }
+    <Popover>
+      {" "}
+      <Modal>
+        <div
+          className={styles.bodyDesignSystem}
+          id="body-design-system"
+          key={designSystem.metadata.designSystemId}
+          ref={scrollRef}
         >
-          <Section.Subsection
-            subSectionName="Palettes"
-            actions={
+          <HeaderDesignSystem />
+          <Section
+            sectionName="colors"
+            sectionTitle={
               <>
-                <Modal.Toggle
-                  id="palette-builder"
-                  replaceOpen={
-                    pluginDisplayMode === "fullscreen"
-                      ? () =>
-                          navigate(
-                            `/palette-builder?currentDesignSystem=${designSystemPath}`
-                          )
-                      : undefined
-                  }
-                >
-                  <button className="action-ghost-button" type="button">
-                    <MdConstruction size={ICON_SIZE_MD} />
-                    Palette builder
-                  </button>
-                </Modal.Toggle>
-                <Modal.Body
-                  id="palette-builder"
-                  isOpenToSync={isPaletteBuilderOpen}
-                  setIsOpenToSync={setIsPaletteBuilderOpen}
-                >
-                  <PaletteBuilderModal />
-                </Modal.Body>
-                <Modal.Toggle
-                  id="color-picker"
-                  replaceOpen={
-                    pluginDisplayMode === "fullscreen"
-                      ? () =>
-                          navigate(
-                            `/color-picker?currentDesignSystem=${designSystemPath}`
-                          )
-                      : undefined
-                  }
-                >
-                  <button className="action-ghost-button" type="button">
-                    <MdPalette size={ICON_SIZE_MD} />
-                    Color picker
-                  </button>
-                </Modal.Toggle>
-                <Modal.Body
-                  id="color-picker"
-                  isOpenToSync={isColorPickerOpen}
-                  setIsOpenToSync={setIsColorPickerOpen}
-                >
-                  <ColorPickerModal />
-                </Modal.Body>
+                <IconColors size={ICON_SIZE_XL} /> Colors
               </>
             }
           >
-            <>
-              <Section.EmptySection
-                sectionName="palettes"
-                itemToInsert="palette"
-                onInsert={initPalette}
-                sectionLength={designSystem.palettes.length}
-                mediumHeight={true}
-              />
-              <DraggableList keyList="palettes">
-                {designSystem.palettes.map((colorPalette, index) => (
-                  <PaletteComponent
-                    key={colorPalette.paletteName}
-                    colorPalette={colorPalette}
-                    index={index}
-                  />
-                ))}
-              </DraggableList>
-            </>
-          </Section.Subsection>
-          <Section.Subsection subSectionName="Themes">
-            <ThemesComponent />
-          </Section.Subsection>
-          <Section.Subsection
-            subSectionName="Semantic color tokens"
-            actions={
+            <Section.Subsection
+              subSectionName="Palettes"
+              actions={
+                <>
+                  <Modal.Toggle
+                    id="palette-builder"
+                    replaceOpen={
+                      pluginDisplayMode === "fullscreen"
+                        ? () =>
+                            navigate(
+                              `/palette-builder?currentDesignSystem=${designSystemPath}`
+                            )
+                        : undefined
+                    }
+                  >
+                    <button className="action-ghost-button" type="button">
+                      <MdConstruction size={ICON_SIZE_MD} />
+                      Palette builder
+                    </button>
+                  </Modal.Toggle>
+                  <Modal.Body
+                    id="palette-builder"
+                    isOpenToSync={isPaletteBuilderOpen}
+                    setIsOpenToSync={setIsPaletteBuilderOpen}
+                  >
+                    <PaletteBuilderModal />
+                  </Modal.Body>
+                  <Modal.Toggle
+                    id="color-picker"
+                    replaceOpen={
+                      pluginDisplayMode === "fullscreen"
+                        ? () =>
+                            navigate(
+                              `/color-picker?currentDesignSystem=${designSystemPath}`
+                            )
+                        : undefined
+                    }
+                  >
+                    <button className="action-ghost-button" type="button">
+                      <MdPalette size={ICON_SIZE_MD} />
+                      Color picker
+                    </button>
+                  </Modal.Toggle>
+                  <Modal.Body
+                    id="color-picker"
+                    isOpenToSync={isColorPickerOpen}
+                    setIsOpenToSync={setIsColorPickerOpen}
+                  >
+                    <ColorPickerModal />
+                  </Modal.Body>
+                </>
+              }
+            >
               <>
-                <Modal.Toggle
-                  id="token-crafter"
-                  openCallback={() => generateRecommandations(designSystem)}
-                  replaceOpen={
-                    pluginDisplayMode === "fullscreen"
-                      ? () => {
-                          generateRecommandations(designSystem);
-                          navigate(
-                            `/token-crafter?currentDesignSystem=${designSystemPath}`
-                          );
-                        }
-                      : undefined
-                  }
-                >
-                  <button className="action-ghost-button" type="button">
-                    <MdBrush size={ICON_SIZE_MD} />
-                    Token crafter
-                  </button>
-                </Modal.Toggle>
-                <Modal.Body
-                  id="token-crafter"
-                  isOpenToSync={isTokenCrafterOpen}
-                  setIsOpenToSync={setIsTokenCrafterOpen}
-                >
-                  <TokenCrafterModal />
-                </Modal.Body>
+                <Section.EmptySection
+                  sectionName="palettes"
+                  itemToInsert="palette"
+                  onInsert={initPalette}
+                  sectionLength={designSystem.palettes.length}
+                  mediumHeight={true}
+                />
+                <DraggableList keyList="palettes">
+                  {designSystem.palettes.map((colorPalette, index) => (
+                    <PaletteComponent
+                      key={colorPalette.paletteName}
+                      colorPalette={colorPalette}
+                      index={index}
+                    />
+                  ))}
+                </DraggableList>
+              </>
+            </Section.Subsection>
+            <Section.Subsection subSectionName="Themes">
+              <ThemesComponent />
+            </Section.Subsection>
+            <Section.Subsection
+              subSectionName="Semantic color tokens"
+              actions={
+                <>
+                  <Modal.Toggle
+                    id="token-crafter"
+                    openCallback={() => generateRecommandations(designSystem)}
+                    replaceOpen={
+                      pluginDisplayMode === "fullscreen"
+                        ? () => {
+                            generateRecommandations(designSystem);
+                            navigate(
+                              `/token-crafter?currentDesignSystem=${designSystemPath}`
+                            );
+                          }
+                        : undefined
+                    }
+                  >
+                    <button className="action-ghost-button" type="button">
+                      <MdBrush size={ICON_SIZE_MD} />
+                      Token crafter
+                    </button>
+                  </Modal.Toggle>
+                  <Modal.Body
+                    id="token-crafter"
+                    isOpenToSync={isTokenCrafterOpen}
+                    setIsOpenToSync={setIsTokenCrafterOpen}
+                  >
+                    <TokenCrafterModal />
+                  </Modal.Body>
+                </>
+              }
+            >
+              <SemanticColorTokensComponent />
+            </Section.Subsection>
+          </Section>
+          <Section
+            sectionName="texts"
+            sectionTitle={
+              <>
+                <FontIcon size={ICON_SIZE_XL} /> Texts
               </>
             }
           >
-            <SemanticColorTokensComponent />
-          </Section.Subsection>
-        </Section>
-        <Section
-          sectionName="texts"
-          sectionTitle={
-            <>
-              <FontIcon size={ICON_SIZE_XL} /> Texts
-            </>
-          }
-        >
-          <Section.Subsection subSectionName="Fonts">
-            <FontsComponent />
-          </Section.Subsection>
-          <Section.Subsection subSectionName="Typography">
-            <TypographyComponent />
-          </Section.Subsection>
-        </Section>
-        <Section
-          sectionName="layout"
-          sectionTitle={
-            <>
-              <SpacesIcon size={ICON_SIZE_XL} /> Layout
-            </>
-          }
-        >
-          <Section.Subsection subSectionName="Spaces">
-            <SpacesComponent />
-          </Section.Subsection>
-          <Section.Subsection subSectionName="Radius">
-            <RadiusComponent />
-          </Section.Subsection>
-          <Section.Subsection subSectionName="Effects">
-            <EffectsComponent />
-          </Section.Subsection>
-        </Section>
-      </div>
-    </Modal>
+            <Section.Subsection subSectionName="Fonts">
+              <FontsComponent />
+            </Section.Subsection>
+            <Section.Subsection subSectionName="Typography">
+              <TypographyComponent />
+            </Section.Subsection>
+          </Section>
+          <Section
+            sectionName="layout"
+            sectionTitle={
+              <>
+                <SpacesIcon size={ICON_SIZE_XL} /> Layout
+              </>
+            }
+          >
+            <Section.Subsection
+              subSectionName="Spaces"
+              actions={
+                <>
+                  <Popover.Toggle id="presets" >
+                    <button
+                      type="button"
+                      className="action-ghost-button"
+                      style={{
+                        zIndex:4
+                      }}
+                    >
+                      <MdStore size={ICON_SIZE_MD}/> Presets
+                    </button>
+                  </Popover.Toggle>
+                  <Popover.Body id="presets" zIndex={5} >
+                    <SpacesPresetPopover />
+                  </Popover.Body>
+                </>
+              }
+            >
+              <SpacesComponent />
+            </Section.Subsection>
+            <Section.Subsection subSectionName="Radius">
+              <RadiusComponent />
+            </Section.Subsection>
+            <Section.Subsection subSectionName="Effects">
+              <EffectsComponent />
+            </Section.Subsection>
+          </Section>
+        </div>
+      </Modal>
+    </Popover>
   );
 }
 

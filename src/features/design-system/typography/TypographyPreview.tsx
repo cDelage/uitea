@@ -1,5 +1,5 @@
 import { TypographyScale } from "../../../domain/DesignSystemDomain";
-import { useDesignSystemContext } from "../DesignSystemContext";
+import { getTypoCssProperties } from "../../../util/DesignSystemUtils";
 
 function TypographyPreview({
   typographyScale,
@@ -8,11 +8,8 @@ function TypographyPreview({
   typographyScale: TypographyScale;
   keyScale: string;
 }) {
-  const {
-    designSystem: { fonts },
-  } = useDesignSystemContext();
   return (
-    <div style={{ fontFamily: fonts.default }}>
+    <div style={{ ...getTypoCssProperties(typographyScale) }}>
       {keyScale} - Lorem ipsum dolor sit amet
     </div>
   );

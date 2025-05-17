@@ -13,8 +13,8 @@
 
 .previewContainer {
   height: 100px;
-  background-color: var(--uidt-tertiary-bg);
-  color: var(--uidt-tertiary-text);
+  background-color: var(--base-background);
+  color: var(--base-text-default);
   display: flex;
   align-items: center;
   justify-content: center;

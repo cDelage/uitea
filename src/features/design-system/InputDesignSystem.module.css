@@ -98,5 +98,5 @@
 }
 
 .popoverContainer:hover {
-  border-bottom: var(--uidt-base-border) 1px solid;
+  border-bottom: var(--uidt-primary-outline-light-border) 1px solid;
 }

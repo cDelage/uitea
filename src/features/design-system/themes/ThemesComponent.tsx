@@ -6,7 +6,7 @@ import { isEqual } from "lodash";
 import { useParams } from "react-router-dom";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import classNames from "classnames";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
@@ -26,7 +26,6 @@ function ThemesComponent() {
   const { designSystem, tokenFamilies, editMode } = useDesignSystemContext();
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
-  const [expandIndex, setExpandIndex] = useState<number | undefined>(undefined);
   const { handleSubmit, reset, control, watch, setValue, register } =
     useForm<Themes>({
       defaultValues: designSystem.themes,
@@ -181,6 +180,7 @@ function ThemesComponent() {
                     isAddRemoveDragAllowed={true}
                     index={index}
                     editText={true}
+                    popoverId={watch(`otherThemes.${index}.name`)}
                     popoverEdit={
                       <ColorPickerDesignSystem
                         changeComplete={(color) =>
@@ -233,20 +233,14 @@ function ThemesComponent() {
           {mainTheme && (
             <ThemePreview
               theme={mainTheme}
-              expandIndex={expandIndex}
               isMain={true}
-              setExpandIndex={setExpandIndex}
-              index={0}
             />
           )}
           {fields.map((theme, index) => (
             <ThemePreview
               theme={theme}
               key={`${theme.name}${index}`}
-              expandIndex={expandIndex}
-              setExpandIndex={setExpandIndex}
               mainTheme={mainTheme}
-              index={index + 1}
             />
           ))}
         </PreviewComponentDesignSystem>

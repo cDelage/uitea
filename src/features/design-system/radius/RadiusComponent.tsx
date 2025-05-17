@@ -16,7 +16,11 @@ import { useSynchronizedVerticalScroll } from "../../../util/SynchronizedScroll"
 import InputDesignSystem from "../InputDesignSystem";
 import RadiusPreview from "./RadiusPreview";
 
-import { Radius, RadiusItem } from "../../../domain/DesignSystemDomain";
+import {
+  Measurement,
+  Radius,
+  RadiusItem,
+} from "../../../domain/DesignSystemDomain";
 import { generateUniqueRadiusKey } from "../../../util/DesignSystemUtils";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
 import { isEqual } from "lodash";
@@ -31,7 +35,7 @@ function RadiusComponent() {
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
-  const { register, watch, control, handleSubmit, reset } = useForm({
+  const { register, watch, control, handleSubmit, reset, setValue } = useForm({
     defaultValues: radius,
   });
 
@@ -126,8 +130,10 @@ function RadiusComponent() {
             key="defaultRadius"
             label="default"
             handleSubmit={handleSubmit(submitRadius)}
-            value={watch("default")}
-            register={register("default")}
+            measurement={watch("default")}
+            setMeasurement={(measurement: Measurement) =>
+              setValue("default", measurement)
+            }
             tooltipValue="radius-default"
           />
           <div className={styles.sideSettingsTitle}>
@@ -148,10 +154,13 @@ function RadiusComponent() {
                 draggableTools={draggableTools}
                 index={index}
                 registerKey={register(`additionalsRadius.${index}.radiusKey`)}
-                register={register(`additionalsRadius.${index}.radiusValue`)}
                 tooltipValue={`radius-${watch(
                   `additionalsRadius.${index}.radiusKey`
                 )}`}
+                measurement={watch("default")}
+                setMeasurement={(measurement: Measurement) =>
+                  setValue("default", measurement)
+                }
               />
             ))}
           </div>

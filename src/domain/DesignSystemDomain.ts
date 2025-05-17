@@ -129,9 +129,12 @@ export interface TypographyScale {
   textDecoration: TextDecoration;
   padding: Measurement;
   margin: Measurement;
+  font?: string;
+  color?: string;
 }
 
 export type DefaultTypography =
+  | "root"
   | "paragraph"
   | "h1"
   | "h2"
@@ -159,38 +162,60 @@ export type FontWeight =
   | "700"
   | "800"
   | "900";
+
 export type TypographySpacing =
+  | "-1em"
+  | "-0.9em"
+  | "-0.8em"
+  | "-0.7em"
+  | "-0.6em"
   | "-0.5em"
   | "-0.4em"
   | "-0.3em"
   | "-0.2em"
   | "-0.1em"
+  | "-0.09em"
   | "-0.08em"
+  | "-0.07em"
+  | "-0.06em"
   | "-0.05em"
   | "-0.02em"
   | "0em"
   | "0.02em"
   | "0.05em"
+  | "0.06em"
+  | "0.07em"
   | "0.08em"
+  | "0.09em"
   | "0.1em"
   | "0.2em"
   | "0.3em"
   | "0.4em"
-  | "0.5em";
+  | "0.5em"
+  | "0.6em"
+  | "0.7em"
+  | "0.8em"
+  | "0.9em"
+  | "1em";
+
+export interface PresetSpaces {
+  presetName: string,
+  spaces: Space[]
+}
 
 export interface Space {
   spaceKey: string;
-  spaceValue: string;
+  spaceValue: Measurement;
 }
 
 export interface Radius {
-  default: string;
+  default: Measurement;
   additionalsRadius: RadiusItem[];
 }
 
 export interface RadiusItem {
   radiusKey: string;
-  radiusValue: string;
+  radiusValue: Measurement;
 }
 
 export interface Effect {
@@ -265,7 +290,7 @@ export interface ColorCombinationCollection {
   active?: ColorCombination;
   focus?: ColorCombination;
   group?: string;
-  previewComponent?: PreviewComponent;
+  defaultCombination?: boolean;
 }
 
 export interface ColorCombinationCollectionGroup {

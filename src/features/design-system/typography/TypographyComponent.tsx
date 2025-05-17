@@ -149,6 +149,7 @@ function TypographyComponent() {
                     watch={watch}
                     setValue={setValue}
                     scaleName={typoScale}
+                    handleSubmit={handleSubmit(submitTypography)}
                   />
                 }
                 tooltipValue={`typography-${
@@ -170,9 +171,7 @@ function TypographyComponent() {
                 isAddRemoveDragAllowed={true}
                 onAdd={() => handleAddAdditionalScale(index)}
                 onRemove={() => handleRemove(index)}
-                value={`${watch(
-                  `customScales.${index}.scale.fontSize.value`
-                )}/${watch(`customScales.${index}.scale.fontSize.value`)}`}
+                value={getTypoName(watch(`customScales.${index}.scale`))}
                 registerKey={register(`customScales.${index}.scaleName`)}
                 draggableTools={draggableTools}
                 index={index}
@@ -183,6 +182,7 @@ function TypographyComponent() {
                     watch={watch}
                     setValue={setValue}
                     scaleName={scale.scaleName}
+                    handleSubmit={handleSubmit(submitTypography)}
                   />
                 }
                 popoverId={scale.scaleName}

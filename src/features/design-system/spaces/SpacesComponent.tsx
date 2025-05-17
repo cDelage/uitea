@@ -11,7 +11,6 @@ import {
   RemovableIndex,
   useDraggableFeatures,
 } from "../../../util/DraggableContext";
-import { useSynchronizedVerticalScroll } from "../../../util/SynchronizedScroll";
 
 import InputDesignSystem from "../InputDesignSystem";
 import SpacePreview from "./SpacePreview"; // le composant créé plus haut
@@ -24,7 +23,6 @@ import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 import Popover from "../../../ui/kit/Popover";
-// import { DEFAULT_SPACES } from "../../domain/DesignSystemDomain"; // si tu veux les defaults
 
 function SpacesComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -32,7 +30,7 @@ function SpacesComponent() {
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
 
-  const { register, watch, control, handleSubmit, reset } = useForm<{
+  const { register, watch, control, handleSubmit, reset, setValue } = useForm<{
     spaces: Space[];
   }>({
     defaultValues: {
@@ -67,8 +65,6 @@ function SpacesComponent() {
     }
   );
 
-  const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
-
   const spacesRef = useRef<HTMLFormElement>(null);
   useSidebarComponentVisible(spacesRef, "spaces");
   useTriggerScroll({
@@ -96,7 +92,10 @@ function SpacesComponent() {
     const spaceKey = generateUniqueSpacesKey(spacesArray, `${index + 1}`);
     const newSpace: Space = {
       spaceKey,
-      spaceValue: spacesArray[index]?.spaceValue ?? "8px",
+      spaceValue: {
+        unit: "PX",
+        value: 0,
+      },
     };
     insert(index + 1, newSpace, { shouldFocus: false });
     handleSubmit(submitSpaces)();
@@ -118,7 +117,7 @@ function SpacesComponent() {
         onSubmit={handleSubmit(submitSpaces)}
         ref={spacesRef}
       >
-        <div className={sideSettingsClass} ref={scrollableLeft}>
+        <div className={sideSettingsClass}>
           <div className={styles.sideSettingsTitle}>
             <h5>Spaces</h5>
           </div>
@@ -137,7 +136,10 @@ function SpacesComponent() {
                 draggableTools={draggableTools}
                 index={index}
                 registerKey={register(`spaces.${index}.spaceKey`)}
-                register={register(`spaces.${index}.spaceValue`)}
+                measurement={watch(`spaces.${index}.spaceValue`)}
+                setMeasurement={(measurement) =>
+                  setValue(`spaces.${index}.spaceValue`, measurement)
+                }
                 tooltipValue={`space-${watch(`spaces.${index}.spaceKey`)}`}
               />
             ))}
@@ -155,7 +157,7 @@ function SpacesComponent() {
         </div>
 
         <PreviewComponentDesignSystem maxHeight="600px">
-          <div className={styles.previewElement} ref={scrollableRight}>
+          <div className={styles.previewElement}>
             {spacesArray.map((field, index) => (
               <SpacePreview
                 key={field.id}
@@ -166,6 +168,11 @@ function SpacesComponent() {
               />
             ))}
           </div>
+          <div
+            style={{
+              minHeight: "32px",
+            }}
+          />
         </PreviewComponentDesignSystem>
 
         <div className={styles.darkPreviewPlaceholder} />

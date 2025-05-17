@@ -5,10 +5,12 @@ function ValueSlider({
   values,
   value,
   setValue,
+  onChangeComplete
 }: {
   values: string[];
   value: string;
   setValue: (value: string) => void;
+  onChangeComplete?: () => void;
 }) {
   const currentIndex = values.findIndex((val) => val === value) ?? 0;
 
@@ -18,6 +20,7 @@ function ValueSlider({
       max={values.length - 1}
       value={currentIndex}
       step={1}
+      onChangeComplete={onChangeComplete}
       onChange={(val) => {
         if (typeof val === "number") {
           if (Number.isInteger(val)) {

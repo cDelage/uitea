@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import WebFont from "webfontloader";
 
-function FontDisplay({ display, font, fontSize, lineHeight }: { display: string; font: string, fontSize?: string, lineHeight?: string }) {
+function FontDisplay({ display, font, fontSize, lineHeight, width }: { display: string; font: string, fontSize?: string, lineHeight?: string, width?: string }) {
   useEffect(() => {
     WebFont.load({
       google: {
@@ -14,7 +14,12 @@ function FontDisplay({ display, font, fontSize, lineHeight }: { display: string;
       style={{
         fontFamily: font,
         fontSize,
-        lineHeight
+        lineHeight,
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        width,
+        maxWidth: width
       }}
     >
       {display}

@@ -1,9 +1,14 @@
 import styled, { css } from "styled-components";
-import { DesignSystem, TokenFamily } from "../../../domain/DesignSystemDomain";
+import {
+  ColorCombination,
+  DesignSystem,
+  TokenFamily,
+} from "../../../domain/DesignSystemDomain";
 
 export const PreviewStyle = styled.div<{
   $tokenFamilies: TokenFamily[];
   $designSystem: DesignSystem;
+  $defaultCombination?: ColorCombination;
 }>`
   display: flex;
   flex-direction: column;
@@ -24,7 +29,14 @@ export const PreviewStyle = styled.div<{
     })};
 
   color: var(--base-text-default);
-  font-family: ${(props) => props.$designSystem.fonts.default};
+
+  ${(props) => {
+    return props.$designSystem.fonts.additionals.map(
+      (font) => css`
+    --font-${font.fontName}:${font.value};
+      `
+    );
+  }};
 
   .text-color-light {
     color: var(--base-text-light);
@@ -37,6 +49,15 @@ export const PreviewStyle = styled.div<{
   .text-color-dark {
     color: var(--base-text-dark);
   }
+
+  ${(props) =>
+    props.$defaultCombination &&
+    css`
+      .default-combination {
+        background: var(--${props.$defaultCombination.background});
+        color: var(--${props.$defaultCombination.text});
+      }
+    `}
 `;
 
 export const PreviewEmptyStyle = styled.div<{

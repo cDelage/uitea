@@ -1,8 +1,6 @@
 .spacePreviewItem {
   display: flex;
   align-items: center;
-  background-color: var(--uidt-primary-bg);
-  color: var(--uidt-primary-text);
   overflow: show;
   justify-content: center;
 }

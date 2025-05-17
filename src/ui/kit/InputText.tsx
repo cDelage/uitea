@@ -10,6 +10,10 @@ const InputText = styled.input`
   height: var(--uidt-space-7);
   box-sizing: border-box;
 
+  &:hover{
+    outline: var(--uidt-primary-outline-light-border) 1px solid;
+  }
+
   &:focus{
     outline: var(--uidt-primary-outline-border) 1px solid;
   }

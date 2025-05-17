@@ -8,12 +8,12 @@ import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
 import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useMemo, useState } from "react";
+import { ColorCombination, DesignToken, Theme, TokenFamily } from "../../domain/DesignSystemDomain";
 import {
-  DesignToken,
-  Theme,
-  TokenFamily,
-} from "../../domain/DesignSystemDomain";
-import { getDesignSystemTokens, getPaletteTokens, KEYBOARD_ACTIONS } from "../../util/DesignSystemUtils";
+  getDesignSystemTokens,
+  getPaletteTokens,
+  KEYBOARD_ACTIONS,
+} from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 import { recolorPalettes } from "../../util/ThemeGenerator";
 
@@ -61,6 +61,23 @@ function PageDesignSystem() {
         })
       : tokenFamilies;
   }, [designSystem, theme, tokenFamilies]);
+
+  const defaultCombination = useMemo<ColorCombination>(() => {
+    if (designSystem?.semanticColorTokens.colorCombinationCollections.length) {
+      const collection =
+        designSystem?.semanticColorTokens.colorCombinationCollections.find(
+          (collection) => collection.defaultCombination
+        )?.default ??
+        designSystem?.semanticColorTokens.colorCombinationCollections.find(
+          (collection) => collection.default
+        )?.default;
+      if (collection) return collection;
+    }
+    return {
+      background: "uidt-primary-bg",
+      text: "uidt-primary-text",
+    };
+  }, [designSystem]);
 
   useEffect(() => {
     const clearKeyboardAction = () => {
@@ -150,6 +167,7 @@ function PageDesignSystem() {
         theme,
         setTheme,
         themeTokenFamilies,
+        defaultCombination
       }}
     >
       <div className={styles.designSystemPage}>

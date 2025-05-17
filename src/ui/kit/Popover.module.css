@@ -5,6 +5,10 @@
   align-items: center;
   gap: var(--uidt-space-3);
   cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 
 .tab:hover {
@@ -74,4 +78,3 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-

@@ -1,19 +1,14 @@
-import { ComponentType } from "react";
 import {
   ColorCombination,
-  ColorCombinationCollection,
   ColorCombinationCollectionGroup,
-  PREVIEW_COMPONENT_ICONS,
 } from "../../../domain/DesignSystemDomain";
 import CombinationPreview from "./CombinationPreview";
 import styles from "./SemanticPreview.module.css";
 
 function CombinationGroup({
   combinationGroup,
-  titleColor,
 }: {
   combinationGroup: ColorCombinationCollectionGroup;
-  titleColor?: string;
 }) {
   function shouldDisplayCombination(
     combination?: ColorCombination
@@ -25,33 +20,12 @@ function CombinationGroup({
     );
   }
 
-  const PreviewElement:
-    | ComponentType<{
-        combination: ColorCombinationCollection;
-      }>
-    | undefined = combinationGroup
-    ? PREVIEW_COMPONENT_ICONS.find(
-        (preview) =>
-          combinationGroup.previewComponent === preview.previewComponent
-      )?.component
-    : undefined;
-
   return (
     <>
       {!combinationGroup.childs.length ? (
         <div>
           <div className="column gap-3">
-            <h4
-              style={{
-                color:
-                  (titleColor || combinationGroup.default?.text) &&
-                  `var(--${
-                    titleColor ? titleColor : combinationGroup.default?.text
-                  })`,
-              }}
-            >
-              {combinationGroup.combinationName}
-            </h4>
+            <h4>{combinationGroup.combinationName}</h4>
             <div className="tokens-grid">
               {shouldDisplayCombination(combinationGroup.default) && (
                 <CombinationPreview
@@ -80,11 +54,6 @@ function CombinationGroup({
                   combinationName={combinationGroup.combinationName ?? ""}
                   state="focus"
                 />
-              )}
-              {PreviewElement && (
-                <div className="row h-full align-center">
-                  <PreviewElement combination={combinationGroup} />
-                </div>
               )}
             </div>
           </div>
@@ -136,11 +105,6 @@ function CombinationGroup({
                   state="focus"
                 />
               )}
-              {PreviewElement && (
-                <div className="row h-full align-center overflow-hidden">
-                  <PreviewElement combination={combinationGroup} />
-                </div>
-              )}
             </div>
           </div>
           <div
@@ -157,7 +121,6 @@ function CombinationGroup({
             {combinationGroup.childs.map((combinationGroupChild) => (
               <CombinationGroup
                 key={combinationGroupChild.combinationName}
-                titleColor={combinationGroup.default?.text}
                 combinationGroup={combinationGroupChild}
               ></CombinationGroup>
             ))}

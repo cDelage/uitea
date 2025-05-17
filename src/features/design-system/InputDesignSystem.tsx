@@ -9,6 +9,8 @@ import classNames from "classnames";
 import { DraggableTools } from "../../util/DraggableContext";
 import CopyableTopTooltip from "../../ui/kit/CopyableTopTooltip";
 import { useSearchParams } from "react-router-dom";
+import { Measurement } from "../../domain/DesignSystemDomain";
+import InputMeasurement from "../../ui/kit/InputMeasurement";
 
 function InputDesignSystem({
   label,
@@ -29,10 +31,14 @@ function InputDesignSystem({
   portalTooltip,
   editText,
   isLocked,
+  measurement,
+  setMeasurement,
 }: {
   label: string;
   value?: string | undefined;
   register?: UseFormRegisterReturn<string>;
+  measurement?: Measurement;
+  setMeasurement?: (measurement: Measurement) => void;
   registerKey?: UseFormRegisterReturn<string>;
   popoverEdit?: ReactNode;
   handleSubmit?: () => void;
@@ -195,7 +201,10 @@ function InputDesignSystem({
                 </button>
               )}
               {isLocked && (
-                <MdLock size={ICON_SIZE_SM} color="var(--uidt-palette-gray-400)" />
+                <MdLock
+                  size={ICON_SIZE_SM}
+                  color="var(--uidt-palette-gray-400)"
+                />
               )}
             </div>
             {register && !isColor && !popoverEdit && (
@@ -272,9 +281,20 @@ function InputDesignSystem({
                 </Popover.Body>
               </>
             )}
+            {measurement && (
+              <div className="row w-full">
+                <InputMeasurement
+                  measurement={measurement}
+                  setMeasurement={editMode ? setMeasurement : undefined}
+                  width="100%"
+                  flex={true}
+                  onBlur={editMode ? handleSubmit : undefined}
+                />
+              </div>
+            )}
           </div>
         </div>
-        <div className={styles.sideContainer}/>
+        <div className={styles.sideContainer} />
       </div>
     </CopyableTopTooltip>
   );

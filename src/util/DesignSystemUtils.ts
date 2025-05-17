@@ -16,6 +16,8 @@ import {
   ColorCombination,
   DesignSystem,
   ColorCombinationCollectionGroup,
+  TypographyScale,
+  Measurement,
 } from "../domain/DesignSystemDomain";
 import { ColorResult } from "react-color";
 import { PaletteBuilderMetadata } from "../domain/PaletteBuilderDomain";
@@ -481,7 +483,9 @@ export function getTokenAvailableGroups({
   combinationName: string | undefined;
   collections: ColorCombinationCollection[];
 }) {
-  const toExcludes = combinationName ? findCollectionTree(combinationName, collections) : [];
+  const toExcludes = combinationName
+    ? findCollectionTree(combinationName, collections)
+    : [];
   return collections.filter(
     (combination) =>
       !toExcludes.includes(combination.combinationName) &&
@@ -518,4 +522,25 @@ export function findCollectionTree(
 
   recurse(rootName);
   return Array.from(result).map((result) => result.combinationName);
+}
+
+export function getTypoCssProperties(typo: TypographyScale): CSSProperties {
+  return {
+    fontSize: measurementToCss(typo.fontSize),
+    lineHeight: measurementToCss(typo.lineHeight),
+    fontWeight: typo.fontWeight,
+    letterSpacing: typo.letterSpacing,
+    wordSpacing: typo.wordSpacing,
+    fontStyle: typo.fontStyle,
+    textTransform: typo.textTransform,
+    textDecoration: typo.textDecoration,
+    padding: measurementToCss(typo.padding),
+    margin: measurementToCss(typo.margin),
+    fontFamily: typo.font ? `var(--font-${typo.font})` : undefined,
+    color: `var(--${typo.color})`,
+  };
+}
+
+export function measurementToCss(measurement: Measurement): string {
+  return `${measurement.value}${measurement.unit.toLocaleLowerCase()}`;
 }

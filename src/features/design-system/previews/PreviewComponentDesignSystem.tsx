@@ -13,7 +13,12 @@ function PreviewComponentDesignSystem({
   maxHeight?: string;
   height?: string;
 }) {
-  const { themeTokenFamilies, tokenFamilies, designSystem } = useDesignSystemContext();
+  const {
+    themeTokenFamilies,
+    tokenFamilies,
+    designSystem,
+    defaultCombination,
+  } = useDesignSystemContext();
   const styleRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -25,7 +30,12 @@ function PreviewComponentDesignSystem({
           height,
         }}
       >
-        <PreviewStyle $tokenFamilies={themeTokenFamilies} ref={styleRef} $designSystem={designSystem}>
+        <PreviewStyle
+          $tokenFamilies={themeTokenFamilies}
+          ref={styleRef}
+          $designSystem={designSystem}
+          $defaultCombination={defaultCombination}
+        >
           <div className={styles.previewBody}>{children}</div>
         </PreviewStyle>
       </div>

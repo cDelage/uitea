@@ -7,15 +7,25 @@ function InputMeasurement({
   measurement,
   setMeasurement,
   width,
+  onBlur,
+  flex,
 }: {
   measurement: Measurement;
   setMeasurement?: (measurement: Measurement) => void;
   width?: string;
+  onBlur?: () => void;
+  flex?: boolean;
 }) {
   return (
-    <div className="row fake-input">
+    <div
+      className="row fake-input"
+      style={{
+        flex: flex ? "1" : undefined,
+      }}
+    >
       <input
         type="number"
+        onBlur={onBlur}
         className="inherit-input empty-border skip-arrow left-spinner"
         size={(measurement.value ? measurement.value.toString().length : 1) + 1}
         value={measurement.value}
@@ -23,7 +33,7 @@ function InputMeasurement({
           width,
           padding: "0px",
           paddingRight: "2px",
-          borderBottom: "1px solid transparent"
+          borderBottom: "1px solid transparent",
         }}
         onChange={(e) =>
           setMeasurement?.({
@@ -34,7 +44,8 @@ function InputMeasurement({
       />
       <select
         value={measurement.unit}
-        className="inherit-select select-no-arrow"
+        className="inherit-select select-no-arrow fake-input-select"
+        onBlur={onBlur}
         style={{
           padding: "2px",
           borderRadius: "0px",
