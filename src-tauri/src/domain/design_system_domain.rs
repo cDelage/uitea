@@ -13,7 +13,7 @@ pub struct DesignSystem {
     pub fonts: Fonts,
     pub typography: Typographies,
     pub radius: Radius,
-    pub effects: Vec<Effect>,
+    pub shadows: Vec<Shadows>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -187,7 +187,7 @@ pub struct ColorCombinationCollection {
     pub active: Option<ColorCombination>,
     pub focus: Option<ColorCombination>,
     pub group: Option<String>,
-    pub default_combination: Option<bool>
+    pub default_combination: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -437,16 +437,28 @@ impl Typographies {
 impl Default for TypographyScale {
     fn default() -> Self {
         TypographyScale {
-            font_size: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
-            line_height: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            font_size: Measurement {
+                unit: UnitOfMeasurement::PX,
+                value: 0.0,
+            },
+            line_height: Measurement {
+                unit: UnitOfMeasurement::PX,
+                value: 0.0,
+            },
             font_weight: FontWeight::Four,
             letter_spacing: TypographySpacing::Zero,
             word_spacing: TypographySpacing::Zero,
             font_style: FontStyle::Normal,
             text_transform: TextTransform::None,
             text_decoration: TextDecoration::None,
-            padding: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
-            margin: Measurement { unit: UnitOfMeasurement::PX, value: 0.0 },
+            padding: Measurement {
+                unit: UnitOfMeasurement::PX,
+                value: 0.0,
+            },
+            margin: Measurement {
+                unit: UnitOfMeasurement::PX,
+                value: 0.0,
+            },
             font: None,
             color: None,
         }
@@ -462,7 +474,7 @@ pub struct CustomTypographyScale {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AdditionalFontWeight { 
+pub struct AdditionalFontWeight {
     weight_name: String,
     font_weight: FontWeight,
 }
@@ -680,7 +692,7 @@ impl SpacesFile {
 
         SpacesFile::from(&default_spaces)
     }
-    
+
     pub fn to(spaces_file: &SpacesFile) -> Vec<Space> {
         spaces_file
             .0
@@ -703,7 +715,10 @@ pub struct Radius {
 impl Radius {
     pub fn new() -> Radius {
         Radius {
-            default: Measurement { unit: UnitOfMeasurement::PX, value: 4.0 },
+            default: Measurement {
+                unit: UnitOfMeasurement::PX,
+                value: 4.0,
+            },
             additionals_radius: vec![],
         }
     }
@@ -718,36 +733,36 @@ pub struct RadiusItem {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Effect {
-    pub effect_name: String,
-    pub items: Vec<EffectItem>,
-    pub bg: Option<String>,
+pub struct Shadows {
+    pub shadow_name: String,
+    pub shadows_array: Vec<Shadow>,
 }
 
-impl Effect {
-    pub fn new() -> Effect {
-        Effect {
-            effect_name: "shadow".to_string(),
-            bg: None,
-            items: vec![
-                EffectItem {
-                    effect_type: EffectType::BoxShadow,
-                    effect_value: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px".to_string(),
-                },
-                EffectItem {
-                    effect_type: EffectType::BoxShadow,
-                    effect_value: "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px".to_string(),
-                },
-            ],
+impl Shadows {
+    pub fn new() -> Shadows {
+        Shadows {
+            shadow_name: "shadow".to_string(),
+            shadows_array: vec![Shadow {
+                shadow_x: 0.0,
+                shadow_y: 4.0,
+                color: String::from("#000000"),
+                color_opacity: 0.25,
+                blur: 4.0,
+                spread: 0.0,
+            }],
         }
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct EffectItem {
-    pub effect_type: EffectType,
-    pub effect_value: String,
+pub struct Shadow {
+    pub color: String,
+    pub color_opacity: f32,
+    pub shadow_x: f32,
+    pub shadow_y: f32,
+    pub blur: f32,
+    pub spread: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

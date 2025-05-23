@@ -21,8 +21,8 @@ export function useDivClickOutside(
 
         // Vérifier si l'élément cliqué ou l'un de ses parents contient l'attribut data-disableoutside
         if (
-          target.closest("[data-disableoutside]") &&
-          !deactiveDisableOutside
+          target.closest("[data-disableoutside]") ||
+          deactiveDisableOutside
         ) {
           return;
         }

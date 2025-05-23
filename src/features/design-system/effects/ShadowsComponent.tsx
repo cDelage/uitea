@@ -1,14 +1,13 @@
 import classNames from "classnames";
 import styles from "../ComponentDesignSystem.module.css";
-import { DEFAULT_EFFECT } from "../../../ui/UiConstants";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Effect } from "../../../domain/DesignSystemDomain";
+import { Shadows } from "../../../domain/DesignSystemDomain";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import { useSynchronizedVerticalScroll } from "../../../util/SynchronizedScroll";
 import InputDesignSystem from "../InputDesignSystem";
-import EffectsPopover from "./EffectsPopover";
+import ShadowPopover from "./ShadowPopover";
 import { generateUniqueEffectsKey } from "../../../util/DesignSystemUtils";
 import {
   RemovableIndex,
@@ -17,23 +16,24 @@ import {
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import { useRef } from "react";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
-import EffectsPreview from "./EffectsPreview";
+import ShadowPreview from "./ShadowPreview";
 import { isEqual } from "lodash";
 import InputDesignSystemAddRemove from "../InputDesignSystemAddRemove";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import PreviewComponentDesignSystem from "../previews/PreviewComponentDesignSystem";
 import Popover from "../../../ui/kit/Popover";
+import { DEFAULT_SHADOW } from "../../../ui/UiConstants";
 
-function EffectsComponent() {
+function ShadowsComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
-  const { effects } = designSystem;
+  const { shadows } = designSystem;
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
   const topTooltipRef = useRef(null);
-  const { register, watch, control, handleSubmit, setValue, getValues, reset } =
+  const { register, watch, control, handleSubmit, setValue,  reset } =
     useForm({
-      defaultValues: { effects },
+      defaultValues: { shadows },
     });
   const {
     fields: effectsFields,
@@ -42,7 +42,7 @@ function EffectsComponent() {
     move,
   } = useFieldArray({
     control,
-    name: "effects",
+    name: "shadows",
   });
   const { draggableTools } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: RemovableIndex) => {
@@ -69,15 +69,15 @@ function EffectsComponent() {
   });
   useRefreshDesignSystemFormsEvent({
     reset,
-    originalValue: { effects },
+    originalValue: { shadows },
   });
 
-  function submitEffects({ effects: newEffects }: { effects: Effect[] }) {
-    if (isEqual(newEffects, effects)) return;
+  function submitEffects({ shadows: newShadows }: { shadows: Shadows[] }) {
+    if (isEqual(newShadows, shadows)) return;
     saveDesignSystem({
       designSystem: {
         ...designSystem,
-        effects: newEffects,
+        shadows: newShadows,
       },
       isTmp: true,
     });
@@ -85,9 +85,9 @@ function EffectsComponent() {
 
   function handleAddEffect(index: number) {
     const key = generateUniqueEffectsKey(effectsFields, `effect-${index + 2}`);
-    const newEffect: Effect = {
-      ...DEFAULT_EFFECT,
-      effectName: key,
+    const newEffect: Shadows = {
+      shadowsArray: [DEFAULT_SHADOW],
+      shadowName: key,
     };
     insert(index + 1, newEffect, { shouldFocus: false });
     handleSubmit(submitEffects)();
@@ -116,9 +116,9 @@ function EffectsComponent() {
             <div className="column">
               {effectsFields.map((effect, index) => (
                 <InputDesignSystem
-                  key={effect.effectName}
-                  popoverId={`effect-${index}`}
-                  label={watch(`effects.${index}.effectName`)}
+                  key={effect.shadowName}
+                  popoverId={`shadow-${index}`}
+                  label={watch(`shadows.${index}.shadowName`)}
                   draggableTools={draggableTools}
                   isAddRemoveDragAllowed={true}
                   index={index}
@@ -127,24 +127,26 @@ function EffectsComponent() {
                     remove(index);
                     handleSubmit(submitEffects);
                   }}
-                  value={effect.items.map((item) => item.effectValue).join(",")}
-                  registerKey={register(`effects.${index}.effectName`, {
+                  value={effect.shadowsArray
+                    .map(
+                      (item) =>
+                        `(${item.color} ${item.shadowX},${item.shadowY},${item.blur},${item.spread})`
+                    )
+                    .join(",")}
+                  registerKey={register(`shadows.${index}.shadowName`, {
                     required: true,
                   })}
                   handleSubmit={handleSubmit(submitEffects)}
                   popoverEdit={
-                    <EffectsPopover
+                    <ShadowPopover
                       effect={effect}
-                      register={register}
                       index={index}
                       control={control}
-                      watch={watch}
                       setValue={setValue}
-                      getValue={getValues}
                       handleSubmit={handleSubmit(submitEffects)}
                     />
                   }
-                  tooltipValue={`effect-${effect.effectName}`}
+                  tooltipValue={`effect-${effect.shadowName}`}
                   portalTooltip={index === 0 ? topTooltipRef : undefined}
                 />
               ))}
@@ -163,8 +165,8 @@ function EffectsComponent() {
         </div>
         <PreviewComponentDesignSystem maxHeight="400px">
           <div className={styles.previewElementWrap} ref={scrollableRight}>
-            {watch(`effects`).map((effect) => (
-              <EffectsPreview key={effect.effectName} effect={effect} />
+            {watch(`shadows`).map((effect) => (
+              <ShadowPreview key={effect.shadowName} effect={effect} />
             ))}
           </div>
         </PreviewComponentDesignSystem>
@@ -174,4 +176,4 @@ function EffectsComponent() {
   );
 }
 
-export default EffectsComponent;
+export default ShadowsComponent;

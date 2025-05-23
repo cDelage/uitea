@@ -23,7 +23,7 @@ export interface DesignSystem {
   typography: Typographies;
   spaces: Space[];
   radius: Radius;
-  effects: Effect[];
+  shadows: Shadows[];
 }
 
 export interface DesignSystemCreationPayload {
@@ -218,15 +218,18 @@ export interface RadiusItem {
   radiusValue: Measurement;
 }
 
-export interface Effect {
-  effectName: string;
-  items: EffectItem[];
-  bg?: string;
+export interface Shadows {
+  shadowName: string;
+  shadowsArray: Shadow[];
 }
 
-export interface EffectItem {
-  effectType: EffectType;
-  effectValue: string;
+export interface Shadow {
+  shadowX: number;
+  shadowY: number;
+  blur: number;
+  spread: number;
+  color: string;
+  colorOpacity: number;
 }
 
 export type EffectType = "BoxShadow" | "Blur" | "BackdropFilter";

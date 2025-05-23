@@ -16,7 +16,7 @@ function FormComponent({
   return (
     <div className={"column gap-4 " + className}>
       <div className="row justify-between">
-        <label className="text-color-light">{label}</label>
+        <label>{label}</label>
         <div>{rightElement}</div>
       </div>
       {children}

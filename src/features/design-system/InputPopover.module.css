@@ -117,12 +117,12 @@
 }
 
 .tabEffectContainer {
-  display: grid;
-  grid-template-columns: 100px 1fr auto;
+  display: flex;
   padding: var(--uidt-space-3) var(--uidt-space-3);
   box-sizing: border-box;
   gap: var(--uidt-space-3);
   align-items: center;
+  justify-content: space-between;
   border-bottom: transparent 2px solid;
 }
 

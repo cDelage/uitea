@@ -8,7 +8,7 @@ use anyhow::{anyhow, Result, Context};
 
 use crate::{
     domain::design_system_domain::{
-        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Effect, ExportPayload, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, Space, SpacesFile, Themes, TintsFile, Typographies
+        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Shadows, ExportPayload, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, Space, SpacesFile, Themes, TintsFile, Typographies
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -219,7 +219,7 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     save_to_yaml_file(radius_pathbuf, &design_system.radius)?;
 
     let effect_pathbuf: PathBuf = design_system_path.join(EFFECTS_PATH);
-    save_to_yaml_file(effect_pathbuf, &design_system.effects)?;
+    save_to_yaml_file(effect_pathbuf, &design_system.shadows)?;
 
     let themes_pathbuf: PathBuf = design_system_path.join(THEMELIST_PATH);
     save_to_yaml_file(themes_pathbuf, &design_system.themes)?;
@@ -368,16 +368,16 @@ pub fn init_radius(design_system_path: &PathBuf) -> Result<()> {
     save_to_yaml_file(radius_pathbuf, &radius_file)
 }
 
-pub fn fetch_effects(design_system_path: &PathBuf) -> Result<Vec<Effect>> {
+pub fn fetch_effects(design_system_path: &PathBuf) -> Result<Vec<Shadows>> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let effects_pathbuf: PathBuf = fetch_pathbuf.join(EFFECTS_PATH);
-    load_yaml_from_pathbuf::<Vec<Effect>>(&effects_pathbuf)
+    load_yaml_from_pathbuf::<Vec<Shadows>>(&effects_pathbuf)
 }
 
 pub fn init_effects(design_system_path: &PathBuf) -> Result<()> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let effect_pathbuf: PathBuf = fetch_pathbuf.join(EFFECTS_PATH);
-    let effect = Effect::new();
+    let effect = Shadows::new();
     save_to_yaml_file(effect_pathbuf, &vec![effect])
 }
 

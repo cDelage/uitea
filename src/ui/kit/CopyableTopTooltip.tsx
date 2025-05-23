@@ -43,25 +43,25 @@ function CopyableTopTooltip({
       onMouseLeave={handleMouseLeave}
     >
       {tooltipValue && !portalComponent && (
-        <div
-          className={styles.tooltipBody}
-          onClick={(e) => {
-            e.stopPropagation();
-            copy(tooltipValue);
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
-          style={{
-            transform: transformBody,
-          }}
-        >
-          <div className={styles.valueTextContainer}>{tooltipValue}</div>
-          {isCopied ? (
-            <MdCheck size={ICON_SIZE_MD} />
-          ) : (
-            <MdContentCopy size={ICON_SIZE_MD} />
-          )}
-          <div className={styles.tooltipArrow}></div>
-        </div>
+          <div
+            className={styles.tooltipBody}
+            onClick={(e) => {
+              e.stopPropagation();
+              copy(tooltipValue);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              transform: transformBody,
+            }}
+          >
+            <div className={styles.valueTextContainer}>{tooltipValue}</div>
+            {isCopied ? (
+              <MdCheck size={ICON_SIZE_MD} />
+            ) : (
+              <MdContentCopy size={ICON_SIZE_MD} />
+            )}
+            <div className={styles.tooltipArrow}></div>
+          </div>
       )}
       {tooltipValue &&
         isHover &&

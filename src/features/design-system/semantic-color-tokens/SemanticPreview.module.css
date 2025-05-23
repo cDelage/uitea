@@ -7,7 +7,7 @@
 
 .combinationGroupWithChild {
   display: flex;
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--radius);
   width: 100%;
   box-shadow: var(--uidt-shadow-md);
   box-sizing: border-box;

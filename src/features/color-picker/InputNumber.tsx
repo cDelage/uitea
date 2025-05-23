@@ -12,20 +12,20 @@ function InputNumber({
 }: {
   value: number;
   setValue: (value: number) => void;
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
   step?: number;
 }) {
-  const [valueInput, setValueInput] = useState(value);
+  const [valueInput, setValueInput] = useState(Number(value.toFixed(2)));
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!Number.isNaN(e.target.value)) {
       setValueInput(autoRangeNumber(Number(e.target.value), min, max));
     }
   }
-  const inputStyle = classNames("inherit-input", styles.inputContainer);
+  const inputStyle = classNames("inherit-input empty-border", styles.inputContainer);
   return (
-    <div className="row gap-2 align-center">
+    <div className="row gap-2 align-center uidt-input p-2">
       <input
         className={inputStyle}
         type="number"

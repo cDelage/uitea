@@ -8,7 +8,7 @@ import {
   CustomTypographyScale,
   Space,
   RadiusItem,
-  Effect,
+  Shadows,
   DesignToken,
   SemanticColorTokens,
   TokenFamily,
@@ -22,6 +22,7 @@ import {
 import { ColorResult } from "react-color";
 import { PaletteBuilderMetadata } from "../domain/PaletteBuilderDomain";
 import { getFilenameDate } from "./DateUtil";
+import ColorIO from "colorjs.io";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
@@ -53,7 +54,7 @@ export const generateUniqueTintKey = (
  * @returns Un nom unique pour la clé.
  */
 export const generateUniqueEffectsKey = (
-  effects: Effect[],
+  effects: Shadows[],
   baseKey: string
 ): string => {
   let uniqueKey = baseKey;
@@ -61,7 +62,7 @@ export const generateUniqueEffectsKey = (
 
   // Tant que la clé existe déjà (on compare avec le premier élément du tuple),
   // on incrémente le "counter" pour générer une nouvelle clé.
-  while (effects.filter((shade) => shade.effectName === uniqueKey).length) {
+  while (effects.filter((shade) => shade.shadowName === uniqueKey).length) {
     uniqueKey = `${baseKey}-${counter}`;
     counter++;
   }
@@ -216,33 +217,6 @@ export function getClosestToPercentage<T>({
   return array[targetIndex];
 }
 
-export function getEffectCss(effect: Effect): CSSProperties {
-  const cssProps: CSSProperties = {};
-  const boxShadows = effect.items.filter(
-    (item) => item.effectType === "BoxShadow"
-  );
-  const backdropFilter = effect.items.filter(
-    (item) => item.effectType === "BackdropFilter"
-  );
-  const blur = effect.items.filter((item) => item.effectType === "Blur");
-
-  if (boxShadows.length) {
-    cssProps.boxShadow = boxShadows.map((e) => e.effectValue).join(",");
-  }
-  if (backdropFilter.length) {
-    cssProps.backdropFilter = `${backdropFilter[0].effectValue}`;
-  }
-  if (blur.length) {
-    cssProps.filter = `blur(${blur[0].effectValue})`;
-  }
-
-  if (effect.bg) {
-    cssProps.background = effect.bg;
-  }
-
-  return cssProps;
-}
-
 export function stopPropagation(e: MouseEvent) {
   e.stopPropagation();
 }
@@ -376,14 +350,15 @@ function getColorCombinationTokens(
 }
 
 export function getDesignSystemTokens(
-  designSystem?: DesignSystem
+  designSystem?: DesignSystem,
+  skipSemantic?: boolean
 ): TokenFamily[] {
   if (!designSystem) return [];
   const paletteTokens = designSystem.palettes.map(getPaletteTokenFamily);
-  return [
-    ...paletteTokens,
-    ...getSemanticColorTokens(designSystem.semanticColorTokens),
-  ];
+  const semanticTokens = skipSemantic
+    ? []
+    : getSemanticColorTokens(designSystem.semanticColorTokens);
+  return [...paletteTokens, ...semanticTokens];
 }
 
 export function findDesignSystemColor({
@@ -436,6 +411,23 @@ export function combinationHasAnyColor(
     (combination?.background || combination?.text || combination?.border) !==
     undefined
   );
+}
+
+export function getShadowColor({
+  shadowColor,
+  element,
+}: {
+  shadowColor: string;
+  element?: RefObject<HTMLDivElement | null>;
+}) : string {
+  if (shadowColor.startsWith("#")) return shadowColor;
+  const color = getCssVariableValue(shadowColor, element);
+  if (color) return color;
+  try {
+    return new ColorIO(shadowColor).toString({ format: "hex" });
+  } catch {
+    return "#DDDDDD";
+  }
 }
 
 export function getCssVariableValue(

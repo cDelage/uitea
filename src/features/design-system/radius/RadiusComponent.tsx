@@ -99,7 +99,10 @@ function RadiusComponent() {
 
     const newRadius: RadiusItem = {
       radiusKey,
-      radiusValue: additionalsRadiusArray[index]?.radiusValue ?? "8px",
+      radiusValue: {
+        value: 8.0,
+        unit: "PX",
+      },
     };
 
     insert(index + 1, newRadius, { shouldFocus: false });
@@ -157,9 +160,9 @@ function RadiusComponent() {
                 tooltipValue={`radius-${watch(
                   `additionalsRadius.${index}.radiusKey`
                 )}`}
-                measurement={watch("default")}
+                measurement={watch(`additionalsRadius.${index}.radiusValue`)}
                 setMeasurement={(measurement: Measurement) =>
-                  setValue("default", measurement)
+                  setValue(`additionalsRadius.${index}.radiusValue`, measurement)
                 }
               />
             ))}

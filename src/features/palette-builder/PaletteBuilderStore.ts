@@ -318,10 +318,9 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>(
         return {
           ...state,
           ...paletteBuilderFromFile(paletteBuilder),
-          canUndoRedo
+          canUndoRedo,
         };
       });
-      
     },
     redoPaletteBuilder: async () => {
       const paletteBuilder = await invoke<PaletteBuilderPayload>(
@@ -334,7 +333,7 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>(
         return {
           ...state,
           ...paletteBuilderFromFile(paletteBuilder),
-          canUndoRedo
+          canUndoRedo,
         };
       });
     },
@@ -552,14 +551,14 @@ function getColorAxeToPoints({
 
 export function autoRangeNumber(
   value: number,
-  min: number,
-  max: number,
+  min?: number,
+  max?: number,
   modulo?: boolean
 ) {
   if (modulo) {
-    return Math.max(min, value % max);
+    return Math.max(min ?? value, value % (max ?? value));
   }
-  return Math.min(max, Math.max(min, value));
+  return Math.min(max ?? value, Math.max(min ?? value, value));
 }
 
 interface ColorPositionIndex {

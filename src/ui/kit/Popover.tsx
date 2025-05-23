@@ -485,9 +485,9 @@ function SelectorButton({
       style={{ width, minWidth: width, maxWidth: width }}
     >
       {value ? (
-        <div className="text-color-default">{value}</div>
+        <div className="uidt-text-color-default">{value}</div>
       ) : (
-        <div className="text-color-light">{placeholder}</div>
+        <div className="uidt-text-color-light">{placeholder}</div>
       )}
       <div className="row gap-2 align-center">
         {onRemove && (

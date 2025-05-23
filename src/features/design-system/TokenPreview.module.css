@@ -5,7 +5,7 @@
     overflow: hidden;
     background-color: var(--base-background);
     box-shadow: var(--uidt-shadow-inset);
-    border-radius: var(--uidt-rounded-md);
+    border-radius: var(--radius);
     padding: var(--uidt-space-4);
     box-sizing: border-box;
     border: 1px solid var(--base-border);

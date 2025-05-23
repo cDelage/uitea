@@ -3,7 +3,7 @@
   box-sizing: border-box;
   color: var(--uidt-add-text);
   cursor: pointer;
-  margin: var(--uidt-space-0) var(--uidt-space-7);
+  margin: var(--uidt-space-0) var(--uidt-space-3);
   padding: var(--uidt-space-3);
   border-radius: var(--uidt-rounded-md);
 }
@@ -17,7 +17,7 @@
   border: dashed 2px var(--uidt-remove-border);
   color: var(--uidt-remove-text);
   cursor: pointer;
-  margin: var(--uidt-space-0) var(--uidt-space-7);
+  margin: var(--uidt-space-0) var(--uidt-space-3);
   padding: var(--uidt-space-3);
   border-radius: var(--uidt-rounded-md);
 }

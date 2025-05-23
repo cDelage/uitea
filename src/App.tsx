@@ -61,6 +61,26 @@ const router = createBrowserRouter([
   },
 ]);
 
+export {};
+
+type HexString = `#${string}`;
+
+interface EyeDropperResult {
+  /** Couleur en notation sRGB hexadécimale (#RRGGBB) */
+  sRGBHex: HexString;
+}
+
+interface EyeDropper {
+  open(): Promise<EyeDropperResult>;
+}
+
+declare global {
+  interface Window {
+    /** Présent uniquement sur Chromium ≥ 95 (incl. WebView2) */
+    EyeDropper?: new () => EyeDropper;
+  }
+}
+
 function App() {
   const queryClient = new QueryClient({
     defaultOptions: {

@@ -12,24 +12,19 @@ import { useDesignSystemContext } from "./DesignSystemContext";
 import DraggableList from "./DraggableList";
 import FontIcon from "../../ui/icons/FontIcon";
 import { useSaveDesignSystem } from "./DesignSystemQueries";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FontsComponent from "./fonts/FontsComponent";
 import TypographyComponent from "./typography/TypographyComponent";
 import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
 import SpacesIcon from "../../ui/icons/SpacesIcon";
 import SpacesComponent from "./spaces/SpacesComponent";
 import RadiusComponent from "./radius/RadiusComponent";
-import EffectsComponent from "./effects/EffectsComponent";
+import ShadowsComponent from "./effects/ShadowsComponent";
 import Modal from "../../ui/kit/Modal";
-import { MdBrush, MdConstruction, MdPalette, MdStore } from "react-icons/md";
-import PaletteBuilderModal from "../palette-builder/PaletteBuilderModal";
-import { useEffect, useState } from "react";
-import ColorPickerModal from "../color-picker/ColorPickerModal";
+import { MdBrush, MdConstruction, MdStore } from "react-icons/md";
 import ThemesComponent from "./themes/ThemesComponent";
 import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorTokensComponent";
-import TokenCrafterModal from "../token-crafter/TokenCrafterModal";
 import { useTokenCrafterStore } from "../token-crafter/TokenCrafterStore";
-import { useUserSettings } from "../home/HomeQueries";
 import Popover from "../../ui/kit/Popover";
 import SpacesPresetPopover from "./spaces/SpacesPresetPopover";
 
@@ -38,15 +33,8 @@ function BodyDesignSystem() {
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { scrollRef } = useScrollTriggerRefresh();
-  const [isPaletteBuilderOpen, setIsPaletteBuilderOpen] = useState(false);
-  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
-  const [isTokenCrafterOpen, setIsTokenCrafterOpen] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const { generateRecommandations } = useTokenCrafterStore();
   const navigate = useNavigate();
-  const { userSettings } = useUserSettings();
-
-  const pluginDisplayMode = userSettings?.pluginDisplayMode ?? "fullscreen";
 
   function initPalette() {
     saveDesignSystem({
@@ -57,24 +45,6 @@ function BodyDesignSystem() {
       isTmp: true,
     });
   }
-
-  useEffect(() => {
-    searchParams.set(
-      "paletteBuilderOpen",
-      isPaletteBuilderOpen ? "true" : "false"
-    );
-    setSearchParams(searchParams);
-  }, [isPaletteBuilderOpen, searchParams, setSearchParams]);
-
-  useEffect(() => {
-    searchParams.set("colorPickerOpen", isColorPickerOpen ? "true" : "false");
-    setSearchParams(searchParams);
-  }, [isColorPickerOpen, searchParams, setSearchParams]);
-
-  useEffect(() => {
-    searchParams.set("tokenCrafterOpen", isTokenCrafterOpen ? "true" : "false");
-    setSearchParams(searchParams);
-  }, [isTokenCrafterOpen, searchParams, setSearchParams]);
 
   return (
     <Popover>
@@ -99,52 +69,18 @@ function BodyDesignSystem() {
               subSectionName="Palettes"
               actions={
                 <>
-                  <Modal.Toggle
-                    id="palette-builder"
-                    replaceOpen={
-                      pluginDisplayMode === "fullscreen"
-                        ? () =>
-                            navigate(
-                              `/palette-builder?currentDesignSystem=${designSystemPath}`
-                            )
-                        : undefined
+                  <button
+                    className="action-ghost-button"
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        `/palette-builder?currentDesignSystem=${designSystemPath}`
+                      )
                     }
                   >
-                    <button className="action-ghost-button" type="button">
-                      <MdConstruction size={ICON_SIZE_MD} />
-                      Palette builder
-                    </button>
-                  </Modal.Toggle>
-                  <Modal.Body
-                    id="palette-builder"
-                    isOpenToSync={isPaletteBuilderOpen}
-                    setIsOpenToSync={setIsPaletteBuilderOpen}
-                  >
-                    <PaletteBuilderModal />
-                  </Modal.Body>
-                  <Modal.Toggle
-                    id="color-picker"
-                    replaceOpen={
-                      pluginDisplayMode === "fullscreen"
-                        ? () =>
-                            navigate(
-                              `/color-picker?currentDesignSystem=${designSystemPath}`
-                            )
-                        : undefined
-                    }
-                  >
-                    <button className="action-ghost-button" type="button">
-                      <MdPalette size={ICON_SIZE_MD} />
-                      Color picker
-                    </button>
-                  </Modal.Toggle>
-                  <Modal.Body
-                    id="color-picker"
-                    isOpenToSync={isColorPickerOpen}
-                    setIsOpenToSync={setIsColorPickerOpen}
-                  >
-                    <ColorPickerModal />
-                  </Modal.Body>
+                    <MdConstruction size={ICON_SIZE_MD} />
+                    Palette builder
+                  </button>
                 </>
               }
             >
@@ -174,32 +110,19 @@ function BodyDesignSystem() {
               subSectionName="Semantic color tokens"
               actions={
                 <>
-                  <Modal.Toggle
-                    id="token-crafter"
-                    openCallback={() => generateRecommandations(designSystem)}
-                    replaceOpen={
-                      pluginDisplayMode === "fullscreen"
-                        ? () => {
-                            generateRecommandations(designSystem);
-                            navigate(
-                              `/token-crafter?currentDesignSystem=${designSystemPath}`
-                            );
-                          }
-                        : undefined
-                    }
+                  <button
+                    className="action-ghost-button"
+                    type="button"
+                    onClick={() => {
+                      generateRecommandations(designSystem);
+                      navigate(
+                        `/token-crafter?currentDesignSystem=${designSystemPath}`
+                      );
+                    }}
                   >
-                    <button className="action-ghost-button" type="button">
-                      <MdBrush size={ICON_SIZE_MD} />
-                      Token crafter
-                    </button>
-                  </Modal.Toggle>
-                  <Modal.Body
-                    id="token-crafter"
-                    isOpenToSync={isTokenCrafterOpen}
-                    setIsOpenToSync={setIsTokenCrafterOpen}
-                  >
-                    <TokenCrafterModal />
-                  </Modal.Body>
+                    <MdBrush size={ICON_SIZE_MD} />
+                    Token crafter
+                  </button>
                 </>
               }
             >
@@ -233,18 +156,18 @@ function BodyDesignSystem() {
               subSectionName="Spaces"
               actions={
                 <>
-                  <Popover.Toggle id="presets" >
+                  <Popover.Toggle id="presets">
                     <button
                       type="button"
                       className="action-ghost-button"
                       style={{
-                        zIndex:4
+                        zIndex: 4,
                       }}
                     >
-                      <MdStore size={ICON_SIZE_MD}/> Presets
+                      <MdStore size={ICON_SIZE_MD} /> Presets
                     </button>
                   </Popover.Toggle>
-                  <Popover.Body id="presets" zIndex={5} >
+                  <Popover.Body id="presets" zIndex={5}>
                     <SpacesPresetPopover />
                   </Popover.Body>
                 </>
@@ -256,7 +179,7 @@ function BodyDesignSystem() {
               <RadiusComponent />
             </Section.Subsection>
             <Section.Subsection subSectionName="Effects">
-              <EffectsComponent />
+              <ShadowsComponent />
             </Section.Subsection>
           </Section>
         </div>

@@ -4,6 +4,7 @@ import {
   DesignSystem,
   TokenFamily,
 } from "../../../domain/DesignSystemDomain";
+import { measurementToCss } from "../../../util/DesignSystemUtils";
 
 export const PreviewStyle = styled.div<{
   $tokenFamilies: TokenFamily[];
@@ -38,6 +39,20 @@ export const PreviewStyle = styled.div<{
     );
   }};
 
+  --radius: ${(props) => measurementToCss(props.$designSystem.radius.default)};
+
+  .radius {
+    border-radius: var(--radius);
+  }
+
+  ${(props) => {
+    return props.$designSystem.radius.additionalsRadius.map(
+      (radius) => css`
+    --radius-${radius.radiusKey}:${measurementToCss(radius.radiusValue)};
+      `
+    );
+  }};
+
   .text-color-light {
     color: var(--base-text-light);
   }
@@ -58,6 +73,19 @@ export const PreviewStyle = styled.div<{
         color: var(--${props.$defaultCombination.text});
       }
     `}
+
+  .rect-rounded-left {
+    border-top-left-radius: var(--radius);
+    border-bottom-left-radius: var(--radius);
+  }
+
+  .rect-rounded-top-right {
+    border-top-right-radius: var(--radius);
+  }
+
+  .rect-rounded-bottom-right {
+    border-bottom-right-radius: var(--radius);
+  }
 `;
 
 export const PreviewEmptyStyle = styled.div<{

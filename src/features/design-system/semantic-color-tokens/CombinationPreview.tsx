@@ -26,7 +26,7 @@ function CombinationPreview({
 
   return (
     <Popover>
-      <div className="row shadow-md rounded-md w-full h-fit">
+      <div className="row shadow-md radius w-full h-fit">
         <div
           className="border-box row align-center justify-center rect-rounded-left"
           style={{

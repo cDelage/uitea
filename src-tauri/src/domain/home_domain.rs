@@ -44,6 +44,7 @@ pub struct PresetDressing {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UserSettings {
+    //Obsolete, to remove when new user settings will be created
     pub plugin_display_mode: PluginDisplayMode,
 }
 

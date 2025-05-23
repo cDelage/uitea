@@ -7,7 +7,7 @@ use crate::{
     application::home_application::fetch_presets_dressing,
     domain::{
         design_system_domain::{
-            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Effect, ExportPayload, Fonts, Palette, Radius, SemanticColorTokens, Space, Typographies
+            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, Shadows, ExportPayload, Fonts, Palette, Radius, SemanticColorTokens, Space, Typographies
         },
         home_domain::PresetDressing,
     },
@@ -139,7 +139,7 @@ pub fn find_design_system(
         Ok(radius) => Ok(radius),
     }?;
 
-    let effects: Vec<Effect> = match design_system_repository::fetch_effects(&design_system_pathbuf)
+    let effects: Vec<Shadows> = match design_system_repository::fetch_effects(&design_system_pathbuf)
     {
         Err(_) => {
             design_system_repository::init_effects(&design_system_pathbuf)?;
@@ -155,7 +155,7 @@ pub fn find_design_system(
         typography,
         spaces,
         radius,
-        effects,
+        shadows: effects,
         themes,
         semantic_color_tokens,
     })

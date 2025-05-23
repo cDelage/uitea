@@ -1,14 +1,10 @@
 import {
   MdAdd,
-  MdArrowBack,
-  MdArrowForward,
   MdChevronLeft,
-  MdConstruction,
   MdDelete,
   MdDone,
   MdDragIndicator,
   MdLocationPin,
-  MdOpenInNew,
   MdRemove,
   MdSave,
   MdSettings,
@@ -68,13 +64,7 @@ import { save } from "@tauri-apps/api/dialog";
 import { getFilenameDate } from "../../util/DateUtil";
 import ColorPreviewBody from "./ColorPreviewBody";
 
-function PaletteBuilderComponent({
-  isModal,
-  closeModal,
-}: {
-  isModal?: boolean;
-  closeModal?: () => void;
-}) {
+function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   const {
     palettes,
     createPalette,
@@ -85,9 +75,6 @@ function PaletteBuilderComponent({
     deletePalette,
     alignerSettings,
     setAlignerSettings,
-    canUndoRedo,
-    undoPaletteBuilder,
-    redoPaletteBuilder,
   } = usePaletteBuilderStore();
   const { steps, tintNamingMode } = settings;
   const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<
@@ -188,13 +175,11 @@ function PaletteBuilderComponent({
       });
       closeModal?.();
       reset();
-      if (!isModal) {
-        navigate(
-          `/design-system/${encodeURIComponent(
-            designSystemPathComputed
-          )}?editMode=true`
-        );
-      }
+      navigate(
+        `/design-system/${encodeURIComponent(
+          designSystemPathComputed
+        )}?editMode=true`
+      );
     }
   }
 
@@ -275,62 +260,16 @@ function PaletteBuilderComponent({
     [styles.rightSidepanelSpace]: isSidepanelOpen,
   });
 
-  const paletteBuilderStyle = classNames(styles.paletteBuilder, {
-    [styles.modalPaletteBuilder]: isModal,
-  });
-
   return (
     <SidePanel
       isOpenToSync={isSidepanelOpen}
       setIsOpenToSync={setIsSidepanelOpen}
     >
       <Popover>
-        <div className={paletteBuilderStyle}>
-          {isModal && (
-            <div className={styles.header}>
-              <div className="row gap-2 align-center">
-                <MdConstruction size={ICON_SIZE_MD} />
-                <h5>Palette builder</h5>
-              </div>
-              <div className="row align-center gap-4">
-                <div className="row gap-2">
-                  <button
-                    className="action-ghost-button"
-                    disabled={!canUndoRedo.canUndo}
-                    onClick={() => undoPaletteBuilder()}
-                  >
-                    <MdArrowBack size={ICON_SIZE_SM} />
-                  </button>
-                  <button
-                    className="action-ghost-button"
-                    disabled={!canUndoRedo.canRedo}
-                    onClick={() => redoPaletteBuilder()}
-                  >
-                    <MdArrowForward size={ICON_SIZE_SM} />
-                  </button>
-                </div>
-                <SidePanel.Button id="settings">
-                  <button className="action-ghost-button">
-                    <MdSettings size={ICON_SIZE_MD} /> Advanced settings
-                  </button>
-                </SidePanel.Button>
-                <button
-                  className="action-ghost-button"
-                  onClick={() =>
-                    navigate(
-                      `/palette-builder?currentDesignSystem=${designSystemPath}`
-                    )
-                  }
-                >
-                  <MdOpenInNew size={ICON_SIZE_MD} /> Full screen
-                </button>
-              </div>
-            </div>
-          )}
+        <div className={styles.paletteBuilder}>
           <div className={styles.builderBodyContainer}>
             <div className={builderBodyContainerChild}>
               <div className="column gap-6">
-                {!isModal && (
                   <div className="row justify-between align-center gap-4">
                     {currentDesignSystem && (
                       <ButtonTertiary
@@ -352,7 +291,6 @@ function PaletteBuilderComponent({
                       </ButtonTertiary>
                     </SidePanel.Button>
                   </div>
-                )}
                 <div className="row align-center gap-8">
                   <div>
                     <FormComponent label="Tints naming mode" className="flex-1">

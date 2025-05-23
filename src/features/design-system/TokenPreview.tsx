@@ -27,7 +27,7 @@ function TokenPreview({
       >
         <div className="row align-center gap-3 p-2 py-3 w-fit">
           <div
-            className="palette-color w-full"
+            className="palette-color w-full radius"
             style={{
               ...getRectSize({ height: "var(--uidt-space-7)" }),
               background: `var(--${value})`,

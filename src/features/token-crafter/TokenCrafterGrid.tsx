@@ -26,7 +26,7 @@ import FormComponent from "../../ui/kit/FormComponent";
 import { useNavigate } from "react-router-dom";
 import SidePanel from "../../ui/kit/SidePanel";
 
-function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
+function TokenCrafterGrid() {
   const { designSystem } = useTokenCrafterContext();
   const { saveDesignSystem } = useSaveDesignSystem(
     designSystem.metadata.designSystemPath
@@ -105,7 +105,6 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
           background: "var(--base-background)",
         }}
       >
-        {!isModal && (
           <div className="row justify-between p-2">
             <ButtonTertiary
               onClick={() =>
@@ -124,7 +123,6 @@ function TokenCrafterGrid({ isModal }: { isModal?: boolean }) {
               </ButtonTertiary>
             </SidePanel.Button>
           </div>
-        )}
         <div className={styles.tokenCrafterGrid}>
           <div className="row gap-4">
             <div className="column h-fit gap-4 justify-between">

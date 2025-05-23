@@ -2,13 +2,13 @@ import { SliderStyles } from "rc-slider/lib/interface";
 import {
   CustomTypographyScale,
   DefaultTypography,
-  Effect,
   EffectType,
   FontStyle,
   FontWeight,
   Palette,
   PresetSpaces,
   RecommandationContrastPayload,
+  Shadow,
   TextDecoration,
   TextTransform,
   TypographySpacing,
@@ -176,20 +176,6 @@ export const DEFAULT_TYPOGRAPHIES: DefaultTypography[] = [
   "strong",
   "small",
 ];
-
-export const DEFAULT_EFFECT: Effect = {
-  effectName: "shadow",
-  items: [
-    {
-      effectType: "BoxShadow",
-      effectValue: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px",
-    },
-    {
-      effectType: "BoxShadow",
-      effectValue: "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px",
-    },
-  ],
-};
 
 export const EFFECT_TYPES: EffectType[] = [
   "BoxShadow",
@@ -455,3 +441,12 @@ export const SPACES_PRESETS: PresetSpaces[] = [
     ],
   },
 ];
+
+export const DEFAULT_SHADOW : Shadow = {
+  shadowX: 0,
+  shadowY: 4,
+  blur: 4,
+  spread: 0,
+  color: "#000000",
+  colorOpacity: 0.25
+}

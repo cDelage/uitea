@@ -12,6 +12,8 @@ interface ColorPickerStore {
   colors: ColorIO[];
   canUndoRedo: CanUndoRedo;
   samples: Sample[];
+  activePipette?: number;
+  setActivePipette: (index: number | undefined) => void;
   setColor: (color: ColorIO, index: number) => void;
   initColorPickerStore: () => void;
   registerColorPicker: () => void;
@@ -29,6 +31,14 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
     canRedo: false,
     canUndo: false,
   },
+  setActivePipette(index: number | undefined) {
+    set((state) => {
+      return {
+        ...state,
+        activePipette: index,
+      };
+    });
+  },
   setColor(color: ColorIO, index: number) {
     set((state) => {
       const colors = state.colors;
@@ -36,6 +46,7 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
       return {
         ...state,
         colors,
+        activePipette: undefined,
       };
     });
     get().registerColorPicker();

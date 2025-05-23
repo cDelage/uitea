@@ -18,7 +18,7 @@ function InputMeasurement({
 }) {
   return (
     <div
-      className="row fake-input"
+      className="row uidt-input"
       style={{
         flex: flex ? "1" : undefined,
       }}
@@ -44,7 +44,7 @@ function InputMeasurement({
       />
       <select
         value={measurement.unit}
-        className="inherit-select select-no-arrow fake-input-select"
+        className="inherit-select select-no-arrow uidt-input-select"
         onBlur={onBlur}
         style={{
           padding: "2px",

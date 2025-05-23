@@ -19,11 +19,13 @@ import {
   useFindDesignSystem,
   useUndoRedoDesignSystem,
 } from "../../features/design-system/DesignSystemQueries";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdContrast } from "react-icons/md";
 import { usePaletteBuilderStore } from "../../features/palette-builder/PaletteBuilderStore";
 import { HeaderTools } from "../../util/HeaderTools";
 import { useColorPickerStore } from "../../features/color-picker/ColorPickerStore";
 import { useTokenCrafterStore } from "../../features/token-crafter/TokenCrafterStore";
+import Popover from "../kit/Popover";
+import ColorPickerPopover from "../../features/color-picker/ColorPickerPopover";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
@@ -130,10 +132,18 @@ function Header() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === "z" && headerTools.canUndoRedo?.canUndo) {
+      if (
+        event.ctrlKey &&
+        event.key === "z" &&
+        headerTools.canUndoRedo?.canUndo
+      ) {
         headerTools.undo?.();
       }
-      if (event.ctrlKey && event.key === "y" && headerTools.canUndoRedo?.canRedo) {
+      if (
+        event.ctrlKey &&
+        event.key === "y" &&
+        headerTools.canUndoRedo?.canRedo
+      ) {
         headerTools.redo?.();
       }
     };
@@ -178,6 +188,16 @@ function Header() {
         )}
       </div>
       <div className={styles.buttons}>
+        <Popover>
+          <Popover.Toggle id="contrast-checker" positionPayload="bottom-right">
+            <button className="action-ghost-button">
+              <MdContrast size={ICON_SIZE_SM} />
+            </button>
+          </Popover.Toggle>
+          <Popover.Body id="contrast-checker" skipDisableOutside={true} zIndex={1000}>
+            <ColorPickerPopover/>
+          </Popover.Body>
+        </Popover>
         {headerTools.canUndoRedo && (
           <div className={styles.undoRedoButtons}>
             <button
