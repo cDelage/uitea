@@ -1,6 +1,10 @@
 import { MdFormatSize } from "react-icons/md";
 import styles from "../InputPopover.module.css";
-import { DEFAULT_SHADOW, ICON_SIZE_MD } from "../../../ui/UiConstants";
+import {
+  DEFAULT_SHADOW,
+  getRectSize,
+  ICON_SIZE_MD,
+} from "../../../ui/UiConstants";
 import { Control, useFieldArray, UseFormSetValue } from "react-hook-form";
 import { Shadows } from "../../../domain/DesignSystemDomain";
 import {
@@ -13,20 +17,24 @@ import { useDesignSystemContext } from "../DesignSystemContext";
 import { PreviewStyle } from "../previews/PreviewStyle";
 import Popover from "../../../ui/kit/Popover";
 import { useRef } from "react";
+import { buildBoxShadow } from "../../../util/DesignSystemUtils";
 
 function ShadowPopover({
   index,
   control,
   setValue,
   handleSubmit,
+  shadows,
 }: {
   setValue: UseFormSetValue<{ shadows: Shadows[] }>;
   control: Control<{ shadows: Shadows[] }>;
   effect: Shadows;
   index: number;
   handleSubmit: () => void;
+  shadows: Shadows;
 }) {
-  const { editMode, designSystem, tokenFamilies } = useDesignSystemContext();
+  const { editMode, designSystem, tokenFamilies, defaultCombination } =
+    useDesignSystemContext();
   const styleRef = useRef<HTMLDivElement>(null);
   const {
     fields: items,
@@ -74,10 +82,19 @@ function ShadowPopover({
       <PreviewStyle
         $tokenFamilies={tokenFamilies}
         $designSystem={designSystem}
+        $defaultCombination={defaultCombination}
         ref={styleRef}
       >
         <div className={styles.previewContainer}>
-          <div className={styles.rectPreview} />
+          <div
+            className="default-combination row align-center justify-center radius"
+            style={{
+              ...getRectSize({ height: "60%" }),
+              boxShadow: buildBoxShadow(shadows, styleRef),
+            }}
+          >
+            shadow-{shadows.shadowName}
+          </div>
         </div>
       </PreviewStyle>
       {styleRef.current && (

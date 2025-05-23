@@ -195,7 +195,7 @@ function TintComponent({
               submitEvent();
             }}
           >
-            <Popover.Toggle id="color-picker" keyPopover={shadeToken}>
+            <Popover.Toggle id="color-picker">
               <small className="text-color-light">
                 <input
                   {...register(`tints.${index}.color`)}

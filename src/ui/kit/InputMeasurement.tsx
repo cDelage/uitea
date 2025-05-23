@@ -9,12 +9,14 @@ function InputMeasurement({
   width,
   onBlur,
   flex,
+  disableUnit
 }: {
   measurement: Measurement;
   setMeasurement?: (measurement: Measurement) => void;
   width?: string;
   onBlur?: () => void;
   flex?: boolean;
+  disableUnit?: boolean
 }) {
   return (
     <div
@@ -46,6 +48,7 @@ function InputMeasurement({
         value={measurement.unit}
         className="inherit-select select-no-arrow uidt-input-select"
         onBlur={onBlur}
+        disabled={disableUnit}
         style={{
           padding: "2px",
           borderRadius: "0px",

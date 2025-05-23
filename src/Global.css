@@ -906,6 +906,10 @@ input[type="number"]::-webkit-inner-spin-button {
   overflow: hidden;
 }
 
+.uidt-input-hover-background:hover {
+  background-color: var(--uidt-primary-outline-bg);
+}
+
 .uidt-input:hover {
   border: var(--uidt-primary-outline-light-border) 1px solid;
 }
@@ -1337,6 +1341,10 @@ td {
 .table-transparent td {
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+.rounded-none {
+  border-radius: 0px;
 }
 
 .rounded-md {

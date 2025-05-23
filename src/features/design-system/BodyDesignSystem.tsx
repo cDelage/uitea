@@ -19,7 +19,7 @@ import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
 import SpacesIcon from "../../ui/icons/SpacesIcon";
 import SpacesComponent from "./spaces/SpacesComponent";
 import RadiusComponent from "./radius/RadiusComponent";
-import ShadowsComponent from "./effects/ShadowsComponent";
+import ShadowsComponent from "./shadows/ShadowsComponent";
 import Modal from "../../ui/kit/Modal";
 import { MdBrush, MdConstruction, MdStore } from "react-icons/md";
 import ThemesComponent from "./themes/ThemesComponent";
@@ -27,6 +27,8 @@ import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorT
 import { useTokenCrafterStore } from "../token-crafter/TokenCrafterStore";
 import Popover from "../../ui/kit/Popover";
 import SpacesPresetPopover from "./spaces/SpacesPresetPopover";
+import SidePanel from "../../ui/kit/SidePanel";
+import ShadowPresetSidepanel from "./shadows/ShadowPresetSidepanel";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
@@ -48,142 +50,163 @@ function BodyDesignSystem() {
 
   return (
     <Popover>
-      {" "}
-      <Modal>
-        <div
-          className={styles.bodyDesignSystem}
-          id="body-design-system"
-          key={designSystem.metadata.designSystemId}
-          ref={scrollRef}
-        >
-          <HeaderDesignSystem />
-          <Section
-            sectionName="colors"
-            sectionTitle={
-              <>
-                <IconColors size={ICON_SIZE_XL} /> Colors
-              </>
-            }
+      <SidePanel background={true}>
+        <Modal>
+          <div
+            className={styles.bodyDesignSystem}
+            id="body-design-system"
+            key={designSystem.metadata.designSystemId}
+            ref={scrollRef}
           >
-            <Section.Subsection
-              subSectionName="Palettes"
-              actions={
+            <HeaderDesignSystem />
+            <Section
+              sectionName="colors"
+              sectionTitle={
                 <>
-                  <button
-                    className="action-ghost-button"
-                    type="button"
-                    onClick={() =>
-                      navigate(
-                        `/palette-builder?currentDesignSystem=${designSystemPath}`
-                      )
-                    }
-                  >
-                    <MdConstruction size={ICON_SIZE_MD} />
-                    Palette builder
-                  </button>
+                  <IconColors size={ICON_SIZE_XL} /> Colors
                 </>
               }
             >
-              <>
-                <Section.EmptySection
-                  sectionName="palettes"
-                  itemToInsert="palette"
-                  onInsert={initPalette}
-                  sectionLength={designSystem.palettes.length}
-                  mediumHeight={true}
-                />
-                <DraggableList keyList="palettes">
-                  {designSystem.palettes.map((colorPalette, index) => (
-                    <PaletteComponent
-                      key={colorPalette.paletteName}
-                      colorPalette={colorPalette}
-                      index={index}
-                    />
-                  ))}
-                </DraggableList>
-              </>
-            </Section.Subsection>
-            <Section.Subsection subSectionName="Themes">
-              <ThemesComponent />
-            </Section.Subsection>
-            <Section.Subsection
-              subSectionName="Semantic color tokens"
-              actions={
-                <>
-                  <button
-                    className="action-ghost-button"
-                    type="button"
-                    onClick={() => {
-                      generateRecommandations(designSystem);
-                      navigate(
-                        `/token-crafter?currentDesignSystem=${designSystemPath}`
-                      );
-                    }}
-                  >
-                    <MdBrush size={ICON_SIZE_MD} />
-                    Token crafter
-                  </button>
-                </>
-              }
-            >
-              <SemanticColorTokensComponent />
-            </Section.Subsection>
-          </Section>
-          <Section
-            sectionName="texts"
-            sectionTitle={
-              <>
-                <FontIcon size={ICON_SIZE_XL} /> Texts
-              </>
-            }
-          >
-            <Section.Subsection subSectionName="Fonts">
-              <FontsComponent />
-            </Section.Subsection>
-            <Section.Subsection subSectionName="Typography">
-              <TypographyComponent />
-            </Section.Subsection>
-          </Section>
-          <Section
-            sectionName="layout"
-            sectionTitle={
-              <>
-                <SpacesIcon size={ICON_SIZE_XL} /> Layout
-              </>
-            }
-          >
-            <Section.Subsection
-              subSectionName="Spaces"
-              actions={
-                <>
-                  <Popover.Toggle id="presets">
+              <Section.Subsection
+                subSectionName="Palettes"
+                actions={
+                  <>
                     <button
-                      type="button"
                       className="action-ghost-button"
-                      style={{
-                        zIndex: 4,
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/palette-builder?currentDesignSystem=${designSystemPath}`
+                        )
+                      }
+                    >
+                      <MdConstruction size={ICON_SIZE_MD} />
+                      Palette builder
+                    </button>
+                  </>
+                }
+              >
+                <>
+                  <Section.EmptySection
+                    sectionName="palettes"
+                    itemToInsert="palette"
+                    onInsert={initPalette}
+                    sectionLength={designSystem.palettes.length}
+                    mediumHeight={true}
+                  />
+                  <DraggableList keyList="palettes">
+                    {designSystem.palettes.map((colorPalette, index) => (
+                      <PaletteComponent
+                        key={colorPalette.paletteName}
+                        colorPalette={colorPalette}
+                        index={index}
+                      />
+                    ))}
+                  </DraggableList>
+                </>
+              </Section.Subsection>
+              <Section.Subsection subSectionName="Themes">
+                <ThemesComponent />
+              </Section.Subsection>
+              <Section.Subsection
+                subSectionName="Semantic color tokens"
+                actions={
+                  <>
+                    <button
+                      className="action-ghost-button"
+                      type="button"
+                      onClick={() => {
+                        generateRecommandations(designSystem);
+                        navigate(
+                          `/token-crafter?currentDesignSystem=${designSystemPath}`
+                        );
                       }}
                     >
-                      <MdStore size={ICON_SIZE_MD} /> Presets
+                      <MdBrush size={ICON_SIZE_MD} />
+                      Token crafter
                     </button>
-                  </Popover.Toggle>
-                  <Popover.Body id="presets" zIndex={5}>
-                    <SpacesPresetPopover />
-                  </Popover.Body>
+                  </>
+                }
+              >
+                <SemanticColorTokensComponent />
+              </Section.Subsection>
+            </Section>
+            <Section
+              sectionName="texts"
+              sectionTitle={
+                <>
+                  <FontIcon size={ICON_SIZE_XL} /> Texts
                 </>
               }
             >
-              <SpacesComponent />
-            </Section.Subsection>
-            <Section.Subsection subSectionName="Radius">
-              <RadiusComponent />
-            </Section.Subsection>
-            <Section.Subsection subSectionName="Effects">
-              <ShadowsComponent />
-            </Section.Subsection>
-          </Section>
-        </div>
-      </Modal>
+              <Section.Subsection subSectionName="Fonts">
+                <FontsComponent />
+              </Section.Subsection>
+              <Section.Subsection subSectionName="Typography">
+                <TypographyComponent />
+              </Section.Subsection>
+            </Section>
+            <Section
+              sectionName="layout"
+              sectionTitle={
+                <>
+                  <SpacesIcon size={ICON_SIZE_XL} /> Layout
+                </>
+              }
+            >
+              <Section.Subsection
+                subSectionName="Spaces"
+                actions={
+                  <>
+                    <Popover.Toggle id="presets">
+                      <button
+                        type="button"
+                        className="action-ghost-button"
+                        style={{
+                          zIndex: 4,
+                        }}
+                      >
+                        <MdStore size={ICON_SIZE_MD} /> Presets
+                      </button>
+                    </Popover.Toggle>
+                    <Popover.Body id="presets" zIndex={5}>
+                      <SpacesPresetPopover />
+                    </Popover.Body>
+                  </>
+                }
+              >
+                <SpacesComponent />
+              </Section.Subsection>
+              <Section.Subsection subSectionName="Radius">
+                <RadiusComponent />
+              </Section.Subsection>
+              <Section.Subsection
+                subSectionName="Shadows"
+                actions={
+                  <>
+                    <SidePanel.Button id="presets-shadows">
+                      <button
+                        type="button"
+                        className="action-ghost-button"
+                        style={{
+                          zIndex: 4,
+                        }}
+                      >
+                        <MdStore size={ICON_SIZE_MD} /> Presets
+                      </button>
+                    </SidePanel.Button>
+                    <SidePanel.Body id="presets-shadows" width="50%" background="#eff6ff">
+                      <ShadowPresetSidepanel/>
+                    </SidePanel.Body>
+                  </>
+                }
+              >
+                <ShadowsComponent />
+              </Section.Subsection>
+            </Section>
+          </div>
+        </Modal>
+      </SidePanel>
     </Popover>
   );
 }

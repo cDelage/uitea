@@ -193,9 +193,9 @@ function SidebarDesignSystem() {
                   visible={visible}
                 />
                 <SidebarFile
-                  filename={"Effects"}
+                  filename={"Shadows"}
                   underFolder={true}
-                  id={"effects"}
+                  id={"shadows"}
                   icon={<MdContrast size={ICON_SIZE_SM} />}
                   visible={visible}
                 />

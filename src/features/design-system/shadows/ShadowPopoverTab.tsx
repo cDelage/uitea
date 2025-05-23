@@ -85,7 +85,7 @@ function ShadowPopoverTab({
   );
 
   function handleHoverEvent() {
-    if (shadowPopoverTabMode === "drag-hover") {
+    if (draggableTools.dragIndex !== undefined) {
       draggableTools.setHoverIndex(shadowIndex);
     }
   }

@@ -149,8 +149,6 @@ function Body({
   );
 }
 
-type ClosePopoverEvent = CustomEvent<{ keyPopover: string | undefined }>;
-
 /**
  * Toggle menu
  */
@@ -158,14 +156,12 @@ function Toggle({
   children,
   id,
   positionPayload,
-  keyPopover,
   disabled,
   disableClosure,
 }: {
   children: ReactNode;
   id: string;
   positionPayload?: PositionPayload;
-  keyPopover?: string;
   disabled?: boolean;
   disableClosure?: boolean;
 }): JSX.Element {
@@ -190,16 +186,6 @@ function Toggle({
         );
         if (openPopoverId === "" || openPopoverId !== id) {
           openPopover(menuPosition, id, rect);
-          document.dispatchEvent(
-            new CustomEvent<{ keyPopover: string | undefined }>(
-              "open-popover",
-              {
-                detail: {
-                  keyPopover,
-                },
-              }
-            )
-          );
         } else if (!disableClosure) {
           closePopover(id);
         }
@@ -223,30 +209,6 @@ function Toggle({
       document.removeEventListener("refresh-scroll", handleSetPosition);
     };
   }, [toggleRef, setPosition, positionPayload, setToggleRect]);
-
-  useEffect(() => {
-    function handleClose(e: ClosePopoverEvent) {
-      if (e.detail.keyPopover && e.detail.keyPopover !== keyPopover) {
-        closePopover(id);
-      }
-    }
-
-    if (openPopoverId === id) {
-      document.addEventListener("open-popover", handleClose as EventListener);
-    } else {
-      document.removeEventListener(
-        "open-popover",
-        handleClose as EventListener
-      );
-    }
-
-    return () => {
-      document.removeEventListener(
-        "open-popover",
-        handleClose as EventListener
-      );
-    };
-  }, [closePopover, keyPopover, openPopoverId, id]);
 
   return cloneElement(
     children as ReactElement<

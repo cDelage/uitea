@@ -110,27 +110,23 @@
 .keyValueMenuContainer {
   display: flex;
   flex-direction: column;
-  max-height: 240px;
-  overflow-y: auto;
-  overflow-x: hidden;
   box-sizing: border-box;
+  padding-bottom: var(--uidt-space-3);
 }
 
 .tabEffectContainer {
   display: flex;
-  padding: var(--uidt-space-3) var(--uidt-space-3);
+  padding: var(--uidt-space-3);
   box-sizing: border-box;
   gap: var(--uidt-space-3);
   align-items: center;
   justify-content: space-between;
-  border-bottom: transparent 2px solid;
+  border-top: transparent 2px solid;
 }
 
 .rectPreview {
   width: 60%;
   height: 60%;
-  background-color: var(--uidt-palette-single-white);
-  border-radius: var(--uidt-rounded-md);
 }
 
 .colorPreviewContainer {

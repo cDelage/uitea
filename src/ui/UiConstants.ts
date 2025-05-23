@@ -2,7 +2,6 @@ import { SliderStyles } from "rc-slider/lib/interface";
 import {
   CustomTypographyScale,
   DefaultTypography,
-  EffectType,
   FontStyle,
   FontWeight,
   Palette,
@@ -175,12 +174,6 @@ export const DEFAULT_TYPOGRAPHIES: DefaultTypography[] = [
   "h6",
   "strong",
   "small",
-];
-
-export const EFFECT_TYPES: EffectType[] = [
-  "BoxShadow",
-  "BackdropFilter",
-  "Blur",
 ];
 
 export const WEB_SAFE_FONTS: string[] = [
@@ -448,5 +441,6 @@ export const DEFAULT_SHADOW : Shadow = {
   blur: 4,
   spread: 0,
   color: "#000000",
-  colorOpacity: 0.25
+  colorOpacity: 0.25,
+  inset: false,
 }

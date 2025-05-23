@@ -31,10 +31,9 @@ function ShadowsComponent() {
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const [scrollableLeft, scrollableRight] = useSynchronizedVerticalScroll();
   const topTooltipRef = useRef(null);
-  const { register, watch, control, handleSubmit, setValue,  reset } =
-    useForm({
-      defaultValues: { shadows },
-    });
+  const { register, watch, control, handleSubmit, setValue, reset } = useForm({
+    defaultValues: { shadows },
+  });
   const {
     fields: effectsFields,
     insert,
@@ -62,10 +61,10 @@ function ShadowsComponent() {
   );
   const effectsRef = useRef(null);
 
-  useSidebarComponentVisible(effectsRef, "effects");
+  useSidebarComponentVisible(effectsRef, "shadows");
   useTriggerScroll({
     ref: effectsRef,
-    triggerId: `effects`,
+    triggerId: `shadows`,
   });
   useRefreshDesignSystemFormsEvent({
     reset,
@@ -130,7 +129,7 @@ function ShadowsComponent() {
                   value={effect.shadowsArray
                     .map(
                       (item) =>
-                        `(${item.color} ${item.shadowX},${item.shadowY},${item.blur},${item.spread})`
+                        `[${item.color},${item.shadowX},${item.shadowY},${item.blur},${item.spread}]`
                     )
                     .join(",")}
                   registerKey={register(`shadows.${index}.shadowName`, {
@@ -143,17 +142,18 @@ function ShadowsComponent() {
                       index={index}
                       control={control}
                       setValue={setValue}
+                      shadows={watch(`shadows.${index}`)}
                       handleSubmit={handleSubmit(submitEffects)}
                     />
                   }
-                  tooltipValue={`effect-${effect.shadowName}`}
+                  tooltipValue={`shadow-${effect.shadowName}`}
                   portalTooltip={index === 0 ? topTooltipRef : undefined}
                 />
               ))}
               {editMode && (
                 <InputDesignSystemAddRemove
                   draggableTools={draggableTools}
-                  itemName="effect"
+                  itemName="shadow"
                   onAppend={() => handleAddEffect(effectsFields.length - 1)}
                 />
               )}

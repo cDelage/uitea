@@ -17,7 +17,7 @@ function SidePanel({
   closeCallback,
   isOpenToSync,
   setIsOpenToSync,
-  defaultOpen
+  defaultOpen,
 }: {
   children: ReactNode;
   background?: boolean;
@@ -104,7 +104,17 @@ function SidePanelButton({
   );
 }
 
-function SidePanelBody({ children, id }: { children: ReactNode; id: string }) {
+function SidePanelBody({
+  children,
+  id,
+  width,
+  background
+}: {
+  children: ReactNode;
+  id: string;
+  width?: string;
+  background?: string;
+}) {
   const { openModalId, closeModal } = useSidepanelContext();
   const refModalBody = useDivClickOutside(() => {
     if (openModalId === id) setTimeout(() => closeModal(id), 0);
@@ -119,7 +129,14 @@ function SidePanelBody({ children, id }: { children: ReactNode; id: string }) {
       nodeRef={refModalBody}
       classNames="modal"
     >
-      <div className={styles.sidePanelBody} ref={refModalBody}>
+      <div
+        className={styles.sidePanelBody}
+        ref={refModalBody}
+        style={{
+          width,
+          background
+        }}
+      >
         {children}
       </div>
     </CSSTransition>,

@@ -199,8 +199,8 @@ export type TypographySpacing =
   | "1em";
 
 export interface PresetSpaces {
-  presetName: string,
-  spaces: Space[]
+  presetName: string;
+  spaces: Space[];
 }
 
 export interface Space {
@@ -218,6 +218,10 @@ export interface RadiusItem {
   radiusValue: Measurement;
 }
 
+export type ShadowsPreset = Shadows & {
+  author?: string;
+};
+
 export interface Shadows {
   shadowName: string;
   shadowsArray: Shadow[];
@@ -230,9 +234,8 @@ export interface Shadow {
   spread: number;
   color: string;
   colorOpacity: number;
+  inset: boolean;
 }
-
-export type EffectType = "BoxShadow" | "Blur" | "BackdropFilter";
 
 export interface SemanticColorTokens {
   background?: string;

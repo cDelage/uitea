@@ -419,7 +419,7 @@ export function getShadowColor({
 }: {
   shadowColor: string;
   element?: RefObject<HTMLDivElement | null>;
-}) : string {
+}): string {
   if (shadowColor.startsWith("#")) return shadowColor;
   const color = getCssVariableValue(shadowColor, element);
   if (color) return color;
@@ -535,4 +535,39 @@ export function getTypoCssProperties(typo: TypographyScale): CSSProperties {
 
 export function measurementToCss(measurement: Measurement): string {
   return `${measurement.value}${measurement.unit.toLocaleLowerCase()}`;
+}
+
+/**
+ * Utilise colorjs.io pour convertir une couleur CSS et une opacité en chaîne compatible RGBA.
+ */
+function toRgba(color: string, opacity: number): string {
+  try{
+    const c = new ColorIO(color);
+    c.alpha = opacity;
+    return c.toString({ format: "css" });
+  } catch{
+    return "#DDDDDD"
+  }
+}
+
+/**
+ * Construit la valeur CSS pour box-shadow à partir d'un objet Shadows.
+ */
+export function buildBoxShadow(
+  shadows: Shadows,
+  styleRef?: RefObject<HTMLDivElement | null>
+): string {
+  return shadows.shadowsArray
+    .map((sh) => {
+      const hexColor = styleRef?.current ? getShadowColor({
+        shadowColor: sh.color,
+        element: styleRef,
+      }) : sh.color;
+      const { shadowX, shadowY, blur, spread, colorOpacity, inset } = sh;
+      const rgba = toRgba(hexColor, colorOpacity);
+      return `${shadowX}px ${shadowY}px ${blur}px ${spread}px ${rgba} ${
+        inset ? "inset" : ""
+      }`;
+    })
+    .join(", ");
 }

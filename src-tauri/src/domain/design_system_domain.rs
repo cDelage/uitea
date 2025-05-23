@@ -749,6 +749,7 @@ impl Shadows {
                 color_opacity: 0.25,
                 blur: 4.0,
                 spread: 0.0,
+                inset: false
             }],
         }
     }
@@ -763,13 +764,7 @@ pub struct Shadow {
     pub shadow_y: f32,
     pub blur: f32,
     pub spread: f32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum EffectType {
-    BoxShadow,
-    Blur,
-    BackdropFilter,
+    pub inset: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

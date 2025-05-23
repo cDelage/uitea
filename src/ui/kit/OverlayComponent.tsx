@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 import { CSSProperties } from "styled-components";
@@ -12,9 +13,11 @@ import { CSSProperties } from "styled-components";
 function OverlayComponent({
   children,
   zIndex,
+  refObject
 }: {
   children: ReactNode;
   zIndex?: number;
+  refObject?: RefObject<HTMLDivElement | null>
 }) {
   const emptyRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<DOMRect>();
@@ -63,7 +66,7 @@ function OverlayComponent({
   }, []);
 
   const child = children as ReactElement<{
-    ref?: React.Ref<HTMLElement>;
+    ref?: React.Ref<HTMLDivElement | null>;
     style?: CSSProperties;
   }>;
 
@@ -78,6 +81,7 @@ function OverlayComponent({
             left: pos.x,
             zIndex,
           },
+          ref: refObject
         }),
         document.body
       )

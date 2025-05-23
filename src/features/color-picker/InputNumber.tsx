@@ -10,13 +10,13 @@ function InputNumber({
   setValue,
   step,
 }: {
-  value: number;
+  value?: number;
   setValue: (value: number) => void;
   min?: number;
   max?: number;
   step?: number;
 }) {
-  const [valueInput, setValueInput] = useState(Number(value.toFixed(2)));
+  const [valueInput, setValueInput] = useState(Number(value?.toFixed(2)));
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!Number.isNaN(e.target.value)) {

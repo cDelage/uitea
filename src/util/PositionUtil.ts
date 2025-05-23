@@ -3,6 +3,7 @@ import {
   PositionPayload,
 } from "../ui/kit/PositionAbsolute.type";
 
+
 export function getRectPosition(
   position: PositionPayload,
   rect?: DOMRect,
@@ -16,7 +17,11 @@ export function getRectPosition(
       left: 0,
     };
   }
+
   switch (position) {
+    // ————————————————————————————————————————————
+    // positions classiques
+    // ————————————————————————————————————————————
     case "top-left":
       pos.left = rect.x;
       pos.top = rect.y;
@@ -37,10 +42,41 @@ export function getRectPosition(
       pos.top = rect.y + rect.height;
       pos.transform = transform;
       break;
+
+    // ————————————————————————————————————————————
+    // nouvelles positions « outer »
+    // collées sur le côté X du rect au lieu du côté Y
+    // ————————————————————————————————————————————
+    case "top-left-outer":
+      // popover à gauche du rect, aligné sur son sommet
+      pos.left = rect.x;
+      pos.top = rect.y;
+      pos.transform = transform ?? "translateX(-100%)";
+      break;
+    case "top-right-outer":
+      // popover à droite du rect, aligné sur son sommet
+      pos.right = window.innerWidth - rect.x - rect.width;
+      pos.top = rect.y;
+      pos.transform = transform ?? "translateX(100%)";
+      break;
+    case "bottom-left-outer":
+      // popover à gauche du rect, aligné sur son bas
+      pos.left = rect.x;
+      pos.top = rect.y + rect.height;
+      pos.transform = transform ?? "translateX(-100%)";
+      break;
+    case "bottom-right-outer":
+      // popover à droite du rect, aligné sur son bas
+      pos.right = window.innerWidth - rect.x - rect.width;
+      pos.top = rect.y + rect.height;
+      pos.transform = transform ?? "translateX(100%)";
+      break;
   }
 
   return pos;
 }
+
+
 export function calcPositionVisible(
   initialPosition: PositionAbsolute,
   popoverBoundingRect?: DOMRect,

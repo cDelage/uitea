@@ -71,6 +71,10 @@ export const PreviewStyle = styled.div<{
       .default-combination {
         background: var(--${props.$defaultCombination.background});
         color: var(--${props.$defaultCombination.text});
+        border: ${props.$defaultCombination.border
+            ? `var(--${props.$defaultCombination.border})`
+            : "transparent"}
+          1px solid;
       }
     `}
 
