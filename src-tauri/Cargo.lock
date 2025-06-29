@@ -73,32 +73,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "anyhow-tauri",
- "base64 0.22.1",
- "chrono",
- "env_logger",
- "fontdb 0.12.0",
- "indexmap 1.9.3",
- "log",
- "pickledb",
- "regex",
- "reqwest",
- "resvg",
- "serde",
- "serde_json",
- "serde_with",
- "serde_yaml",
- "tauri",
- "tauri-build",
- "usvg-text-layout",
- "uuid",
-]
-
-[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4117,6 +4091,32 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
+
+[[package]]
+name = "uitea"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "anyhow-tauri",
+ "base64 0.22.1",
+ "chrono",
+ "env_logger",
+ "fontdb 0.12.0",
+ "indexmap 1.9.3",
+ "log",
+ "pickledb",
+ "regex",
+ "reqwest",
+ "resvg",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "serde_yaml",
+ "tauri",
+ "tauri-build",
+ "usvg-text-layout",
+ "uuid",
+]
 
 [[package]]
 name = "unicode-bidi"

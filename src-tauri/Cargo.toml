@@ -1,11 +1,11 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+name = "uitea"
+version = "1.0.0"
+description = "Design system builder"
+authors = ["cDelage"]
+license = "MIT"
+repository = "https://github.com/cDelage/uitea/tree/main"
+default-run = "uitea"
 edition = "2021"
 rust-version = "1.60"
 
