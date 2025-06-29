@@ -1,0 +1,113 @@
+.modal {
+  width: 90vw;
+  max-width: 90vw;
+  height: 90vh;
+  max-height: 90vh;
+}
+
+.modalHeader {
+  display: flex;
+  padding: var(--uidt-space-3) var(--uidt-space-6);
+  gap: var(--uidt-space-2);
+  border-bottom: var(--uidt-base-border) 1px solid;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.colorPickerComponent {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--uidt-base-background);
+  height: 100%;
+  position: relative;
+}
+
+.colorPicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.colorPickerBody {
+  background-color: var(--uidt-component-bg);
+  padding: var(--uidt-space-6);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+  transform: translateY(-10%);
+}
+
+.rightSidepanelSpace {
+  padding-right: 33.3%;
+}
+
+.actionsContainer {
+  position: absolute;
+  top: var(--uidt-space-3);
+  right: var(--uidt-space-3);
+}
+
+.leftActionsContainer {
+  position: absolute;
+  top: var(--uidt-space-3);
+  left: var(--uidt-space-3);
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-0) var(--uidt-space-8) var(--uidt-space-0);
+  overflow-y: auto;
+  position: relative;
+}
+
+.sidePanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.6), 30%, #ffffff);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uidt-space-4) var(--uidt-space-4);
+  justify-content: space-between;
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-4);
+}
+
+.sidePanelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-4);
+}
+
+.colorSampling {
+  padding: var(--uidt-space-4);
+  background-color: var(--uidt-component-bg);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-4);
+}
+
+.colorsPreview {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: var(--uidt-space-16);
+  overflow-y: auto;
+}

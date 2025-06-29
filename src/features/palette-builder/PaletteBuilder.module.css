@@ -1,0 +1,202 @@
+.paletteBuilder {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--uidt-base-background);
+  height: 100%;
+}
+
+.modalPaletteBuilder {
+  width: 90vw;
+  max-width: 90vw;
+  height: 90vh;
+  max-height: 90vh;
+}
+
+.header {
+  display: flex;
+  padding: var(--uidt-space-3) var(--uidt-space-6);
+  gap: var(--uidt-space-2);
+  border-bottom: var(--uidt-base-border) 1px solid;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.builderBodyContainer {
+  padding: var(--uidt-space-5) var(--uidt-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-6);
+  position: relative;
+  overflow: hidden;
+  max-height: 100%;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.tablePaletteBuilder {
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.tableHeader {
+  height: 40px;
+}
+
+.paletteRow {
+  height: 60px;
+  padding: var(--uidt-space-2);
+  overflow: hidden;
+}
+
+.columnPalette {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 140px;
+  max-width: 140px;
+  width: 140px;
+  padding: var(--uidt-space-3);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.columnPalette[data-open="true"] {
+  background-color: var(--uidt-palette-gray-50);
+  color: var(--uidt-add-text);
+  text-decoration: underline;
+}
+
+.columnPaletteHeader {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 140px;
+  max-width: 140px;
+  width: 140px;
+  padding: var(--uidt-space-3);
+  text-align: left;
+  box-sizing: border-box;
+  background-color: var(--uidt-base-background);
+}
+
+.columnTint {
+  font-weight: var(--uidt-font-weight-default);
+  min-width: 30px !important;
+  padding: var(--uidt-space-0) !important;
+  margin: var(--uidt-space-0) !important;
+  position: relative;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-0) var(--uidt-space-8) var(--uidt-space-0);
+  overflow-y: auto;
+  position: relative;
+}
+
+.sidePanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.6), 30%, #ffffff);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uidt-space-4) var(--uidt-space-4);
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-4);
+}
+
+.sidePanelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-4);
+}
+
+.recommandedHueButton {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-3);
+  padding: var(--uidt-space-3);
+  box-sizing: border-box;
+  color: var(--uidt-base-text-light);
+  border-radius: var(--uidt-rounded-md);
+  cursor: pointer;
+}
+
+.recommandedHueButton:hover {
+  background-color: var(--uidt-component-hover-bg);
+  color: var(--uidt-component-hover-text);
+}
+
+.rightSidepanelSpace {
+  padding-right: 500px;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-6);
+  align-items: center;
+}
+
+.percentContainer {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+}
+
+.complementaryColorsRow {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--uidt-space-3);
+}
+
+.dragActionContainer {
+  display: none;
+}
+
+.columnPalette:hover .dragActionContainer {
+  display: flex;
+}
+
+.columnPalette[data-dragged="true"] {
+  background-color: var(--uidt-add-bg);
+  color: var(--uidt-add-text);
+}
+
+.columnPalette[data-dragged="true"][data-remove="true"] {
+  background-color: var(--uidt-remove-bg);
+  color: var(--uidt-remove-text);
+}
+
+.anchorPreviewContainer {
+  display: flex;
+  justify-content: end;
+}
+
+.anchorPlaceholder {
+  height: 16px;
+}
+
+.valueRealign {
+  padding-bottom: 3px;
+}

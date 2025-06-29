@@ -1,0 +1,20 @@
+.anchorContainer {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.iconFill {
+  /* couleur du “centre” */
+  position: relative;
+  z-index: 2;
+  transform: scale(70%);
+  fill: var(--uidt-anchor-bg);
+}
+
+.iconBorder {
+  /* pseudo‑bordure colorée */
+  position: absolute;
+  inset: 0; /* colle exactement dessus */
+  z-index: 1;
+}

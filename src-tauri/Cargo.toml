@@ -1,11 +1,11 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+name = "uitea"
+version = "1.0.0"
+description = "Design system builder"
+authors = ["cDelage"]
+license = "MIT"
+repository = "https://github.com/cDelage/uitea/tree/main"
+default-run = "uitea"
 edition = "2021"
 rust-version = "1.60"
 
@@ -17,7 +17,14 @@ tauri-build = { version = "1.5.6", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.8.2", features = [ "dialog-all", "fs-all", "window-all"] }
+tauri = { version = "1.8.2", features = [
+    "path-all",
+    "shell-open",
+    "protocol-asset",
+    "dialog-all",
+    "fs-all",
+    "window-all"
+] }
 pickledb = "0.5.1"
 anyhow-tauri = "1.0.0"
 anyhow = "1.0.95"
@@ -25,9 +32,26 @@ serde_yaml = "0.9.21"
 uuid = "1.11.0"
 log = "0.4.25"
 env_logger = "0.10.2"
+indexmap = { version = "1.9.3", features = ["serde"] }
+base64 = "0.22.1"
+serde_with = "3.0.0"
+# --- rendu SVG → PNG ---
+resvg = { version = "0.45.1", features = [
+    # gardez les trois pour que le texte SVG fonctionne partout
+    "text",          # mise en page + rasterisation du texte
+    "system-fonts",  # chargement automatique des fontes installées
+    "memmap-fonts",  # ↳ accès direct aux fichiers de polices
+    "raster-images", # <image> embarquées ou externes si besoin
+] }
+usvg-text-layout = "0.38" # pose juste 50 ko et ré-exporte fontdb
+fontdb = "0.12" # utile pour charger d’autres dossiers de polices
+reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
+regex = "1"
+chrono = "0.4.31"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
 # If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.
 # DO NOT REMOVE!!
-custom-protocol = [ "tauri/custom-protocol" ]
+custom-protocol = ["tauri/custom-protocol"]

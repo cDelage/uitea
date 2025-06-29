@@ -4,8 +4,8 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: var(--color-theme-modal-bg);
-  z-index: 1000;
+  background-color: var(--uidt-modal-bg);
+  z-index: 30;
   transition: all 0.5s;
 }
 
@@ -14,22 +14,30 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: var(--color-theme-component-bg);
+  background-color: var(--uidt-component-bg);
   border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  padding: 16px;
+  box-shadow: var(--uidt-shadow-md);
   transition: all 0.5s;
   max-height: 100%;
   overflow: hidden;
 }
 
 .modalBodyMd {
-  height: var(--space-18);
   width: 500px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  padding: var(--space-4);
-  gap: var(--space-8);
+  padding: var(--uidt-space-5);
+  gap: var(--uidt-space-8);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.modalBodyCustom {
+  width: 500px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -37,5 +45,14 @@
   display: flex;
   justify-content: end;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--uidt-space-4);
+  padding: var(--uidt-space-5);
+}
+
+.modalCustomHeader {
+  display: flex;
+  padding: var(--uidt-space-3);
+  gap: var(--uidt-space-2);
+  border-bottom: var(--uidt-base-border) 1px solid;
+  align-items: center;
 }

@@ -1,13 +1,13 @@
 .recentFileTab{
-    background-color: var(--color-theme-component-bg);
-    padding: var(--space-5);
+    background-color: var(--uidt-component-bg);
+    padding: var(--uidt-space-5);
     display: flex;
     justify-content: space-between;
     cursor: pointer;
 }
 
 .recentFileTab:hover{
-    background-color: var(--color-theme-component-hover-bg);
-    color: var(--color-theme-component-hover-text);
+    background-color: var(--uidt-component-hover-bg);
+    color: var(--uidt-component-hover-text);
 
 }

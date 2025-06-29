@@ -4,8 +4,8 @@ export const TextArea = styled.textarea`
   border: none;
   resize: none;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-solid);
-  padding: var(--space-4);
+  box-shadow: var(--uidt-shadow-solid);
+  padding: var(--uidt-space-4);
   font-family: inherit;
   box-sizing: border-box;
   background-color: var(--bg-default);

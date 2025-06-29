@@ -5,4 +5,43 @@
   gap: 32px;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
 }
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-0) var(--uidt-space-8) var(--uidt-space-0);
+  overflow-y: auto;
+  position: relative;
+}
+
+.sidePanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.6), 30%, #ffffff);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uidt-space-4) var(--uidt-space-4);
+  justify-content: space-between;
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-4);
+}
+
+.sidePanelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-4);
+}
+

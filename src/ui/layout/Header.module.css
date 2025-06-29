@@ -1,16 +1,30 @@
 .header{
   display: flex;
-  justify-content: space-between;
-  height: var(--space-7);
+  height: var(--uidt-space-7);
   user-select: none;
-  padding: var(--space-0);
-  margin: var(--space-0);
-  align-items: baseline;
+  padding: var(--uidt-space-0);
+  margin: var(--uidt-space-0);
+  align-items: center;
   -webkit-app-region: drag;
 }
 
-.buttons {
+.buttons{
+  display: flex;
+  justify-content: end;
+  gap: var(--uidt-space-6);
+  align-items: center;
+}
+
+.windowButtons {
   display: flex;
   -webkit-app-region: no-drag;
 }
 
+.undoRedoButtons {
+  display: flex;
+  gap: var(--uidt-space-3)
+}
+
+.undoRedoButton {
+  -webkit-app-region: no-drag;
+}

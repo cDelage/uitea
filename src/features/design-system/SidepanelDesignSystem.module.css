@@ -1,0 +1,110 @@
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+  background-color: var(--base-background);
+  height: 100%;
+}
+
+.sidePanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.6),
+    30%,
+    rgba(255, 255, 255, 0.8)
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uidt-space-6);
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.sidePanelFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-6);
+  position: sticky;
+  bottom: 0px;
+  z-index: 100;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.6),
+    30%,
+    rgba(255, 255, 255, 0.8)
+  );
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uidt-space-6);
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-8);
+  padding: var(--uidt-space-0) var(--uidt-space-6) var(--uidt-space-6)
+    var(--uidt-space-6);
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.previewGridElement{
+  display: flex;
+  position: relative;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+
+.previewGridElement > .actionHover {
+  display: none;
+}
+
+.previewGridElement:hover > .actionHover {
+  display: inherit;
+}
+
+.rightActions {
+  position: absolute;
+  top: var(--uidt-space-2);
+  right: var(--uidt-space-2);
+  color:#3f3f46;
+}
+
+.previewElement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: white;
+  width: 65%;
+  height: 65%;
+}
+
+
+.previewElement > .actionHover {
+  display: none;
+}
+
+.previewElement:hover > .actionHover {
+  display: inherit;
+  color: #71717a
+}

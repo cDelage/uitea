@@ -1,0 +1,33 @@
+.sidebarSection {
+  display: flex;
+  padding: var(--uidt-space-3) var(--uidt-space-5);
+  gap: var(--uidt-space-3);
+  box-sizing: border-box;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.sidebarSection:hover {
+  background-color: var(--uidt-base-button-hover-bg);
+}
+
+.sidebarSection[data-visible="true"]:hover {
+  background: var(--uidt-base-button-active-bg);
+}
+
+.sidebarSectionVisible {
+  background: var(--uidt-base-button-active-bg);
+}
+
+
+.fileUnderFolder {
+  padding-left: var(--uidt-space-8);
+}
+
+.iconChevronContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-1);
+  transition: transform 300ms linear;
+}

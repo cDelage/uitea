@@ -1,0 +1,13 @@
+.presetBanner {
+  position: relative;
+  min-height: 120px;
+  height: 120px;
+  max-height: 120px;
+  width: 100%;
+}
+
+.logoContainer {
+  position: relative;
+  height: 100px;
+  width: 100px;
+}

@@ -1,0 +1,55 @@
+.tokenSelector {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+}
+
+.family {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--uidt-space-4);
+  position: relative;
+}
+
+.family[data-active="true"] {
+  background-color: var(--uidt-component-hover-bg);
+}
+
+.tokens {
+  display: flex;
+  flex-direction: column;
+}
+
+.token {
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-3);
+  padding: var(--uidt-space-4);
+  cursor: pointer;
+}
+
+.token:hover {
+  background-color: var(--uidt-component-hover-bg);
+}
+
+
+.labelColor {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--uidt-space-4) var(--uidt-space-3);
+  background-color: var(--uidt-tertiary-bg);
+  color: var(--uidt-tertiary-text);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+}
+
+.labelColor .removeColor {
+  display: none;
+}
+
+.labelColor:hover .removeColor {
+  display: flex;
+  cursor: pointer;
+}

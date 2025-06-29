@@ -1,0 +1,37 @@
+.headerDesignSystem {
+  height: 280px;
+  min-height: 280px;
+  max-height: 280px;
+  background-color: var(--uidt-palette-primary-300);
+  box-shadow: var(--uidt-shadow-inset);
+  position: relative;
+}
+
+.shadowTitleContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    359deg,
+    #171717 10%,
+    rgba(23, 23, 23, 0) 80%
+  );
+  display: flex;
+  height: 100%;
+  align-items: end;
+  padding: var(--uidt-space-8);
+  box-sizing: border-box;
+}
+
+.logoContainer{
+  position: absolute;
+  top: 20%;
+  bottom:20%;
+  right: var(--uidt-space-8);
+}
+
+.titleDesignSystem {
+  color: white;
+}

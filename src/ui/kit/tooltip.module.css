@@ -1,0 +1,121 @@
+.tooltipElement {
+  position: relative;
+}
+
+.tooltipElement .tooltipBody {
+  display: none;
+}
+
+.tooltipElement:hover .tooltipBody {
+  display: flex;
+}
+
+.tooltipElement .tooltipBodyRight {
+  display: none;
+}
+
+.tooltipElement:hover .tooltipBodyRight {
+  display: flex;
+}
+
+.tooltipElement .tooltipBodyBottom {
+  display: none;
+}
+
+.tooltipElement:hover .tooltipBodyBottom {
+  display: flex;
+}
+
+.tooltipBody {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  background-color: var(--uidt-tooltip-bg);
+  color: var(--uidt-tooltip-text);
+  border: none;
+  padding: var(--uidt-space-2);
+  box-sizing: border-box;
+  border-radius: var(--uidt-rounded-md);
+  z-index: 3;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+  display: flex;
+  gap: var(--uidt-space-2);
+}
+
+/* La flèche en tant qu'élément enfant */
+.tooltipArrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--uidt-tooltip-bg);
+}
+
+.valueTextContainer {
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.tooltipBodyRight {
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  transform: translate(-100%, -50%);
+  background-color: var(--uidt-tooltip-bg);
+  color: var(--uidt-tooltip-text);
+  border: none;
+  padding: var(--uidt-space-2);
+  box-sizing: border-box;
+  border-radius: var(--uidt-rounded-md);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--uidt-space-2);
+  width: fit-content;
+}
+
+.tooltipArrowRight {
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--uidt-tooltip-bg);
+}
+
+.tooltipBodyBottom {
+  position: absolute;
+  top: calc(100% + 8px); /* Espace entre l'élément et la tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--uidt-tooltip-bg);
+  color: var(--uidt-tooltip-text);
+  border: none;
+  padding: var(--uidt-space-2);
+  box-sizing: border-box;
+  border-radius: var(--uidt-rounded-md);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--uidt-space-2);
+  width: fit-content;
+}
+
+.tooltipArrowBottom {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--uidt-tooltip-bg);
+}

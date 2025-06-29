@@ -2,21 +2,27 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { RecentFile, RemoveRecentFilesPayload } from "../../domain/HomeDomain";
-import { DesignSystemMetadata } from "../../domain/DesignSystemDomain";
+import {
+  PresetDressing,
+  RecentFilesMetadata,
+  RemoveRecentFilesPayload,
+  UserSettings,
+} from "../../domain/HomeDomain";
+import { DesignSystemMetadataHome } from "../../domain/DesignSystemDomain";
+import { PaletteBuilderMetadata } from "../../domain/PaletteBuilderDomain";
 
 /**
  * Hook pour récupérer tous les fichiers récents
  */
 export function useFindAllRecentFiles() {
   const { removeFile } = useRemoveRecentFile();
-  const isClient = typeof window !== "undefined";
 
   const { data: recentFiles, isLoading: isLoadingRecentFiles } = useQuery({
-    queryKey: ["recentFiles"],
+    queryKey: ["recent-files"],
     queryFn: async () => {
-      const files = await invoke<RecentFile[]>("find_all_recent_files");
-      console.log(files);
+      const files = await invoke<RecentFilesMetadata[]>(
+        "find_all_recent_files"
+      );
 
       files
         .filter((recentFile) => "Unknown" in recentFile)
@@ -31,35 +37,50 @@ export function useFindAllRecentFiles() {
         });
 
       return files
-        .filter((recentFile) => "DesignSystem" in recentFile)
-        .map(
-          (designSystem) => designSystem.DesignSystem
-        ) as DesignSystemMetadata[];
+        .filter((recentFile) => !("Unknown" in recentFile))
+        .map((recentFile) => {
+          if ("DesignSystem" in recentFile) return recentFile.DesignSystem;
+          if ("PaletteBuilder" in recentFile) return recentFile.PaletteBuilder;
+        }) as (DesignSystemMetadataHome | PaletteBuilderMetadata)[];
     },
-    enabled: isClient,
   });
 
-  return { recentFiles, isLoadingRecentFiles };
+  return {
+    recentFiles: recentFiles as (
+      | DesignSystemMetadataHome
+      | PaletteBuilderMetadata
+    )[],
+    isLoadingRecentFiles,
+  };
 }
 
 /**
  * Hook pour ajouter un fichier récent
  */
-export function useInsertRecentFile() {
+export function useInsertRecentFile(
+  category: "DesignSystemCategory" | "PaletteBuilderCategory"
+) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { mutate: insertRecentFile, isPending: isInsertingFile } = useMutation<
     string,
     Error,
-    string
+    {
+      filePath: string;
+      editMode: boolean;
+      category: "DesignSystemCategory" | "PaletteBuilderCategory";
+    }
   >({
-    mutationFn: async (filePath: string) =>
-      await invoke("insert_recent_file", { filePath }),
+    mutationFn: async (recentFile) =>
+      await invoke("insert_recent_file", {
+        recentFile,
+      }),
     onSuccess: (res) => {
-      // Mettre à jour le cache après une insertion réussie
-      queryClient.invalidateQueries({ queryKey: ["recentFiles"] });
-      console.log(res);
-      navigate(`/design-system/${encodeURIComponent(res)}`);
+      if (category === "DesignSystemCategory") {
+        // Mettre à jour le cache après une insertion réussie
+        queryClient.invalidateQueries({ queryKey: ["recent-files"] });
+        navigate(`/design-system/${encodeURIComponent(res)}?editMode=true`);
+      }
     },
     onError: (err) => {
       toast.error(err);
@@ -84,13 +105,62 @@ export function useRemoveRecentFile() {
       await invoke("remove_recent_file", { removePayload }),
     onSuccess: (path) => {
       // Mettre à jour le cache après une suppression réussie
-      queryClient.invalidateQueries({ queryKey: ["recentFiles"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-files"] });
       toast.success(`Succeed to remove ${path} from recent file`);
     },
     onError: (err) => {
+      console.error(err);
       toast.error(err);
     },
   });
 
   return { removeFile, isRemovingFile };
+}
+
+export function usePresetDressing() {
+  const { data: presetDressing, isLoading: isLoadingPresetDressing } =
+    useQuery<PresetDressing>({
+      queryKey: ["preset-dressing"],
+      queryFn: async () => await invoke("fetch_presets_dressing"),
+    });
+
+  return { presetDressing, isLoadingPresetDressing };
+}
+
+export function useUserSettings() {
+  const { data: userSettings, isLoading: isLoadingUserSettings } =
+    useQuery<UserSettings>({
+      queryKey: ["user-settings"],
+      queryFn: async () => await invoke("fetch_user_settings"),
+    });
+
+  return {
+    userSettings,
+    isLoadingUserSettings,
+  };
+}
+
+export function useUpdateUserSettings() {
+  const queryClient = useQueryClient();
+
+  const { mutate: updateUserSettings, isPending: isUpdatingUserSettings } =
+    useMutation({
+      mutationFn: async (userSettings: UserSettings) =>
+        await invoke("update_user_settings", {
+          userSettings,
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["user-settings"],
+        });
+      },
+      onError: (err) => {
+        toast.error(err);
+      },
+    });
+
+  return {
+    updateUserSettings,
+    isUpdatingUserSettings,
+  };
 }

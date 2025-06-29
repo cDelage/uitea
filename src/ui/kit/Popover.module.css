@@ -1,0 +1,80 @@
+.tab {
+  padding: var(--uidt-space-3) var(--uidt-space-5);
+  color: var(--uidt-component-text);
+  display: flex;
+  align-items: center;
+  gap: var(--uidt-space-3);
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.tab:hover {
+  background-color: var(--uidt-component-hover-bg);
+  color: var(--uidt-component-hover-text);
+}
+
+.tabAlert {
+  background-color: var(--uidt-alert-bg);
+  color: var(--uidt-alert-text);
+}
+
+.tabPrimary {
+  background-color: var(--uidt-primary-bg);
+  color: var(--uidt-primary-text);
+}
+
+.tabDisabled {
+  background-color: var(--uidt-base-background-disabled);
+  color: var(--uidt-base-text-disabled);
+  cursor: not-allowed;
+}
+
+.tabDisabled:hover {
+  background-color: var(--uidt-base-background-disabled);
+  color: var(--uidt-base-text-disabled);
+}
+
+.tabAlert:hover {
+  background-color: var(--uidt-alert-hover-bg);
+  color: var(--uidt-alert-hover-text);
+}
+
+.tabPrimary:hover {
+  background-color: var(--uidt-primary-hover-bg);
+  color: var(--uidt-primary-hover-text);
+}
+
+.tabSelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--uidt-space-4);
+  position: relative;
+  width: 200px;
+}
+
+.tabSelector[data-active="true"] {
+  background-color: var(--uidt-component-hover-bg);
+}
+
+.bodyDefault {
+  background-color: var(--uidt-component-bg);
+  border-radius: var(--uidt-rounded-md);
+  border: 1px solid var(--uidt-component-border);
+  box-shadow: var(--uidt-shadow-md);
+  position: absolute;
+}
+
+.popoverSelectorChildren {
+  background-color: var(--uidt-component-bg);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+  overflow: hidden;
+  width: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

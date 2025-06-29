@@ -1,0 +1,59 @@
+.shade {
+  padding: var(--uidt-space-2) var(--uidt-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uidt-space-3);
+  box-sizing: border-box;
+  border-radius: var(--uidt-rounded-md);
+  height: 110px;
+  min-height: 110px;
+  max-height: 110px;
+  border: solid 2px transparent;
+}
+
+.shadeAdd {
+  border: dashed 2px var(--uidt-add-border);
+  box-sizing: border-box;
+  color: var(--uidt-add-text);
+  cursor: pointer;
+}
+
+.shadeRemove {
+  border: dashed 2px var(--uidt-remove-border);
+  color: var(--uidt-remove-text);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.shadeRemove:hover {
+  opacity: 1;
+}
+
+.shadeAdd:hover {
+  border: dashed 2px var(--uidt-add-hover-border);
+  color: var(--uidt-add-hover-text);
+}
+
+.elevateColor {
+  transform: translateY(-2px);
+}
+
+.colorPreview {
+  width: 100%;
+  height: var(--uidt-space-10);
+  min-height: var(--uidt-space-10);
+  border-radius: var(--uidt-rounded-md);
+  box-shadow: var(--uidt-shadow-md);
+  transition: var(--uidt-transition-base);
+}
+
+.draggable {
+  background-color: var(--uidt-drag-bg);
+  cursor: pointer;
+}
+
+.dragHover {
+  border-left: var(--uidt-add-border) 2px solid;
+  border-radius: 0px;
+  cursor: pointer;
+}

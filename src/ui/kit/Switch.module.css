@@ -1,0 +1,41 @@
+/* ToggleSwitch.module.css */
+.toggleSwitch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.switch {
+  width: 32px;
+  height: 16px;
+  background: var(--uidt-palette-primary-200);
+  border-radius: 10px;
+  position: relative;
+  transition: background 0.3s;
+  box-shadow: var(--uidt-shadow-md);
+}
+
+.switch::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: -2px;
+  transform: translateY(-50%);
+  transition: left 0.3s;
+}
+
+.input {
+  display: none;
+}
+
+.input:checked + .switch {
+  background: var(--uidt-palette-primary-800);
+}
+
+.input:checked + .switch::before {
+  left: 16px;
+}

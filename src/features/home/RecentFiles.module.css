@@ -1,9 +1,9 @@
 .recentFileArray {
-  background-color: var(--color-single-white);
+  background-color: var(--uidt-palette-single-white);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--uidt-shadow-md);
   overflow: hidden;
 }

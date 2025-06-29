@@ -1,0 +1,13 @@
+.placeholderContainer {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--uidt-space-0) var(--uidt-space-7) var(--uidt-space-0) var(--uidt-space-8);
+    box-sizing: border-box;
+    height: 120px;
+    gap: var(--uidt-space-4)
+
+}
