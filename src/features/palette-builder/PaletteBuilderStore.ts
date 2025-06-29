@@ -31,7 +31,7 @@ interface PaletteBuilderStore {
   settings: PalettesStoreSettings;
   alignerSettings: AlignerSettings;
   canUndoRedo: CanUndoRedo;
-  createPalette: (tint?: ColorIO) => void;
+  createPalette: (tint?: ColorIO) => PaletteBuild;
   createPaletteFromExisting: (
     palette: PaletteBuild,
     color: ColorRecommanded
@@ -105,21 +105,21 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>(
         }
       );
       const tints: TintBuild[] = constructTints(tintPrebuild, settings);
+      const palette: PaletteBuild = {
+        id: v4(),
+        name: getHueName(paletteTint),
+        tints,
+        settings: settings.paletteSettings,
+      };
+
       set((state) => {
         return {
           ...state,
-          palettes: [
-            ...state.palettes,
-            {
-              id: v4(),
-              name: getHueName(paletteTint),
-              tints,
-              settings: settings.paletteSettings,
-            },
-          ],
+          palettes: [...state.palettes, palette],
         };
       });
       doPaletteBuilder();
+      return palette;
     },
     createPaletteFromExisting(
       palette: PaletteBuild,
@@ -447,10 +447,10 @@ export function getEndsTints({
       (mode) => mode.space === interpolationColorSpace
     );
     const satChromaAxe: PickerAxe | undefined = picker?.axes.find(
-      (axe) => axe.axe === "s" || axe.axe === "c"
+      (axe) => axe.name === "s" || axe.name === "c"
     );
     const hueAxe: PickerAxe | undefined = picker?.axes.find(
-      (axe) => axe.axe === "h"
+      (axe) => axe.name === "h"
     );
 
     if (settings.satChromaGapLeft !== 0.5 && satChromaAxe) {
@@ -462,7 +462,7 @@ export function getEndsTints({
       });
       const newSatChroma = linearPieceInterpolation(colorPoints);
       startColor.set(
-        `${interpolationColorSpace}.${satChromaAxe.axe}`,
+        `${interpolationColorSpace}.${satChromaAxe.name}`,
         newSatChroma
       );
     }
@@ -476,7 +476,7 @@ export function getEndsTints({
       });
       const newSatChroma = linearPieceInterpolation(colorPoints);
       endColor.set(
-        `${interpolationColorSpace}.${satChromaAxe.axe}`,
+        `${interpolationColorSpace}.${satChromaAxe.name}`,
         newSatChroma
       );
     }
@@ -494,7 +494,7 @@ export function getEndsTints({
         positionX: settings.hueGapLeft,
       });
       const newHue = linearPieceInterpolation(colorPoints);
-      startColor.set(`${interpolationColorSpace}.${hueAxe.axe}`, newHue);
+      startColor.set(`${interpolationColorSpace}.${hueAxe.name}`, newHue);
     }
 
     if (settings.hueGapRight !== 0.5 && hueAxe) {
@@ -510,7 +510,7 @@ export function getEndsTints({
         positionX: settings.hueGapRight,
       });
       const newHue = linearPieceInterpolation(colorPoints);
-      endColor.set(`${interpolationColorSpace}.${hueAxe.axe}`, newHue);
+      endColor.set(`${interpolationColorSpace}.${hueAxe.name}`, newHue);
     }
   }
   return [startColor, endColor];
@@ -539,7 +539,7 @@ function getColorAxeToPoints({
     },
     center: {
       x: 0.5,
-      y: centerColor.get(`${interpolationColorSpace}.${axe.axe}`),
+      y: centerColor.get(`${interpolationColorSpace}.${axe.name}`),
     },
     max: {
       x: 1,

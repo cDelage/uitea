@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import classNames from "classnames";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
 
@@ -109,23 +108,14 @@ function RadiusComponent() {
     handleSubmit(submitRadius)();
   }
 
-  const formClassNames = classNames(
-    styles.componentDesignSystem,
-    styles.mediumHeight
-  );
-  const sideSettingsClass = classNames(
-    styles.sideSettings,
-    styles.scrollableSettings
-  );
-
   return (
     <Popover>
       <form
-        className={formClassNames}
+        className={styles.componentDesignSystem}
         onSubmit={handleSubmit(submitRadius)}
         ref={radiusRef}
       >
-        <div className={sideSettingsClass} ref={scrollableLeft}>
+        <div className={styles.sideSettings} ref={scrollableLeft}>
           <div className={styles.sideSettingsTitle}>
             <h5>Default radius</h5>
           </div>
@@ -182,7 +172,7 @@ function RadiusComponent() {
           )}
         </div>
 
-        <PreviewComponentDesignSystem maxHeight="400px">
+        <PreviewComponentDesignSystem>
           <div className={styles.previewElementWrap} ref={scrollableRight}>
             <RadiusPreview label="default" radiusValue={watch("default")} />
             {additionalsRadiusArray.map((field, index) => (

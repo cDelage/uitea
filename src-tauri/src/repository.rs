@@ -13,13 +13,22 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 
+use crate::domain::fonts_domain::FONTS_EXTENSIONS;
 use crate::domain::image_domain::ImageLocal;
+use crate::domain::{FileInfos, FileMetadata};
+use chrono::{DateTime, Local};
+use base64::engine::general_purpose::STANDARD as B64;
+use resvg::{
+    tiny_skia::{Pixmap, Transform},
+    usvg::{Options, Tree},
+};
 
+pub mod color_picker_repository;
 pub mod design_system_repository;
+pub mod fonts_repository;
 pub mod home_repository;
 pub mod palette_builder_repository;
 pub mod undo_repository;
-pub mod color_picker_repository;
 
 const DESIGN_SYSTEM_METADATA_PATH: &str = "design_system_metadata.yaml";
 const TMP_PATH: &str = "tmp";
@@ -147,7 +156,7 @@ where
     Ok(data)
 }
 
-fn fetch_image_folder(path: &str) -> Result<Vec<String>> {
+fn fetch_image_folder(path: &PathBuf) -> Result<Vec<String>> {
     let mut images = Vec::new();
     let entries = std::fs::read_dir(path)?;
     for entry in entries {
@@ -238,16 +247,163 @@ pub fn assert_file_in_directory(filepath: &String, folder: &PathBuf) -> Result<S
     Ok(filepath.to_string())
 }
 
-pub fn open_folder<P: AsRef<Path>>(path: P) -> std::io::Result<()> {
+pub fn open_folder<P: AsRef<Path>>(path: P) -> Result<()> {
     #[cfg(target_os = "windows")]
-    { Command::new("explorer").arg(path.as_ref()).spawn()?; }
+    {
+        Command::new("explorer").arg(path.as_ref()).spawn()?;
+    }
 
     #[cfg(target_os = "macos")]
-    { Command::new("open").arg(path.as_ref()).spawn()?; }
+    {
+        Command::new("open").arg(path.as_ref()).spawn()?;
+    }
 
     // Sur la plupart des desktops Linux / *BSD
     #[cfg(all(unix, not(target_os = "macos")))]
-    { Command::new("xdg-open").arg(path.as_ref()).spawn()?; }
+    {
+        Command::new("xdg-open").arg(path.as_ref()).spawn()?;
+    }
 
     Ok(())
+}
+
+/// Convertit un SVG (chaîne UTF‑8) en un PNG encodé en Base64 (data‑URI)
+///
+/// * `svg` : code source SVG complet
+/// * `dpi` : résolution cible pour le rendu (96 dpi par défaut)
+///
+/// Retourne une chaîne « data:image/png;base64,… » prête à être insérée dans du HTML/CSS.
+pub fn svg_to_png_b64(svg: &str, dpi: f32, fonts_repository: Option<PathBuf>) -> Result<String> {
+    /*─── 1. Préparation des options + bases de polices ────────────────*/
+    let mut opt = Options::default();
+    opt.dpi = dpi;
+
+    // Chargement des polices système par défaut
+    opt.fontdb_mut().load_system_fonts();
+    opt.font_family = String::from("Arial");
+
+    // Si un dépôt de polices personnalisées est fourni et existe, on charge ces polices
+    if let Some(ref repo_path) = fonts_repository {
+        println!("try to read repo fonts {:?}", repo_path);
+        if repo_path.is_dir() {
+            // On récupère les informations de fichiers dans le répertoire, en filtrant par extensions autorisées
+            let font_files = list_file_info_in_dir(repo_path, Some(FONTS_EXTENSIONS))
+                .with_context(|| {
+                    format!(
+                        "Échec lors de la lecture du répertoire de polices personnalisées : {:?}",
+                        repo_path
+                    )
+                })?;
+
+            // Pour chaque fichier de police trouvé, on tente de le charger
+            for file_info in font_files {
+                println!("try to load font {:?}", &file_info.filepath);
+                let font_path = Path::new(&file_info.filepath);
+                opt.fontdb_mut().load_font_file(font_path)?;
+                println!("success");
+            }
+        }
+    }
+
+    /*─── 2. Parsing du SVG ───────────────────────────────────────────*/
+    let tree = Tree::from_str(svg, &opt).context("SVG invalide")?;
+
+    let size = tree.size().to_int_size(); // u32 × u32
+    let mut pixmap =
+        Pixmap::new(size.width(), size.height()).context("Échec d’allocation du buffer")?;
+
+    /*─── 3. Rendu ───────────────────────────────────────────────────*/
+    // L’API `render` n’a plus d’argument FitTo, on passe simplement
+    // l’identité en transformée racine.
+    resvg::render(&tree, Transform::identity(), &mut pixmap.as_mut());
+
+    /*─── 4. PNG → Base64 ────────────────────────────────────────────*/
+    let png = pixmap.encode_png().context("Échec d’encodage PNG")?;
+    Ok(format!("data:image/png;base64,{}", B64.encode(png)))
+}
+
+pub fn list_file_info_in_dir(
+    dir: &PathBuf,
+    allowed_extensions: Option<&[&str]>,
+) -> Result<Vec<FileInfos>> {
+    let mut results = Vec::new();
+
+    if dir.is_dir() {
+        for entry in fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            if path.is_file() {
+                if let (Some(stem), Some(ext)) = (
+                    path.file_stem().and_then(|s| s.to_str()),
+                    path.extension().and_then(|e| e.to_str()),
+                ) {
+                    let ext_lower = ext.to_ascii_lowercase();
+                    let is_allowed = match allowed_extensions {
+                        Some(allowed) => {
+                            allowed.iter().any(|allowed_ext| allowed_ext == &ext_lower)
+                        }
+                        None => true,
+                    };
+
+                    if is_allowed {
+                        let filename_with_ext = path
+                            .file_name()
+                            .and_then(|f| f.to_str())
+                            .unwrap_or_default()
+                            .to_string();
+
+                        results.push(FileInfos {
+                            filename: stem.to_string(),
+                            filename_with_extension: filename_with_ext,
+                            extension: ext_lower,
+                            filepath: path.to_string_lossy().to_string(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+/// Tente de lire les métadonnées du fichier à `path`.  
+/// - Si le fichier existe, renvoie `Some(FileMetadata)` contenant  
+///   - `filename` : le nom du fichier  
+///   - `update_date` : date de dernière modification (RFC 3339)  
+/// - Sinon, renvoie `None`.
+pub fn get_file_metadata<P: AsRef<Path>>(path: P) -> Option<FileMetadata> {
+    let path = path.as_ref();
+
+    // 1) Récupère les métadonnées du fichier ou None si erreur (fichier introuvable, etc.)
+    let meta = fs::metadata(path).ok()?;
+
+    // 2) Date de dernière modification (SystemTime) ou None si impossible
+    let modified = meta.modified().ok()?;
+
+    // 3) Conversion en chrono::DateTime<Local> et format RFC3339
+    let datetime: DateTime<Local> = modified.into();
+    let update_date = datetime.to_rfc3339();
+
+    // 4) Extraction du nom de fichier
+    let filename = path.file_name()?
+                        .to_string_lossy()
+                        .into_owned();
+
+    Some(FileMetadata { filename, update_date })
+}
+
+pub fn get_file_date<P: AsRef<Path>>(path: P) -> Result<String> {
+    let path = path.as_ref();
+
+    // 1) Récupère les métadonnées du fichier ou None si erreur (fichier introuvable, etc.)
+    let meta = fs::metadata(path)?;
+
+    // 2) Date de dernière modification (SystemTime) ou None si impossible
+    let modified = meta.modified()?;
+
+    // 3) Conversion en chrono::DateTime<Local> et format RFC3339
+    let datetime: DateTime<Local> = modified.into();
+    Ok(datetime.to_rfc3339())
 }

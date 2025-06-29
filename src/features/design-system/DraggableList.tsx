@@ -13,7 +13,7 @@ function DraggableList({
   keyList,
 }: {
   children: ReactNode;
-  keyList: "palettes" | "themes";
+  keyList: "palettes";
 }) {
   const { designSystem } = useDesignSystemContext();
   const { designSystemPath } = useParams();

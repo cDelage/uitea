@@ -74,9 +74,10 @@ function ColorPickerDesignSystem({
                   >
                     <TokenSelector
                       tokensFamilies={tokens}
-                      onSelect={(token: DesignToken) =>
-                        setColor(new ColorIO(token.value))
-                      }
+                      onSelect={(token: DesignToken) => {
+                        setColor(new ColorIO(token.value));
+                        changeComplete?.(token.value);
+                      }}
                     />
                   </Popover.Body>
                 </>

@@ -12,15 +12,20 @@ function ColorPreviewBody({
   isAlignerDisplay,
   isAnchor,
   tints,
+  isComparedContrastTint,
+  selectedTintIndex,
 }: {
   color: ColorIO;
   isAlignerDisplay: boolean;
   isAnchor?: boolean;
   tints: TintBuild[];
+  isComparedContrastTint: boolean;
+  selectedTintIndex?: number;
 }) {
   const { alignerSettings } = usePaletteBuilderStore();
 
   const alignerDisplay = useMemo<AlignerValue[]>(() => {
+    if (!isAlignerDisplay && !isComparedContrastTint) return [];
     if (alignerSettings.aligner === "HWB") {
       color.toGamut({ space: "hwb" });
       return [
@@ -65,8 +70,9 @@ function ColorPreviewBody({
       ];
     } else if (alignerSettings.aligner === "CONTRAST_COLOR") {
       if (alignerSettings.alignerContrastMode === "PALETTE_STEP") {
-        const comparationTint =
-          tints[alignerSettings.alignerContrastPaletteStep];
+        const comparationTint = isComparedContrastTint
+          ? tints[selectedTintIndex ?? 0]
+          : tints[alignerSettings.alignerContrastPaletteStep];
         if (comparationTint) {
           return [
             {
@@ -90,12 +96,12 @@ function ColorPreviewBody({
     }
 
     return [];
-  }, [alignerSettings, color, tints]);
+  }, [alignerSettings, color, tints, isAlignerDisplay, isComparedContrastTint, selectedTintIndex]);
 
   return (
     <div className="gap-2 h-full p-1">
       <table className="table-transparent">
-        {isAlignerDisplay &&
+        {(isAlignerDisplay || isComparedContrastTint) &&
           alignerDisplay.map((line) => (
             <tr
               key={line.aligner}

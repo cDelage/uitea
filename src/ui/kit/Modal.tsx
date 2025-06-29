@@ -105,9 +105,13 @@ function Body({
   );
 }
 
-function Md({ children }: { children: ReactNode }) {
+function Md({ children, width }: { children: ReactNode; width?: string }) {
   return (
-    <div className={styles.modalBodyMd} data-disableoutside={true}>
+    <div
+      className={styles.modalBodyMd}
+      style={{ width, minWidth: width, maxWidth: width }}
+      data-disableoutside={true}
+    >
       {children}
     </div>
   );
@@ -116,12 +120,17 @@ function Md({ children }: { children: ReactNode }) {
 function ModalCustom({
   children,
   title,
+  width,
 }: {
   children: ReactNode;
   title: string;
+  width?: string;
 }) {
   return (
-    <div className={styles.modalBodyCustom}>
+    <div
+      className={styles.modalBodyCustom}
+      style={{ width, minWidth: width, maxWidth: width }}
+    >
       <div className={styles.modalCustomHeader}>
         <h5>{title}</h5>
       </div>

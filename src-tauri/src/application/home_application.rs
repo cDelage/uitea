@@ -11,13 +11,13 @@ use crate::{
         image_domain::ImageLocal,
     },
     repository::{
-        self, design_system_repository, home_repository,
+        self, design_system_repository::{self}, home_repository,
         palette_builder_repository::find_palette_builder_metadata,
     },
     AppState,
 };
 use anyhow::Result;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 pub fn insert_recent_file(state: State<AppState>, recent_file: RecentFile) -> Result<PathBuf> {
     home_repository::insert_recent_file(state, recent_file)
@@ -61,12 +61,16 @@ pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> R
     home_repository::update_recent_file(state, updated_file)
 }
 
-pub fn fetch_presets_dressing() -> Result<PresetDressing> {
-    home_repository::fetch_presets_dressing()
+pub fn fetch_presets_dressing(app: AppHandle) -> Result<PresetDressing> {
+    home_repository::fetch_presets_dressing(app)
 }
 
 pub fn encode_image_base64(path: String) -> Result<ImageLocal> {
     repository::encode_image_base64(path)
+}
+
+pub fn svg_to_png(svg: &str, design_system_path: Option<PathBuf>) -> Result<String> {
+    home_repository::svg_to_png(&svg, design_system_path)
 }
 
 
@@ -76,4 +80,8 @@ pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings)
 
 pub fn fetch_user_settings(state: State<AppState>) -> Result<UserSettings> {
     home_repository::fetch_user_settings(state)
+}
+
+pub fn open_folder(path: PathBuf) -> Result<()> {
+    repository::open_folder(path)
 }

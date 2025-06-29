@@ -16,6 +16,7 @@ export const PreviewStyle = styled.div<{
   overflow: hidden;
   overflow-y: auto;
   height: 100%;
+  font-family: ${(props) => props.$designSystem.fonts.default};
   ${(props) =>
     props.$tokenFamilies.flatMap((tokenFamily) => {
       return tokenFamily.tokens.map(

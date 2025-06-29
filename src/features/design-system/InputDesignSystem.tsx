@@ -229,7 +229,7 @@ function InputDesignSystem({
                   id={popoverId ?? "edit-popover"}
                   positionPayload="bottom-left"
                 >
-                  <div className={styles.popoverContainer}>
+                  <div className={styles.popoverContainer} data-edit={editMode}>
                     {register && (isColor || editText) ? (
                       <input
                         className="inherit-input empty-border w-full"
@@ -244,7 +244,9 @@ function InputDesignSystem({
                       />
                     ) : (
                       <input
-                        className="inherit-input w-full"
+                        className={`inherit-input w-full ${
+                          editMode ? "" : " empty-border "
+                        }`}
                         placeholder="empty"
                         value={value}
                         readOnly={true}
@@ -276,9 +278,11 @@ function InputDesignSystem({
                     </div>
                   </div>
                 </Popover.Toggle>
-                <Popover.Body id={popoverId ?? "edit-popover"} zIndex={100}>
-                  {popoverEdit}
-                </Popover.Body>
+                {editMode && popoverEdit && (
+                  <Popover.Body id={popoverId ?? "edit-popover"} zIndex={100}>
+                    {popoverEdit}
+                  </Popover.Body>
+                )}
               </>
             )}
             {measurement && (
@@ -289,6 +293,7 @@ function InputDesignSystem({
                   width="100%"
                   flex={true}
                   onBlur={editMode ? handleSubmit : undefined}
+                  readOnly={!editMode}
                 />
               </div>
             )}

@@ -2,17 +2,12 @@ import styles from "./BodyDesignSystem.module.css";
 import Section from "./SectionDesignSystem";
 import HeaderDesignSystem from "./HeaderDesignSystem";
 import IconColors from "../../ui/icons/IconColors";
-import {
-  DEFAULT_PALETTE,
-  ICON_SIZE_MD,
-  ICON_SIZE_XL,
-} from "../../ui/UiConstants";
+import { ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
 import PaletteComponent from "./palette/PaletteComponent";
 import { useDesignSystemContext } from "./DesignSystemContext";
 import DraggableList from "./DraggableList";
 import FontIcon from "../../ui/icons/FontIcon";
-import { useSaveDesignSystem } from "./DesignSystemQueries";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import FontsComponent from "./fonts/FontsComponent";
 import TypographyComponent from "./typography/TypographyComponent";
 import { useScrollTriggerRefresh } from "../../util/ScrollTriggerRefresh";
@@ -29,24 +24,15 @@ import Popover from "../../ui/kit/Popover";
 import SpacesPresetPopover from "./spaces/SpacesPresetPopover";
 import SidePanel from "../../ui/kit/SidePanel";
 import ShadowPresetSidepanel from "./shadows/ShadowPresetSidepanel";
+import IndependantColorsComponent from "./palette/IndependantColorsComponent";
+import PalettePlaceholder from "./palette/PalettePlaceholder";
+import EmptyPalettes from "./palette/EmptyPalettes";
 
 function BodyDesignSystem() {
   const { designSystem } = useDesignSystemContext();
-  const { designSystemPath } = useParams();
-  const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
   const { scrollRef } = useScrollTriggerRefresh();
   const { generateRecommandations } = useTokenCrafterStore();
   const navigate = useNavigate();
-
-  function initPalette() {
-    saveDesignSystem({
-      designSystem: {
-        ...designSystem,
-        palettes: [...designSystem.palettes, DEFAULT_PALETTE],
-      },
-      isTmp: true,
-    });
-  }
 
   return (
     <Popover>
@@ -76,7 +62,7 @@ function BodyDesignSystem() {
                       type="button"
                       onClick={() =>
                         navigate(
-                          `/palette-builder?currentDesignSystem=${designSystemPath}`
+                          `/palette-builder?currentDesignSystem=${designSystem.metadata.designSystemPath}`
                         )
                       }
                     >
@@ -87,13 +73,7 @@ function BodyDesignSystem() {
                 }
               >
                 <>
-                  <Section.EmptySection
-                    sectionName="palettes"
-                    itemToInsert="palette"
-                    onInsert={initPalette}
-                    sectionLength={designSystem.palettes.length}
-                    mediumHeight={true}
-                  />
+                  {!designSystem.palettes.length && <PalettePlaceholder />}
                   <DraggableList keyList="palettes">
                     {designSystem.palettes.map((colorPalette, index) => (
                       <PaletteComponent
@@ -105,8 +85,15 @@ function BodyDesignSystem() {
                   </DraggableList>
                 </>
               </Section.Subsection>
+              <Section.Subsection subSectionName="Independant colors">
+                <IndependantColorsComponent />
+              </Section.Subsection>
               <Section.Subsection subSectionName="Themes">
-                <ThemesComponent />
+                {designSystem.palettes.length !== 0 ? (
+                  <ThemesComponent />
+                ) : (
+                  <EmptyPalettes />
+                )}
               </Section.Subsection>
               <Section.Subsection
                 subSectionName="Semantic color tokens"
@@ -118,7 +105,7 @@ function BodyDesignSystem() {
                       onClick={() => {
                         generateRecommandations(designSystem);
                         navigate(
-                          `/token-crafter?currentDesignSystem=${designSystemPath}`
+                          `/token-crafter?currentDesignSystem=${designSystem.metadata.designSystemPath}`
                         );
                       }}
                     >
@@ -128,7 +115,11 @@ function BodyDesignSystem() {
                   </>
                 }
               >
-                <SemanticColorTokensComponent />
+                {designSystem.palettes.length !== 0 ? (
+                  <SemanticColorTokensComponent />
+                ) : (
+                  <EmptyPalettes />
+                )}
               </Section.Subsection>
             </Section>
             <Section
@@ -195,8 +186,12 @@ function BodyDesignSystem() {
                         <MdStore size={ICON_SIZE_MD} /> Presets
                       </button>
                     </SidePanel.Button>
-                    <SidePanel.Body id="presets-shadows" width="50%" background="#eff6ff">
-                      <ShadowPresetSidepanel/>
+                    <SidePanel.Body
+                      id="presets-shadows"
+                      width="50%"
+                      background="#eff6ff"
+                    >
+                      <ShadowPresetSidepanel />
                     </SidePanel.Body>
                   </>
                 }

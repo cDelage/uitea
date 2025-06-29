@@ -141,7 +141,9 @@ function InputShadow({
               </Popover.Toggle>
               <Popover.Body id="token-selector" zIndex={6000}>
                 <TokenSelector
-                  tokensFamilies={tokenFamilies}
+                  tokensFamilies={tokenFamilies.filter(
+                    (family) => family.category === "color"
+                  )}
                   onSelect={(color) =>
                     setShadow({
                       ...shadow,

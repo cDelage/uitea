@@ -31,19 +31,9 @@
     var(--uidt-space-0);
   box-sizing: border-box;
   height: fit-content;
+  position: relative;
 }
 
-.mediumHeight {
-  min-height: 400px;
-  height: 400px;
-  max-height: 400px;
-}
-
-.bigHeight {
-  min-height: 600px;
-  height: 600px;
-  max-height: 600px;
-}
 
 .componentHead {
   display: flex;
@@ -51,25 +41,24 @@
   color: var(--uidt-base-text-light);
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sideSettings {
+  position: sticky;
+  top: 49px;
+  left:0px;
   display: flex;
   flex-direction: column;
   gap: var(--uidt-space-5);
   width: 280px;
   min-width: 280px;
   max-width: 280px;
+  height: fit-content;
   box-sizing: border-box;
 }
 
-.scrollableSettings {
-  display: flex;
-  flex-direction: column;
-  gap: var(--uidt-space-5);
-  height: 100%;
-  overflow: auto;
-}
 
 .themeScrollableSizing {
   max-height: 270px;
@@ -161,7 +150,7 @@
 
 .previewRectWrap {
   width: calc(50% - 16px);
-  height: calc(50% - 16px);
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;

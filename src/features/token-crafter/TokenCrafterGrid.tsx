@@ -100,7 +100,7 @@ function TokenCrafterGrid() {
   return (
     <Popover>
       <div
-        className="column"
+        className="column shadow-inset"
         style={{
           background: "var(--base-background)",
         }}

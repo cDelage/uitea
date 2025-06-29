@@ -9,18 +9,21 @@ function InputMeasurement({
   width,
   onBlur,
   flex,
-  disableUnit
+  disableUnit,
+  readOnly,
 }: {
   measurement: Measurement;
   setMeasurement?: (measurement: Measurement) => void;
   width?: string;
   onBlur?: () => void;
   flex?: boolean;
-  disableUnit?: boolean
+  disableUnit?: boolean;
+  readOnly?: boolean;
 }) {
   return (
     <div
-      className="row uidt-input"
+      className={`row uidt-input`}
+      data-readonly={readOnly}
       style={{
         flex: flex ? "1" : undefined,
       }}
@@ -28,6 +31,7 @@ function InputMeasurement({
       <input
         type="number"
         onBlur={onBlur}
+        disabled={readOnly}
         className="inherit-input empty-border skip-arrow left-spinner"
         size={(measurement.value ? measurement.value.toString().length : 1) + 1}
         value={measurement.value}
@@ -48,7 +52,7 @@ function InputMeasurement({
         value={measurement.unit}
         className="inherit-select select-no-arrow uidt-input-select"
         onBlur={onBlur}
-        disabled={disableUnit}
+        disabled={disableUnit || readOnly}
         style={{
           padding: "2px",
           borderRadius: "0px",

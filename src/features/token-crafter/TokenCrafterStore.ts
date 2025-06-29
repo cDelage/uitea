@@ -5,6 +5,7 @@ import {
   ColorCombinationState,
   CombinationContrasts,
   DesignSystem,
+  isPalette,
   Palette,
   PaletteAndColor,
   RecommandationContrastPayload,
@@ -46,6 +47,7 @@ interface TokenCrafterStore {
   generateRecommandations: (designSystem: DesignSystem) => void;
   generateMonochromeRecommandation: (designSystem: DesignSystem) => void;
   generateMultipalettesRecommandation: (designSystem: DesignSystem) => void;
+  generateWhiteRecommandation: (designSystem: DesignSystem) => void;
   setApplyBorder: (applyBorder: boolean) => void;
   undoTokenCrafter: () => void;
   redoTokenCrafter: () => void;
@@ -89,7 +91,6 @@ export const useTokenCrafterStore = create<TokenCrafterStore>((set, get) => ({
         ...state,
         collection: {
           group: state.collection.group,
-          previewComponent: state.collection.previewComponent,
         },
       };
     });
@@ -127,9 +128,11 @@ export const useTokenCrafterStore = create<TokenCrafterStore>((set, get) => ({
     const {
       generateMonochromeRecommandation,
       generateMultipalettesRecommandation,
+      generateWhiteRecommandation,
     } = get();
     generateMonochromeRecommandation(designSystem);
     generateMultipalettesRecommandation(designSystem);
+    generateWhiteRecommandation(designSystem);
   },
   generateMonochromeRecommandation: async (designSystem: DesignSystem) => {
     const palettesRecommandation: RecommandationRow[] = designSystem.palettes
@@ -156,7 +159,7 @@ export const useTokenCrafterStore = create<TokenCrafterStore>((set, get) => ({
     });
   },
   generateMultipalettesRecommandation: async (designSystem: DesignSystem) => {
-    const palettesAndColors = getPaletteAndColor(designSystem.palettes);
+    const palettesAndColors = getPaletteAndColor(designSystem);
     const duos = getColorPaletteDuos(palettesAndColors);
     const complementaryRecommandations = duos.map((duo) =>
       getComplementaryRecommandations({
@@ -172,6 +175,41 @@ export const useTokenCrafterStore = create<TokenCrafterStore>((set, get) => ({
           ...state.recommandations,
           ...complementaryRecommandations,
         ],
+      };
+    });
+  },
+  generateWhiteRecommandation(designSystem) {
+    const colorBackgroundWhiteRecommandations =
+      getRecommandationColorAndPalette({
+        paletteArray: designSystem.palettes,
+        recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
+        tint: {
+          label: "white",
+          color: designSystem.independantColors.white,
+        },
+        background: "color",
+      });
+      colorBackgroundWhiteRecommandations.label = "white-palettes"
+
+    const paletteBackgroundWhiteRecommandations =
+      getRecommandationColorAndPalette({
+        paletteArray: designSystem.palettes,
+        recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
+        tint: {
+          label: "white",
+          color: designSystem.independantColors.white,
+        },
+        background: "palette",
+      });
+
+    set((state) => {
+      return {
+        ...state,
+        recommandations: [
+          ...state.recommandations,
+          colorBackgroundWhiteRecommandations,
+          paletteBackgroundWhiteRecommandations,
+        ],
         isLoadingRecommandation: false,
       };
     });
@@ -183,13 +221,31 @@ export const useTokenCrafterStore = create<TokenCrafterStore>((set, get) => ({
       applyParams.indexPaletteA !== undefined &&
       applyParams.indexPaletteB !== undefined
     ) {
-      applyParams.recommandationRow = getComplementaryRecommandations({
-        duo: [
-          palettesAndColors[applyParams.indexPaletteA].palette,
-          palettesAndColors[applyParams.indexPaletteB].palette,
-        ],
-        recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
-      });
+      const paletteA = palettesAndColors[applyParams.indexPaletteA].palette;
+      const paletteB = palettesAndColors[applyParams.indexPaletteB].palette;
+
+      if (isPalette(paletteA) && isPalette(paletteB)) {
+        applyParams.recommandationRow = getComplementaryRecommandations({
+          duo: [paletteA, paletteB],
+          recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
+        });
+      } else if (!isPalette(paletteA) && isPalette(paletteB)) {
+        applyParams.recommandationRow = getRecommandationColorAndPalette({
+          background: "color",
+          paletteArray: [paletteB],
+          recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
+          tint: paletteA,
+        });
+      } else if (isPalette(paletteA) && !isPalette(paletteB)) {
+        applyParams.recommandationRow = getRecommandationColorAndPalette({
+          background: "palette",
+          paletteArray: [paletteA],
+          recommandationContrastPayload: DEFAULT_RECOMMANDATIONS,
+          tint: paletteB,
+        });
+      }else {
+        applyParams.recommandationRow = undefined;
+      }
     } else {
       applyParams.recommandationRow = undefined;
     }
@@ -265,18 +321,34 @@ export function getMonochromeTintRecommandations(
   ];
 }
 
-export function getPaletteAndColor(
-  originalPalettes: Palette[]
-): PaletteAndColor[] {
-  return originalPalettes
-    .filter((palette) => palette.tints.length)
-    .map((palette) => {
-      const mainTint = palette.tints[Math.floor(palette.tints.length / 2)];
+export function getPaletteAndColor({
+  palettes,
+  independantColors,
+}: DesignSystem): PaletteAndColor[] {
+  return [
+    ...palettes
+      .filter((palette) => palette.tints.length)
+      .map((palette) => {
+        const mainTint = palette.tints[Math.floor(palette.tints.length / 2)];
+        return {
+          mainColor: new ColorIO(mainTint.color),
+          palette,
+        };
+      }),
+    {
+      mainColor: new ColorIO(independantColors.white),
+      palette: {
+        label: "white",
+        color: independantColors.white,
+      },
+    },
+    ...independantColors.independantColors.map((color) => {
       return {
-        mainColor: new ColorIO(mainTint.color),
-        palette,
+        mainColor: new ColorIO(color.color),
+        palette: color,
       };
-    });
+    }),
+  ];
 }
 
 export function getColorPaletteDuos(
@@ -299,7 +371,8 @@ export function getColorPaletteDuos(
             }) && !isGray(complementary.mainColor)
         )
         .forEach((complementary) => {
-          compatiblePalettes.push([palette.palette, complementary.palette]);
+          if (isPalette(palette.palette) && isPalette(complementary.palette))
+            compatiblePalettes.push([palette.palette, complementary.palette]);
         });
     }
   });
@@ -322,7 +395,8 @@ export function getColorPaletteDuos(
             compIndex !== index
         )
         .forEach((analogue) => {
-          compatiblePalettes.push([palette.palette, analogue.palette]);
+          if (isPalette(palette.palette) && isPalette(analogue.palette))
+            compatiblePalettes.push([palette.palette, analogue.palette]);
         });
 
       //Second complementary hues
@@ -339,7 +413,8 @@ export function getColorPaletteDuos(
             compIndex !== index
         )
         .forEach((complementary) => {
-          compatiblePalettes.push([palette.palette, complementary.palette]);
+          if (isPalette(palette.palette) && isPalette(complementary.palette))
+            compatiblePalettes.push([palette.palette, complementary.palette]);
         });
 
       palettes
@@ -355,7 +430,8 @@ export function getColorPaletteDuos(
             compIndex !== index
         )
         .forEach((complementary) => {
-          compatiblePalettes.push([palette.palette, complementary.palette]);
+          if (isPalette(palette.palette) && isPalette(complementary.palette))
+            compatiblePalettes.push([palette.palette, complementary.palette]);
         });
 
       palettes
@@ -371,7 +447,8 @@ export function getColorPaletteDuos(
             compIndex !== index
         )
         .forEach((complementary) => {
-          compatiblePalettes.push([palette.palette, complementary.palette]);
+          if (isPalette(palette.palette) && isPalette(complementary.palette))
+            compatiblePalettes.push([palette.palette, complementary.palette]);
         });
     }
   });
@@ -453,6 +530,82 @@ export function getComplementaryRecommandations({
   };
 }
 
+function getRecommandationColorAndPalette({
+  tint,
+  paletteArray,
+  recommandationContrastPayload,
+  background,
+}: {
+  tint: Tint;
+  paletteArray: Palette[];
+  recommandationContrastPayload: RecommandationContrastPayload[];
+  background: "color" | "palette";
+}): RecommandationRow {
+  const result: RecommandationMetadata[] = [];
+
+  paletteArray.forEach((palette) => {
+    recommandationContrastPayload.forEach((recommandation) => {
+      const text = findTargetContrast({
+        array: palette.tints,
+        contrast: recommandation.text,
+        tint,
+      });
+      const border = findTargetContrast({
+        array: palette.tints,
+        contrast: recommandation.border,
+        tint,
+      });
+      if (text && border) {
+        const combination: ColorCombination =
+          background === "color"
+            ? {
+                background: `color-${tint.label}`,
+                text: `${palette.paletteName}-${text.label}`,
+                border: `${palette.paletteName}-${border.label}`,
+              }
+            : {
+                background: `palette-${palette.paletteName}-${text.label}`,
+                text: `color-${tint.label}`,
+                border: `palette-${palette.paletteName}-${border.label}`,
+              };
+        const combinationTokens: ColorCombination =
+          background === "color"
+            ? {
+                background: `color-${tint.label}`,
+                text: `palette-${palette.paletteName}-${text.label}`,
+                border: `palette-${palette.paletteName}-${border.label}`,
+              }
+            : {
+                background: `palette-${palette.paletteName}-${text.label}`,
+                text: `color-${tint.label}`,
+                border: `palette-${palette.paletteName}-${border.label}`,
+              };
+
+        const bg = new ColorIO(tint.color);
+        const ligthness = bg.get("okhsl.l");
+        const bgShadow = new ColorIO(
+          ligthness < 0.8 ? bg : border?.color ?? text?.color
+        );
+        bgShadow.alpha = 0.2;
+
+        result.push({
+          combinationNames: combination,
+          combinationTokens,
+          backgroundRgba: bgShadow.toString({ format: "srgb" }),
+          contrasts: {
+            backgroundText: bg.contrastWCAG21(text.color),
+            backgroundBorder: bg.contrastWCAG21(border.color),
+          },
+        });
+      }
+    });
+  });
+  return {
+    label: `palettes-${tint.label}`,
+    combinations: result,
+  };
+}
+
 function getRecommandationContrastByArray({
   tint,
   array,
@@ -498,7 +651,7 @@ function getRecommandationContrastByArray({
       bgShadow.alpha = 0.2;
 
       result.push({
-        combinationName: combination,
+        combinationNames: combination,
         combinationTokens,
         backgroundRgba: bgShadow.toString({ format: "srgb" }),
         contrasts: {

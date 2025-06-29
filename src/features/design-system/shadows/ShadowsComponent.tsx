@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import styles from "../ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -92,26 +91,16 @@ function ShadowsComponent() {
     handleSubmit(submitEffects)();
   }
 
-  const formClassNames = classNames(
-    styles.componentDesignSystem,
-    styles.mediumHeight
-  );
-
-  const sideSettingsClass = classNames(
-    styles.sideSettings,
-    styles.scrollableSettings
-  );
-
   return (
     <Popover>
       <form
-        className={formClassNames}
+        className={styles.componentDesignSystem}
         onSubmit={handleSubmit(submitEffects)}
         ref={effectsRef}
       >
         <div>
           <div ref={topTooltipRef} className="relative" />
-          <div className={sideSettingsClass} ref={scrollableLeft}>
+          <div className={styles.sideSettings} ref={scrollableLeft}>
             <div className="column">
               {effectsFields.map((effect, index) => (
                 <InputDesignSystem
@@ -163,7 +152,7 @@ function ShadowsComponent() {
             </div>
           </div>
         </div>
-        <PreviewComponentDesignSystem maxHeight="400px">
+        <PreviewComponentDesignSystem>
           <div className={styles.previewElementWrap} ref={scrollableRight}>
             {watch(`shadows`).map((effect) => (
               <ShadowPreview key={effect.shadowName} effect={effect} />

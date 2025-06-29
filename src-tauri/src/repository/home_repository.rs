@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use std::{fs, path::PathBuf};
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use crate::{
     domain::{
@@ -15,10 +15,24 @@ use crate::{
     AppState,
 };
 
-use super::{fetch_image_folder, load_yaml_from_pathbuf};
+use super::{
+    design_system_repository::EXPORTS_PATH, fetch_image_folder, fonts_repository::FONTS_PATH,
+    load_yaml_from_pathbuf, svg_to_png_b64,
+};
 
-const BANNERS_PATH: &str = "./assets/banners";
-const LOGOS_PATH: &str = "./assets/logos";
+const BANNERS_PATH: &str = "assets/banners";
+const LOGOS_PATH: &str = "assets/logos";
+
+pub fn fetch_presets_dressing(app: AppHandle) -> Result<PresetDressing> {
+    let resource_dir = app
+        .path_resolver()
+        .resource_dir()
+        .ok_or_else(|| anyhow::anyhow!("Impossible de trouver le resource_dir"))?;
+
+    let banners: Vec<String> = fetch_image_folder(&resource_dir.join(BANNERS_PATH))?;
+    let logos: Vec<String> = fetch_image_folder(&resource_dir.join(LOGOS_PATH))?;
+    Ok(PresetDressing { banners, logos })
+}
 
 pub fn insert_recent_file(state: State<AppState>, recent_file: RecentFile) -> Result<PathBuf> {
     validate_recent_file(&recent_file)?;
@@ -49,7 +63,7 @@ pub fn validate_recent_file(recent_file: &RecentFile) -> Result<PathBuf> {
                 || !design_system_metadata_path.is_file()
             {
                 return Err(anyhow!(
-                    "Le dossier chargé n'inclut pas un design-system pathframe"
+                    "Le dossier chargé n'inclut pas un design-system uitea"
                 ));
             }
             recent_file.file_path.to_path_buf()
@@ -124,12 +138,6 @@ pub fn update_recent_file(state: State<AppState>, updated_file: RecentFile) -> R
     }
 }
 
-pub fn fetch_presets_dressing() -> Result<PresetDressing> {
-    let banners: Vec<String> = fetch_image_folder(BANNERS_PATH)?;
-    let logos: Vec<String> = fetch_image_folder(LOGOS_PATH)?;
-    Ok(PresetDressing { banners, logos })
-}
-
 pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings) -> Result<()> {
     let mut db = state.user_settings_db.lock().unwrap();
     db.set("userSettings", &user_settings)
@@ -141,4 +149,12 @@ pub fn fetch_user_settings(state: State<AppState>) -> Result<UserSettings> {
     let db = state.user_settings_db.lock().unwrap();
     let user_settings: UserSettings = db.get("userSettings").unwrap_or_default();
     Ok(user_settings)
+}
+
+pub fn svg_to_png(svg: &str, design_system_path: Option<PathBuf>) -> Result<String> {
+    let compute_pathbuf: Option<PathBuf> = match design_system_path {
+        Some(path) => Some(path.join(EXPORTS_PATH).join(FONTS_PATH)),
+        None => None,
+    };
+    svg_to_png_b64(&svg, 96.0, compute_pathbuf)
 }

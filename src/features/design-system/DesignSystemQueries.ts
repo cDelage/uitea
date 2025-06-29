@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 import { useInsertRecentFile } from "../home/HomeQueries";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { buildReadme, getImagesPreview } from "../../util/DesignSystemUtils";
+
 
 export function useCreateDesignSystem() {
   const { insertRecentFile } = useInsertRecentFile("DesignSystemCategory");
@@ -74,7 +76,6 @@ export function useCurrentDesignSystem() {
 //Save temporary
 export function useSaveDesignSystem(designSystemPath?: string) {
   const queryClient = useQueryClient();
-
   const { mutate: saveDesignSystem, isPending: isSavingDesignSystem } =
     useMutation({
       mutationFn: async ({
@@ -84,17 +85,18 @@ export function useSaveDesignSystem(designSystemPath?: string) {
         designSystem: DesignSystem;
         isTmp: boolean;
       }): Promise<DesignSystem> =>
-        await invoke("save_design_system", {
+        await invoke<DesignSystem>("save_design_system", {
           designSystem,
           isTmp,
         }),
       onError: (error) => {
         toast.error(error);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["design-system", designSystemPath],
-        });
+      onSuccess: (designSystem: DesignSystem) => {
+        queryClient.setQueryData(
+          ["design-system", designSystemPath],
+          designSystem
+        );
       },
     });
 
@@ -144,15 +146,30 @@ export function useGenerateExport() {
           payload,
         });
       },
-      onSuccess: () => {
-        toast.success("export successfull");
-      },
       onError: (err) => {
         toast.error("fail to generate export");
-        console.error(err)
+        console.error(err);
       },
     }
   );
 
   return { generateExport, isGeneratingExport };
+}
+
+export function useSaveReadme() {
+  const { mutate: saveReadme, isPending: isSavingReadme } = useMutation({
+    mutationFn: async (designSystem: DesignSystem) => {
+      const metadata = { ...designSystem.metadata };
+      metadata.readme = buildReadme(designSystem);
+      metadata.previewImages = await getImagesPreview(designSystem);
+      await invoke("save_readme", {
+        metadata,
+      });
+    },
+    onError: () => {
+      toast.error("Fail to save readme");
+    },
+  });
+
+  return { saveReadme, isSavingReadme };
 }

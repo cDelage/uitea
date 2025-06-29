@@ -2,8 +2,6 @@ import { ReactNode, useRef } from "react";
 import styles from "./SectionDesignSystem.module.css";
 import { useSearchParams } from "react-router-dom";
 import { useTriggerScroll } from "../../util/TriggerScrollEvent";
-import { ButtonPrimary } from "../../ui/kit/Buttons";
-import classNames from "classnames";
 
 function Section({
   sectionTitle,
@@ -60,35 +58,15 @@ function SubSection({
 }
 
 function EmptySection({
-  sectionName,
-  itemToInsert,
-  onInsert,
   sectionLength,
-  mediumHeight,
-  hFull,
+  children
 }: {
-  sectionName: string;
-  itemToInsert: string;
-  onInsert: () => void;
   sectionLength: number;
-  mediumHeight?: boolean;
-  hFull?: boolean;
+  children: ReactNode;
 }) {
-  const emptyContainerClassNames = classNames(
-    styles.emptyContentContainer,
-    {
-      [styles.mediumHeight]: mediumHeight,
-    },
-    {
-      "h-full": hFull,
-    }
-  );
   if (sectionLength) return null;
   return (
-    <div className={emptyContainerClassNames}>
-      Empty {sectionName}
-      <ButtonPrimary onClick={onInsert}>Insert a {itemToInsert}</ButtonPrimary>
-    </div>
+    children
   );
 }
 

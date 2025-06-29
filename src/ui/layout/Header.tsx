@@ -19,13 +19,24 @@ import {
   useFindDesignSystem,
   useUndoRedoDesignSystem,
 } from "../../features/design-system/DesignSystemQueries";
-import { MdArrowBack, MdArrowForward, MdContrast } from "react-icons/md";
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdContrast,
+  MdEdit,
+  MdVisibility,
+} from "react-icons/md";
 import { usePaletteBuilderStore } from "../../features/palette-builder/PaletteBuilderStore";
 import { HeaderTools } from "../../util/HeaderTools";
 import { useColorPickerStore } from "../../features/color-picker/ColorPickerStore";
 import { useTokenCrafterStore } from "../../features/token-crafter/TokenCrafterStore";
 import Popover from "../kit/Popover";
 import ColorPickerPopover from "../../features/color-picker/ColorPickerPopover";
+import Switch from "../kit/Switch";
+import { RecentFile } from "../../domain/HomeDomain";
+import { invoke } from "@tauri-apps/api";
+import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 function Header() {
   const [isMax, setIsMax] = useState(false);
@@ -33,6 +44,7 @@ function Header() {
   const { designSystemPath } = useParams();
   const { designSystem } = useFindDesignSystem(designSystemPath);
   const { pathname } = useLocation();
+  const queryClient = useQueryClient();
   const { undoDesignSystem, redoDesignSystem } =
     useUndoRedoDesignSystem(designSystemPath);
   const {
@@ -40,7 +52,7 @@ function Header() {
     undoPaletteBuilder,
     redoPaletteBuilder,
   } = usePaletteBuilderStore();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     canUndoRedo: canUndoRedoTokenCrafter,
     undoTokenCrafter,
@@ -54,6 +66,9 @@ function Header() {
     undoColorPicker,
     redoColorPicker,
   } = useColorPickerStore();
+  const editMode: boolean = JSON.parse(
+    searchParams.get("editMode") || "false"
+  ) as boolean;
 
   const headerTools = useMemo<HeaderTools>(() => {
     if (
@@ -130,6 +145,38 @@ function Header() {
     redoTokenCrafter,
   ]);
 
+  const VisibilityIcon = editMode ? MdEdit : MdVisibility;
+
+  function toggleSearchParams() {
+    const newEditMode = !editMode;
+    searchParams.set("editMode", String(newEditMode));
+    setSearchParams(searchParams);
+
+    if (!newEditMode) {
+      if (window.getSelection) {
+        const selection: Selection | null = window.getSelection();
+        selection?.removeAllRanges();
+      }
+    }
+
+    if (!designSystemPath) return;
+    invoke<{ updatedFile: RecentFile }>("update_recent_file", {
+      updatedFile: {
+        filePath: designSystemPath,
+        editMode: newEditMode,
+        category: "DesignSystemCategory",
+      },
+    })
+      .then(() => {
+        queryClient.invalidateQueries({
+          queryKey: "recent-files",
+        });
+      })
+      .catch((err) => {
+        toast.error(`Fail to save read only : ${err}`);
+      });
+  }
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -194,8 +241,12 @@ function Header() {
               <MdContrast size={ICON_SIZE_SM} />
             </button>
           </Popover.Toggle>
-          <Popover.Body id="contrast-checker" skipDisableOutside={true} zIndex={1000}>
-            <ColorPickerPopover/>
+          <Popover.Body
+            id="contrast-checker"
+            skipDisableOutside={true}
+            zIndex={1000}
+          >
+            <ColorPickerPopover />
           </Popover.Body>
         </Popover>
         {headerTools.canUndoRedo && (
@@ -214,6 +265,12 @@ function Header() {
             >
               <MdArrowForward size={ICON_SIZE_SM} />
             </button>
+          </div>
+        )}
+        {pathname.startsWith("/design-system") && (
+          <div className="row gap-1 align-center">
+            <Switch checked={editMode} onChange={toggleSearchParams} />
+            <VisibilityIcon size={ICON_SIZE_SM} />
           </div>
         )}
         <div className={styles.windowButtons} data-tauri-drag-region={true}>

@@ -22,9 +22,6 @@ function SemanticPreview() {
   return (
     <div
       className="gap-10 p-8 border-box column"
-      style={{
-        height: "600px",
-      }}
     >
       <h1 className="text-color-dark">
         {designSystem.metadata.designSystemName}

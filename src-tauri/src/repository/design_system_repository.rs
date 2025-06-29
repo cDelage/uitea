@@ -1,14 +1,20 @@
+use std::io::Write;
 use std::{
     collections::HashMap,
-    fs,
+    fs::{self, File},
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, Result, Context};
+use anyhow::{anyhow, Context, Result};
+use base64::{engine::general_purpose, Engine as _};
 
+use crate::domain::design_system_domain::{ExportsMetadata, IndependantColors};
+use crate::repository::{compute_path_with_extension_overwrite, get_file_date, get_file_metadata, open_folder};
 use crate::{
     domain::design_system_domain::{
-        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, Shadows, ExportPayload, Fonts, Palette, PalettesMetadataFile, Radius, SemanticColorTokens, Space, SpacesFile, Themes, TintsFile, Typographies
+        DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, ExportPayload, Fonts,
+        Palette, PalettesMetadataFile, Radius, SemanticColorTokens, Shadows, Space, SpacesFile,
+        Themes, TintsFile, Typographies,
     },
     repository::{
         compute_fetch_pathbuf, compute_path_with_extension, filename_equals, FetchPath, TMP_PATH,
@@ -16,7 +22,8 @@ use crate::{
 };
 
 use super::{
-    assert_file_in_directory, copy_file, load_yaml_from_pathbuf, open_folder, save_to_yaml_file, DESIGN_SYSTEM_METADATA_PATH
+    assert_file_in_directory, copy_file, load_yaml_from_pathbuf, save_to_yaml_file,
+    DESIGN_SYSTEM_METADATA_PATH,
 };
 
 const PALETTES_PATH: &str = "palettes";
@@ -26,10 +33,15 @@ const TYPOGRAPHY_PATH: &str = "typography.yaml";
 const SPACES_PATH: &str = "spaces.yaml";
 const RADIUS_PATH: &str = "radius.yaml";
 const EFFECTS_PATH: &str = "effects.yaml";
-const EXPORTS_PATH: &str = "exports";
+pub const EXPORTS_PATH: &str = "exports";
 const IMAGES_PATH: &str = "images";
 const THEMELIST_PATH: &str = "themes.yaml";
+const PREVIEW_IMAGES_PATH: &str = "preview_images";
 const SEMANTIC_COLOR_TOKENS_PATH: &str = "semantic_color_tokens.yaml";
+const INDEPENDANT_COLORS_PATH: &str = "independant_colors.yaml";
+const README_PATH: &str = "README.md";
+const EXPORT_STYLESHEET_PATH: &str = "export-stylesheet.css";
+const EXPORT_FIGMA_PATH: &str = "export-figma-token-studio.json";
 
 pub fn create_design_system(design_system_metadata: &mut DesignSystemMetadata) -> Result<()> {
     println!(
@@ -79,11 +91,19 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
     }
     let file: DesignSystemMetadataFile =
         load_yaml_from_pathbuf::<DesignSystemMetadataFile>(&design_system_metadata_pathbuf)?;
+    
+    let exports: ExportsMetadata = fetch_exports_metadata(&design_system_path)?;
+    let update_date = get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))?;
     Ok(DesignSystemMetadata::from(
         &file,
         &original_pathbuf,
-        design_system_path.join(TMP_PATH).join(DESIGN_SYSTEM_METADATA_PATH).is_file(),
+        design_system_path
+            .join(TMP_PATH)
+            .join(DESIGN_SYSTEM_METADATA_PATH)
+            .is_file(),
         &get_images_path(&fetch_pathbuf),
+        exports,
+        update_date
     ))
 }
 
@@ -177,7 +197,7 @@ pub fn save_palettes(design_system: &DesignSystem, design_system_path: &PathBuf)
     Ok(())
 }
 
-pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<()> {
+pub fn save_design_system(design_system: &mut DesignSystem, is_tmp: bool) -> Result<&DesignSystem> {
     //Define the path (if the save is tmp or not)
     let design_system_path: PathBuf = if is_tmp {
         let tmp_pathbuf: PathBuf = design_system
@@ -206,6 +226,9 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
     save_metadata(&design_system_path, &design_system.metadata)?;
 
     save_palettes(&design_system, &design_system_path)?;
+
+    let independant_colors_pathbuf: PathBuf = design_system_path.join(INDEPENDANT_COLORS_PATH);
+    save_to_yaml_file(independant_colors_pathbuf, &design_system.independant_colors)?;
 
     let fonts_pathbuf: PathBuf = design_system_path.join(FONTS_PATH);
     save_to_yaml_file(fonts_pathbuf, &design_system.fonts)?;
@@ -242,7 +265,32 @@ pub fn save_design_system(design_system: &DesignSystem, is_tmp: bool) -> Result<
             fs::remove_dir_all(tmp_pathbuf)?;
         }
     }
+    design_system.metadata.is_tmp = is_tmp;
 
+    Ok(design_system)
+}
+
+pub fn save_readme(metadata: DesignSystemMetadata) -> Result<()> {
+    if let Some(readme) = metadata.readme {
+        let readme_pathbuf: PathBuf = metadata.design_system_path.join(README_PATH);
+        let mut file = File::create(readme_pathbuf)?;
+        file.write_all(readme.as_bytes())?;
+
+        let preview_images_pathbuf: PathBuf = metadata.design_system_path.join(EXPORTS_PATH).join(PREVIEW_IMAGES_PATH);
+        if !preview_images_pathbuf.is_dir() {
+            fs::create_dir_all(&preview_images_pathbuf)?;
+        }
+        for image in &metadata.preview_images {
+            let image_path = preview_images_pathbuf.join(&image.path);
+            let mut image_file = File::create(&image_path)?;
+            if image.path.contains("png") {
+                let png_bytes = general_purpose::STANDARD.decode(image.binary.trim())?;
+                image_file.write_all(&png_bytes)?;
+            } else {
+                image_file.write_all(image.binary.as_bytes())?;
+            }
+        }
+    }
     Ok(())
 }
 
@@ -438,13 +486,46 @@ pub fn fetch_semantic_color_tokens(design_system_path: &PathBuf) -> Result<Seman
 }
 
 pub fn register_export(payload: ExportPayload) -> Result<()> {
-    let ExportPayload {design_system_path, export_name, value, extension} = payload;
+    let ExportPayload {
+        design_system_path,
+        export_name,
+        value,
+        extension,
+    } = payload;
     let export_pathbuf = design_system_path.join(EXPORTS_PATH);
-    if !&export_pathbuf.is_dir(){
+    if !&export_pathbuf.is_dir() {
         fs::create_dir(&export_pathbuf)?;
     };
-    let file_path = compute_path_with_extension(&export_pathbuf, &export_name, &extension);
+    let file_path: PathBuf = compute_path_with_extension_overwrite(&export_pathbuf, &export_name, &extension);
     fs::write(file_path, value)?;
-    open_folder(export_pathbuf)?;
     Ok(())
+}
+
+pub fn init_independant_colors(design_system_path: &PathBuf) -> Result<()> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let independant_color_path: PathBuf = fetch_pathbuf.join(INDEPENDANT_COLORS_PATH);
+    save_to_yaml_file(independant_color_path, &IndependantColors::new())
+}
+
+pub fn fetch_independant_colors(design_system_path: &PathBuf) -> Result<IndependantColors> {
+    let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
+    let independant_colors_path: PathBuf = fetch_pathbuf.join(INDEPENDANT_COLORS_PATH);
+    load_yaml_from_pathbuf::<IndependantColors>(&independant_colors_path)
+}
+
+pub fn fetch_exports_metadata(design_system_path: &PathBuf) -> Result<ExportsMetadata>{
+    Ok(ExportsMetadata {
+        css:get_file_metadata(design_system_path.join(EXPORTS_PATH).join(EXPORT_STYLESHEET_PATH)),
+        figma_token_studio: get_file_metadata(design_system_path.join(EXPORTS_PATH).join(EXPORT_FIGMA_PATH)),
+        readme: get_file_metadata(design_system_path.join(README_PATH))
+    })
+}
+
+pub fn open_export_folder(design_system_path: PathBuf) -> Result<()> {
+    let export_pathbuf = design_system_path.join(EXPORTS_PATH);
+    open_folder(export_pathbuf)
+}
+
+pub fn get_design_system_update_date(design_system_path: &PathBuf) -> Result<String> {
+        get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))
 }

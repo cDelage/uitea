@@ -4,7 +4,6 @@ import { useDesignSystemContext } from "../DesignSystemContext";
 import { Fonts } from "../../../domain/DesignSystemDomain";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import { useParams } from "react-router-dom";
-import classNames from "classnames";
 import InputDesignSystem from "../InputDesignSystem";
 import { generateUniqueFontKey } from "../../../util/DesignSystemUtils";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
@@ -70,11 +69,6 @@ function FontsComponent() {
     }
   );
 
-  const formClassNames = classNames(
-    styles.componentDesignSystem,
-    styles.mediumHeight
-  );
-
   function submitFonts(newFonts: Fonts) {
     if (isEqual(newFonts, fonts)) return;
 
@@ -102,19 +96,14 @@ function FontsComponent() {
     );
   }
 
-  const sideSettingsClassNames = classNames(
-    styles.sideSettings,
-    styles.scrollableSettings
-  );
-
   return (
     <Popover onClose={handleSubmit(submitFonts)}>
       <form
-        className={formClassNames}
+        className={styles.componentDesignSystem}
         ref={fontsRef}
         onSubmit={handleSubmit(submitFonts)}
       >
-        <div className={sideSettingsClassNames}>
+        <div className={styles.sideSettings}>
           <div className={styles.sideSettingsTitle}>
             <h5>Default font</h5>
           </div>
@@ -128,6 +117,7 @@ function FontsComponent() {
               <FontsPopover
                 value={watch(`default`)}
                 setValue={(value) => setValue(`default`, value)}
+                popoverId={`default`}
               />
             }
           />
@@ -158,6 +148,7 @@ function FontsComponent() {
                     setValue={(value) =>
                       setValue(`additionals.${index}.value`, value)
                     }
+                    popoverId={`additionals.${index}`}
                   />
                 }
               />
@@ -174,7 +165,7 @@ function FontsComponent() {
             <div className="row justify-center">Empty</div>
           )}
         </div>
-        <PreviewComponentDesignSystem maxHeight="600px">
+        <PreviewComponentDesignSystem>
           <div
             className={styles.previewElement}
             style={{
@@ -193,15 +184,15 @@ function FontsComponent() {
               </div>
               {fontAdditionals.map((font, index) => (
                 <div key={font.fontName}>
-                  <FontDisplay
-                    key={font.fontName}
-                    font={watch(`additionals.${index}.value`)}
-                    fontSize="28px"
-                    lineHeight="32px"
-                    display={`${watch(
-                      `additionals.${index}.fontName`
-                    )} : ${watch(`additionals.${index}.value`)}`}
-                  />
+                  <div
+                    style={{
+                      fontSize: "28px",
+                      lineHeight: "32px",
+                      fontFamily: watch(`additionals.${index}.value`),
+                    }}
+                  >{`${watch(`additionals.${index}.fontName`)} : ${watch(
+                    `additionals.${index}.value`
+                  )}`}</div>
                 </div>
               ))}
             </div>

@@ -6,21 +6,20 @@
   align-items: center;
   user-select: none;
   cursor: pointer;
-  border-radius: var(--uidt-rounded-md);
 }
 
 .sidebarSection:hover {
   background-color: var(--uidt-base-button-hover-bg);
 }
 
+.sidebarSection[data-visible="true"]:hover {
+  background: var(--uidt-base-button-active-bg);
+}
+
 .sidebarSectionVisible {
   background: var(--uidt-base-button-active-bg);
 }
 
-.sidebarSectionVisibleFirst {
-}
-.sidebarSectionVisibleLast {
-}
 
 .fileUnderFolder {
   padding-left: var(--uidt-space-8);

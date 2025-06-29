@@ -2,11 +2,16 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
+use crate::domain::FileMetadata;
+
+use super::{image_domain::ImageLocal, FileInfos};
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DesignSystem {
     pub metadata: DesignSystemMetadata,
     pub palettes: Vec<Palette>,
+    pub independant_colors: IndependantColors,
     pub themes: Themes,
     pub semantic_color_tokens: SemanticColorTokens,
     pub spaces: Vec<Space>,
@@ -75,6 +80,19 @@ pub struct DesignSystemMetadata {
     pub can_redo: bool,
     pub banner: String,
     pub logo: String,
+    pub readme: Option<String>,
+    pub preview_images: Vec<ImageLocal>,
+    pub fonts: Vec<FileInfos>,
+    pub exports: ExportsMetadata,
+    pub update_date: String
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ExportsMetadata {
+    pub css: Option<FileMetadata>,
+    pub figma_token_studio: Option<FileMetadata>,
+    pub readme: Option<FileMetadata>
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -117,6 +135,8 @@ impl DesignSystemMetadata {
         path: &PathBuf,
         is_tmp: bool,
         image_pathbuf: &PathBuf,
+        exports: ExportsMetadata,
+        update_date: String
     ) -> DesignSystemMetadata {
         let DesignSystemMetadataFile {
             design_system_id,
@@ -137,6 +157,11 @@ impl DesignSystemMetadata {
             is_tmp,
             can_redo: false,
             can_undo: false,
+            readme: None,
+            preview_images: vec![],
+            fonts: vec![],
+            exports,
+            update_date
         }
     }
 }
@@ -147,6 +172,22 @@ pub struct Palette {
     pub palette_name: String,
     pub palette_path: Option<PathBuf>,
     pub tints: Vec<Tint>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndependantColors {
+    pub white: String,
+    pub independant_colors: Vec<Tint>,
+}
+
+impl IndependantColors {
+    pub fn new() -> IndependantColors {
+        IndependantColors {
+            white: String::from("#ffffff"),
+            independant_colors: vec![],
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -749,7 +790,7 @@ impl Shadows {
                 color_opacity: 0.25,
                 blur: 4.0,
                 spread: 0.0,
-                inset: false
+                inset: false,
             }],
         }
     }

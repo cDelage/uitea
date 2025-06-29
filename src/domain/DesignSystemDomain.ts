@@ -13,10 +13,12 @@ import LabelCombinationPreview from "../features/design-system/previews/combinat
 import ArrayRowCombinationPreview from "../features/design-system/previews/combination-preview/ArrayRowCombinationPreview";
 import ArrayHeaderCombinationPreview from "../features/design-system/previews/combination-preview/ArrayHeaderCombinationPreview";
 import ColorIO from "colorjs.io";
+import { ImageLocal } from "./ImageDomain";
 
 export interface DesignSystem {
   metadata: DesignSystemMetadata;
   palettes: Palette[];
+  independantColors: IndependantColors;
   themes: Themes;
   semanticColorTokens: SemanticColorTokens;
   fonts: Fonts;
@@ -33,6 +35,11 @@ export interface DesignSystemCreationPayload {
   logo?: string;
 }
 
+export interface DesignSystemSavePayload {
+  designSystem: DesignSystem;
+  isTmp: boolean;
+}
+
 export type DesignSystemMetadataHome = DesignSystemMetadata & {
   editMode: boolean;
 };
@@ -46,11 +53,21 @@ export interface DesignSystemMetadata {
   canRedo: boolean;
   banner: string;
   logo: string;
+  readme?: string;
+  previewImages: ImageLocal[];
+  fonts: FileInfo[];
+  exports: ExportsMetadata;
+  updateDate: string;
 }
 
 export interface Palette {
   paletteName: string;
   tints: Tint[];
+}
+
+export interface IndependantColors {
+  white: string;
+  independantColors: Tint[];
 }
 
 export interface Tint {
@@ -306,7 +323,6 @@ export interface ColorCombinationCollectionGroup {
   active?: ColorCombination;
   focus?: ColorCombination;
   group?: string;
-  previewComponent?: PreviewComponent;
   childs: ColorCombinationCollectionGroup[];
 }
 
@@ -329,7 +345,7 @@ export interface RecommandationRow {
 }
 
 export interface RecommandationMetadata {
-  combinationName: ColorCombination;
+  combinationNames: ColorCombination;
   combinationTokens: ColorCombination;
   contrasts: CombinationContrasts;
   backgroundRgba: string;
@@ -345,9 +361,15 @@ export interface RecommandationContrastPayload {
   border: number;
 }
 
+export type PaletteOrTint = Palette | Tint;
+
+export function isPalette(p: PaletteOrTint): p is Palette {
+  return "paletteName" in p;
+}
+
 export interface PaletteAndColor {
   mainColor: ColorIO;
-  palette: Palette;
+  palette: PaletteOrTint;
 }
 
 export interface HandleUpdateColorPayload {
@@ -369,3 +391,55 @@ export interface Measurement {
   unit: UnitOfMeasurement;
   value: number;
 }
+
+//Readme objects
+export interface SemanticColorTokensMapped {
+  backgroundToken?: string;
+  backgroundColor?: string;
+  textLightToken?: string;
+  textLightColor?: string;
+  textDefaultToken?: string;
+  textDefaultColor?: string;
+  textDarkToken?: string;
+  textDarkColor?: string;
+  borderToken?: string;
+  borderColor?: string;
+  colorCombinationCollections: ColorCombinationCollectionMapped[];
+}
+
+export interface ColorCombinationCollectionMapped {
+  combinationName?: string;
+  default?: ColorCombinationMapped;
+  hover?: ColorCombinationMapped;
+  active?: ColorCombinationMapped;
+  focus?: ColorCombinationMapped;
+}
+
+export interface ColorCombinationMapped {
+  backgroundToken?: string;
+  backgroundColor?: string;
+  borderToken?: string;
+  borderColor?: string;
+  textToken?: string;
+  textColor?: string;
+}
+
+export interface FileInfo {
+  filename: string;
+  filenameWithExtension: string;
+  extension: string;
+  filepath: string;
+}
+
+export interface FileMetadata {
+  filename: string;
+  updateDate: string;
+}
+
+export interface ExportsMetadata {
+  css?: FileMetadata;
+  figmaTokenStudio?: FileMetadata;
+  readme?: FileMetadata;
+}
+
+export type EXPORT_CATEGORY = "css" | "figma" | "readme";

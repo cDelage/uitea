@@ -76,10 +76,10 @@ export function useChartAxeData({
     PICKER_MODES.find((picker) => picker.space === interpolationColorSpace) ??
     DEFAULT_PICKER_MODE;
   const satChromaAxe =
-    pickerMode.axes.find((axe) => axe.axe === "c" || axe.axe === "s") ??
+    pickerMode.axes.find((axe) => axe.name === "c" || axe.name === "s") ??
     pickerMode.axes[1];
   const hueAxe =
-    pickerMode.axes.find((axe) => axe.axe === "h") ?? pickerMode.axes[2];
+    pickerMode.axes.find((axe) => axe.name === "h") ?? pickerMode.axes[2];
 
   const leftColor: ColorIO = palette.tints[0].color;
   const centerColor: ColorIO =
@@ -237,7 +237,7 @@ export function useChartAxeData({
       rightAxeData: rightLightnessAxe,
     },
     {
-      axeName: satChromaAxe.axe,
+      axeName: satChromaAxe.name,
       axeLabel: satChromaAxe.label,
       leftAxeData: leftSatChromaAxe,
       rightAxeData: rightSatChromaAxe,
@@ -261,11 +261,11 @@ export function computeChartAxeGradient({
   axe: PickerAxe;
 }) {
   const startColor = centerColor.clone().set({
-    [`${interpolationColorSpace}.${axe.axe}`]: axe.max,
+    [`${interpolationColorSpace}.${axe.name}`]: axe.max,
   });
 
   const endColor = centerColor.clone().set({
-    [`${interpolationColorSpace}.${axe.axe}`]: axe.min,
+    [`${interpolationColorSpace}.${axe.name}`]: axe.min,
   });
 
   return `${startColor.toString({
@@ -289,11 +289,11 @@ export function getPaletteChart({
     DEFAULT_PICKER_MODE;
 
   const axe: PickerAxe =
-    colorSpace.axes.find((axe) => axe.axe === axeName) ?? colorSpace.axes[0];
+    colorSpace.axes.find((axe) => axe.name === axeName) ?? colorSpace.axes[0];
 
   let minY = axe.min;
   let maxY = axe.max;
-  if (axe.axe === "h") {
+  if (axe.name === "h") {
     const hues = palette.tints.map((tint) =>
       tint.color.get(`${interpolationColorSpace}.h`)
     );

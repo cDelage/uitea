@@ -444,3 +444,29 @@ export const DEFAULT_SHADOW : Shadow = {
   colorOpacity: 0.25,
   inset: false,
 }
+
+export const INDEPENDANT_COLORS_PALETTE : Palette = {  
+  paletteName: "independant-colors",
+  tints: [
+    {
+      label: "1",
+      color: "#2563eb"
+    },
+    {
+      label: "2",
+      color: "#ea580c"
+    },
+    {
+      label: "3",
+      color: "#16a34a"
+    },
+    {
+      label: "4",
+      color: "#d97706"
+    },
+    {
+      label: "5",
+      color: "#0d9488"
+    },
+  ]
+}

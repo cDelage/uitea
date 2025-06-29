@@ -140,7 +140,7 @@ function Recommandations() {
           {palettesAndColors.length !== 0 && (
             <div className="column gap-8">
               <div className="column gap-6">
-                <h3>Mix palettes</h3>
+                <h3>Mix palettes & colors</h3>
                 <div className="row gap-4 align-center">
                   <SelectPalettePopover target="indexPaletteA" />
                   <button

@@ -84,6 +84,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   const [triggerMemo, setTriggerMemo] = useState(1);
   const { designSystemPath } = useParams();
   const [searchParams] = useSearchParams();
+  const [triggerOpen, setTriggerOpen] = useState<string | undefined>(undefined);
   const currentDesignSystem = searchParams.get("currentDesignSystem");
   const designSystemPathComputed: string | undefined =
     designSystemPath ?? currentDesignSystem ?? undefined;
@@ -184,8 +185,11 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   }
 
   function handleCreatePalette() {
-    createPalette(colorCreatePalette);
+    const palette = createPalette(colorCreatePalette);
     setSelectedPaletteIndex(palettes.length);
+    setTriggerOpen("palette");
+    const centerIndex = palette.tints.findIndex((tint) => tint.isCenter);
+    setSelectedTintIndex(centerIndex);
   }
 
   function setSteps(steps: number) {
@@ -264,33 +268,35 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
     <SidePanel
       isOpenToSync={isSidepanelOpen}
       setIsOpenToSync={setIsSidepanelOpen}
+      triggerOpen={triggerOpen}
+      setTriggerOpen={setTriggerOpen}
     >
       <Popover>
         <div className={styles.paletteBuilder}>
           <div className={styles.builderBodyContainer}>
             <div className={builderBodyContainerChild}>
               <div className="column gap-6">
-                  <div className="row justify-between align-center gap-4">
-                    {currentDesignSystem && (
-                      <ButtonTertiary
-                        onClick={() =>
-                          navigate(
-                            `/design-system/${encodeURIComponent(
-                              currentDesignSystem
-                            )}?editMode=true`
-                          )
-                        }
-                      >
-                        <MdChevronLeft size={ICON_SIZE_MD} /> Back to design
-                        system
-                      </ButtonTertiary>
-                    )}
-                    <SidePanel.Button id="settings">
-                      <ButtonTertiary>
-                        <MdSettings size={ICON_SIZE_MD} /> Advanced settings
-                      </ButtonTertiary>
-                    </SidePanel.Button>
-                  </div>
+                <div className="row justify-between align-center gap-4">
+                  {currentDesignSystem && (
+                    <ButtonTertiary
+                      onClick={() =>
+                        navigate(
+                          `/design-system/${encodeURIComponent(
+                            currentDesignSystem
+                          )}?editMode=true`
+                        )
+                      }
+                    >
+                      <MdChevronLeft size={ICON_SIZE_MD} /> Back to design
+                      system
+                    </ButtonTertiary>
+                  )}
+                  <SidePanel.Button id="settings">
+                    <ButtonTertiary>
+                      <MdSettings size={ICON_SIZE_MD} /> Advanced settings
+                    </ButtonTertiary>
+                  </SidePanel.Button>
+                </div>
                 <div className="row align-center gap-8">
                   <div>
                     <FormComponent label="Tints naming mode" className="flex-1">
@@ -432,6 +438,15 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                 }
                                 isAnchor={tint.isAnchor}
                                 tints={palette.tints}
+                                isComparedContrastTint={
+                                  tintIndex ===
+                                    alignerSettings.alignerContrastPaletteStep &&
+                                  alignerSettings.aligner ===
+                                    "CONTRAST_COLOR" &&
+                                  alignerSettings.alignerContrastMode ===
+                                    "PALETTE_STEP"
+                                }
+                                selectedTintIndex={selectedTintIndex}
                               />
                               {tintIndex === selectedTintIndex &&
                                 paletteIndex === selectedPaletteIndex &&
@@ -446,6 +461,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                         left: "50%",
                                         transform:
                                           "translate(-50%, -95%) scale(130%)",
+                                        zIndex:1000
                                       }}
                                     />
                                     <MdLocationPin
@@ -456,6 +472,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                         top: 0,
                                         left: "50%",
                                         transform: "translate(-50%, -100%)",
+                                        zIndex:1000
                                       }}
                                     />
                                   </>

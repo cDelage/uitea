@@ -32,11 +32,17 @@ function MainThemeTokenPopover({
     .filter((family) => family.tokens.length)
     .map((family) => family.tokens[0]);
 
-  const [color, setColor] = useState(defaultColor ?? "#1F85DE");
+  const [color, setColor] = useState(defaultColor ?? filteredTokens[0].value);
 
   return (
-    <div className={styles.inputPopover}>
+    <div
+      className={styles.inputPopover}
+      style={{
+        width: "400px",
+      }}
+    >
       <div className="column gap-8 p-4">
+        <h5>Select your primary color lightest token</h5>
         <div className="row gap-3 wrap">
           {filteredTokens.map((token) => (
             <div className="flex-1">

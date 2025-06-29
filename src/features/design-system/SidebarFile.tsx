@@ -33,7 +33,11 @@ function SidebarFile({
   }
 
   return (
-    <div className={fileClassname} onClick={triggerScrollRequest}>
+    <div
+      className={fileClassname}
+      onClick={triggerScrollRequest}
+      data-visible={visible === id}
+    >
       {icon ? icon : <FcFile size={ICON_SIZE_SM} />}
       {filename}
     </div>

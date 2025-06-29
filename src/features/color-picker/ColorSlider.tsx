@@ -4,6 +4,8 @@ import {
   HANDLE_SLIDER_HORIZONTAL,
   RAIL_SLIDER_HORIZONTAL,
 } from "../../ui/UiConstants";
+import { useColorPickerStore } from "./ColorPickerStore";
+import { PickerAxeName } from "../../util/PickerUtil";
 
 function ColorSlider({
   gradient,
@@ -14,7 +16,8 @@ function ColorSlider({
   step = 1,
   color,
   reverse,
-  onChangeComplete
+  onChangeComplete,
+  axe,
 }: {
   gradient: string;
   value: number;
@@ -25,14 +28,24 @@ function ColorSlider({
   color?: ColorIO;
   reverse?: boolean;
   onChangeComplete?: () => void;
+  axe?: PickerAxeName;
 }) {
+  const { pickerFallbacks } = useColorPickerStore();
+
+  function getValue(): number | undefined {
+    if (value) return value;
+    if (axe) {
+      return pickerFallbacks.find((fallback) => fallback.axe === axe)?.value;
+    }
+    return undefined;
+  }
   return (
     <Slider
       min={min}
       max={max}
       step={step}
       included={false}
-      value={value}
+      value={getValue()}
       reverse={reverse}
       onChangeComplete={onChangeComplete}
       onChange={(value) => {

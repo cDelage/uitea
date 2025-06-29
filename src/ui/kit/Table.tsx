@@ -38,8 +38,8 @@ export const Table = styled.table`
 
     .hoverable {
       &:hover {
-        background-color: var(--uidt-component-hover-bg);
-        color: var(--uidt-component-hover-text);
+        background-color: var(--uidt-primary-outline-hover-bg);
+        color: var(--uidt-primary-outline-hover-text);
       }
     }
 

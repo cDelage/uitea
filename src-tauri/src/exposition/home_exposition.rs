@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow_tauri::{self, IntoTAResult, TAResult};
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use crate::{
     application::home_application,
@@ -47,13 +47,18 @@ pub fn update_recent_file(
 }
 
 #[tauri::command]
-pub fn fetch_presets_dressing() -> TAResult<PresetDressing> {
-    home_application::fetch_presets_dressing().into_ta_result()
+pub fn fetch_presets_dressing(app: AppHandle) -> TAResult<PresetDressing> {
+    home_application::fetch_presets_dressing(app).into_ta_result()
 }
 
 #[tauri::command]
 pub fn encode_image_base64(path: String) -> TAResult<ImageLocal> {
     home_application::encode_image_base64(path).into_ta_result()
+}
+
+#[tauri::command]
+pub fn svg_to_png_b64(svg: String, design_system_path: Option<PathBuf>) -> TAResult<String> {
+    home_application::svg_to_png(&svg, design_system_path).into_ta_result()
 }
 
 #[tauri::command]
@@ -64,4 +69,9 @@ pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings)
 #[tauri::command]
 pub fn fetch_user_settings(state: State<AppState>) -> TAResult<UserSettings> {
     home_application::fetch_user_settings(state).into_ta_result()
+}
+
+#[tauri::command]
+pub fn open_folder(path: PathBuf) -> TAResult<()>{
+    home_application::open_folder(path).into_ta_result()
 }

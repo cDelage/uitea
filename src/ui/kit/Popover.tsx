@@ -195,20 +195,22 @@ function Toggle({
 
   useEffect(() => {
     function handleSetPosition() {
-      const rect = toggleRef.current?.getBoundingClientRect();
-      const menuPosition = getRectPosition(
-        positionPayload || "bottom-left",
-        rect
-      );
-      setPosition(menuPosition);
-      setToggleRect(toggleRef.current?.getBoundingClientRect());
+      if (openPopoverId === id) {
+        const rect = toggleRef.current?.getBoundingClientRect();
+        const menuPosition = getRectPosition(
+          positionPayload || "bottom-left",
+          rect
+        );
+        setPosition(menuPosition);
+        setToggleRect(toggleRef.current?.getBoundingClientRect());
+      }
     }
 
     document.addEventListener("refresh-scroll", handleSetPosition);
     return () => {
       document.removeEventListener("refresh-scroll", handleSetPosition);
     };
-  }, [toggleRef, setPosition, positionPayload, setToggleRect]);
+  }, [toggleRef, setPosition, positionPayload, setToggleRect, id, openPopoverId]);
 
   return cloneElement(
     children as ReactElement<

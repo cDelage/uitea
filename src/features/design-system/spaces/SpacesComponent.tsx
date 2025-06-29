@@ -103,11 +103,9 @@ function SpacesComponent() {
 
   const formClassNames = classNames(
     styles.componentDesignSystem,
-    styles.bigHeight
   );
   const sideSettingsClass = classNames(
     styles.sideSettings,
-    styles.scrollableSettings
   );
 
   return (
@@ -156,7 +154,7 @@ function SpacesComponent() {
           </div>
         </div>
 
-        <PreviewComponentDesignSystem maxHeight="600px">
+        <PreviewComponentDesignSystem>
           <div className={styles.previewElement}>
             {spacesArray.map((field, index) => (
               <SpacePreview

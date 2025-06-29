@@ -3,11 +3,12 @@
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:5173",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "package": {
-    "productName": "pathframe",
-    "version": "0.1.0"
+    "productName": "uitea",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -24,6 +25,12 @@
       "protocol": {
         "asset": true,
         "assetScope": ["**"]
+      },
+      "shell": {
+        "open": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
@@ -41,7 +48,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.pathframe.dev",
+      "identifier": "com.uitea.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -50,7 +57,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": ["assets/banners/**/*", "assets/logos/**/*"],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -69,7 +76,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "pathframe",
+        "title": "uitea",
         "decorations": false,
         "transparent": true
       }

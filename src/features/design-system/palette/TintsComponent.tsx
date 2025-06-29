@@ -2,14 +2,9 @@ import { MouseEvent, useRef, useState } from "react";
 import styles from "./TintsComponent.module.css";
 import { ComponentMode, useDesignSystemContext } from "../DesignSystemContext";
 import classNames from "classnames";
-import { Palette, Tint } from "../../../domain/DesignSystemDomain";
-import {
-  UseFieldArrayReturn,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
-import { useDraggableContext } from "../../../util/DraggableContext";
+import { Tint } from "../../../domain/DesignSystemDomain";
+import { UseFormRegisterReturn } from "react-hook-form";
+import { DraggableTools } from "../../../util/DraggableContext";
 import {
   generateUniqueTintKey,
   stopPropagation,
@@ -19,59 +14,79 @@ import Popover from "../../../ui/kit/Popover";
 import { useSearchParams } from "react-router-dom";
 import ColorPickerLinear from "../../color-picker/ColorPickerLinear";
 import ColorIO from "colorjs.io";
-import { getRectSize } from "../../../ui/UiConstants";
+import { ICON_SIZE_SM } from "../../../ui/UiConstants";
+import { MdLock } from "react-icons/md";
 
 function TintComponent({
   index,
-  register,
-  getValues,
   submitEvent,
-  tints,
   error,
   paletteName,
-  setValue,
-  tintsFieldArray,
+  registerKey,
+  setColor,
+  getColor,
+  getLabel,
+  keyReadOnly,
+  tokenStart,
+  insertTint,
+  removeTint,
+  tintsArray,
+  draggableTools,
 }: {
-  paletteName: string;
-  index: number;
-  register: UseFormRegister<Palette>;
-  getValues: UseFormGetValues<Palette>;
+  paletteName?: string;
+  index?: number;
   submitEvent: () => void;
-  setValue: UseFormSetValue<Palette>;
-  tints: Tint[];
   error?: string;
-  tintsFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
+  registerKey?: UseFormRegisterReturn<string>;
+  setColor: (e: string) => void;
+  getColor: () => string;
+  getLabel: () => string;
+  keyReadOnly?: string;
+  tokenStart: "palette" | "color";
+  tintsArray?: Tint[];
+  insertTint?: (tint: Tint) => void;
+  removeTint?: (index: number) => void;
+  draggableTools?: DraggableTools;
 }) {
   const { editMode } = useDesignSystemContext();
 
   const shadeRef = useRef<HTMLDivElement>(null);
-  const { dragIndex, hoverIndex, setDragIndex, setHoverIndex } =
-    useDraggableContext();
 
-  const shadeToken: string = `palette-${paletteName}-${getValues(
-    `tints.${index}.label`
-  )}`;
+  const shadeToken: string = paletteName
+    ? `${tokenStart}-${paletteName}-${getLabel()}`
+    : `${tokenStart}-${getLabel()}`;
 
-  const [colorIo, setColorIo] = useState(
-    new ColorIO(getValues(`tints.${index}.color`))
-  );
+  const [colorIo, setColorIo] = useState(() => {
+    try {
+      return new ColorIO(getColor());
+    } catch {
+      return new ColorIO("#DDDDDD");
+    }
+  });
 
   const [searchParams] = useSearchParams();
 
   const keyboardAction = searchParams.get("keyboardAction");
 
-  function getShadeComponentMode(): ComponentMode {
+  function getTintComponentMode(): ComponentMode {
     if (editMode) {
-      if (!dragIndex && keyboardAction === "i") {
+      if (draggableTools?.dragIndex !== undefined && keyboardAction === "i") {
         return "add";
       } else if (
-        (dragIndex === index && hoverIndex === "remove") ||
-        (!dragIndex && keyboardAction === "d")
+        (draggableTools?.dragIndex === index &&
+          draggableTools?.hoverIndex === "remove") ||
+        (draggableTools?.dragIndex !== undefined && keyboardAction === "d")
       ) {
         return "remove";
-      } else if (dragIndex === index && hoverIndex !== "remove") {
+      } else if (
+        draggableTools?.dragIndex === index &&
+        draggableTools?.hoverIndex !== "remove"
+      ) {
         return "drag";
-      } else if (hoverIndex === index && dragIndex !== index) {
+      } else if (
+        draggableTools?.hoverIndex === index &&
+        draggableTools?.dragIndex !== index
+      ) {
         return "drag-hover";
       } else {
         return "edit";
@@ -81,63 +96,59 @@ function TintComponent({
     }
   }
 
-  const shadeComponentMode = getShadeComponentMode();
+  const tintComponentMode = getTintComponentMode();
 
   const shadeClassname = classNames(
     styles.shade,
     {
-      draggable: shadeComponentMode === "drag",
+      draggable: tintComponentMode === "drag" && tintsArray,
     },
     {
-      "remove-hover": shadeComponentMode === "remove",
+      "remove-hover": tintComponentMode === "remove" && removeTint,
     },
     {
-      remove: shadeComponentMode === "remove" && dragIndex === index,
+      remove:
+        tintComponentMode === "remove" &&
+        draggableTools?.dragIndex === index &&
+        removeTint,
     },
     {
-      "drag-hover-left": shadeComponentMode === "drag-hover",
+      "drag-hover-left": tintComponentMode === "drag-hover" && tintsArray,
     },
     {
-      "add-right": shadeComponentMode === "add",
+      "add-right": tintComponentMode === "add" && insertTint,
     }
   );
 
-  const strongClassname = classNames({
+  const strongClassname = classNames("relative", {
     error: error,
   });
 
   const colorPreviewClassname = classNames(styles.colorPreview, "cursor-move");
 
   function handleHoverEvent() {
-    if (dragIndex !== undefined) {
-      setHoverIndex(index);
+    if (draggableTools && draggableTools?.dragIndex !== undefined) {
+      draggableTools?.setHoverIndex(index);
     }
   }
 
   function handleMouseDown(e: MouseEvent<HTMLInputElement>) {
     e.stopPropagation();
-    if (shadeComponentMode === "edit") {
-      setDragIndex(index);
+    if (draggableTools && tintComponentMode === "edit") {
+      draggableTools.setDragIndex(index);
     }
   }
 
   function handleClick() {
-    if (shadeComponentMode === "add") {
-      const label = generateUniqueTintKey(
-        tintsFieldArray.fields,
-        `palette-${index + 1}`
-      );
-      tintsFieldArray.insert(
-        index,
-        {
-          label,
-          color: "#DDDDDD",
-        },
-        { shouldFocus: false }
-      );
+    if (tintComponentMode === "add" && tintsArray && index !== undefined) {
+      const label = generateUniqueTintKey(tintsArray, `${index + 1}`);
+      insertTint?.({
+        label,
+        color: "#DDDDDD",
+      });
       submitEvent();
-    } else if (shadeComponentMode === "remove") {
-      tintsFieldArray.remove(index);
+    } else if (tintComponentMode === "remove" && index !== undefined) {
+      removeTint?.(index);
       submitEvent();
     }
   }
@@ -163,55 +174,50 @@ function TintComponent({
         <div className="column" onMouseDown={stopPropagation}>
           <strong className={strongClassname}>
             <input
-              {...register(`tints.${index}.label`, {
-                required: true,
-                validate: (label: string) => {
-                  const duplicates = tints.filter(
-                    (_, i) => i !== index && tints[i].label === label
-                  );
-                  return (
-                    duplicates.length === 0 || "Shades key can't be duplicated"
-                  );
-                },
-              })}
+              {...(registerKey ?? { value: keyReadOnly })}
               className="inherit-input"
               type="text"
               autoComplete="off"
               onBlur={submitEvent}
-              readOnly={!editMode && !dragIndex}
+              readOnly={!editMode && !draggableTools?.dragIndex}
+              disabled={!registerKey}
               onMouseDown={(e) => {
                 if (e.currentTarget.readOnly) {
                   e.preventDefault();
                 }
               }}
             />
+            {!registerKey && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: "0px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <MdLock
+                  size={ICON_SIZE_SM}
+                  color="var(--uidt-base-text-light)"
+                />
+              </div>
+            )}
           </strong>
           <Popover
             onClose={() => {
-              setValue(
-                `tints.${index}.color`,
-                colorIo.toString({ format: "hex" })
-              );
+              setColor(colorIo.toString({ format: "hex" }));
               submitEvent();
             }}
           >
-            <Popover.Toggle id="color-picker">
-              <small className="text-color-light">
-                <input
-                  {...register(`tints.${index}.color`)}
-                  type="text"
-                  className="inherit-input"
-                  autoComplete="off"
-                  onBlur={submitEvent}
-                  readOnly={!editMode && !dragIndex}
-                  onMouseDown={(e) => {
-                    if (e.currentTarget.readOnly) {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-              </small>
-            </Popover.Toggle>
+            {editMode ? (
+              <Popover.Toggle id="color-picker">
+                <div className="input-hover">
+                  <div className="text-color-light">{getColor()}</div>
+                </div>
+              </Popover.Toggle>
+            ) : (
+              <div className="text-color-light">{getColor()}</div>
+            )}
             <Popover.Body id="color-picker" zIndex={100}>
               <div
                 className="popover-body"
@@ -221,22 +227,6 @@ function TintComponent({
                 }}
               >
                 <ColorPickerLinear color={colorIo} onChange={setColorIo} />
-                <div className="row justify-center align-center gap-2">
-                  <div
-                    className="palette-color"
-                    style={{
-                      background: colorIo.toString({
-                        format: "hex",
-                      }),
-                      ...getRectSize({ height: "var(--uidt-space-9)" }),
-                    }}
-                  ></div>
-                  <strong>
-                    {colorIo.toString({
-                      format: "hex",
-                    })}
-                  </strong>
-                </div>
               </div>
             </Popover.Body>
           </Popover>

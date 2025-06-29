@@ -60,7 +60,7 @@ function RecommandationRowComponent({
           {recommandationRow.combinations.map((combinationMetadata, index) => (
             <RecommandationStyled
               $combination={combinationMetadata}
-              key={`${combinationMetadata.combinationName}${index}`}
+              key={`${combinationMetadata.combinationNames}${index}`}
               $applyBorder={applyBorder}
               $isDragged={
                 index === dragTools.dragIndex &&
@@ -132,14 +132,14 @@ function RecommandationRowComponent({
                 <div>
                   <MdFormatColorFill size={ICON_SIZE_SM} />
                 </div>
-                <div>{combinationMetadata.combinationName.background}</div>
+                <div>{combinationMetadata.combinationNames.background}</div>
                 <div style={{ justifySelf: "end" }}>
                   <MdContrast size={ICON_SIZE_SM} />
                 </div>
                 <div>
                   <MdTitle size={ICON_SIZE_SM} />
                 </div>
-                <div>{combinationMetadata.combinationName.text}</div>
+                <div>{combinationMetadata.combinationNames.text}</div>
                 <div style={{ justifySelf: "end" }}>
                   {combinationMetadata.contrasts.backgroundText?.toFixed(2)}
                 </div>
@@ -148,7 +148,7 @@ function RecommandationRowComponent({
                     <div>
                       <MdBorderAll size={ICON_SIZE_SM} />
                     </div>
-                    <div>{combinationMetadata.combinationName.border}</div>
+                    <div>{combinationMetadata.combinationNames.border}</div>
                     <div style={{ justifySelf: "end" }}>
                       {combinationMetadata.contrasts.backgroundBorder?.toFixed(
                         2

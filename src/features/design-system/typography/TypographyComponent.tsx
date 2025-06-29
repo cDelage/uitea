@@ -106,11 +106,6 @@ function TypographyComponent() {
     styles.bigHeight
   );
 
-  const sideSettingsClass = classNames(
-    styles.sideSettings,
-    styles.scrollableSettings
-  );
-
   function handleRemove(index: number) {
     remove(index);
     handleSubmit(submitTypography)();
@@ -131,7 +126,7 @@ function TypographyComponent() {
         onSubmit={handleSubmit(submitTypography)}
         ref={typographyRef}
       >
-        <div className={sideSettingsClass}>
+        <div className={styles.sideSettings}>
           <div className={styles.sideSettingsTitle}>
             <h5>Typography scales</h5>
           </div>
@@ -203,7 +198,7 @@ function TypographyComponent() {
             )}
           </div>
         </div>
-        <PreviewComponentDesignSystem maxHeight="600px">
+        <PreviewComponentDesignSystem>
           <div
             className={styles.previewElement}
             style={{

@@ -1,3 +1,4 @@
+import { isPalette } from "../../domain/DesignSystemDomain";
 import Popover from "../../ui/kit/Popover";
 import { getRectSize } from "../../ui/UiConstants";
 import { PreviewStyle } from "../design-system/previews/PreviewStyle";
@@ -52,7 +53,9 @@ function SelectPalettePopover({
                       }),
                     }}
                   ></div>
-                  {selectedPalette?.palette.paletteName}
+                  {isPalette(selectedPalette?.palette)
+                    ? selectedPalette?.palette.paletteName
+                    : selectedPalette?.palette.label}
                 </div>
               )
             }
@@ -73,7 +76,11 @@ function SelectPalettePopover({
           <Popover.Actions>
             {palettesAndColors.map((palette, index) => (
               <Popover.Tab
-                key={palette.palette.paletteName}
+                key={
+                  isPalette(palette.palette)
+                    ? palette.palette.paletteName
+                    : palette.palette.label
+                }
                 clickEvent={() => setSelectedPalette(index)}
               >
                 <div
@@ -83,7 +90,9 @@ function SelectPalettePopover({
                     background: palette.mainColor.toString({ format: "hex" }),
                   }}
                 ></div>
-                {palette.palette.paletteName}
+                {isPalette(palette.palette)
+                  ? palette.palette.paletteName
+                  : palette.palette.label}
               </Popover.Tab>
             ))}
           </Popover.Actions>

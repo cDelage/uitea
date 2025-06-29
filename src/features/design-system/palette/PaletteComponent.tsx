@@ -1,4 +1,8 @@
-import { DesignSystem, Palette } from "../../../domain/DesignSystemDomain";
+import {
+  DesignSystem,
+  Palette,
+  Tint,
+} from "../../../domain/DesignSystemDomain";
 import styles from "../ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import classNames from "classnames";
@@ -39,7 +43,7 @@ function PaletteComponent({
 }) {
   const { designSystem, editMode } = useDesignSystemContext();
   const { paletteName } = colorPalette;
-  const componentId = `palette-${paletteName}`
+  const componentId = `palette-${paletteName}`;
   const colorPaletteRef = useRef<HTMLFormElement>(null);
   const { designSystemPath } = useParams();
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
@@ -59,10 +63,6 @@ function PaletteComponent({
     defaultValues: colorPalette,
   });
 
-  const tintsFieldArray = useFieldArray({
-    control,
-    name: "tints",
-  });
   useTriggerScroll({
     ref: colorPaletteRef,
     triggerId: componentId,
@@ -71,7 +71,11 @@ function PaletteComponent({
     reset,
     originalValue: colorPalette,
   });
-
+  
+  const tintsFieldArray = useFieldArray({
+    control,
+    name: "tints",
+  });
   const { draggableTools } = useDraggableFeatures(
     (dragIndex?: number, hoverIndex?: RemovableIndex) => {
       if (
@@ -239,25 +243,50 @@ function PaletteComponent({
       </div>
       <DraggableContext.Provider value={draggableTools}>
         <div className={styles.shadesContainer}>
-          {tintsFieldArray.fields.map((shade, shadeIndex) => (
+          {tintsFieldArray.fields.map((tint, tintIndex) => (
             <TintComponent
-              key={shade.id}
-              getValues={getValues}
-              index={shadeIndex}
-              register={register}
-              setValue={setValue}
-              tints={tintsFieldArray.fields}
+              key={tint.id}
+              getColor={() => getValues(`tints.${tintIndex}.color`)}
+              getLabel={() => getValues(`tints.${tintIndex}.label`)}
+              index={tintIndex}
+              setColor={(color: string) =>
+                setValue(`tints.${tintIndex}.color`, color)
+              }
               submitEvent={handleSubmit(submitPalette)}
               error={errors.tints?.[index]?.label?.message}
               paletteName={paletteName}
-              tintsFieldArray={tintsFieldArray}
+              tokenStart="palette"
+              registerKey={register(`tints.${tintIndex}.label`, {
+                required: true,
+                validate: (label: string) => {
+                  const duplicates = tintsFieldArray.fields.filter(
+                    (_, i) =>
+                      i !== tintIndex &&
+                      tintsFieldArray.fields[i].label === label
+                  );
+                  return (
+                    duplicates.length === 0 || "Shades key can't be duplicated"
+                  );
+                },
+              })}
+              tintsArray={tintsFieldArray.fields}
+              insertTint={(tintInsert: Tint) =>
+                tintsFieldArray.insert(tintIndex, tintInsert, {
+                  shouldFocus: false,
+                })
+              }
+              removeTint={tintsFieldArray.remove}
+              draggableTools={draggableTools}
             />
           ))}
           {editMode && (
             <TintsAddRemove
               draggableTools={draggableTools}
-              shadesFieldArray={tintsFieldArray}
               handleSubmit={handleSubmit(submitPalette)}
+              appendTint={(tint: Tint) =>
+                tintsFieldArray.append(tint)
+              }
+              tintArray={tintsFieldArray.fields}
             />
           )}
         </div>

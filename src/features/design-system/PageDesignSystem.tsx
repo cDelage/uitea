@@ -8,7 +8,13 @@ import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
 import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useMemo, useState } from "react";
-import { ColorCombination, DesignToken, Theme, TokenFamily } from "../../domain/DesignSystemDomain";
+import {
+  ColorCombination,
+  DesignToken,
+  FileInfo,
+  Theme,
+  TokenFamily,
+} from "../../domain/DesignSystemDomain";
 import {
   getDesignSystemTokens,
   getPaletteTokens,
@@ -16,6 +22,7 @@ import {
 } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 import { recolorPalettes } from "../../util/ThemeGenerator";
+import { invoke } from "@tauri-apps/api";
 
 function PageDesignSystem() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();
@@ -30,6 +37,7 @@ function PageDesignSystem() {
     searchParams.get("editMode") || "false"
   ) as boolean;
   const [theme, setTheme] = useState<Theme | undefined>(undefined);
+  const [loadedFonts, setLoadedFonts] = useState<string[]>([]);
 
   function handleSetActiveComponent(newActiveComponent?: ActiveComponent) {
     setActiveComponent((active) =>
@@ -152,6 +160,28 @@ function PageDesignSystem() {
     };
   }, [designSystem, saveDesignSystem, isSavingDesignSystem]);
 
+  useEffect(() => {
+    const loadFont = async (fontInfo: FileInfo) => {
+      const base64: string = await invoke("load_font_as_base64", {
+        path: fontInfo.filepath,
+      });
+      const fontName = fontInfo.filename;
+      const fontFace = new FontFace(
+        fontName,
+        `url(data:font/${fontInfo.extension};base64,${base64})`
+      );
+      await fontFace.load();
+      document.fonts.add(fontFace);
+      setLoadedFonts([...loadedFonts, fontInfo.filename]);
+    };
+
+    designSystem?.metadata.fonts.forEach((font) => {
+      if (!loadedFonts.includes(font.filename)) {
+        loadFont(font);
+      }
+    });
+  }, [designSystem, loadedFonts, setLoadedFonts]);
+
   if (isLoadingDesignSystem) return <Loader />;
   if (!designSystem) return null;
 
@@ -167,7 +197,7 @@ function PageDesignSystem() {
         theme,
         setTheme,
         themeTokenFamilies,
-        defaultCombination
+        defaultCombination,
       }}
     >
       <div className={styles.designSystemPage}>

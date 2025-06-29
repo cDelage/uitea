@@ -1013,3 +1013,6 @@ export const FONT_ARRAY: Font[] = [
     variable: false,
   },
 ];
+
+
+export const FONTS_EXTENSIONS = ["woff", "woff2", "ttf", "otf", "eot"]

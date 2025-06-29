@@ -78,7 +78,7 @@ function ExistingPaletteBuilderTab({
           </button>
         </Popover.Toggle>
         <Popover.Body
-          zIndex={50}
+          zIndex={500}
           id={`palette-builder-options-${paletteBuilderMetadata.paletteBuilderName}`}
         >
           <Popover.Actions>
@@ -117,7 +117,7 @@ function ExistingPaletteBuilderTab({
         <Popover.Body
           id={`delete-builder-${paletteBuilderMetadata.paletteBuilderName}`}
           key={paletteBuilderMetadata.paletteBuilderName}
-          zIndex={100}
+          zIndex={500}
         >
           <Popover.Actions>
             <Popover.Tab>

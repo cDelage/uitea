@@ -1,6 +1,7 @@
 .inputDesignSystem {
   display: flex;
-  padding: var(--uidt-space-3) var(--uidt-space-0) var(--uidt-space-3) var(--uidt-space-0);
+  padding: var(--uidt-space-3) var(--uidt-space-0) var(--uidt-space-3)
+    var(--uidt-space-0);
   border-top: transparent 2px solid;
   border-bottom: transparent 2px solid;
   height: fit-content;
@@ -61,7 +62,7 @@
   height: 100%;
 }
 
-.titlePadding{
+.titlePadding {
   margin-bottom: 2px;
 }
 
@@ -85,7 +86,6 @@
   transform: scale(1.2);
 }
 
-
 .popoverContainer {
   display: flex;
   align-items: center;
@@ -99,4 +99,9 @@
 
 .popoverContainer:hover {
   border-bottom: var(--uidt-primary-outline-light-border) 1px solid;
+}
+
+.popoverContainer[data-edit="false"] {
+  border-bottom: transparent 1px solid;
+  cursor: auto;
 }

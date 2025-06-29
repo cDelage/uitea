@@ -18,11 +18,22 @@ import {
   ColorCombinationCollectionGroup,
   TypographyScale,
   Measurement,
+  SemanticColorTokensMapped,
+  ColorCombinationMapped,
 } from "../domain/DesignSystemDomain";
 import { ColorResult } from "react-color";
 import { PaletteBuilderMetadata } from "../domain/PaletteBuilderDomain";
 import { getFilenameDate } from "./DateUtil";
 import ColorIO from "colorjs.io";
+import { ImageLocal } from "../domain/ImageDomain";
+import ReadmePalette from "../features/design-system/readme/ReadmePalettes";
+import ReactDOMServer from "react-dom/server";
+import { invoke } from "@tauri-apps/api";
+import ReadmeSemantic from "../features/design-system/readme/ReadmeSemantic";
+import ReadmeFonts from "../features/design-system/readme/ReadmeFonts";
+import ReadmeTypographies from "../features/design-system/readme/ReadmeTypographies";
+import ReadmeRadius from "../features/design-system/readme/ReadmeRadius";
+import ReadmeSpaces from "../features/design-system/readme/ReadmeSpaces";
 
 /**
  * Génère un nom unique pour une clé en vérifiant si elle existe déjà dans la liste de shades.
@@ -354,11 +365,29 @@ export function getDesignSystemTokens(
   skipSemantic?: boolean
 ): TokenFamily[] {
   if (!designSystem) return [];
-  const paletteTokens = designSystem.palettes.map(getPaletteTokenFamily);
-  const semanticTokens = skipSemantic
+  const paletteTokens: TokenFamily[] = designSystem.palettes.map(
+    getPaletteTokenFamily
+  );
+  const independantColorTokens: TokenFamily = {
+    label: "Independant",
+    category: "color",
+    tokens: [
+      {
+        label: "color-white",
+        value: designSystem.independantColors.white,
+      },
+      ...designSystem.independantColors.independantColors.map((color) => {
+        return {
+          label: `color-${color.label}`,
+          value: color.color,
+        } as DesignToken;
+      }),
+    ],
+  };
+  const semanticTokens: TokenFamily[] = skipSemantic
     ? []
     : getSemanticColorTokens(designSystem.semanticColorTokens);
-  return [...paletteTokens, ...semanticTokens];
+  return [...paletteTokens, independantColorTokens, ...semanticTokens];
 }
 
 export function findDesignSystemColor({
@@ -416,13 +445,26 @@ export function combinationHasAnyColor(
 export function getShadowColor({
   shadowColor,
   element,
+  designSystem,
 }: {
   shadowColor: string;
   element?: RefObject<HTMLDivElement | null>;
+  designSystem?: DesignSystem;
 }): string {
   if (shadowColor.startsWith("#")) return shadowColor;
-  const color = getCssVariableValue(shadowColor, element);
-  if (color) return color;
+  if (element) {
+    const color = getCssVariableValue(shadowColor, element);
+    if (color) return color;
+  }
+  if (designSystem) {
+    const palettesTokens: DesignToken[] = designSystem.palettes.flatMap(
+      (palette) => getPaletteTokenFamily(palette).tokens
+    );
+    const color = palettesTokens.find(
+      (color) => color.label === shadowColor
+    )?.value;
+    if (color) return color;
+  }
   try {
     return new ColorIO(shadowColor).toString({ format: "hex" });
   } catch {
@@ -541,12 +583,12 @@ export function measurementToCss(measurement: Measurement): string {
  * Utilise colorjs.io pour convertir une couleur CSS et une opacité en chaîne compatible RGBA.
  */
 function toRgba(color: string, opacity: number): string {
-  try{
+  try {
     const c = new ColorIO(color);
     c.alpha = opacity;
     return c.toString({ format: "css" });
-  } catch{
-    return "#DDDDDD"
+  } catch {
+    return "#DDDDDD";
   }
 }
 
@@ -555,14 +597,18 @@ function toRgba(color: string, opacity: number): string {
  */
 export function buildBoxShadow(
   shadows: Shadows,
-  styleRef?: RefObject<HTMLDivElement | null>
+  styleRef?: RefObject<HTMLDivElement | null>,
+  designSystem?: DesignSystem
 ): string {
   return shadows.shadowsArray
     .map((sh) => {
-      const hexColor = styleRef?.current ? getShadowColor({
-        shadowColor: sh.color,
-        element: styleRef,
-      }) : sh.color;
+      const hexColor = styleRef?.current
+        ? getShadowColor({
+            shadowColor: sh.color,
+            element: styleRef,
+            designSystem,
+          })
+        : sh.color;
       const { shadowX, shadowY, blur, spread, colorOpacity, inset } = sh;
       const rgba = toRgba(hexColor, colorOpacity);
       return `${shadowX}px ${shadowY}px ${blur}px ${spread}px ${rgba} ${
@@ -570,4 +616,257 @@ export function buildBoxShadow(
       }`;
     })
     .join(", ");
+}
+
+export function buildReadme(designSystem: DesignSystem) {
+  return `# ${designSystem.metadata.designSystemName}
+
+  ### Palettes
+  ![palettes](./exports/preview_images/palettes.png)
+
+  ### Semantic color tokens
+  ![semantic](./exports/preview_images/semantic.png)
+
+  ### Fonts
+  ![fonts](./exports/preview_images/fonts.png)
+
+  ### Typographies
+  ![typographies](./exports/preview_images/typographies.png)
+  
+  ### Spaces
+  ![spaces](./exports/preview_images/spaces.png)
+  
+  ### Radius
+  ![radius](./exports/preview_images/radius.png)
+  `;
+}
+
+export async function getImagesPreview(
+  designSystem: DesignSystem
+): Promise<ImageLocal[]> {
+  const palettesSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmePalette({ designSystem })
+  );
+
+  const palettesPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: palettesSvg,
+  });
+
+  const semanticSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmeSemantic({ semantic: mapSemanticTokens(designSystem) })
+  );
+
+  const semanticPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: semanticSvg,
+  });
+
+  const fontsSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmeFonts({ fonts: designSystem.fonts })
+  );
+
+  const fontsPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: fontsSvg,
+    designSystemPath: designSystem.metadata.designSystemPath,
+  });
+
+  const typoSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmeTypographies({ designSystem: designSystem })
+  );
+
+  const typoPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: typoSvg,
+    designSystemPath: designSystem.metadata.designSystemPath,
+  });
+
+  const radiusSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmeRadius({ designSystem: designSystem })
+  );
+
+  const radiusPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: radiusSvg,
+  });
+
+  const spacesSvg = ReactDOMServer.renderToStaticMarkup(
+    ReadmeSpaces({ designSystem: designSystem })
+  );
+
+  const spacesPng: string = await invoke<string>("svg_to_png_b64", {
+    svg: spacesSvg,
+  });
+
+  return [
+    {
+      path: "palettes.svg",
+      binary: palettesSvg,
+    },
+    {
+      path: "palettes.png",
+      binary: palettesPng.split(",")[1],
+    },
+    {
+      path: "semantic.svg",
+      binary: semanticSvg,
+    },
+    {
+      path: "semantic.png",
+      binary: semanticPng.split(",")[1],
+    },
+    {
+      path: "fonts.svg",
+      binary: fontsSvg,
+    },
+    {
+      path: "fonts.png",
+      binary: fontsPng.split(",")[1],
+    },
+    {
+      path: "typographies.svg",
+      binary: typoSvg,
+    },
+    {
+      path: "typographies.png",
+      binary: typoPng.split(",")[1],
+    },
+    {
+      path: "radius.svg",
+      binary: radiusSvg,
+    },
+    {
+      path: "radius.png",
+      binary: radiusPng.split(",")[1],
+    },
+    {
+      path: "spaces.svg",
+      binary: spacesSvg,
+    },
+    {
+      path: "spaces.png",
+      binary: spacesPng.split(",")[1],
+    },
+  ];
+}
+
+export function mapSemanticTokens(
+  designSystem: DesignSystem
+): SemanticColorTokensMapped {
+  const palettesTokens: DesignToken[] = designSystem.palettes.flatMap(
+    (palette) => getPaletteTokenFamily(palette).tokens
+  );
+  const { semanticColorTokens } = designSystem;
+  return {
+    backgroundToken: semanticColorTokens.background,
+    backgroundColor: palettesTokens.find(
+      (token) => token.label === semanticColorTokens.background
+    )?.value,
+    textLightToken: semanticColorTokens.textLight,
+    textLightColor: palettesTokens.find(
+      (token) => token.label === semanticColorTokens.textLight
+    )?.value,
+    textDefaultToken: semanticColorTokens.textDefault,
+    textDefaultColor: palettesTokens.find(
+      (token) => token.label === semanticColorTokens.textDefault
+    )?.value,
+    textDarkToken: semanticColorTokens.textDark,
+    textDarkColor: palettesTokens.find(
+      (token) => token.label === semanticColorTokens.textDark
+    )?.value,
+    borderToken: semanticColorTokens.border,
+    borderColor: palettesTokens.find(
+      (token) => token.label === semanticColorTokens.border
+    )?.value,
+    colorCombinationCollections:
+      semanticColorTokens.colorCombinationCollections.map(
+        (colorCombinationCollection) => {
+          return {
+            combinationName: colorCombinationCollection.combinationName,
+            default: colorCombinationCollection.default
+              ? mapColorCombination(
+                  colorCombinationCollection.default,
+                  palettesTokens
+                )
+              : undefined,
+            hover: colorCombinationCollection.hover
+              ? mapColorCombination(
+                  colorCombinationCollection.hover,
+                  palettesTokens
+                )
+              : undefined,
+            active: colorCombinationCollection.active
+              ? mapColorCombination(
+                  colorCombinationCollection.active,
+                  palettesTokens
+                )
+              : undefined,
+            focus: colorCombinationCollection.focus
+              ? mapColorCombination(
+                  colorCombinationCollection.focus,
+                  palettesTokens
+                )
+              : undefined,
+          };
+        }
+      ),
+  };
+}
+
+export function mapColorCombination(
+  colorCombination: ColorCombination,
+  palettesTokens: DesignToken[]
+): ColorCombinationMapped {
+  return {
+    backgroundToken: colorCombination.background,
+    backgroundColor: palettesTokens.find(
+      (token) => token.label === colorCombination.background
+    )?.value,
+    textToken: colorCombination.text,
+    textColor: palettesTokens.find(
+      (token) => token.label === colorCombination.text
+    )?.value,
+    borderToken: colorCombination.border,
+    borderColor: palettesTokens.find(
+      (token) => token.label === colorCombination.border
+    )?.value,
+  };
+}
+
+export function findMainColorCombination(
+  designSystem: DesignSystem
+): ColorCombinationMapped {
+  const palettesTokens: DesignToken[] = designSystem.palettes.flatMap(
+    (palette) => getPaletteTokenFamily(palette).tokens
+  );
+  const mainCombination: ColorCombinationCollection | undefined =
+    designSystem.semanticColorTokens.colorCombinationCollections.find(
+      (combination) => combination.default && combination.defaultCombination
+    ) ||
+    designSystem.semanticColorTokens.colorCombinationCollections.filter(
+      (x) => x.default
+    )[0];
+
+  return mainCombination?.default
+    ? mapColorCombination(mainCombination.default, palettesTokens)
+    : {
+        backgroundColor: "#1e40af",
+        backgroundToken: "palette-primary-800",
+        textColor: "#ffffff",
+        textToken: "palette-white",
+        borderColor: "#1e40af",
+        borderToken: "palette-primary-800",
+      };
+}
+
+export function findMainBackground(designSystem: DesignSystem) {
+  const baseToken = designSystem.semanticColorTokens.background;
+
+  if (!baseToken) return "#ffffff";
+
+  const palettesTokens: DesignToken[] = designSystem.palettes.flatMap(
+    (palette) => getPaletteTokenFamily(palette).tokens
+  );
+
+  return (
+    palettesTokens.find(
+      (token) => token.label === designSystem.semanticColorTokens.background
+    )?.value ?? "#ffffff"
+  );
 }

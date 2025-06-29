@@ -51,8 +51,14 @@ export type PickerSpace = "hsl" | "oklch" | "lch" | "okhsl" | "hwb" | "hsv";
 
 export type PickerAxeName = "h" | "s" | "l" | "c" | "w" | "b" | "v";
 
-export interface PickerAxe {
+export interface PickerFallback {
   axe: PickerAxeName;
+  space: PickerSpace;
+  value: number;
+}
+
+export interface PickerAxe {
+  name: PickerAxeName;
   label: string;
   min: number;
   max: number;
@@ -75,7 +81,7 @@ export function getPickerData({
 }): PickerData[] {
   const { space, axes } = pickerMode;
   return axes.map((axe) => {
-    const { min, max, steps, axe: name, otherAxes, gradientSteps } = axe;
+    const { min, max, steps, name: name, otherAxes, gradientSteps } = axe;
 
     const gradientColors = Array.from({ length: gradientSteps }, (_, i) => {
       const gradientColor = new ColorIO(color);
@@ -113,25 +119,33 @@ export function updateColor({
   color,
   pickerMode,
   value,
+  fallbacks,
 }: {
   color: ColorIO;
   pickerMode: ColorSpace;
   value: number;
   axe: PickerAxeName;
+  fallbacks: PickerFallback[];
 }): ColorIO {
   const newColor = new ColorIO(color);
   const { axes, space } = pickerMode;
 
   const computedValues: [number, number, number] = [
-    axe === axes[0].axe
+    axe === axes[0].name
       ? Number(value.toFixed(2))
-      : color.get(`${space}.${axes[0].axe}`),
-    axe === axes[1].axe
+      : color.get(`${space}.${axes[0].name}`) ??
+        fallbacks.find((fallback) => fallback.axe === axes[0].name)?.value ??
+        0,
+    axe === axes[1].name
       ? Number(value.toFixed(2))
-      : color.get(`${space}.${axes[1].axe}`),
-    axe === axes[2].axe
+      : (color.get(`${space}.${axes[1].name}`) ||
+          fallbacks.find((fallback) => fallback.axe === axes[1].name)?.value) ??
+        0,
+    axe === axes[2].name
       ? Number(value.toFixed(2))
-      : color.get(`${space}.${axes[2].axe}`),
+      : (color.get(`${space}.${axes[2].name}`) ||
+          fallbacks.find((fallback) => fallback.axe === axes[2].name)?.value) ??
+        0,
   ];
 
   newColor.setAll(space, computedValues);
@@ -151,15 +165,15 @@ export function updateColorFromString({
   const { space, axes } = pickerMode;
   const newColor = new ColorIO(value);
   newColor.set({
-    [`${space}.${axes[0].axe}`]: newColor.get(`${space}.${axes[0].axe}`)
-      ? newColor.get(`${space}.${axes[0].axe}`)
-      : color.get(`${space}.${axes[1].axe}`),
-    [`${space}.${axes[1].axe}`]: newColor.get(`${space}.${axes[1].axe}`)
-      ? newColor.get(`${space}.${axes[1].axe}`)
-      : color.get(`${space}.${axes[1].axe}`),
-    [`${space}.${axes[2].axe}`]: newColor.get(`${space}.${axes[2].axe}`)
-      ? newColor.get(`${space}.${axes[2].axe}`)
-      : color.get(`${space}.${axes[2].axe}`),
+    [`${space}.${axes[0].name}`]: newColor.get(`${space}.${axes[0].name}`)
+      ? newColor.get(`${space}.${axes[0].name}`)
+      : color.get(`${space}.${axes[1].name}`),
+    [`${space}.${axes[1].name}`]: newColor.get(`${space}.${axes[1].name}`)
+      ? newColor.get(`${space}.${axes[1].name}`)
+      : color.get(`${space}.${axes[1].name}`),
+    [`${space}.${axes[2].name}`]: newColor.get(`${space}.${axes[2].name}`)
+      ? newColor.get(`${space}.${axes[2].name}`)
+      : color.get(`${space}.${axes[2].name}`),
   });
 
   return newColor;
@@ -169,7 +183,7 @@ export const DEFAULT_PICKER_MODE: ColorSpace = {
   space: "hsl",
   axes: [
     {
-      axe: "h",
+      name: "h",
       label: "hue",
       min: 0,
       max: 360,
@@ -178,7 +192,7 @@ export const DEFAULT_PICKER_MODE: ColorSpace = {
       otherAxes: ["s", "l"],
     },
     {
-      axe: "s",
+      name: "s",
       label: "saturation",
       min: 0,
       max: 100,
@@ -187,7 +201,7 @@ export const DEFAULT_PICKER_MODE: ColorSpace = {
       otherAxes: ["h", "l"],
     },
     {
-      axe: "l",
+      name: "l",
       label: "lightness",
       min: 0,
       max: 100,
@@ -203,7 +217,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "hsl",
     axes: [
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -213,7 +227,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["s", "l"],
       },
       {
-        axe: "s",
+        name: "s",
         label: "Saturation",
 
         min: 0,
@@ -223,7 +237,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["h", "l"],
       },
       {
-        axe: "l",
+        name: "l",
         label: "Lightness",
         min: 0,
         max: 100,
@@ -237,7 +251,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "hsv",
     axes: [
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -247,7 +261,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["s", "v"],
       },
       {
-        axe: "s",
+        name: "s",
         label: "Saturation",
 
         min: 0,
@@ -257,7 +271,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["h", "v"],
       },
       {
-        axe: "v",
+        name: "v",
         label: "Value",
 
         min: 0,
@@ -272,7 +286,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "hwb",
     axes: [
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -282,7 +296,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["w", "b"],
       },
       {
-        axe: "w",
+        name: "w",
         label: "Whiteness",
         min: 0,
         max: 100,
@@ -291,7 +305,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["h", "b"],
       },
       {
-        axe: "b",
+        name: "b",
         label: "Blackness",
 
         min: 0,
@@ -306,7 +320,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "lch",
     axes: [
       {
-        axe: "l",
+        name: "l",
         label: "Lightness",
 
         min: 0,
@@ -316,7 +330,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["c", "h"],
       },
       {
-        axe: "c",
+        name: "c",
         label: "Chroma",
 
         min: 0,
@@ -326,7 +340,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["l", "h"],
       },
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -341,7 +355,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "oklch",
     axes: [
       {
-        axe: "l",
+        name: "l",
         label: "Lightness",
 
         min: 0,
@@ -351,7 +365,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["c", "h"],
       },
       {
-        axe: "c",
+        name: "c",
         label: "Chroma",
 
         min: 0,
@@ -361,7 +375,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["l", "h"],
       },
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -376,7 +390,7 @@ export const PICKER_MODES: ColorSpace[] = [
     space: "okhsl",
     axes: [
       {
-        axe: "h",
+        name: "h",
         label: "Hue",
 
         min: 0,
@@ -386,7 +400,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["s", "l"],
       },
       {
-        axe: "s",
+        name: "s",
         label: "Saturation",
 
         min: 0,
@@ -396,7 +410,7 @@ export const PICKER_MODES: ColorSpace[] = [
         otherAxes: ["h", "l"],
       },
       {
-        axe: "l",
+        name: "l",
         label: "Lightness",
         min: 0,
         max: 1,

@@ -3,18 +3,19 @@ import styles from "./TintsComponent.module.css";
 import { MdAdd, MdDelete } from "react-icons/md";
 import { DraggableTools } from "../../../util/DraggableContext";
 import { ICON_SIZE_MD } from "../../../ui/UiConstants";
-import { UseFieldArrayReturn } from "react-hook-form";
-import { Palette } from "../../../domain/DesignSystemDomain";
+import { Tint } from "../../../domain/DesignSystemDomain";
 import { generateUniqueTintKey } from "../../../util/DesignSystemUtils";
 import { MouseEvent } from "react";
 
 function TintsAddRemove({
   draggableTools,
-  shadesFieldArray,
   handleSubmit,
+  tintArray,
+  appendTint,
 }: {
   draggableTools: DraggableTools;
-  shadesFieldArray: UseFieldArrayReturn<Palette, "tints", "id">;
+  tintArray: Tint[];
+  appendTint: (tint: Tint) => void;
   handleSubmit: () => void;
 }) {
   const shadeClassNames = classNames(
@@ -32,19 +33,19 @@ function TintsAddRemove({
     : "var(--uidt-remove-bg)";
 
   function handleMouseEnter() {
-    if (draggableTools.dragIndex) {
+    if (draggableTools.dragIndex !== undefined) {
       draggableTools.setHoverIndex("remove");
     }
   }
 
   function handleClick(e: MouseEvent<HTMLDivElement>) {
     e.stopPropagation();
-    if (!draggableTools.dragIndex) {
+    if (draggableTools.dragIndex === undefined) {
       const label = generateUniqueTintKey(
-        shadesFieldArray.fields,
-        `palette-${shadesFieldArray.fields.length + 1}`
+        tintArray,
+        `${tintArray.length + 1}`
       );
-      shadesFieldArray.append({
+      appendTint({
         label,
         color: "#DDDDDD",
       });

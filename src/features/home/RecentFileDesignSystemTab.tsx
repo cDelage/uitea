@@ -38,14 +38,14 @@ function RecentFileDesignSystemTab({
       </td>
       <td className="shrink">
         <Popover.Toggle
-          id={`file-actions-design-${index}`}
+          id={`actions-${designSystemName}-${index}`}
           positionPayload="bottom-right"
         >
           <GhostButton>
             <MdMoreHoriz size={ICON_SIZE_MD} />
           </GhostButton>
         </Popover.Toggle>
-        <Popover.Body id={`file-actions-design-${index}`}>
+        <Popover.Body id={`actions-${designSystemName}-${index}`}>
           <Popover.Actions>
             <Popover.Tab clickEvent={() => navigate(getPath())}>
               <MdOpenInNew /> Open

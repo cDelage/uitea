@@ -7,11 +7,13 @@ import {
   Sample,
   formatPickerStore,
 } from "../../domain/ColorPickerDomain";
+import { PickerFallback, ColorSpace } from "../../util/PickerUtil";
 
 interface ColorPickerStore {
   colors: ColorIO[];
   canUndoRedo: CanUndoRedo;
   samples: Sample[];
+  pickerFallbacks: PickerFallback[];
   activePipette?: number;
   setActivePipette: (index: number | undefined) => void;
   setColor: (color: ColorIO, index: number) => void;
@@ -22,6 +24,8 @@ interface ColorPickerStore {
   removeColorSample: (index: number) => void;
   undoColorPicker: () => void;
   redoColorPicker: () => void;
+  setPickerFallback: (color: ColorIO, colorSpace: ColorSpace) => void;
+  
 }
 
 export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
@@ -31,6 +35,7 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
     canRedo: false,
     canUndo: false,
   },
+  pickerFallbacks: [],
   setActivePipette(index: number | undefined) {
     set((state) => {
       return {
@@ -137,6 +142,30 @@ export const useColorPickerStore = create<ColorPickerStore>((set, get) => ({
         samples: colorPicker.samples,
         canUndoRedo,
         colors: colorPicker.colors.map((color) => new ColorIO(color)),
+      };
+    });
+  },
+  setPickerFallback(color, colorSpace) {
+    const axesFallback: PickerFallback[] = colorSpace.axes
+      .map((axe) => {
+        const value: number = color.get(`${colorSpace.space}.${axe.name}`);
+        return {
+          axe: axe.name,
+          space: colorSpace.space,
+          value,
+        };
+      })
+      .filter((x) => x.value);
+    const newAxes = axesFallback.map((x) => x.axe);
+    set((state) => {
+      return {
+        ...state,
+        pickerFallbacks: [
+          ...state.pickerFallbacks.filter(
+            (fallback) => !newAxes.includes(fallback.axe) && fallback.space === colorSpace.space
+          ),
+          ...axesFallback,
+        ],
       };
     });
   },

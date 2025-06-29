@@ -131,15 +131,6 @@
   gap: var(--uidt-space-4);
 }
 
-.separator {
-  display: flex;
-  height: 1px;
-  min-height: 1px;
-  max-height: 1px;
-  background-color: var(--uidt-base-border);
-  box-sizing: border-box;
-}
-
 .recommandedHueButton {
   display: flex;
   align-items: center;

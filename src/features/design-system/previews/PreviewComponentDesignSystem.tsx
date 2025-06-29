@@ -6,11 +6,9 @@ import { PreviewContext } from "./PreviewContext";
 
 function PreviewComponentDesignSystem({
   children,
-  maxHeight,
   height,
 }: {
   children: ReactNode;
-  maxHeight?: string;
   height?: string;
 }) {
   const {
@@ -26,7 +24,6 @@ function PreviewComponentDesignSystem({
       <div
         className={styles.previewContainer}
         style={{
-          maxHeight,
           height,
         }}
       >

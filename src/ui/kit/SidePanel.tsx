@@ -18,6 +18,8 @@ function SidePanel({
   isOpenToSync,
   setIsOpenToSync,
   defaultOpen,
+  triggerOpen,
+  setTriggerOpen
 }: {
   children: ReactNode;
   background?: boolean;
@@ -25,6 +27,8 @@ function SidePanel({
   isOpenToSync?: boolean;
   setIsOpenToSync?: (value: boolean) => void;
   defaultOpen?: string;
+  triggerOpen?: string;
+  setTriggerOpen?: (value: string | undefined) => void;
 }) {
   const [openId, setOpenId] = useState<string | null>(defaultOpen ?? null);
   function open(id: string) {
@@ -49,6 +53,13 @@ function SidePanel({
       setIsOpenToSync(true);
     }
   }, [openId, isOpenToSync, setIsOpenToSync]);
+
+  useEffect(() => {
+    if(triggerOpen && setTriggerOpen){
+      open(triggerOpen)
+      setTriggerOpen(undefined);
+    }
+  },[triggerOpen, setTriggerOpen])
 
   return (
     <SidepanelContext.Provider

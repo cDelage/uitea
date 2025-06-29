@@ -1,4 +1,4 @@
-use std::{fmt::Debug, fs};
+use std::{fmt::Debug};
 
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
@@ -116,9 +116,4 @@ pub fn get_present<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
     let historic: Historic<T> = undo_db.get(object_id).unwrap_or_default();
     let present_historic: T = historic.present.ok_or(anyhow!("fail to find present"))?;
     Ok(present_historic)
-}
-
-pub fn remove_undo_repository() -> Result<()> {
-    fs::remove_file("../db/undo-redo.db").ok();
-    Ok(())
 }
