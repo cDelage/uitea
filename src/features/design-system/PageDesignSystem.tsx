@@ -22,7 +22,7 @@ import {
 } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 import { recolorPalettes } from "../../util/ThemeGenerator";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 function PageDesignSystem() {
   const { designSystem, isLoadingDesignSystem } = useCurrentDesignSystem();

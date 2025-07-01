@@ -60,7 +60,7 @@ import {
   ALIGNER_OPTIONS,
   paletteBuildToFile,
 } from "../../domain/PaletteBuilderDomain";
-import { save } from "@tauri-apps/api/dialog";
+import { save } from "@tauri-apps/plugin-dialog";
 import { getFilenameDate } from "../../util/DateUtil";
 import ColorPreviewBody from "./ColorPreviewBody";
 

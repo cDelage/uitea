@@ -1,7 +1,7 @@
 import ColorIO from "colorjs.io";
 import { create } from "zustand";
 import { CanUndoRedo } from "../../util/UndoRedo";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import {
   ColorPickerStoreData,
   Sample,

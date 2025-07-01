@@ -18,7 +18,7 @@ import {
   paletteBuildToFile,
   paletteBuilderFromFile,
 } from "../../domain/PaletteBuilderDomain";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import { CanUndoRedo } from "../../util/UndoRedo";
 
 export interface Point {

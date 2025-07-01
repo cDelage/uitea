@@ -16,7 +16,7 @@ import {
 import ColorIO from "colorjs.io";
 import { DEFAULT_RECOMMANDATIONS } from "../../ui/UiConstants";
 import { CanUndoRedo } from "../../util/UndoRedo";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 interface TokenDragTools {
   dragIndex?: number;

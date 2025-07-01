@@ -27,7 +27,7 @@ import {
 } from "../../ui/UiConstants";
 import Popover from "../../ui/kit/Popover";
 import SidebarSettings from "./SidebarSettings";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import PaletteIcon from "../../ui/icons/PaletteIcon";
 import FontIcon from "../../ui/icons/FontIcon";
 import SpacesIcon from "../../ui/icons/SpacesIcon";

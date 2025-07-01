@@ -1,6 +1,14 @@
 {
-    "identifier": "main-capability",
-    "description": "Capability for the main window",
-    "windows": ["main"],
-    "permissions": ["core:window:default", "core:window:allow-start-dragging"]
-  }
+  "identifier": "main-capability",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "fs:default",
+    "dialog:default",
+    "shell:default"
+  ]
+}

@@ -63,11 +63,14 @@ fn make_db(path: PathBuf) -> PickleDb {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             // 1) récupérer le répertoire de données de l’app
             let data_dir = app
                 .handle()
-                .path_resolver()
+                .path()
                 .app_data_dir()
                 .expect("Impossible de trouver app_data_dir");
             // on peut organiser sous un sous­dossier à ton nom

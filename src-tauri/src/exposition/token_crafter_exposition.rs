@@ -2,7 +2,9 @@ use anyhow_tauri::{IntoTAResult, TAResult};
 use tauri::State;
 
 use crate::{
-    application::token_crafter_application, domain::design_system_domain::ColorCombinationCollection, repository::undo_repository::UndoRedoActions, AppState
+    application::token_crafter_application,
+    domain::design_system_domain::ColorCombinationCollection,
+    repository::undo_repository::UndoRedoActions, AppState,
 };
 
 #[tauri::command]

@@ -4,11 +4,10 @@ import { MdOutlineFolder, MdSquareFoot } from "react-icons/md";
 import Modal from "../../ui/kit/Modal";
 import FormComponent from "../../ui/kit/FormComponent";
 import InputText from "../../ui/kit/InputText";
-import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
 import { useForm } from "react-hook-form";
 import { DesignSystemCreationPayload } from "../../domain/DesignSystemDomain";
 import { useCreateDesignSystem } from "../design-system/DesignSystemQueries";
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 import toast from "react-hot-toast";
 import { usePresetDressing } from "./HomeQueries";
 import { useEffect } from "react";
@@ -18,6 +17,7 @@ import ImageLocalComponent from "../../ui/kit/ImageLocal";
 import Popover from "../../ui/kit/Popover";
 import ImageSelectorPopover from "./ImageSelectorPopover";
 import ButtonImagePicker from "../../ui/kit/ButtonImagePicker";
+import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
 
 function ModalCreateDesignSystem() {
   const { createDesignSystem } = useCreateDesignSystem();

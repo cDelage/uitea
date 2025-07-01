@@ -1,11 +1,11 @@
 use anyhow::{anyhow, Result};
 use base64::engine::general_purpose;
+use base64::Engine;
 use regex::Regex;
 use reqwest::blocking::Client;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use base64::Engine;
 
 use crate::domain::design_system_domain::DesignSystem;
 use crate::domain::fonts_domain::{FONTS_EXTENSIONS, GOOGLE_FONTS};
@@ -103,12 +103,14 @@ pub fn load_font_as_base64(path: PathBuf) -> Result<String> {
         Ok(data) => {
             let b64 = general_purpose::STANDARD.encode(data);
             Ok(b64)
-        },
+        }
         Err(e) => Err(anyhow!(format!("Failed to read font: {}", e))),
     }
 }
 
-
 pub fn upload_typography(original_path: PathBuf, design_system_path: PathBuf) -> Result<String> {
-    copy_file(&original_path, &design_system_path.join(EXPORTS_PATH).join(FONTS_PATH))
+    copy_file(
+        &original_path,
+        &design_system_path.join(EXPORTS_PATH).join(FONTS_PATH),
+    )
 }

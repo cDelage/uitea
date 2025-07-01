@@ -39,12 +39,20 @@ pub fn save_design_system(
 }
 
 #[tauri::command]
-pub fn undo_design_system(app: AppHandle, state: State<AppState>, design_system_path: String) -> TAResult<()> {
+pub fn undo_design_system(
+    app: AppHandle,
+    state: State<AppState>,
+    design_system_path: String,
+) -> TAResult<()> {
     design_system_application::undo_design_system(app, &state, &design_system_path).into_ta_result()
 }
 
 #[tauri::command]
-pub fn redo_design_system(app: AppHandle, state: State<AppState>, design_system_path: String) -> TAResult<()> {
+pub fn redo_design_system(
+    app: AppHandle,
+    state: State<AppState>,
+    design_system_path: String,
+) -> TAResult<()> {
     design_system_application::redo_design_system(app, &state, &design_system_path).into_ta_result()
 }
 

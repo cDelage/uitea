@@ -28,7 +28,7 @@ import ColorIO from "colorjs.io";
 import { ImageLocal } from "../domain/ImageDomain";
 import ReadmePalette from "../features/design-system/readme/ReadmePalettes";
 import ReactDOMServer from "react-dom/server";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import ReadmeSemantic from "../features/design-system/readme/ReadmeSemantic";
 import ReadmeFonts from "../features/design-system/readme/ReadmeFonts";
 import ReadmeTypographies from "../features/design-system/readme/ReadmeTypographies";
