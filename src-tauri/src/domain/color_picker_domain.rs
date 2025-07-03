@@ -20,7 +20,7 @@ pub struct ColorPickerStore {
 impl Default for ColorPickerStore {
     fn default() -> Self {
         ColorPickerStore {
-            colors: vec![String::from("#bfdbfe"),String::from("#1e3a8a")],
+            colors: vec![String::from("#bfdbfe"), String::from("#1e3a8a")],
             samples: vec![ColorSample {
                 name: String::from("sample-1"),
                 colors: vec![],

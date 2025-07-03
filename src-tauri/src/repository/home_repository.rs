@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use std::{fs, path::PathBuf};
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 
 use crate::{
     domain::{
@@ -25,9 +25,9 @@ const LOGOS_PATH: &str = "assets/logos";
 
 pub fn fetch_presets_dressing(app: AppHandle) -> Result<PresetDressing> {
     let resource_dir = app
-        .path_resolver()
+        .path()
         .resource_dir()
-        .ok_or_else(|| anyhow::anyhow!("Impossible de trouver le resource_dir"))?;
+        .map_err(|e| anyhow::anyhow!("Impossible de trouver le resource_dir : {e}"))?;
 
     let banners: Vec<String> = fetch_image_folder(&resource_dir.join(BANNERS_PATH))?;
     let logos: Vec<String> = fetch_image_folder(&resource_dir.join(LOGOS_PATH))?;
@@ -80,6 +80,7 @@ pub fn validate_recent_file(recent_file: &RecentFile) -> Result<PathBuf> {
 pub fn find_all_recent_files(state: State<AppState>) -> Vec<RecentFile> {
     println!("Fetch all recent files");
     let db = state.user_settings_db.lock().unwrap();
+    println!("unwrap success");
     db.get("recentFiles").unwrap_or_default()
 }
 

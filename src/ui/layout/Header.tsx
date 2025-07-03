@@ -1,4 +1,4 @@
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import styles from "./header.module.css";
 import { IoHomeOutline, IoHomeSharp, IoRemove } from "react-icons/io5";
 import {
@@ -34,9 +34,10 @@ import Popover from "../kit/Popover";
 import ColorPickerPopover from "../../features/color-picker/ColorPickerPopover";
 import Switch from "../kit/Switch";
 import { RecentFile } from "../../domain/HomeDomain";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+const appWindow = getCurrentWebviewWindow()
 
 function Header() {
   const [isMax, setIsMax] = useState(false);

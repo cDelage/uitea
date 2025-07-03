@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Loader from "../../../ui/kit/Loader";
 import ExportLine from "./ExportLine";
 import { ICON_SIZE_MD } from "../../../ui/UiConstants";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 function ExportModal() {
   const { designSystem } = useDesignSystemContext();

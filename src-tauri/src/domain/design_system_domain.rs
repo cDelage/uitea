@@ -84,7 +84,7 @@ pub struct DesignSystemMetadata {
     pub preview_images: Vec<ImageLocal>,
     pub fonts: Vec<FileInfos>,
     pub exports: ExportsMetadata,
-    pub update_date: String
+    pub update_date: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -92,7 +92,7 @@ pub struct DesignSystemMetadata {
 pub struct ExportsMetadata {
     pub css: Option<FileMetadata>,
     pub figma_token_studio: Option<FileMetadata>,
-    pub readme: Option<FileMetadata>
+    pub readme: Option<FileMetadata>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -136,7 +136,7 @@ impl DesignSystemMetadata {
         is_tmp: bool,
         image_pathbuf: &PathBuf,
         exports: ExportsMetadata,
-        update_date: String
+        update_date: String,
     ) -> DesignSystemMetadata {
         let DesignSystemMetadataFile {
             design_system_id,
@@ -161,7 +161,7 @@ impl DesignSystemMetadata {
             preview_images: vec![],
             fonts: vec![],
             exports,
-            update_date
+            update_date,
         }
     }
 }

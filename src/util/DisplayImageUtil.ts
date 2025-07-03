@@ -1,4 +1,4 @@
-import { readBinaryFile } from "@tauri-apps/api/fs";
+import { readFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 
 function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
   let binary = "";
@@ -14,7 +14,7 @@ export function useImagesBinary() {
     for (const image of imagesPath) {
       if (!images.get(image)) {
         // Lire le fichier en tant que binaire
-        const fileBuffer = await readBinaryFile(image);
+        const fileBuffer = await readFile("avatar.png", { baseDir: BaseDirectory.Resource });
         // Convertir en base64
         const base64String = arrayBufferToBase64(fileBuffer);
         // Déduire le type MIME (ici, par exemple, 'image/png')

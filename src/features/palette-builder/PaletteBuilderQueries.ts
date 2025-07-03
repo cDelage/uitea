@@ -4,7 +4,7 @@ import {
   PaletteBuilderMetadata,
   PaletteBuilderRenameMetadata,
 } from "../../domain/PaletteBuilderDomain";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import toast from "react-hot-toast";
 
 export function useSavePaletteBuilder() {

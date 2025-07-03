@@ -1,4 +1,4 @@
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 import { ICON_SIZE_XXL } from "../../ui/UiConstants";
 import styles from "./homeActionButtons.module.css";
 import { MdUploadFile } from "react-icons/md";

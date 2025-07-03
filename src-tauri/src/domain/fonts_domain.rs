@@ -196,5 +196,4 @@ pub const GOOGLE_FONTS: &[&str] = &[
     "Zilla Slab",
 ];
 
-
 pub const FONTS_EXTENSIONS: &[&str] = &["woff", "woff2", "ttf", "otf", "eot"];

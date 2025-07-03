@@ -80,7 +80,7 @@ pub struct PaletteBuilderMetadata {
     pub palette_builder_name: String,
     #[serde(serialize_with = "serialize_pathbuf_as_string")]
     pub path: PathBuf,
-    pub main_colors: Vec<String>
+    pub main_colors: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -88,5 +88,5 @@ pub struct PaletteBuilderMetadata {
 pub struct PaletteBuilderRenamePayload {
     pub metadata: PaletteBuilderMetadata,
     pub new_name: String,
-    pub design_system_path: PathBuf
+    pub design_system_path: PathBuf,
 }

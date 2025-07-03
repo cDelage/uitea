@@ -11,7 +11,9 @@ use crate::{
         image_domain::ImageLocal,
     },
     repository::{
-        self, design_system_repository::{self}, home_repository,
+        self,
+        design_system_repository::{self},
+        home_repository,
         palette_builder_repository::find_palette_builder_metadata,
     },
     AppState,
@@ -26,7 +28,7 @@ pub fn insert_recent_file(state: State<AppState>, recent_file: RecentFile) -> Re
 /// Récupère tous les chemins de fichiers
 pub fn find_all_recent_files(state: State<AppState>) -> Result<Vec<RecentFilesMetadata>> {
     let paths: Vec<RecentFile> = home_repository::find_all_recent_files(state);
-    Ok(paths
+    let recent_files : Vec<RecentFilesMetadata> = paths
         .into_iter()
         .map(|recent_file: RecentFile| match recent_file.category {
             DesignSystemCategory => {
@@ -39,14 +41,14 @@ pub fn find_all_recent_files(state: State<AppState>) -> Result<Vec<RecentFilesMe
                     Err(_) => RecentFilesMetadata::Unknown(recent_file.file_path.clone()),
                 }
             }
-            PaletteBuilderCategory => {
-                match find_palette_builder_metadata(&recent_file.file_path) {
-                    Ok(metadata) => RecentFilesMetadata::PaletteBuilder(metadata),
-                    Err(_) => RecentFilesMetadata::Unknown(recent_file.file_path.clone()),
-                }
-            }
+            PaletteBuilderCategory => match find_palette_builder_metadata(&recent_file.file_path) {
+                Ok(metadata) => RecentFilesMetadata::PaletteBuilder(metadata),
+                Err(_) => RecentFilesMetadata::Unknown(recent_file.file_path.clone()),
+            },
         })
-        .collect::<Vec<RecentFilesMetadata>>())
+        .collect::<Vec<RecentFilesMetadata>>(); 
+    println!("success to read recent_files {:?}", recent_files);
+    Ok(recent_files)
 }
 
 /// Supprime un chemin de fichier spécifique
@@ -72,7 +74,6 @@ pub fn encode_image_base64(path: String) -> Result<ImageLocal> {
 pub fn svg_to_png(svg: &str, design_system_path: Option<PathBuf>) -> Result<String> {
     home_repository::svg_to_png(&svg, design_system_path)
 }
-
 
 pub fn update_user_settings(state: State<AppState>, user_settings: UserSettings) -> Result<()> {
     home_repository::update_user_settings(state, user_settings)

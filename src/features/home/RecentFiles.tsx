@@ -11,7 +11,7 @@ import {
 import RecentFilePaletteBuilderTab from "./RecentFilePaletteBuilderTab";
 import { useNavigate } from "react-router-dom";
 import { usePaletteBuilderStore } from "../palette-builder/PaletteBuilderStore";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import Popover from "../../ui/kit/Popover";
 
 function RecentFiles() {

@@ -31,7 +31,7 @@ export function useSidebarComponentVisible(
         setSearchParams(searchParams);
         bodyDesignSystem?.removeEventListener("scroll", handleUnlock);
       }
-      bodyDesignSystem?.addEventListener("scroll", handleUnlock);
+      bodyDesignSystem?.addEventListener("scroll", handleUnlock, { passive: true });
     } else {
       observer.observe(component.current as Element);
     }
