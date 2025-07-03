@@ -66,7 +66,33 @@
         ],
         "enable": true
       },
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "windows": [
+            "main"
+          ],
+          "permissions": [
+            "core:window:default",
+            "core:window:allow-start-dragging",
+            "core:window:allow-minimize",
+            "core:window:allow-maximize",
+            "core:window:allow-unmaximize",
+            "core:window:allow-unminimize",
+            "core:window:allow-toggle-maximize",
+            "core:window:allow-close",
+            "fs:default",
+            "shell:default",
+            "dialog:default",
+            "dialog:allow-open",
+            "dialog:allow-save",
+            "dialog:allow-message",
+            "dialog:allow-ask",
+            "dialog:allow-confirm"
+          ]
+        }
+      ]
     }
   }
 }
