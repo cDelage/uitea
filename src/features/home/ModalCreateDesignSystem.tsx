@@ -99,6 +99,7 @@ function ModalCreateDesignSystem() {
               <Popover.Body id="banner-selector" zIndex={40}>
                 <ImageSelectorPopover
                   width={"498px"}
+                  popoverId="banner-selector"
                   imagesPreset={presetDressing?.banners}
                   value={watch("banner")}
                   setValue={(value: string) => setValue("banner", value)}
@@ -108,15 +109,16 @@ function ModalCreateDesignSystem() {
             <Modal.Md>
               <div className="row gap-4 align-center">
                 <Popover>
-                  <Popover.Toggle id="banner-selector">
+                  <Popover.Toggle id="logos-selector">
                     <div className={styles.logoContainer}>
                       <ButtonImagePicker id="banner-selector" />
                       <ImageLocalComponent srcPath={logo} />
                     </div>
                   </Popover.Toggle>
-                  <Popover.Body id="banner-selector" zIndex={40}>
+                  <Popover.Body id="logos-selector" zIndex={40}>
                     <ImageSelectorPopover
-                      width={"150px"}
+                      width={"140px"}
+                      popoverId="logos-selector"
                       imagesPreset={presetDressing?.logos}
                       value={watch("logo")}
                       setValue={(value: string) => setValue("logo", value)}
