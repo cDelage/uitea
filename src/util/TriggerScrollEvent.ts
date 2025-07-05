@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export type TriggerScrollEvent = CustomEvent<{ id: string }>;
+export type TriggerScrollEvent = CustomEvent<{ id: string, direct?: boolean }>;
 
 export function useTriggerScroll({
   ref,
@@ -16,8 +16,9 @@ export function useTriggerScroll({
 
     function handleTriggerScroll(e: TriggerScrollEvent) {
       if (e.detail.id === triggerId) {
+        
         ref.current?.scrollIntoView({
-          behavior: "smooth",
+          behavior: e.detail.direct ? "auto" : "smooth",
           block: "start",
         });
 

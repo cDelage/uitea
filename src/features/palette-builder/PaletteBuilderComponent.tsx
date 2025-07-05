@@ -179,7 +179,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
       navigate(
         `/design-system/${encodeURIComponent(
           designSystemPathComputed
-        )}?editMode=true`
+        )}?editMode=true&scrollComponent=Palettes`
       );
     }
   }
@@ -283,7 +283,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                         navigate(
                           `/design-system/${encodeURIComponent(
                             currentDesignSystem
-                          )}?editMode=true`
+                          )}?editMode=true&scrollComponent=Palettes`
                         )
                       }
                     >

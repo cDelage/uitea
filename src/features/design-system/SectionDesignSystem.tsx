@@ -42,6 +42,11 @@ function SubSection({
     searchParams.get("editMode") || "false"
   ) as boolean;
 
+  useTriggerScroll({
+    ref: refSubsection,
+    triggerId: subSectionName,
+  });
+
   return (
     <div ref={refSubsection} className={styles.subSection}>
       <div className={styles.subSectionHeader}>

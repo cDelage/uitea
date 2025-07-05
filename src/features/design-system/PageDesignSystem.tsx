@@ -38,11 +38,12 @@ function PageDesignSystem() {
   ) as boolean;
   const [theme, setTheme] = useState<Theme | undefined>(undefined);
   const [loadedFonts, setLoadedFonts] = useState<string[]>([]);
+  const scrollComponent = searchParams.get("scrollComponent");
 
   function handleSetActiveComponent(newActiveComponent?: ActiveComponent) {
     setActiveComponent((active) =>
       active?.componentId === newActiveComponent?.componentId &&
-      active?.mode === newActiveComponent?.mode
+        active?.mode === newActiveComponent?.mode
         ? undefined
         : newActiveComponent
     );
@@ -59,15 +60,15 @@ function PageDesignSystem() {
   const themeTokenFamilies: TokenFamily[] = useMemo(() => {
     return theme !== undefined && designSystem !== undefined
       ? getDesignSystemTokens({
-          ...designSystem,
-          ...recolorPalettes({
-            palettes: designSystem?.palettes,
-            defaultBackground:
-              designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
-            newBackground: theme?.background ?? "#DDDDDD",
-            independantColors: designSystem.independantColors
-          }),
-        })
+        ...designSystem,
+        ...recolorPalettes({
+          palettes: designSystem?.palettes,
+          defaultBackground:
+            designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
+          newBackground: theme?.background ?? "#DDDDDD",
+          independantColors: designSystem.independantColors
+        }),
+      })
       : tokenFamilies;
   }, [designSystem, theme, tokenFamilies]);
 
@@ -87,6 +88,21 @@ function PageDesignSystem() {
       text: "uidt-primary-text",
     };
   }, [designSystem]);
+
+  useEffect(() => {
+    if (scrollComponent) {
+      document.dispatchEvent(
+        new CustomEvent("triggerScroll", {
+          detail: {
+            id: scrollComponent,
+            direct: true
+          },
+        })
+      );
+      searchParams.delete("scrollComponent");
+      setSearchParams(searchParams);
+    }
+  }, [scrollComponent])
 
   useEffect(() => {
     const clearKeyboardAction = () => {
