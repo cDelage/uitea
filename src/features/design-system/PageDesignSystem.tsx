@@ -60,11 +60,12 @@ function PageDesignSystem() {
     return theme !== undefined && designSystem !== undefined
       ? getDesignSystemTokens({
           ...designSystem,
-          palettes: recolorPalettes({
+          ...recolorPalettes({
             palettes: designSystem?.palettes,
             defaultBackground:
               designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
             newBackground: theme?.background ?? "#DDDDDD",
+            independantColors: designSystem.independantColors
           }),
         })
       : tokenFamilies;

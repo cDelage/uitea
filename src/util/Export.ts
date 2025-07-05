@@ -1,7 +1,7 @@
 import { DesignSystem, Palette } from "../domain/DesignSystemDomain";
 import { TokenGroup, TokenSet, TokensFile } from "../domain/ExportDomain";
 import { getPaletteTokenFamily } from "./DesignSystemUtils";
-import { recolorPalettes } from "./ThemeGenerator";
+import { recolorPalettes as recolorTokens } from "./ThemeGenerator";
 import cssbeautify from "cssbeautify";
 
 export function generateTokenStudioFile(
@@ -11,13 +11,14 @@ export function generateTokenStudioFile(
   const palettesThemes = designSystem.themes.otherThemes.reduce<
     Record<string, TokenSet>
   >((acc, theme) => {
-    const palettes = recolorPalettes({
+    const recolorTokensResults = recolorTokens({
       palettes: designSystem.palettes,
       defaultBackground: designSystem.themes.mainTheme?.background ?? "#DDDDDD",
       newBackground: theme.background ?? "#DDDDDD",
+      independantColors: designSystem.independantColors
     });
 
-    acc[theme.name] = mapPalettesToTokenSet(palettes);
+    acc[theme.name] = mapPalettesToTokenSet(recolorTokensResults.palettes);
     return acc;
   }, {});
 
@@ -53,12 +54,14 @@ export function cssExport(designSystem: DesignSystem): string {
   const themesPalettes = designSystem.themes.otherThemes.map((theme) => {
     return `
     [data-theme="${theme.name}"]{
-      ${recolorPalettes({
+      ${recolorTokens({
         palettes: designSystem.palettes,
         defaultBackground:
           designSystem.themes.mainTheme?.background ?? "#DDDDDD",
         newBackground: theme.background ?? "#DDDDDD",
+        independantColors: designSystem.independantColors
       })
+        .palettes
         .map(getCssPaletteTokens)
         .join("")}
     }
