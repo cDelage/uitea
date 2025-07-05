@@ -111,7 +111,7 @@ function TokenCrafterGrid() {
                 navigate(
                   `/design-system/${encodeURIComponent(
                     designSystem.metadata.designSystemPath
-                  )}?editMode=true`
+                  )}?editMode=true&scrollComponent=semantic-color-tokens`
                 )
               }
             >
