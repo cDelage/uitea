@@ -23,7 +23,7 @@ import {
   paletteBuildToFile,
 } from "../../domain/PaletteBuilderDomain";
 import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 import {
   useFetchDesignSystemPaletteBuilder,
   useRemovePaletteBuilderFromDesignSystem,
@@ -31,7 +31,7 @@ import {
 } from "./PaletteBuilderQueries";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Table } from "../../ui/kit/Table";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import { generateUniquePaletteBuilder } from "../../util/DesignSystemUtils";
 import ExistingPaletteBuilderTab from "./ExistingPaletteBuilderTab";
 import toast from "react-hot-toast";

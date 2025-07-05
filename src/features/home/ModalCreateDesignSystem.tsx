@@ -4,11 +4,10 @@ import { MdOutlineFolder, MdSquareFoot } from "react-icons/md";
 import Modal from "../../ui/kit/Modal";
 import FormComponent from "../../ui/kit/FormComponent";
 import InputText from "../../ui/kit/InputText";
-import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
 import { useForm } from "react-hook-form";
 import { DesignSystemCreationPayload } from "../../domain/DesignSystemDomain";
 import { useCreateDesignSystem } from "../design-system/DesignSystemQueries";
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 import toast from "react-hot-toast";
 import { usePresetDressing } from "./HomeQueries";
 import { useEffect } from "react";
@@ -18,6 +17,7 @@ import ImageLocalComponent from "../../ui/kit/ImageLocal";
 import Popover from "../../ui/kit/Popover";
 import ImageSelectorPopover from "./ImageSelectorPopover";
 import ButtonImagePicker from "../../ui/kit/ButtonImagePicker";
+import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
 
 function ModalCreateDesignSystem() {
   const { createDesignSystem } = useCreateDesignSystem();
@@ -99,6 +99,7 @@ function ModalCreateDesignSystem() {
               <Popover.Body id="banner-selector" zIndex={40}>
                 <ImageSelectorPopover
                   width={"498px"}
+                  popoverId="banner-selector"
                   imagesPreset={presetDressing?.banners}
                   value={watch("banner")}
                   setValue={(value: string) => setValue("banner", value)}
@@ -108,15 +109,16 @@ function ModalCreateDesignSystem() {
             <Modal.Md>
               <div className="row gap-4 align-center">
                 <Popover>
-                  <Popover.Toggle id="banner-selector">
+                  <Popover.Toggle id="logos-selector">
                     <div className={styles.logoContainer}>
                       <ButtonImagePicker id="banner-selector" />
                       <ImageLocalComponent srcPath={logo} />
                     </div>
                   </Popover.Toggle>
-                  <Popover.Body id="banner-selector" zIndex={40}>
+                  <Popover.Body id="logos-selector" zIndex={40}>
                     <ImageSelectorPopover
-                      width={"150px"}
+                      width={"140px"}
+                      popoverId="logos-selector"
                       imagesPreset={presetDressing?.logos}
                       value={watch("logo")}
                       setValue={(value: string) => setValue("logo", value)}

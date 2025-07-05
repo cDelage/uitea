@@ -12,24 +12,18 @@ rust-version = "1.60"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.6", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.8.2", features = [
-    "path-all",
-    "shell-open",
-    "protocol-asset",
-    "dialog-all",
-    "fs-all",
-    "window-all"
-] }
+tauri = { version = "2", features = [
+    "protocol-asset"] }
 pickledb = "0.5.1"
 anyhow-tauri = "1.0.0"
 anyhow = "1.0.95"
 serde_yaml = "0.9.21"
-uuid = "1.11.0"
+uuid = { version = "1.17", features = ["v4", "fast-rng"] }
 log = "0.4.25"
 env_logger = "0.10.2"
 indexmap = { version = "1.9.3", features = ["serde"] }
@@ -48,6 +42,9 @@ fontdb = "0.12" # utile pour charger d’autres dossiers de polices
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
 regex = "1"
 chrono = "0.4.31"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-shell = "2"
 
 
 [features]

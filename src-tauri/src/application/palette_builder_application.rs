@@ -4,11 +4,13 @@ use crate::{
     domain::{
         home_domain::{RecentFile, RecentFileCategory},
         palette_builder_domain::{
-            PaletteBuilder, PaletteBuilderFile, PaletteBuilderMetadata, PaletteBuilderRenamePayload, PaletteBuilderUndoRedo,
+            PaletteBuilder, PaletteBuilderFile, PaletteBuilderMetadata,
+            PaletteBuilderRenamePayload, PaletteBuilderUndoRedo,
         },
     },
     repository::{
-        design_system_repository, home_repository, palette_builder_repository, undo_repository::{self, UndoRedoActions},
+        design_system_repository, home_repository, palette_builder_repository,
+        undo_repository::{self, UndoRedoActions},
     },
     AppState,
 };
@@ -70,7 +72,10 @@ pub fn rename_palette_builder(payload: PaletteBuilderRenamePayload) -> Result<()
     palette_builder_repository::rename_palette_builder(payload)
 }
 
-pub fn do_palette_builder(state: State<AppState>, palette_builder: PaletteBuilderUndoRedo) -> Result<()> {
+pub fn do_palette_builder(
+    state: State<AppState>,
+    palette_builder: PaletteBuilderUndoRedo,
+) -> Result<()> {
     undo_repository::set_new::<PaletteBuilderUndoRedo>(
         &state,
         &"palette-builder",
@@ -80,19 +85,13 @@ pub fn do_palette_builder(state: State<AppState>, palette_builder: PaletteBuilde
 }
 
 pub fn undo_palette_builder(state: State<AppState>) -> Result<PaletteBuilderUndoRedo> {
-    undo_repository::undo::<PaletteBuilderUndoRedo>(
-        &state,
-        &"palette-builder",
-    )
+    undo_repository::undo::<PaletteBuilderUndoRedo>(&state, &"palette-builder")
 }
 
 pub fn redo_palette_builder(state: State<AppState>) -> Result<PaletteBuilderUndoRedo> {
-    undo_repository::redo::<PaletteBuilderUndoRedo>(
-        &state,
-        &"palette-builder",
-    )
+    undo_repository::redo::<PaletteBuilderUndoRedo>(&state, &"palette-builder")
 }
 
-pub fn can_undo_redo_palette_builder(state: State<AppState>) -> Result<UndoRedoActions>{
+pub fn can_undo_redo_palette_builder(state: State<AppState>) -> Result<UndoRedoActions> {
     undo_repository::can_undo_redo::<PaletteBuilderUndoRedo>(&state, &"palette-builder")
 }

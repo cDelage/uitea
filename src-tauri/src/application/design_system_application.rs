@@ -7,7 +7,9 @@ use crate::{
     application::home_application::fetch_presets_dressing,
     domain::{
         design_system_domain::{
-            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, ExportPayload, ExportsMetadata, Fonts, IndependantColors, Palette, Radius, SemanticColorTokens, Shadows, Space, Typographies
+            DesignSystem, DesignSystemCreationPayload, DesignSystemMetadata, ExportPayload,
+            ExportsMetadata, Fonts, IndependantColors, Palette, Radius, SemanticColorTokens,
+            Shadows, Space, Typographies,
         },
         home_domain::PresetDressing,
     },
@@ -44,8 +46,12 @@ pub fn create_design_system(payload: DesignSystemCreationPayload) -> Result<Desi
         readme: None,
         preview_images: vec![],
         fonts: vec![],
-        exports: ExportsMetadata { css: None, figma_token_studio: None, readme: None },
-        update_date: String::new()
+        exports: ExportsMetadata {
+            css: None,
+            figma_token_studio: None,
+            readme: None,
+        },
+        update_date: String::new(),
     };
 
     design_system_repository::create_design_system(&mut design_system)?;
@@ -59,6 +65,7 @@ pub fn find_design_system(
 ) -> Result<DesignSystem> {
     println!("find design system");
     let design_system_pathbuf: PathBuf = PathBuf::from(design_system_path);
+    design_system_repository::remove_empty_temp(&design_system_pathbuf)?;
     let fetch_path = repository::compute_fetch_pathbuf(&design_system_pathbuf);
     let mut metadata: DesignSystemMetadata =
         design_system_repository::find_design_system_metadata(&design_system_pathbuf)?;
@@ -179,7 +186,7 @@ pub fn find_design_system(
         shadows: effects,
         themes,
         semantic_color_tokens,
-        independant_colors
+        independant_colors,
     })
 }
 
@@ -192,6 +199,7 @@ pub fn save_design_system(
 ) -> Result<DesignSystem> {
     println!("save design system");
     let design_system_path: PathBuf = design_system.metadata.design_system_path.clone();
+    design_system_repository::remove_empty_temp(&design_system_path)?;
     let design_system_string_path = design_system_path
         .to_str()
         .ok_or_else(|| anyhow!("fail to find db path"))?;
@@ -228,12 +236,17 @@ pub fn save_design_system(
         undo_repository::can_undo_redo::<DesignSystem>(&state, &design_system_string_path)?;
     design_system.metadata.can_redo = can_undo_redo.can_redo;
     design_system.metadata.can_undo = can_undo_redo.can_undo;
-    let update_date: String = design_system_repository::get_design_system_update_date(&design_system_path)?;
+    let update_date: String =
+        design_system_repository::get_design_system_update_date(&design_system_path)?;
     design_system.metadata.update_date = update_date;
     Ok(design_system)
 }
 
-pub fn undo_design_system(app: AppHandle, state: &State<AppState>, design_system_path: &String) -> Result<()> {
+pub fn undo_design_system(
+    app: AppHandle,
+    state: &State<AppState>,
+    design_system_path: &String,
+) -> Result<()> {
     println!("undo design system");
     let mut design_system: DesignSystem =
         undo_repository::undo::<DesignSystem>(state, design_system_path)?;
@@ -243,7 +256,11 @@ pub fn undo_design_system(app: AppHandle, state: &State<AppState>, design_system
     Ok(())
 }
 
-pub fn redo_design_system(app: AppHandle, state: &State<AppState>, design_system_path: &String) -> Result<()> {
+pub fn redo_design_system(
+    app: AppHandle,
+    state: &State<AppState>,
+    design_system_path: &String,
+) -> Result<()> {
     println!("redo design system");
     let mut design_system: DesignSystem =
         undo_repository::redo::<DesignSystem>(state, design_system_path)?;

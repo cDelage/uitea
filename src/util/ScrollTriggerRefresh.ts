@@ -8,7 +8,7 @@ export function useScrollTriggerRefresh() {
     }
     const element = scrollRef.current;
     if (element) {
-      element.addEventListener("scroll", handleScroll);
+      element.addEventListener("scroll", handleScroll, { passive: true });
     }
     return () => {
       if (element) {

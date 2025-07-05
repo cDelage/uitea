@@ -16,8 +16,8 @@ use std::process::Command;
 use crate::domain::fonts_domain::FONTS_EXTENSIONS;
 use crate::domain::image_domain::ImageLocal;
 use crate::domain::{FileInfos, FileMetadata};
-use chrono::{DateTime, Local};
 use base64::engine::general_purpose::STANDARD as B64;
+use chrono::{DateTime, Local};
 use resvg::{
     tiny_skia::{Pixmap, Transform},
     usvg::{Options, Tree},
@@ -387,11 +387,12 @@ pub fn get_file_metadata<P: AsRef<Path>>(path: P) -> Option<FileMetadata> {
     let update_date = datetime.to_rfc3339();
 
     // 4) Extraction du nom de fichier
-    let filename = path.file_name()?
-                        .to_string_lossy()
-                        .into_owned();
+    let filename = path.file_name()?.to_string_lossy().into_owned();
 
-    Some(FileMetadata { filename, update_date })
+    Some(FileMetadata {
+        filename,
+        update_date,
+    })
 }
 
 pub fn get_file_date<P: AsRef<Path>>(path: P) -> Result<String> {

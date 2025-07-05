@@ -1,4 +1,4 @@
-use std::{fmt::Debug};
+use std::fmt::Debug;
 
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
@@ -76,7 +76,9 @@ pub fn undo<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
         if historic.past.len() > 25 {
             historic.past.drain(0..historic.past.len() - 15);
         }
-        undo_db.set(object_id, &historic).or(Err(anyhow!("Impossible to undo")))?;
+        undo_db
+            .set(object_id, &historic)
+            .or(Err(anyhow!("Impossible to undo")))?;
         undo_db.dump()?;
         return Ok(prev);
     }
@@ -97,11 +99,13 @@ pub fn redo<T: Serialize + for<'de> Deserialize<'de> + Clone + Debug>(
         }
         historic.present = Some(next.clone());
         undo_db.set(object_id, &historic)?;
-        match undo_db.get::<Historic<T>>(object_id){
-            None => {println!("fail to get")}
+        match undo_db.get::<Historic<T>>(object_id) {
+            None => {
+                println!("fail to get")
+            }
             Some(_) => {}
         };
-        
+
         return Ok(next);
     }
 

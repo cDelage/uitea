@@ -44,8 +44,8 @@ export function useSynchronizedVerticalScroll(): UseSynchronizedVerticalScrollRe
     };
 
     // On écoute l'événement 'scroll' sur chacun des éléments
-    el1.addEventListener("scroll", handleScroll1);
-    el2.addEventListener("scroll", handleScroll2);
+    el1.addEventListener("scroll", handleScroll1, { passive: true });
+    el2.addEventListener("scroll", handleScroll2), { passive: true };
 
     // On retire les listeners quand le composant se démonte
     return () => {

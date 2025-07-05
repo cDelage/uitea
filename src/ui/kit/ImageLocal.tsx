@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import { ImageLocal } from "../../domain/ImageDomain";
 import Loader from "./Loader";
 import styles from "./ImageLocal.module.css";

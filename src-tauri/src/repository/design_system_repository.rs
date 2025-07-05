@@ -9,7 +9,9 @@ use anyhow::{anyhow, Context, Result};
 use base64::{engine::general_purpose, Engine as _};
 
 use crate::domain::design_system_domain::{ExportsMetadata, IndependantColors};
-use crate::repository::{compute_path_with_extension_overwrite, get_file_date, get_file_metadata, open_folder};
+use crate::repository::{
+    compute_path_with_extension_overwrite, get_file_date, get_file_metadata, open_folder,
+};
 use crate::{
     domain::design_system_domain::{
         DesignSystem, DesignSystemMetadata, DesignSystemMetadataFile, ExportPayload, Fonts,
@@ -91,7 +93,7 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
     }
     let file: DesignSystemMetadataFile =
         load_yaml_from_pathbuf::<DesignSystemMetadataFile>(&design_system_metadata_pathbuf)?;
-    
+
     let exports: ExportsMetadata = fetch_exports_metadata(&design_system_path)?;
     let update_date = get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))?;
     Ok(DesignSystemMetadata::from(
@@ -103,7 +105,7 @@ pub fn find_design_system_metadata(design_system_path: &PathBuf) -> Result<Desig
             .is_file(),
         &get_images_path(&fetch_pathbuf),
         exports,
-        update_date
+        update_date,
     ))
 }
 
@@ -228,7 +230,10 @@ pub fn save_design_system(design_system: &mut DesignSystem, is_tmp: bool) -> Res
     save_palettes(&design_system, &design_system_path)?;
 
     let independant_colors_pathbuf: PathBuf = design_system_path.join(INDEPENDANT_COLORS_PATH);
-    save_to_yaml_file(independant_colors_pathbuf, &design_system.independant_colors)?;
+    save_to_yaml_file(
+        independant_colors_pathbuf,
+        &design_system.independant_colors,
+    )?;
 
     let fonts_pathbuf: PathBuf = design_system_path.join(FONTS_PATH);
     save_to_yaml_file(fonts_pathbuf, &design_system.fonts)?;
@@ -276,7 +281,10 @@ pub fn save_readme(metadata: DesignSystemMetadata) -> Result<()> {
         let mut file = File::create(readme_pathbuf)?;
         file.write_all(readme.as_bytes())?;
 
-        let preview_images_pathbuf: PathBuf = metadata.design_system_path.join(EXPORTS_PATH).join(PREVIEW_IMAGES_PATH);
+        let preview_images_pathbuf: PathBuf = metadata
+            .design_system_path
+            .join(EXPORTS_PATH)
+            .join(PREVIEW_IMAGES_PATH);
         if !preview_images_pathbuf.is_dir() {
             fs::create_dir_all(&preview_images_pathbuf)?;
         }
@@ -295,6 +303,7 @@ pub fn save_readme(metadata: DesignSystemMetadata) -> Result<()> {
 }
 
 pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetadata) -> Result<()> {
+    remove_empty_temp(&design_system_path)?;
     let images_path: PathBuf = get_images_path(&design_system_path);
     let banner = match assert_file_in_directory(&metadata.banner, &images_path) {
         Ok(path) => path,
@@ -321,8 +330,6 @@ pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetada
             }
         }
     };
-
-    println!("banner: {:?} , logo: {:?}", &banner, &logo);
 
     //Save metadata
     let design_system_metadata_path: PathBuf = design_system_path.join(DESIGN_SYSTEM_METADATA_PATH);
@@ -496,7 +503,8 @@ pub fn register_export(payload: ExportPayload) -> Result<()> {
     if !&export_pathbuf.is_dir() {
         fs::create_dir(&export_pathbuf)?;
     };
-    let file_path: PathBuf = compute_path_with_extension_overwrite(&export_pathbuf, &export_name, &extension);
+    let file_path: PathBuf =
+        compute_path_with_extension_overwrite(&export_pathbuf, &export_name, &extension);
     fs::write(file_path, value)?;
     Ok(())
 }
@@ -513,11 +521,19 @@ pub fn fetch_independant_colors(design_system_path: &PathBuf) -> Result<Independ
     load_yaml_from_pathbuf::<IndependantColors>(&independant_colors_path)
 }
 
-pub fn fetch_exports_metadata(design_system_path: &PathBuf) -> Result<ExportsMetadata>{
+pub fn fetch_exports_metadata(design_system_path: &PathBuf) -> Result<ExportsMetadata> {
     Ok(ExportsMetadata {
-        css:get_file_metadata(design_system_path.join(EXPORTS_PATH).join(EXPORT_STYLESHEET_PATH)),
-        figma_token_studio: get_file_metadata(design_system_path.join(EXPORTS_PATH).join(EXPORT_FIGMA_PATH)),
-        readme: get_file_metadata(design_system_path.join(README_PATH))
+        css: get_file_metadata(
+            design_system_path
+                .join(EXPORTS_PATH)
+                .join(EXPORT_STYLESHEET_PATH),
+        ),
+        figma_token_studio: get_file_metadata(
+            design_system_path
+                .join(EXPORTS_PATH)
+                .join(EXPORT_FIGMA_PATH),
+        ),
+        readme: get_file_metadata(design_system_path.join(README_PATH)),
     })
 }
 
@@ -527,5 +543,17 @@ pub fn open_export_folder(design_system_path: PathBuf) -> Result<()> {
 }
 
 pub fn get_design_system_update_date(design_system_path: &PathBuf) -> Result<String> {
-        get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))
+    get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))
+}
+
+
+//Sometimes there is an issue with tmp empty but not deleted. This function verify it and remove when necessary
+pub fn remove_empty_temp(design_system_path: &PathBuf) -> Result<()>{
+    let tmp_path: PathBuf = design_system_path.join(TMP_PATH);
+    let tmp_metadata_path: PathBuf = tmp_path.join(DESIGN_SYSTEM_METADATA_PATH);
+    if tmp_path.is_dir() && !tmp_metadata_path.is_file() {
+        println!("remove empty folder tmp");
+        fs::remove_dir(tmp_path)?;
+    }
+    Ok(())
 }

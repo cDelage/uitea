@@ -61,7 +61,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-export {};
+export { };
 
 type HexString = `#${string}`;
 

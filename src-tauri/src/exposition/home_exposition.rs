@@ -6,7 +6,9 @@ use tauri::{AppHandle, State};
 use crate::{
     application::home_application,
     domain::{
-        home_domain::{PresetDressing, RecentFile, RecentFilesMetadata, RemoveRecentFilesPayload, UserSettings},
+        home_domain::{
+            PresetDressing, RecentFile, RecentFilesMetadata, RemoveRecentFilesPayload, UserSettings,
+        },
         image_domain::ImageLocal,
     },
     AppState,
@@ -72,6 +74,6 @@ pub fn fetch_user_settings(state: State<AppState>) -> TAResult<UserSettings> {
 }
 
 #[tauri::command]
-pub fn open_folder(path: PathBuf) -> TAResult<()>{
+pub fn open_folder(path: PathBuf) -> TAResult<()> {
     home_application::open_folder(path).into_ta_result()
 }

@@ -60,7 +60,7 @@ import {
   ALIGNER_OPTIONS,
   paletteBuildToFile,
 } from "../../domain/PaletteBuilderDomain";
-import { save } from "@tauri-apps/api/dialog";
+import { save } from "@tauri-apps/plugin-dialog";
 import { getFilenameDate } from "../../util/DateUtil";
 import ColorPreviewBody from "./ColorPreviewBody";
 
@@ -179,7 +179,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
       navigate(
         `/design-system/${encodeURIComponent(
           designSystemPathComputed
-        )}?editMode=true`
+        )}?editMode=true&scrollComponent=Palettes`
       );
     }
   }
@@ -283,7 +283,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                         navigate(
                           `/design-system/${encodeURIComponent(
                             currentDesignSystem
-                          )}?editMode=true`
+                          )}?editMode=true&scrollComponent=Palettes`
                         )
                       }
                     >

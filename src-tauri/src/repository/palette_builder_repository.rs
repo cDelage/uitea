@@ -100,7 +100,6 @@ pub fn rename_palette_builder(payload: PaletteBuilderRenamePayload) -> Result<()
     Ok(())
 }
 
-
 pub fn find_palette_builder_metadata(path: &PathBuf) -> Result<PaletteBuilderMetadata> {
     println!("try to find palette_builder_metadata {:?}", path);
     // Vérifie que l'extension du fichier est présente et correspond à "yaml" ou "yml"
@@ -109,7 +108,10 @@ pub fn find_palette_builder_metadata(path: &PathBuf) -> Result<PaletteBuilderMet
         .and_then(|ext| ext.to_str())
         .context("Impossible de récupérer l'extension du fichier")?;
     if extension != "yaml" && extension != "yml" {
-        anyhow::bail!("L'extension doit être 'yaml' ou 'yml', trouvée: {}", extension);
+        anyhow::bail!(
+            "L'extension doit être 'yaml' ou 'yml', trouvée: {}",
+            extension
+        );
     }
 
     // Récupère le nom du fichier sans extension
@@ -118,8 +120,9 @@ pub fn find_palette_builder_metadata(path: &PathBuf) -> Result<PaletteBuilderMet
         .and_then(|name| name.to_str())
         .context("Impossible de récupérer le nom du fichier sans extension")?;
     // Charge le contenu du fichier YAML dans une instance de `PaletteBuilder`
-    let palette_builder: PaletteBuilderFile = load_yaml_from_pathbuf::<PaletteBuilderFile>(&path)
-        .context("Erreur lors du chargement du fichier YAML")?;
+    let palette_builder: PaletteBuilderFile =
+        load_yaml_from_pathbuf::<PaletteBuilderFile>(&path)
+            .context("Erreur lors du chargement du fichier YAML")?;
 
     // Extrait pour chaque palette la couleur associée à la teinte centrale
     let main_colors: Vec<String> = palette_builder
