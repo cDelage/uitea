@@ -303,6 +303,7 @@ pub fn save_readme(metadata: DesignSystemMetadata) -> Result<()> {
 }
 
 pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetadata) -> Result<()> {
+    remove_empty_temp(&design_system_path)?;
     let images_path: PathBuf = get_images_path(&design_system_path);
     let banner = match assert_file_in_directory(&metadata.banner, &images_path) {
         Ok(path) => path,
@@ -329,8 +330,6 @@ pub fn save_metadata(design_system_path: &PathBuf, metadata: &DesignSystemMetada
             }
         }
     };
-
-    println!("banner: {:?} , logo: {:?}", &banner, &logo);
 
     //Save metadata
     let design_system_metadata_path: PathBuf = design_system_path.join(DESIGN_SYSTEM_METADATA_PATH);
@@ -545,4 +544,16 @@ pub fn open_export_folder(design_system_path: PathBuf) -> Result<()> {
 
 pub fn get_design_system_update_date(design_system_path: &PathBuf) -> Result<String> {
     get_file_date(&design_system_path.join(DESIGN_SYSTEM_METADATA_PATH))
+}
+
+
+//Sometimes there is an issue with tmp empty but not deleted. This function verify it and remove when necessary
+pub fn remove_empty_temp(design_system_path: &PathBuf) -> Result<()>{
+    let tmp_path: PathBuf = design_system_path.join(TMP_PATH);
+    let tmp_metadata_path: PathBuf = tmp_path.join(DESIGN_SYSTEM_METADATA_PATH);
+    if tmp_path.is_dir() && !tmp_metadata_path.is_file() {
+        println!("remove empty folder tmp");
+        fs::remove_dir(tmp_path)?;
+    }
+    Ok(())
 }

@@ -26,7 +26,8 @@ function ThemePreview({
             palettes: designSystem.palettes,
             defaultBackground: mainTheme.background,
             newBackground: theme.background,
-          });
+            independantColors: designSystem.independantColors
+          }).palettes;
     } else {
       return undefined;
     }

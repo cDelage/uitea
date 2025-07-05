@@ -76,6 +76,7 @@ export function useCurrentDesignSystem() {
 //Save temporary
 export function useSaveDesignSystem(designSystemPath?: string) {
   const queryClient = useQueryClient();
+
   const { mutate: saveDesignSystem, isPending: isSavingDesignSystem } =
     useMutation({
       mutationFn: async ({
@@ -98,6 +99,9 @@ export function useSaveDesignSystem(designSystemPath?: string) {
           designSystem
         );
       },
+      scope: {
+        id: "save-design-system"
+      }
     });
 
   return { saveDesignSystem, isSavingDesignSystem };

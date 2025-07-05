@@ -65,6 +65,7 @@ pub fn find_design_system(
 ) -> Result<DesignSystem> {
     println!("find design system");
     let design_system_pathbuf: PathBuf = PathBuf::from(design_system_path);
+    design_system_repository::remove_empty_temp(&design_system_pathbuf)?;
     let fetch_path = repository::compute_fetch_pathbuf(&design_system_pathbuf);
     let mut metadata: DesignSystemMetadata =
         design_system_repository::find_design_system_metadata(&design_system_pathbuf)?;
@@ -198,6 +199,7 @@ pub fn save_design_system(
 ) -> Result<DesignSystem> {
     println!("save design system");
     let design_system_path: PathBuf = design_system.metadata.design_system_path.clone();
+    design_system_repository::remove_empty_temp(&design_system_path)?;
     let design_system_string_path = design_system_path
         .to_str()
         .ok_or_else(|| anyhow!("fail to find db path"))?;
