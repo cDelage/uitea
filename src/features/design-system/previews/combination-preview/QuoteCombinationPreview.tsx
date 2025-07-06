@@ -7,7 +7,8 @@ import styled from "styled-components";
 const QuotePreview = styled.div<{ $combination: ColorCombinationCollection }>`
   border-radius: var(--uidt-rounded-md);
   cursor: default;
-  user-select: none;
+  user-select: none;  
+  -webkit-user-select: none;
   padding: var(--uidt-space-2);
   display: flex;
   flex-direction: column;

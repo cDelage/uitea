@@ -5,6 +5,7 @@
   box-sizing: border-box;
   align-items: center;
   user-select: none;
+  -webkit-user-select: none;
   cursor: pointer;
 }
 

@@ -308,6 +308,7 @@ h1 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-bold);
   user-select: none;
+  -webkit-user-select: none;
 }
 
 h2 {
@@ -316,6 +317,8 @@ h2 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-bold);
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 h3 {
@@ -324,6 +327,8 @@ h3 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-bold);
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 h4 {
@@ -332,6 +337,8 @@ h4 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-sm-bold);
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .h4-placeholder {
@@ -346,6 +353,8 @@ h5 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-sm-bold);
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .h5-placeholder {
@@ -360,30 +369,40 @@ h6 {
   margin: 0px;
   font-weight: var(--uidt-font-weight-sm-bold);
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .text-xs {
   font-size: 12px;
   line-height: 12px;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 small {
   font-size: 12px;
   line-height: 16px;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .small {
   font-size: 12px;
   line-height: 16px;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 strong {
   font-size: inherit;
   line-height: inherit;
   user-select: none;
+  -webkit-user-select: none;
+
   font-weight: var(--uidt-font-weight-bold);
 }
 
@@ -1011,6 +1030,8 @@ select:focus-within {
   margin: 0;
   border-bottom: transparent 1px solid;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .inherit-input-size {
@@ -1044,6 +1065,8 @@ select:focus-within {
   text-overflow: ellipsis;
   border-bottom: transparent 1px solid;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .nowrap {
@@ -1356,11 +1379,14 @@ td {
 
 .select-none {
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .color-picker {
   width: 280px;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .text-no-wrap {
@@ -1444,6 +1470,8 @@ td {
   padding: var(--uidt-space-2);
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
+
   overflow: hidden;
 }
 

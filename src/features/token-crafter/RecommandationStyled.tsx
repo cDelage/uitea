@@ -13,6 +13,8 @@ export const RecommandationStyled = styled.div<{
   z-index: 0;
   padding: var(--uidt-space-2);
   box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
   background-color: var(
     --${(props) => props.$combination.combinationTokens.background}
   );
