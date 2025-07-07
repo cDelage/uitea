@@ -11,6 +11,7 @@ import Loader from "./ui/kit/Loader";
 import PagePaletteBuilder from "./features/palette-builder/PagePaletteBuilder";
 import PageColorPicker from "./features/color-picker/PageColorPicker";
 import PageTokenCrafter from "./features/token-crafter/PageTokenCrafter";
+import { GlobalStyle } from "./GlobalStyle";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +93,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalStyle/>
       <ReactQueryDevtools initialIsOpen={false} />
       <Toaster
         position="bottom-right"
