@@ -7,7 +7,7 @@ import { Tint } from "../../../domain/DesignSystemDomain";
 import { generateUniqueTintKey } from "../../../util/DesignSystemUtils";
 import { MouseEvent } from "react";
 
-function TintsAddRemove({
+function TintAddRemove({
   draggableTools,
   handleSubmit,
   tintArray,
@@ -81,4 +81,4 @@ function TintsAddRemove({
   );
 }
 
-export default TintsAddRemove;
+export default TintAddRemove;

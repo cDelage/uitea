@@ -98,7 +98,7 @@ function TintComponent({
 
   const tintComponentMode = getTintComponentMode();
 
-  const shadeClassname = classNames(
+  const tintClassname = classNames(
     styles.shade,
     {
       draggable: tintComponentMode === "drag" && tintsArray,
@@ -156,7 +156,7 @@ function TintComponent({
   return (
     <CopyableTopTooltip tooltipValue={shadeToken}>
       <div
-        className={shadeClassname}
+        className={tintClassname}
         ref={shadeRef}
         onMouseEnter={handleHoverEvent}
         onMouseDown={handleMouseDown}
