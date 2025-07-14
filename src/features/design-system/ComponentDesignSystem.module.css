@@ -9,6 +9,8 @@
   border-bottom: transparent 2px solid;
   border-top: transparent 2px solid;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .componentDesignSystemColumnPadding {
@@ -22,13 +24,14 @@
   border-bottom: transparent 2px solid;
   border-top: transparent 2px solid;
   user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .componentDesignSystem {
   scroll-margin-top: 36px !important;
   display: flex;
-  padding: var(--uidt-space-6) var(--uidt-space-1) var(--uidt-space-6)
-    var(--uidt-space-0);
+  padding: var(--uidt-space-6) var(--uidt-space-1) var(--uidt-space-6) var(--uidt-space-0);
   box-sizing: border-box;
   height: fit-content;
   position: relative;
@@ -48,7 +51,7 @@
 .sideSettings {
   position: sticky;
   top: 49px;
-  left:0px;
+  left: 0px;
   display: flex;
   flex-direction: column;
   gap: var(--uidt-space-5);

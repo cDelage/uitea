@@ -3,6 +3,35 @@
 version = 3
 
 [[package]]
+name = "Uitea"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "anyhow-tauri",
+ "base64 0.22.1",
+ "chrono",
+ "env_logger",
+ "fontdb 0.12.0",
+ "indexmap 1.9.3",
+ "log",
+ "pickledb",
+ "regex",
+ "reqwest 0.11.27",
+ "resvg",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "serde_yaml",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-shell",
+ "usvg-text-layout",
+ "uuid",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4856,35 +4885,6 @@ dependencies = [
  "memoffset",
  "tempfile",
  "winapi",
-]
-
-[[package]]
-name = "uitea"
-version = "1.0.0"
-dependencies = [
- "anyhow",
- "anyhow-tauri",
- "base64 0.22.1",
- "chrono",
- "env_logger",
- "fontdb 0.12.0",
- "indexmap 1.9.3",
- "log",
- "pickledb",
- "regex",
- "reqwest 0.11.27",
- "resvg",
- "serde",
- "serde_json",
- "serde_with",
- "serde_yaml",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-shell",
- "usvg-text-layout",
- "uuid",
 ]
 
 [[package]]

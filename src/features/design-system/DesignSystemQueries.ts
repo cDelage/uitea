@@ -91,7 +91,11 @@ export function useSaveDesignSystem(designSystemPath?: string) {
           isTmp,
         }),
       onError: (error) => {
-        toast.error(error);
+        console.error(error);
+        toast.error("fail to save design system, please retry your action")
+        queryClient.refetchQueries({
+          queryKey: ["design-system", designSystemPath]
+        })
       },
       onSuccess: (designSystem: DesignSystem) => {
         queryClient.setQueryData(

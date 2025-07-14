@@ -6,7 +6,9 @@
   justify-content: space-between;
   padding: var(--uidt-space-4) var(--uidt-space-0);
   box-sizing: border-box;
-  user-select: none; /* Empêche la sélection de texte */
+  user-select: none;
+  -webkit-user-select: none;
+
 }
 
 .topContainer {

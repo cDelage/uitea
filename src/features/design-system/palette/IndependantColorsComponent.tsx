@@ -8,12 +8,12 @@ import { useRef } from "react";
 import { useSidebarComponentVisible } from "../../../util/SidebarComponentVisible";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import styles from "../ComponentDesignSystem.module.css";
-import TintComponent from "./TintsComponent";
+import TintComponent from "./TintComponent";
 import {
   RemovableIndex,
   useDraggableFeatures,
 } from "../../../util/DraggableContext";
-import TintsAddRemove from "./TintsAddRemove";
+import TintAddRemove from "./TintAddRemove";
 
 function IndependantColorsComponent() {
   const { designSystem, editMode } = useDesignSystemContext();
@@ -131,7 +131,7 @@ function IndependantColorsComponent() {
           />
         ))}
         {editMode && (
-          <TintsAddRemove
+          <TintAddRemove
             draggableTools={draggableTools}
             handleSubmit={handleSubmit(submitIndependantColors)}
             appendTint={(tint: Tint) => tintsFieldArray.append(tint)}

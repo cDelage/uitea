@@ -1,14 +1,15 @@
-.header{
+.header {
   display: flex;
   height: var(--uidt-space-7);
   user-select: none;
+  -webkit-user-select: none;
   padding: var(--uidt-space-0);
   margin: var(--uidt-space-0);
   align-items: center;
   -webkit-app-region: drag;
 }
 
-.buttons{
+.buttons {
   display: flex;
   justify-content: end;
   gap: var(--uidt-space-6);

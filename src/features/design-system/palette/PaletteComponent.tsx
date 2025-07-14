@@ -7,7 +7,7 @@ import styles from "../ComponentDesignSystem.module.css";
 import { useDesignSystemContext } from "../DesignSystemContext";
 import classNames from "classnames";
 import { useRef } from "react";
-import TintComponent from "./TintsComponent";
+import TintComponent from "./TintComponent";
 import { useSaveDesignSystem } from "../DesignSystemQueries";
 import { useParams } from "react-router-dom";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import {
 import { getAllErrorMessages } from "../../../util/HookFormUtils";
 import { useTriggerScroll } from "../../../util/TriggerScrollEvent";
 import { useRefreshDesignSystemFormsEvent } from "../../../util/RefreshDesignSystemFormsEvent";
-import TintsAddRemove from "./TintsAddRemove";
+import TintAddRemove from "./TintAddRemove";
 import Popover from "../../../ui/kit/Popover";
 import {
   MdArrowDownward,
@@ -280,7 +280,7 @@ function PaletteComponent({
             />
           ))}
           {editMode && (
-            <TintsAddRemove
+            <TintAddRemove
               draggableTools={draggableTools}
               handleSubmit={handleSubmit(submitPalette)}
               appendTint={(tint: Tint) =>
