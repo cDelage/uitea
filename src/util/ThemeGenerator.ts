@@ -33,13 +33,6 @@ function recolorWithNewBackground({
     initialValue: defaultColor.okhsl[2],
     newCenter: newCenter.okhsl[2],
   });
-  if (defaultColor.toString({ format: "hex" }) === "#fff") {
-    console.log("hsl:", h, s, l, {
-      initialCenter: defaultCenter.okhsl[2],
-      initialValue: defaultColor.okhsl[2],
-      newCenter: newCenter.okhsl[2],
-    })
-  }
 
   const result = new ColorIO("okhsl", [h, s, l]);
 
