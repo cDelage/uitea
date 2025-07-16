@@ -9,6 +9,7 @@ import { DesignToken, TokenFamily } from "../../domain/DesignSystemDomain";
 import { getDesignSystemTokens } from "../../util/DesignSystemUtils";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useFindDesignSystem } from "../design-system/DesignSystemQueries";
+import { useRef } from "react";
 
 function InputColorPopover({
   color,
@@ -27,27 +28,50 @@ function InputColorPopover({
     currentDesignSystem ?? undefined
   );
   const tokenFamilies: TokenFamily[] = getDesignSystemTokens(designSystem, true);
+
+  // Ref pour le fallback <input type="color">
+  const colorInputRef = useRef<HTMLInputElement | null>(null);
+
   async function pickColor() {
     if ("EyeDropper" in window) {
       try {
-        // 2. Ouvrir la pipette
         const eyeDropper = window.EyeDropper
           ? new window.EyeDropper()
           : undefined;
-
         if (eyeDropper) {
           setActivePipette(index === activePipette ? undefined : index);
-          const { sRGBHex } = await eyeDropper.open(); // Attend que l’utilisateur clique
-          setColor(new ColorIO(sRGBHex), index); // 3. Mettre à jour l’état React
+          const { sRGBHex } = await eyeDropper.open();
+          setColor(new ColorIO(sRGBHex), index);
         }
       } catch (err) {
-        // L’utilisateur a peut-être appuyé sur Échap
         console.log("Sélection annulée", err);
+      }
+    } else {
+      // Fallback Mac/Safari/Tauri : on déclenche le color picker natif
+      if (colorInputRef.current) {
+        // nouvelle API showPicker si disponible
+        (colorInputRef.current as any).showPicker?.() || colorInputRef.current.click();
       }
     }
   }
+
   return (
-    <div className="row uidt-input cursor-pointer">
+    <div className="row uidt-input cursor-pointer" style={{ position: "relative" }}>
+      {/* input transparent pour fallback color picker */}
+      <input
+        type="color"
+        ref={colorInputRef}
+        value={colorString}
+        style={{
+          position: "absolute",
+          width: 0,
+          height: 0,
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+        onChange={(e) => setColor(new ColorIO(e.target.value), index)}
+      />
+
       <Popover.Toggle
         id={`color-selector-${index}`}
         positionPayload="bottom-right"
