@@ -3,7 +3,7 @@
 
 __Build your customs design systems and export to other platforms.__
 
-![Static Badge](https://img.shields.io/badge/license-MIT-blue) ![Static Badge](https://img.shields.io/badge/version-1.1.0-green)
+![Static Badge](https://img.shields.io/badge/license-MIT-blue) ![Static Badge](https://img.shields.io/badge/version-1.1.1-green)
 
 
 ## Features
