@@ -595,7 +595,7 @@ function toRgba(color: string, opacity: number): string {
 /**
  * Construit la valeur CSS pour box-shadow à partir d'un objet Shadows.
  */
-export function buildBoxShadow(
+export function buildBoxShadows(
   shadows: Shadows,
   styleRef?: RefObject<HTMLDivElement | null>,
   designSystem?: DesignSystem

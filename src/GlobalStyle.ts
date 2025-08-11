@@ -290,7 +290,7 @@ export const GlobalStyle = createGlobalStyle`
   }
   
   body {
-    background-color: var(--uidt-base-background);
+    background: var(--uidt-base-background);
     color: var(--uidt-base-text-default);
     font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -321,7 +321,7 @@ export const GlobalStyle = createGlobalStyle`
     font-weight: var(--uidt-font-weight-bold);
     user-select: none;
     -webkit-user-select: none;
-  
+    
   }
   
   h3 {

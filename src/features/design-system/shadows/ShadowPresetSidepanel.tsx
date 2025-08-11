@@ -7,7 +7,7 @@ import ShadowPresetPreview from "./ShadowPresetPreview";
 import { useState } from "react";
 import { ButtonPrimary } from "../../../ui/kit/Buttons";
 import {
-  buildBoxShadow,
+  buildBoxShadows,
   generateUniqueEffectsKey,
 } from "../../../util/DesignSystemUtils";
 import { useDesignSystemContext } from "../DesignSystemContext";
@@ -79,7 +79,7 @@ function ShadowPresetSidepanel() {
                   className="row align-center justify-center"
                   style={{
                     background: "#eff6ff",
-                    boxShadow: buildBoxShadow(shadowSelect.shadow, undefined),
+                    boxShadow: buildBoxShadows(shadowSelect.shadow, undefined),
                     ...getRectSize({
                       height: "var(--uidt-space-10)",
                       width: "100px",

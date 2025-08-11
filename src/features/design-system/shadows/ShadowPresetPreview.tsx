@@ -1,5 +1,5 @@
 import { ShadowsPreset } from "../../../domain/DesignSystemDomain";
-import { buildBoxShadow } from "../../../util/DesignSystemUtils";
+import { buildBoxShadows } from "../../../util/DesignSystemUtils";
 import styles from "../SidepanelDesignSystem.module.css";
 
 function ShadowPresetPreview({
@@ -35,7 +35,7 @@ function ShadowPresetPreview({
       <div
         className={styles.previewElement}
         style={{
-          boxShadow: buildBoxShadow(effect, undefined),
+          boxShadow: buildBoxShadows(effect, undefined),
         }}
       >
         {effect.shadowName}
