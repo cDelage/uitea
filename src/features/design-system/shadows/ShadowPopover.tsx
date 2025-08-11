@@ -17,7 +17,7 @@ import { useDesignSystemContext } from "../DesignSystemContext";
 import { PreviewStyle } from "../previews/PreviewStyle";
 import Popover from "../../../ui/kit/Popover";
 import { useRef } from "react";
-import { buildBoxShadow } from "../../../util/DesignSystemUtils";
+import { buildBoxShadows } from "../../../util/DesignSystemUtils";
 
 function ShadowPopover({
   index,
@@ -90,7 +90,7 @@ function ShadowPopover({
             className="default-combination row align-center justify-center radius"
             style={{
               ...getRectSize({ height: "60%" }),
-              boxShadow: buildBoxShadow(shadows, styleRef),
+              boxShadow: buildBoxShadows(shadows, styleRef),
             }}
           >
             shadow-{shadows.shadowName}

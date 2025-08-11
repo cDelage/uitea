@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { Shadows } from "../../../domain/DesignSystemDomain";
 import styles from "../ComponentDesignSystem.module.css";
-import { buildBoxShadow } from "../../../util/DesignSystemUtils";
+import { buildBoxShadows } from "../../../util/DesignSystemUtils";
 import { usePreviewContext } from "../previews/PreviewContext";
 
 function ShadowPreview({ effect }: { effect: Shadows }) {
@@ -16,7 +16,7 @@ function ShadowPreview({ effect }: { effect: Shadows }) {
     <div
       className={previewRect}
       style={{
-        boxShadow: buildBoxShadow(effect, styleRef),
+        boxShadow: buildBoxShadows(effect, styleRef),
       }}
     >
       {effect.shadowName}
