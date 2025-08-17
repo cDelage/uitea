@@ -124,7 +124,7 @@ function ColorPickerLinear({
               className="palette-color"
               style={{
                 background: colorHex,
-                ...getRectSize({ height: "var(--uidt-space-6)" }),
+                ...getRectSize({ height: "var(--uit-space-6)" }),
               }}
             ></div>
             <input
@@ -145,7 +145,7 @@ function ColorPickerLinear({
                 overflow: "hidden",
                 height: "100%",
                 width: "48px",
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <MdColorize size={ICON_SIZE_SM} />

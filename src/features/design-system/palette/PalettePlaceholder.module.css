@@ -5,9 +5,9 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: var(--uidt-space-0) var(--uidt-space-7) var(--uidt-space-0) var(--uidt-space-8);
+    padding: var(--uit-space-0) var(--uit-space-7) var(--uit-space-0) var(--uit-space-8);
     box-sizing: border-box;
     height: 120px;
-    gap: var(--uidt-space-4)
+    gap: var(--uit-space-4)
 
 }

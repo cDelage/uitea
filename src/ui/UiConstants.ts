@@ -206,15 +206,15 @@ export const WEB_SAFE_FONTS: string[] = [
 
 export const SLIDER_STYLE: SliderStyles = {
   handle: {
-    backgroundColor: "var(--uidt-palette-primary-800)",
+    backgroundColor: "var(--uit-palette-primary-800)",
     border: "white 2px solid",
-    boxShadow: "var(--uidt-shadow-md)",
+    boxShadow: "var(--uit-shadow-md)",
   },
   rail: {
-    backgroundColor: "var(--uidt-palette-gray-300)",
+    backgroundColor: "var(--uit-palette-gray-300)",
   },
   track: {
-    backgroundColor: "var(--uidt-palette-primary-300)",
+    backgroundColor: "var(--uit-palette-primary-300)",
   },
 };
 
@@ -233,38 +233,38 @@ export const HANDLE_SLIDER_HORIZONTAL: CSSProperties = {
   borderRadius: "2px",
   height: "24px",
   width: "10px",
-  boxShadow: "var(--uidt-shadow-md)",
-  border: "var(--uidt-base-border) 1px solid",
+  boxShadow: "var(--uit-shadow-md)",
+  border: "var(--uit-base-border) 1px solid",
   bottom: 0,
 };
 
 export const RAIL_SLIDER_HORIZONTAL: CSSProperties = {
   height: "16px",
   borderRadius: "4px",
-  boxShadow: "var(--uidt-shadow-md)",
+  boxShadow: "var(--uit-shadow-md)",
   bottom: 4,
 };
 
 export const HANDLE_SLIDER_LIST: CSSProperties = {
-  boxShadow: "var(--uidt-shadow-md)",
-  border: "var(--uidt-primary-outline-light-border) 1px solid",
-  backgroundColor: "var(--uidt-primary-outline-bg)",
+  boxShadow: "var(--uit-shadow-md)",
+  border: "var(--uit-primary-outline-light-border) 1px solid",
+  backgroundColor: "var(--uit-primary-outline-bg)",
 };
 
 export const RAIL_SLIDER_LIST: CSSProperties = {
   borderRadius: "12px",
-  backgroundColor: "var(--uidt-base-border)",
-  boxShadow: "var(--uidt-shadow-md)",
+  backgroundColor: "var(--uit-base-border)",
+  boxShadow: "var(--uit-shadow-md)",
 };
 
 export const TRACK_SLIDER_LIST: CSSProperties = {
-  backgroundColor: "var(--uidt-primary-outline-light-border)",
+  backgroundColor: "var(--uit-primary-outline-light-border)",
 };
 
 export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
   opacity: 1,
-  border: "1px solid var(--uidt-base-border)",
-  boxShadow: "var(--uidt-shadow-md)",
+  border: "1px solid var(--uit-base-border)",
+  boxShadow: "var(--uit-shadow-md)",
   borderRadius: "4px",
   height: "12px",
   width: "24px",
@@ -273,7 +273,7 @@ export const HANDLE_SLIDER_VERTICAL: CSSProperties = {
 export const RAIL_SLIDER_VERTICAL: CSSProperties = {
   width: "12px",
   borderRadius: "4px",
-  boxShadow: "var(--uidt-shadow-md)",
+  boxShadow: "var(--uit-shadow-md)",
   left: "6px",
 };
 

@@ -62,7 +62,7 @@ function ThemePreview({
                           background: tint.color,
                           border: "none",
                           ...getRectSize({
-                            height: "var(--uidt-space-9)",
+                            height: "var(--uit-space-9)",
                             flex: true,
                           }),
                         }}

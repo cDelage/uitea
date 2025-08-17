@@ -203,7 +203,7 @@ function InputDesignSystem({
               {isLocked && (
                 <MdLock
                   size={ICON_SIZE_SM}
-                  color="var(--uidt-palette-gray-400)"
+                  color="var(--uit-palette-gray-400)"
                 />
               )}
             </div>
@@ -269,7 +269,7 @@ function InputDesignSystem({
                             {!computedColor && (
                               <MdWarning
                                 size={12}
-                                color="var(--uidt-warning-outline-text)"
+                                color="var(--uit-warning-outline-text)"
                               />
                             )}
                           </div>

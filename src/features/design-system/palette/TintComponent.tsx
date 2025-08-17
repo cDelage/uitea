@@ -198,7 +198,7 @@ function TintComponent({
               >
                 <MdLock
                   size={ICON_SIZE_SM}
-                  color="var(--uidt-base-text-light)"
+                  color="var(--uit-base-text-light)"
                 />
               </div>
             )}

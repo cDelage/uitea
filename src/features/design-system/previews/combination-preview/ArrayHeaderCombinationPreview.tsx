@@ -20,27 +20,27 @@ const Table = styled.table<{ $combination: ColorCombinationCollection }>`
   }
 
   th:first-child {
-    border-top-left-radius: var(--uidt-rounded-md);
+    border-top-left-radius: var(--uit-rounded-md);
   }
 
   th:last-child {
-    border-top-right-radius: var(--uidt-rounded-md);
+    border-top-right-radius: var(--uit-rounded-md);
   }
   
   .td-first {
-    border-bottom-left-radius: var(--uidt-rounded-md);
+    border-bottom-left-radius: var(--uit-rounded-md);
   }
 
   .td-last {
-    border-bottom-right-radius: var(--uidt-rounded-md);
+    border-bottom-right-radius: var(--uit-rounded-md);
   }
 
   thead {
     tr {
       font-size: 14px;
       line-height: 20px;
-      font-weight: var(--uidt-font-weight-bold);
-      color: var(--uidt-base-text-light);
+      font-weight: var(--uit-font-weight-bold);
+      color: var(--uit-base-text-light);
       th {
         background-color: var(
           --${(props) => props.$combination.default?.background}
@@ -56,7 +56,7 @@ const Table = styled.table<{ $combination: ColorCombinationCollection }>`
   tbody {
     background-color: transparent;
     border-radius: var(--radius-md);
-    box-shadow: var(--uidt-shadow-md);
+    box-shadow: var(--uit-shadow-md);
   }
 `;
 

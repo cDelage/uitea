@@ -31,19 +31,19 @@
   top: 0px;
   left: 50%;
   transform: translate(-50%, -100%);
-  background-color: var(--uidt-tooltip-bg);
-  color: var(--uidt-tooltip-text);
+  background-color: var(--uit-tooltip-bg);
+  color: var(--uit-tooltip-text);
   border: none;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   box-sizing: border-box;
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   z-index: 3;
   cursor: pointer;
   align-items: center;
   justify-content: space-between;
   width: fit-content;
   display: flex;
-  gap: var(--uidt-space-2);
+  gap: var(--uit-space-2);
 }
 
 /* La flèche en tant qu'élément enfant */
@@ -54,7 +54,7 @@
   transform: translateX(-50%);
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid var(--uidt-tooltip-bg);
+  border-top: 8px solid var(--uit-tooltip-bg);
 }
 
 .valueTextContainer {
@@ -67,17 +67,17 @@
   top: 50%;
   left: -8px;
   transform: translate(-100%, -50%);
-  background-color: var(--uidt-tooltip-bg);
-  color: var(--uidt-tooltip-text);
+  background-color: var(--uit-tooltip-bg);
+  color: var(--uit-tooltip-text);
   border: none;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   box-sizing: border-box;
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--uidt-space-2);
+  gap: var(--uit-space-2);
   width: fit-content;
 }
 
@@ -88,7 +88,7 @@
   transform: translateY(-50%);
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-left: 8px solid var(--uidt-tooltip-bg);
+  border-left: 8px solid var(--uit-tooltip-bg);
 }
 
 .tooltipBodyBottom {
@@ -96,17 +96,17 @@
   top: calc(100% + 8px); /* Espace entre l'élément et la tooltip */
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--uidt-tooltip-bg);
-  color: var(--uidt-tooltip-text);
+  background-color: var(--uit-tooltip-bg);
+  color: var(--uit-tooltip-text);
   border: none;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   box-sizing: border-box;
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--uidt-space-2);
+  gap: var(--uit-space-2);
   width: fit-content;
 }
 
@@ -117,5 +117,5 @@
   transform: translateX(-50%);
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid var(--uidt-tooltip-bg);
+  border-bottom: 8px solid var(--uit-tooltip-bg);
 }

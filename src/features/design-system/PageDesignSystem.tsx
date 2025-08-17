@@ -6,7 +6,7 @@ import Loader from "../../ui/kit/Loader";
 import SidebarDesignSystem from "./SidebarDesignSystem";
 import BodyDesignSystem from "./BodyDesignSystem";
 import styles from "./PageDesignSystem.module.css";
-import { ActiveComponent, DesignSystemContext } from "./DesignSystemContext";
+import { DesignSystemContext } from "./DesignSystemContext";
 import { useEffect, useMemo, useState } from "react";
 import {
   ColorCombination,
@@ -29,9 +29,6 @@ function PageDesignSystem() {
   const { designSystemPath } = useParams();
   const { saveDesignSystem, isSavingDesignSystem } =
     useSaveDesignSystem(designSystemPath);
-  const [activeComponent, setActiveComponent] = useState<
-    ActiveComponent | undefined
-  >(undefined);
   const [searchParams, setSearchParams] = useSearchParams();
   const editMode: boolean = JSON.parse(
     searchParams.get("editMode") || "false"
@@ -39,15 +36,6 @@ function PageDesignSystem() {
   const [theme, setTheme] = useState<Theme | undefined>(undefined);
   const [loadedFonts, setLoadedFonts] = useState<string[]>([]);
   const scrollComponent = searchParams.get("scrollComponent");
-
-  function handleSetActiveComponent(newActiveComponent?: ActiveComponent) {
-    setActiveComponent((active) =>
-      active?.componentId === newActiveComponent?.componentId &&
-        active?.mode === newActiveComponent?.mode
-        ? undefined
-        : newActiveComponent
-    );
-  }
 
   const colorTokens: DesignToken[] | undefined =
     designSystem?.palettes.flatMap(getPaletteTokens);
@@ -205,8 +193,6 @@ function PageDesignSystem() {
   return (
     <DesignSystemContext
       value={{
-        activeComponent,
-        setActiveComponent: handleSetActiveComponent,
         designSystem,
         editMode,
         colorTokens,

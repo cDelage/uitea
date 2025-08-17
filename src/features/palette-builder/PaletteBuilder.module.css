@@ -4,7 +4,7 @@
   overflow-y: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
-  background-color: var(--uidt-base-background);
+  background-color: var(--uit-base-background);
   height: 100%;
 }
 
@@ -17,19 +17,19 @@
 
 .header {
   display: flex;
-  padding: var(--uidt-space-3) var(--uidt-space-6);
-  gap: var(--uidt-space-2);
-  border-bottom: var(--uidt-base-border) 1px solid;
+  padding: var(--uit-space-3) var(--uit-space-6);
+  gap: var(--uit-space-2);
+  border-bottom: var(--uit-base-border) 1px solid;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
 }
 
 .builderBodyContainer {
-  padding: var(--uidt-space-5) var(--uidt-space-6);
+  padding: var(--uit-space-5) var(--uit-space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-6);
+  gap: var(--uit-space-6);
   position: relative;
   overflow: hidden;
   max-height: 100%;
@@ -52,7 +52,7 @@
 
 .paletteRow {
   height: 60px;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   overflow: hidden;
 }
 
@@ -63,14 +63,14 @@
   min-width: 140px;
   max-width: 140px;
   width: 140px;
-  padding: var(--uidt-space-3);
+  padding: var(--uit-space-3);
   text-align: left;
   box-sizing: border-box;
 }
 
 .columnPalette[data-open="true"] {
-  background-color: var(--uidt-palette-gray-50);
-  color: var(--uidt-add-text);
+  background-color: var(--uit-palette-gray-50);
+  color: var(--uit-add-text);
   text-decoration: underline;
 }
 
@@ -81,25 +81,25 @@
   min-width: 140px;
   max-width: 140px;
   width: 140px;
-  padding: var(--uidt-space-3);
+  padding: var(--uit-space-3);
   text-align: left;
   box-sizing: border-box;
-  background-color: var(--uidt-base-background);
+  background-color: var(--uit-base-background);
 }
 
 .columnTint {
-  font-weight: var(--uidt-font-weight-default);
+  font-weight: var(--uit-font-weight-default);
   min-width: 30px !important;
-  padding: var(--uidt-space-0) !important;
-  margin: var(--uidt-space-0) !important;
+  padding: var(--uit-space-0) !important;
+  margin: var(--uit-space-0) !important;
   position: relative;
 }
 
 .sidePanel {
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-8);
-  padding: var(--uidt-space-0) var(--uidt-space-0) var(--uidt-space-8) var(--uidt-space-0);
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-0) var(--uit-space-0) var(--uit-space-8) var(--uit-space-0);
   overflow-y: auto;
   position: relative;
 }
@@ -107,7 +107,7 @@
 .sidePanelHeader {
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-6);
+  gap: var(--uit-space-6);
   position: sticky;
   top: -1px;
   z-index: 100;
@@ -115,36 +115,36 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #fff;
   z-index: 2;
-  padding: var(--uidt-space-4) var(--uidt-space-4);
+  padding: var(--uit-space-4) var(--uit-space-4);
 }
 
 .sidePanelBodyContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-8);
-  padding: var(--uidt-space-0) var(--uidt-space-4);
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-0) var(--uit-space-4);
 }
 
 .sidePanelContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-4);
+  gap: var(--uit-space-4);
 }
 
 .recommandedHueButton {
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-3);
-  padding: var(--uidt-space-3);
+  gap: var(--uit-space-3);
+  padding: var(--uit-space-3);
   box-sizing: border-box;
-  color: var(--uidt-base-text-light);
-  border-radius: var(--uidt-rounded-md);
+  color: var(--uit-base-text-light);
+  border-radius: var(--uit-rounded-md);
   cursor: pointer;
 }
 
 .recommandedHueButton:hover {
-  background-color: var(--uidt-component-hover-bg);
-  color: var(--uidt-component-hover-text);
+  background-color: var(--uit-component-hover-bg);
+  color: var(--uit-component-hover-text);
 }
 
 .rightSidepanelSpace {
@@ -154,7 +154,7 @@
 .chartContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-6);
+  gap: var(--uit-space-6);
   align-items: center;
 }
 
@@ -167,7 +167,7 @@
 .complementaryColorsRow {
   display: flex;
   flex-wrap: wrap;
-  row-gap: var(--uidt-space-3);
+  row-gap: var(--uit-space-3);
 }
 
 .dragActionContainer {
@@ -179,13 +179,13 @@
 }
 
 .columnPalette[data-dragged="true"] {
-  background-color: var(--uidt-add-bg);
-  color: var(--uidt-add-text);
+  background-color: var(--uit-add-bg);
+  color: var(--uit-add-text);
 }
 
 .columnPalette[data-dragged="true"][data-remove="true"] {
-  background-color: var(--uidt-remove-bg);
-  color: var(--uidt-remove-text);
+  background-color: var(--uit-remove-bg);
+  color: var(--uit-remove-text);
 }
 
 .anchorPreviewContainer {

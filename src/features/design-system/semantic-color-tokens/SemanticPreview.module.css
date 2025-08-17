@@ -9,9 +9,9 @@
   display: flex;
   border-radius: var(--radius);
   width: 100%;
-  box-shadow: var(--uidt-shadow-md);
+  box-shadow: var(--uit-shadow-md);
   box-sizing: border-box;
   flex-wrap: wrap;
-  gap: var(--uidt-space-8);
-  padding: var(--uidt-space-8);
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-8);
 }

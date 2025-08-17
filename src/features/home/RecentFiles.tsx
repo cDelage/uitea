@@ -65,14 +65,14 @@ function RecentFiles() {
           <tr>
             <td
               style={{
-                background: "var(--uidt-base-background)",
+                background: "var(--uit-base-background)",
               }}
             >
               Recent file
             </td>
             <td
               style={{
-                background: "var(--uidt-base-background)",
+                background: "var(--uit-base-background)",
               }}
             >
               Actions

@@ -10,7 +10,7 @@
 .sidePanelHeader {
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-6);
+  gap: var(--uit-space-6);
   position: sticky;
   top: -1px;
   z-index: 100;
@@ -21,7 +21,7 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #fff;
   z-index: 2;
-  padding: var(--uidt-space-6);
+  padding: var(--uit-space-6);
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
@@ -30,7 +30,7 @@
 .sidePanelFooter {
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-6);
+  gap: var(--uit-space-6);
   position: sticky;
   bottom: 0px;
   z-index: 100;
@@ -41,7 +41,7 @@
   backdrop-filter: blur(10px);
   border-top: 1px solid #fff;
   z-index: 2;
-  padding: var(--uidt-space-6);
+  padding: var(--uit-space-6);
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
@@ -50,8 +50,8 @@
 .sidePanelBodyContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--uidt-space-8);
-  padding: var(--uidt-space-0) var(--uidt-space-6) var(--uidt-space-6) var(--uidt-space-6);
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-0) var(--uit-space-6) var(--uit-space-6) var(--uit-space-6);
 }
 
 .previewGrid {
@@ -81,8 +81,8 @@
 
 .rightActions {
   position: absolute;
-  top: var(--uidt-space-2);
-  right: var(--uidt-space-2);
+  top: var(--uit-space-2);
+  right: var(--uit-space-2);
   color: #3f3f46;
 }
 

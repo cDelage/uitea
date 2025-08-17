@@ -398,7 +398,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                     .find((palette) => palette.isCenter)
                                     ?.color.toString({ format: "hex" }),
                                   ...getRectSize({
-                                    height: "var(--uidt-space-5)",
+                                    height: "var(--uit-space-5)",
                                   }),
                                 }}
                               ></div>
@@ -454,7 +454,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                   <>
                                     <MdLocationPin
                                       size={ICON_SIZE_XL}
-                                      color="var(--uidt-palette-primary-200)"
+                                      color="var(--uit-palette-primary-200)"
                                       style={{
                                         position: "absolute",
                                         top: 0,
@@ -466,7 +466,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                     />
                                     <MdLocationPin
                                       size={ICON_SIZE_XL}
-                                      color="var(--uidt-primary-bg)"
+                                      color="var(--uit-primary-bg)"
                                       style={{
                                         position: "absolute",
                                         top: 0,
@@ -515,7 +515,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                               background: colorCreatePalette.toString({
                                 format: "hex",
                               }),
-                              ...getRectSize({ height: "var(--uidt-space-9)" }),
+                              ...getRectSize({ height: "var(--uit-space-9)" }),
                             }}
                           ></div>
                           <strong>

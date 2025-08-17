@@ -8,7 +8,7 @@ use std::{
 use anyhow::{anyhow, Context, Result};
 use base64::{engine::general_purpose, Engine as _};
 
-use crate::domain::design_system_domain::{ExportsMetadata, IndependantColors};
+use crate::domain::design_system_domain::{ExportsMetadata, IndependantColors, ThemesFile};
 use crate::repository::{
     compute_path_with_extension_overwrite, get_file_date, get_file_metadata, open_folder,
 };
@@ -249,8 +249,7 @@ pub fn save_design_system(design_system: &mut DesignSystem, is_tmp: bool) -> Res
     let effect_pathbuf: PathBuf = design_system_path.join(EFFECTS_PATH);
     save_to_yaml_file(effect_pathbuf, &design_system.shadows)?;
 
-    let themes_pathbuf: PathBuf = design_system_path.join(THEMELIST_PATH);
-    save_to_yaml_file(themes_pathbuf, &design_system.themes)?;
+    save_themes(&design_system_path, &design_system.themes)?;
 
     let semantic_color_tokens_pathbuf: PathBuf =
         design_system_path.join(SEMANTIC_COLOR_TOKENS_PATH);
@@ -469,16 +468,29 @@ pub fn is_under_design_system(path: &PathBuf) -> bool {
 pub fn fetch_themes(design_system_path: &PathBuf) -> Themes {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);
     let theme_path = fetch_pathbuf.join(THEMELIST_PATH);
+
     if theme_path.is_file() {
-        if let Result::Ok(themes) = load_yaml_from_pathbuf::<Themes>(&theme_path) {
-            return themes;
+        if let Ok(file_model) = load_yaml_from_pathbuf::<ThemesFile>(&theme_path) {
+            // Convertit le modèle fichier → modèle runtime
+            return Themes::from(file_model);
         }
     }
-    return Themes {
+
+    // Valeurs par défaut si fichier manquant / invalide
+    Themes {
         main_theme: None,
         other_themes: vec![],
-    };
+    }
 }
+
+// suppose que tu as déjà save_to_yaml_file(PathBuf, &impl Serialize) -> Result<()>
+
+pub fn save_themes(design_system_path: &PathBuf, themes: &Themes) -> Result<()> {
+    let themes_pathbuf: PathBuf = design_system_path.join(THEMELIST_PATH);
+    let file_model: ThemesFile = ThemesFile::from(themes); // runtime → fichier
+    save_to_yaml_file(themes_pathbuf, &file_model)
+}
+
 
 pub fn init_semantic_color_tokens(design_system_path: &PathBuf) -> Result<()> {
     let FetchPath { fetch_pathbuf, .. } = compute_fetch_pathbuf(&design_system_path);

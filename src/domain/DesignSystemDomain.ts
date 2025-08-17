@@ -95,7 +95,25 @@ export interface Themes {
 export interface Theme {
   name: string;
   background: string;
+  paletteThemeSettings: PaletteThemeSetting[];
 }
+
+export interface PaletteThemeSetting {
+  paletteName: string,
+  attribute: PaletteSettingAttribute,
+  value: number
+}
+
+export type PaletteSettingAttribute =
+  | "lightnessMax"
+  | "lightnessMin"
+  | "satChromaGapLeft"
+  | "satChromaGapRight"
+  | "hueGapLeft"
+  | "hueGapRight"
+  | "lightnessCenter"
+  | "satChromaCenter"
+  | "hueGapCenter";
 
 export type ThemeStateCategory = "default" | "hover" | "active" | "focus";
 

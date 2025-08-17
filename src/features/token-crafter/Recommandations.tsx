@@ -92,7 +92,7 @@ function Recommandations() {
                     style={{
                       background: `var(--${dragTools.recommandation?.combinationTokens.background})`,
                       border: `1px solid var(--${dragTools.recommandation?.combinationTokens.border})`,
-                      ...getRectSize({ height: "var(--uidt-space-5)" }),
+                      ...getRectSize({ height: "var(--uit-space-5)" }),
                     }}
                   />
                   <strong>

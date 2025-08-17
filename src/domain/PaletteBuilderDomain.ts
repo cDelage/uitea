@@ -66,6 +66,9 @@ export interface PaletteSettings {
   satChromaGapRight: number;
   hueGapLeft: number;
   hueGapRight: number;
+  lightnessCenter?: number;
+  satChromaCenter?: number;
+  hueGapCenter?: number;
 }
 
 export interface PalettesStoreSettings {

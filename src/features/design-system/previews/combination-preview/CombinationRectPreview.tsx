@@ -16,7 +16,7 @@ function CombinationRectPreview({
     <div
       className="palette-color"
       style={{
-        borderRadius: "var(--uidt-rounded-md)",
+        borderRadius: "var(--uit-rounded-md)",
         backgroundColor:
           colorCombination.background &&
           `var(--${colorCombination.background})`,

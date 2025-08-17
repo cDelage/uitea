@@ -73,8 +73,7 @@ function Header() {
 
   const headerTools = useMemo<HeaderTools>(() => {
     if (
-      pathname.startsWith("/palette-builder") ||
-      searchParams.get("paletteBuilderOpen") === "true"
+      pathname.startsWith("/palette-builder")
     ) {
       return {
         pageName: "palette builder",
@@ -83,14 +82,22 @@ function Header() {
         redo: redoPaletteBuilder,
       };
     } else if (
-      pathname.startsWith("/color-picker") ||
-      searchParams.get("colorPickerOpen") === "true"
+      pathname.startsWith("/color-picker")
     ) {
       return {
         pageName: "color picker",
         canUndoRedo: canUndoRedoColorPicker,
         undo: undoColorPicker,
         redo: redoColorPicker,
+      };
+    } else if (
+      pathname.startsWith("/theme-customizer")
+    ) {
+      return {
+        pageName: "theme customizer",
+        canUndoRedo: undefined,
+        undo: undefined,
+        redo: undefined,
       };
     } else if (
       pathname.startsWith("/token-crafter") ||

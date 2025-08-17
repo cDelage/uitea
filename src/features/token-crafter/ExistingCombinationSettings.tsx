@@ -133,7 +133,7 @@ function ExistingCombinationSettings({
 
   function getBackground(): string | undefined {
     if (draggableTools.dragIndex === index) {
-      return "var(--uidt-drag-bg)";
+      return "var(--uit-drag-bg)";
     } else if (group?.background) {
       return `var(--${group?.background})`;
     } else {
@@ -165,7 +165,7 @@ function ExistingCombinationSettings({
         background: getBackground(),
         borderTop: `2px solid ${
           draggableTools.hoverIndex === index
-            ? `var(--uidt-drag-border)`
+            ? `var(--uit-drag-border)`
             : `transparent`
         }`,
       }}

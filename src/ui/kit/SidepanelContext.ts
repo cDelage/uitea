@@ -11,7 +11,7 @@ export const SidepanelContext = createContext<null | SidepanelContextType>(
   null
 );
 
-export const useSidepanelContext = () => {
+export function useSidepanelContext() {
   const context = useContext(SidepanelContext) as SidepanelContextType;
   if (!context) throw new Error("Modal context was used outside of his scope");
   return context;

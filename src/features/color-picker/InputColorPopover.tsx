@@ -86,7 +86,7 @@ function InputColorPopover({
             className="palette-color"
             style={{
               background: colorString,
-              ...getRectSize({ height: "var(--uidt-space-6)" }),
+              ...getRectSize({ height: "var(--uit-space-6)" }),
             }}
           ></div>
           {colorString}
@@ -133,7 +133,7 @@ function InputColorPopover({
           borderRadius: "0px",
           overflow: "hidden",
           height: "100%",
-          borderLeft: "1px solid var(--uidt-base-border)",
+          borderLeft: "1px solid var(--uit-base-border)",
         }}
       >
         <MdColorize size={ICON_SIZE_SM} />

@@ -16,7 +16,7 @@ import SpacesComponent from "./spaces/SpacesComponent";
 import RadiusComponent from "./radius/RadiusComponent";
 import ShadowsComponent from "./shadows/ShadowsComponent";
 import Modal from "../../ui/kit/Modal";
-import { MdBrush, MdConstruction, MdStore } from "react-icons/md";
+import { MdBrush, MdConstruction, MdLightMode, MdStore } from "react-icons/md";
 import ThemesComponent from "./themes/ThemesComponent";
 import SemanticColorTokensComponent from "./semantic-color-tokens/SemanticColorTokensComponent";
 import { useTokenCrafterStore } from "../token-crafter/TokenCrafterStore";
@@ -88,7 +88,24 @@ function BodyDesignSystem() {
               <Section.Subsection subSectionName="Independant colors">
                 <IndependantColorsComponent />
               </Section.Subsection>
-              <Section.Subsection subSectionName="Themes">
+              <Section.Subsection subSectionName="Themes"
+                actions={
+                  <>
+                    <button
+                      className="action-ghost-button"
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/theme-customizer/${encodeURIComponent(designSystem.metadata.designSystemPath)}`
+                        )
+                      }
+                    >
+                      <MdLightMode size={ICON_SIZE_MD} />
+                      Theme customizer
+                    </button>
+                  </>
+                }
+              >
                 {designSystem.palettes.length !== 0 ? (
                   <ThemesComponent />
                 ) : (

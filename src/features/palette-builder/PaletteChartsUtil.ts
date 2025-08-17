@@ -37,7 +37,7 @@ export interface ChartAxeData {
   rightAxeData: AxeData;
 }
 
-export function useChartAxeData({
+export function usePaletteBuilderChartAxeData({
   interpolationColorSpace,
   palette,
   index,

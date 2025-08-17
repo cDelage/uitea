@@ -90,7 +90,7 @@ function SidebarDesignSystem() {
                       className="palette-color"
                       style={{
                         background: designSystem.themes.mainTheme?.background,
-                        ...getRectSize({ height: "var(--uidt-space-5)" }),
+                        ...getRectSize({ height: "var(--uit-space-5)" }),
                       }}
                     />
                     {designSystem.themes.mainTheme?.name}
@@ -104,7 +104,7 @@ function SidebarDesignSystem() {
                         className="palette-color"
                         style={{
                           background: theme.background,
-                          ...getRectSize({ height: "var(--uidt-space-5)" }),
+                          ...getRectSize({ height: "var(--uit-space-5)" }),
                         }}
                       />
                       {theme.name}
@@ -129,7 +129,7 @@ function SidebarDesignSystem() {
                       <PaletteIcon
                         palette={palette}
                         size={ICON_SIZE_SM}
-                        color="var(--uidt-base-text-default)"
+                        color="var(--uit-base-text-default)"
                       />
                     }
                     visible={visible}
@@ -145,7 +145,7 @@ function SidebarDesignSystem() {
                   <PaletteIcon
                     palette={INDEPENDANT_COLORS_PALETTE}
                     size={ICON_SIZE_SM}
-                    color="var(--uidt-base-text-default)"
+                    color="var(--uit-base-text-default)"
                   />
                 }
               />

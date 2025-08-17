@@ -27,7 +27,7 @@ function TokenGroupPopover({
                 <div
                   className="palette-color"
                   style={{
-                    ...getRectSize({ height: "var(--uidt-space-5)" }),
+                    ...getRectSize({ height: "var(--uit-space-5)" }),
                     background: `var(--${collection.default?.background})`,
                     border: collection.default?.border
                       ? `var(--${collection.default?.border}) 1px solid`

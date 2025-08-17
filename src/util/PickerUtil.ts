@@ -211,216 +211,214 @@ export const DEFAULT_PICKER_MODE: ColorSpace = {
     },
   ],
 };
+export const HSL: ColorSpace = {
+  space: "hsl",
+  axes: [
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["s", "l"],
+    },
+    {
+      name: "s",
+      label: "Saturation",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "l"],
+    },
+    {
+      name: "l",
+      label: "Lightness",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "s"],
+    },
+  ],
+};
 
+export const HSV: ColorSpace = {
+  space: "hsv",
+  axes: [
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["s", "v"],
+    },
+    {
+      name: "s",
+      label: "Saturation",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "v"],
+    },
+    {
+      name: "v",
+      label: "Value",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "s"],
+    },
+  ],
+};
+
+export const HWB: ColorSpace = {
+  space: "hwb",
+  axes: [
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["w", "b"],
+    },
+    {
+      name: "w",
+      label: "Whiteness",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "b"],
+    },
+    {
+      name: "b",
+      label: "Blackness",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["h", "w"],
+    },
+  ],
+};
+
+export const LCH: ColorSpace = {
+  space: "lch",
+  axes: [
+    {
+      name: "l",
+      label: "Lightness",
+      min: 0,
+      max: 100,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["c", "h"],
+    },
+    {
+      name: "c",
+      label: "Chroma",
+      min: 0,
+      max: 150,
+      steps: 0.5,
+      gradientSteps: 5,
+      otherAxes: ["l", "h"],
+    },
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["l", "c"],
+    },
+  ],
+};
+
+export const OKLCH: ColorSpace = {
+  space: "oklch",
+  axes: [
+    {
+      name: "l",
+      label: "Lightness",
+      min: 0,
+      max: 1,
+      steps: 0.01,
+      gradientSteps: 5,
+      otherAxes: ["c", "h"],
+    },
+    {
+      name: "c",
+      label: "Chroma",
+      min: 0,
+      max: 0.4,
+      steps: 0.01,
+      gradientSteps: 5,
+      otherAxes: ["l", "h"],
+    },
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["l", "c"],
+    },
+  ],
+};
+
+export const OKHSL: ColorSpace = {
+  space: "okhsl",
+  axes: [
+    {
+      name: "h",
+      label: "Hue",
+      min: 0,
+      max: 360,
+      steps: 0.5,
+      gradientSteps: 12,
+      otherAxes: ["s", "l"],
+    },
+    {
+      name: "s",
+      label: "Saturation",
+      min: 0,
+      max: 1,
+      steps: 0.01,
+      gradientSteps: 5,
+      otherAxes: ["h", "l"],
+    },
+    {
+      name: "l",
+      label: "Lightness",
+      min: 0,
+      max: 1,
+      steps: 0.01,
+      gradientSteps: 5,
+      otherAxes: ["h", "s"],
+    },
+  ],
+};
+
+// Reconstruction du tableau complet
 export const PICKER_MODES: ColorSpace[] = [
-  {
-    space: "hsl",
-    axes: [
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["s", "l"],
-      },
-      {
-        name: "s",
-        label: "Saturation",
-
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "l"],
-      },
-      {
-        name: "l",
-        label: "Lightness",
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "s"],
-      },
-    ],
-  },
-  {
-    space: "hsv",
-    axes: [
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["s", "v"],
-      },
-      {
-        name: "s",
-        label: "Saturation",
-
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "v"],
-      },
-      {
-        name: "v",
-        label: "Value",
-
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "s"],
-      },
-    ],
-  },
-  {
-    space: "hwb",
-    axes: [
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["w", "b"],
-      },
-      {
-        name: "w",
-        label: "Whiteness",
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "b"],
-      },
-      {
-        name: "b",
-        label: "Blackness",
-
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["h", "w"],
-      },
-    ],
-  },
-  {
-    space: "lch",
-    axes: [
-      {
-        name: "l",
-        label: "Lightness",
-
-        min: 0,
-        max: 100,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["c", "h"],
-      },
-      {
-        name: "c",
-        label: "Chroma",
-
-        min: 0,
-        max: 150,
-        steps: 0.5,
-        gradientSteps: 5,
-        otherAxes: ["l", "h"],
-      },
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["l", "c"],
-      },
-    ],
-  },
-  {
-    space: "oklch",
-    axes: [
-      {
-        name: "l",
-        label: "Lightness",
-
-        min: 0,
-        max: 1,
-        steps: 0.01,
-        gradientSteps: 5,
-        otherAxes: ["c", "h"],
-      },
-      {
-        name: "c",
-        label: "Chroma",
-
-        min: 0,
-        max: 0.4,
-        steps: 0.01,
-        gradientSteps: 5,
-        otherAxes: ["l", "h"],
-      },
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["l", "c"],
-      },
-    ],
-  },
-  {
-    space: "okhsl",
-    axes: [
-      {
-        name: "h",
-        label: "Hue",
-
-        min: 0,
-        max: 360,
-        steps: 0.5,
-        gradientSteps: 12,
-        otherAxes: ["s", "l"],
-      },
-      {
-        name: "s",
-        label: "Saturation",
-
-        min: 0,
-        max: 1,
-        steps: 0.01,
-        gradientSteps: 5,
-        otherAxes: ["h", "l"],
-      },
-      {
-        name: "l",
-        label: "Lightness",
-        min: 0,
-        max: 1,
-        steps: 0.01,
-        gradientSteps: 5,
-        otherAxes: ["h", "s"],
-      },
-    ],
-  },
+  HSL,
+  HSV,
+  HWB,
+  LCH,
+  OKLCH,
+  OKHSL,
 ];
+
 
 export const WHITE = new ColorIO("#ffffff");
 export const BLACK = new ColorIO("#000000");

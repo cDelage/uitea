@@ -815,11 +815,94 @@ pub struct Themes {
     pub other_themes: Vec<Theme>,
 }
 
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemesFile {
+    pub main_theme: Option<ThemeFile>,
+    #[serde(default)]
+    pub other_themes: Vec<ThemeFile>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Theme {
     pub name: String,
     pub background: String,
+    // ⚠️ PAS de skip_serializing_if ici → côté front on aura toujours [] et jamais undefined
+    #[serde(default)]
+    pub palette_theme_settings: Vec<PaletteThemeSetting>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeFile {
+    pub name: String,
+    pub background: String,
+    // Pour le YAML : si absent → Vec::new(); si vide → non écrit lors de la sérialisation
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub palette_theme_settings: Vec<PaletteThemeSetting>,
+}
+
+impl From<ThemeFile> for Theme {
+    fn from(src: ThemeFile) -> Self {
+        Self {
+            name: src.name,
+            background: src.background,
+            palette_theme_settings: src.palette_theme_settings,
+        }
+    }
+}
+
+impl From<&Theme> for ThemeFile {
+    fn from(src: &Theme) -> Self {
+        Self {
+            name: src.name.clone(),
+            background: src.background.clone(),
+            palette_theme_settings: src.palette_theme_settings.clone(),
+        }
+    }
+}
+
+impl From<ThemesFile> for Themes {
+    fn from(src: ThemesFile) -> Self {
+        Self {
+            main_theme: src.main_theme.map(Theme::from),
+            other_themes: src.other_themes.into_iter().map(Theme::from).collect(),
+        }
+    }
+}
+
+impl From<&Themes> for ThemesFile {
+    fn from(src: &Themes) -> Self {
+        Self {
+            main_theme: src.main_theme.as_ref().map(ThemeFile::from),
+            other_themes: src.other_themes.iter().map(ThemeFile::from).collect(),
+        }
+    }
+}
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PaletteThemeSetting {
+    pub palette_name: String,
+    pub attribute: PaletteSettingAttribute,
+    pub value: f32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub enum PaletteSettingAttribute {
+    LightnessMax,
+    LightnessMin,
+    SatChromaGapLeft,
+    SatChromaGapRight,
+    HueGapLeft,
+    HueGapRight,
+    LightnessCenter,
+    SatChromaCenter,
+    HueGapCenter,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

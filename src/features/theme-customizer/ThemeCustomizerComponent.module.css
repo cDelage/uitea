@@ -1,0 +1,121 @@
+.themeCustomizer {
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: var(--uit-base-background);
+  height: 100%;
+}
+
+.themeSelector {
+  min-width: 350px;
+  max-width: 350px;
+  width: 350px;
+  background-color: var(--uit-component-bg);
+  height: 100%;
+  border-right: 1px solid var(--uit-component-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidePanelBloc {
+  padding: var(--uit-space-4); 
+}
+
+.themeTab{
+    padding: var(--uit-space-6);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.themeTab:hover{
+  background-color: var(--uit-component-hover-bg);
+}
+
+.themeTab[data-open=true]{
+  background-color: var(--uit-component-focus-bg);
+}
+
+.header{
+  background-color: var(--uit-component-bg);
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--uit-space-4);
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--uit-component-border);
+}
+
+.tableHeader {
+  height: 40px;
+}
+
+.columnPaletteHeader {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 140px;
+  max-width: 140px;
+  width: 140px;
+  padding: var(--uit-space-3);
+  text-align: left;
+  box-sizing: border-box;
+  background-color: var(--uit-base-background);
+}
+
+.columnTint {
+  font-weight: var(--uit-font-weight-default);
+  min-width: 30px !important;
+  padding: var(--uit-space-0) !important;
+  margin: var(--uit-space-0) !important;
+  position: relative;
+}
+
+.paletteRow {
+  height: 60px;
+  padding: var(--uit-space-2);
+  overflow: hidden;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-0) var(--uit-space-0) var(--uit-space-8) var(--uit-space-0);
+  overflow-y: auto;
+  position: relative;
+}
+
+.sidePanelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--uit-space-6);
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.6), 30%, #ffffff);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #fff;
+  z-index: 2;
+  padding: var(--uit-space-4) var(--uit-space-4);
+  justify-content: space-between;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uit-space-6);
+  align-items: center;
+}
+
+.sidePanelBodyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uit-space-8);
+  padding: var(--uit-space-0) var(--uit-space-4);
+}

@@ -29,7 +29,7 @@ function TokenPreview({
           <div
             className="palette-color w-full radius"
             style={{
-              ...getRectSize({ height: "var(--uidt-space-7)" }),
+              ...getRectSize({ height: "var(--uit-space-7)" }),
               background: `var(--${value})`,
             }}
           ></div>
