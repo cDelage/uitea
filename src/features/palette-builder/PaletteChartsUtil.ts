@@ -1,26 +1,27 @@
-import { ChartData, ChartOptions } from "chart.js";
+import { ChartData, ChartOptions } from 'chart.js';
 import {
   ColorSpace,
   DEFAULT_PICKER_MODE,
   PICKER_MODES,
   PickerAxe,
   PickerAxeName,
-} from "../../util/PickerUtil";
-import { usePaletteBuilderStore } from "./PaletteBuilderStore";
-import ColorIO from "colorjs.io";
+} from '../../util/PickerUtil';
+import { usePaletteBuilderStore } from './PaletteBuilderStore';
+import ColorIO from 'colorjs.io';
 import {
   InterpolationColorSpace,
   PaletteAxeSetting,
   PaletteBuild,
-} from "../../domain/PaletteBuilderDomain";
+} from '../../domain/PaletteBuilderDomain';
 
 export interface PaletteChartData {
-  line: ChartData<"line">;
-  options: ChartOptions<"line">;
+  line: ChartData<'line'>;
+  options: ChartOptions<'line'>;
 }
 
 export interface AxeData {
   update: (value: number | number[]) => void;
+  onComplete?: () => void;
   reset: () => void;
   gradient: string;
   value: number;
@@ -51,11 +52,8 @@ export function usePaletteBuilderChartAxeData({
     settings: { paletteSettings },
   } = usePaletteBuilderStore();
 
-  function handleUpdateAxe(
-    value: number | number[],
-    setting: PaletteAxeSetting
-  ) {
-    if (typeof value === "number" && palette && index !== undefined) {
+  function handleUpdateAxe(value: number | number[], setting: PaletteAxeSetting) {
+    if (typeof value === 'number' && palette && index !== undefined) {
       updatePalette(
         index,
         {
@@ -65,7 +63,7 @@ export function usePaletteBuilderChartAxeData({
             [setting]: value,
           },
         },
-        true
+        true,
       );
     }
   }
@@ -73,13 +71,10 @@ export function usePaletteBuilderChartAxeData({
   if (!palette || index === undefined) return undefined;
 
   const pickerMode =
-    PICKER_MODES.find((picker) => picker.space === interpolationColorSpace) ??
-    DEFAULT_PICKER_MODE;
+    PICKER_MODES.find((picker) => picker.space === interpolationColorSpace) ?? DEFAULT_PICKER_MODE;
   const satChromaAxe =
-    pickerMode.axes.find((axe) => axe.name === "c" || axe.name === "s") ??
-    pickerMode.axes[1];
-  const hueAxe =
-    pickerMode.axes.find((axe) => axe.name === "h") ?? pickerMode.axes[2];
+    pickerMode.axes.find((axe) => axe.name === 'c' || axe.name === 's') ?? pickerMode.axes[1];
+  const hueAxe = pickerMode.axes.find((axe) => axe.name === 'h') ?? pickerMode.axes[2];
 
   const leftColor: ColorIO = palette.tints[0].color;
   const centerColor: ColorIO =
@@ -88,23 +83,19 @@ export function usePaletteBuilderChartAxeData({
   const rightColor: ColorIO = palette.tints[palette.tints.length - 1].color;
 
   const colorCenterLeft = centerColor
-    .mix("#ffffff", palette.settings.lightnessMax, {
-      space: "oklch",
+    .mix('#ffffff', palette.settings.lightnessLeft, {
+      space: 'oklch',
     })
     .set({
-      [`${interpolationColorSpace}.h`]: leftColor.get(
-        `${interpolationColorSpace}.h`
-      ),
+      [`${interpolationColorSpace}.h`]: leftColor.get(`${interpolationColorSpace}.h`),
     });
 
   const colorCenterRight = centerColor
-    .mix("#000000", 1 - palette.settings.lightnessMin, {
-      space: "oklch",
+    .mix('#000000', 1 - palette.settings.lightnessRight, {
+      space: 'oklch',
     })
     .set({
-      [`${interpolationColorSpace}.h`]: rightColor.get(
-        `${interpolationColorSpace}.h`
-      ),
+      [`${interpolationColorSpace}.h`]: rightColor.get(`${interpolationColorSpace}.h`),
     });
 
   const leftSatChromaGradient = computeChartAxeGradient({
@@ -140,33 +131,33 @@ export function usePaletteBuilderChartAxeData({
   });
 
   const leftLightnessAxe: AxeData = {
-    value: palette.settings.lightnessMax,
+    value: palette.settings.lightnessLeft,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "lightnessMax");
+      handleUpdateAxe(value, 'lightnessLeft');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.lightnessMax, "lightnessMax");
+      handleUpdateAxe(paletteSettings.lightnessLeft, 'lightnessLeft');
     },
     min: 0,
     max: 1,
     gradient: ` #ffffff, ${centerColor.toString({
-      format: "hex",
+      format: 'hex',
     })}`,
     step: 0.01,
   };
 
   const rightLightnessAxe: AxeData = {
-    value: palette.settings.lightnessMin,
+    value: palette.settings.lightnessRight,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "lightnessMin");
+      handleUpdateAxe(value, 'lightnessRight');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.lightnessMin, "lightnessMin");
+      handleUpdateAxe(paletteSettings.lightnessRight, 'lightnessRight');
     },
     min: 0,
     max: 1,
     gradient: `${centerColor.toString({
-      format: "hex",
+      format: 'hex',
     })}, #000000`,
     reverse: true,
     step: 0.01,
@@ -175,10 +166,10 @@ export function usePaletteBuilderChartAxeData({
   const leftSatChromaAxe: AxeData = {
     value: palette.settings.satChromaGapLeft,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "satChromaGapLeft");
+      handleUpdateAxe(value, 'satChromaGapLeft');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.satChromaGapLeft, "satChromaGapLeft");
+      handleUpdateAxe(paletteSettings.satChromaGapLeft, 'satChromaGapLeft');
     },
     min: 0,
     max: 1,
@@ -189,10 +180,10 @@ export function usePaletteBuilderChartAxeData({
   const rightSatChromaAxe: AxeData = {
     value: palette.settings.satChromaGapRight,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "satChromaGapRight");
+      handleUpdateAxe(value, 'satChromaGapRight');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.satChromaGapRight, "satChromaGapRight");
+      handleUpdateAxe(paletteSettings.satChromaGapRight, 'satChromaGapRight');
     },
     min: 0,
     max: 1,
@@ -204,10 +195,10 @@ export function usePaletteBuilderChartAxeData({
   const leftHueAxe: AxeData = {
     value: palette.settings.hueGapLeft,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "hueGapLeft");
+      handleUpdateAxe(value, 'hueGapLeft');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.hueGapLeft, "hueGapLeft");
+      handleUpdateAxe(paletteSettings.hueGapLeft, 'hueGapLeft');
     },
     min: 0,
     max: 1,
@@ -218,10 +209,10 @@ export function usePaletteBuilderChartAxeData({
   const rightHueAxe: AxeData = {
     value: palette.settings.hueGapRight,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, "hueGapRight");
+      handleUpdateAxe(value, 'hueGapRight');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.hueGapRight, "hueGapRight");
+      handleUpdateAxe(paletteSettings.hueGapRight, 'hueGapRight');
     },
     min: 0,
     max: 1,
@@ -231,8 +222,8 @@ export function usePaletteBuilderChartAxeData({
 
   return [
     {
-      axeName: "l",
-      axeLabel: "lightness",
+      axeName: 'l',
+      axeLabel: 'lightness',
       leftAxeData: leftLightnessAxe,
       rightAxeData: rightLightnessAxe,
     },
@@ -243,8 +234,8 @@ export function usePaletteBuilderChartAxeData({
       rightAxeData: rightSatChromaAxe,
     },
     {
-      axeName: "h",
-      axeLabel: "hue",
+      axeName: 'h',
+      axeLabel: 'hue',
       leftAxeData: leftHueAxe,
       rightAxeData: rightHueAxe,
     },
@@ -259,7 +250,7 @@ export function computeChartAxeGradient({
   centerColor: ColorIO;
   interpolationColorSpace: InterpolationColorSpace;
   axe: PickerAxe;
-}) {
+}): string {
   const startColor = centerColor.clone().set({
     [`${interpolationColorSpace}.${axe.name}`]: axe.max,
   });
@@ -269,10 +260,10 @@ export function computeChartAxeGradient({
   });
 
   return `${startColor.toString({
-    format: "hex",
+    format: 'hex',
   })},${centerColor.toString({
-    format: "hex",
-  })},${endColor.toString({ format: "hex" })}`;
+    format: 'hex',
+  })},${endColor.toString({ format: 'hex' })}`;
 }
 
 export function getPaletteChart({
@@ -285,18 +276,14 @@ export function getPaletteChart({
   axeName: PickerAxeName;
 }): PaletteChartData {
   const colorSpace: ColorSpace =
-    PICKER_MODES.find((mode) => mode.space === interpolationColorSpace) ??
-    DEFAULT_PICKER_MODE;
+    PICKER_MODES.find((mode) => mode.space === interpolationColorSpace) ?? DEFAULT_PICKER_MODE;
 
-  const axe: PickerAxe =
-    colorSpace.axes.find((axe) => axe.name === axeName) ?? colorSpace.axes[0];
+  const axe: PickerAxe = colorSpace.axes.find((axe) => axe.name === axeName) ?? colorSpace.axes[0];
 
   let minY = axe.min;
   let maxY = axe.max;
-  if (axe.name === "h") {
-    const hues = palette.tints.map((tint) =>
-      tint.color.get(`${interpolationColorSpace}.h`)
-    );
+  if (axe.name === 'h') {
+    const hues = palette.tints.map((tint) => tint.color.get(`${interpolationColorSpace}.h`));
     minY = Math.floor(Math.min(...hues) - 5);
     maxY = Math.floor(Math.max(...hues) + 5);
   }
@@ -326,7 +313,7 @@ function getOptions({
   maxX: number;
   minY: number;
   maxY: number;
-}): ChartOptions<"line"> {
+}): ChartOptions<'line'> {
   return {
     responsive: false,
     maintainAspectRatio: false,
@@ -348,17 +335,15 @@ function getChartLineData({
   interpolationColorSpace: InterpolationColorSpace;
   axe: PickerAxeName;
   label: string;
-}): ChartData<"line"> {
+}): ChartData<'line'> {
   return {
     labels: palette.tints.map((tint) => tint.name),
     datasets: [
       {
         label,
-        data: palette.tints.map((tint) =>
-          tint.color.get(`${interpolationColorSpace}.${axe}`)
-        ),
-        borderColor: "#1e40af",
-        backgroundColor: "#dbeafe",
+        data: palette.tints.map((tint) => tint.color.get(`${interpolationColorSpace}.${axe}`)),
+        borderColor: '#1e40af',
+        backgroundColor: '#dbeafe',
         tension: 0.4,
         pointRadius: 2,
       },

@@ -1,15 +1,11 @@
-import Slider from "rc-slider";
-import FormComponent from "../../ui/kit/FormComponent";
-import {
-  HANDLE_SLIDER_VERTICAL,
-  ICON_SIZE_MD,
-  RAIL_SLIDER_VERTICAL,
-} from "../../ui/UiConstants";
-import { Line } from "react-chartjs-2";
-import { useMemo } from "react";
-import { ChartAxeData, getPaletteChart } from "./PaletteChartsUtil";
-import { MdRestartAlt } from "react-icons/md";
-import { InterpolationColorSpace, PaletteBuild } from "../../domain/PaletteBuilderDomain";
+import Slider from 'rc-slider';
+import FormComponent from '../../ui/kit/FormComponent';
+import { HANDLE_SLIDER_VERTICAL, ICON_SIZE_MD, RAIL_SLIDER_VERTICAL } from '../../ui/UiConstants';
+import { Line } from 'react-chartjs-2';
+import { useMemo } from 'react';
+import { ChartAxeData, getPaletteChart } from './PaletteChartsUtil';
+import { MdRestartAlt } from 'react-icons/md';
+import { InterpolationColorSpace, PaletteBuild } from '../../domain/PaletteBuilderDomain';
 
 function PaletteChart({
   palette,
@@ -22,7 +18,7 @@ function PaletteChart({
 }) {
   const paletteChartData = useMemo(
     () => getPaletteChart({ axeName, interpolationColorSpace, palette }),
-    [axeName, interpolationColorSpace, palette]
+    [axeName, interpolationColorSpace, palette],
   );
 
   return (
@@ -39,11 +35,12 @@ function PaletteChart({
               included={false}
               reverse={leftAxeData.reverse}
               onChange={leftAxeData.update}
+              onChangeComplete={leftAxeData.onComplete}
               styles={{
                 handle: {
                   ...HANDLE_SLIDER_VERTICAL,
                   background: palette.tints[0].color.toString({
-                    format: "hex",
+                    format: 'hex',
                   }),
                 },
                 rail: {
@@ -59,8 +56,8 @@ function PaletteChart({
           <Line
             data={paletteChartData.line}
             options={paletteChartData.options}
-            width={"380px"}
-            height={"240px"}
+            width={'380px'}
+            height={'240px'}
           />
           <div className="column h-full justify-center">
             <Slider
@@ -70,13 +67,15 @@ function PaletteChart({
               step={rightAxeData.step}
               onChange={rightAxeData.update}
               vertical={true}
+              reverse={rightAxeData.reverse}
+              onChangeComplete={rightAxeData.onComplete}
               included={false}
               styles={{
                 handle: {
                   ...HANDLE_SLIDER_VERTICAL,
-                  background: palette.tints[
-                    palette.tints.length - 1
-                  ].color.toString({ format: "hex" }),
+                  background: palette.tints[palette.tints.length - 1].color.toString({
+                    format: 'hex',
+                  }),
                 },
                 rail: {
                   ...RAIL_SLIDER_VERTICAL,
@@ -84,10 +83,7 @@ function PaletteChart({
                 },
               }}
             />
-            <button
-              className="action-ghost-button"
-              onClick={rightAxeData.reset}
-            >
+            <button className="action-ghost-button" onClick={rightAxeData.reset}>
               <MdRestartAlt size={ICON_SIZE_MD} />
             </button>
           </div>

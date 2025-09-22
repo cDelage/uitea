@@ -81,29 +81,13 @@ export function getPickerData({
 }): PickerData[] {
   const { space, axes } = pickerMode;
   return axes.map((axe) => {
-    const { min, max, steps, name: name, otherAxes, gradientSteps } = axe;
+    const { min, max, steps, name } = axe;
 
-    const gradientColors = Array.from({ length: gradientSteps }, (_, i) => {
-      const gradientColor = new ColorIO(color);
-      gradientColor.set({
-        [`${space}.${name}`]: linearInterpolation(i, gradientSteps, min, max),
-        [`${space}.${otherAxes[0]}`]: Number(
-          color.get(`${space}.${otherAxes[0]}`)?.toFixed(2)
-        ),
-        [`${space}.${otherAxes[1]}`]: Number(
-          color.get(`${space}.${otherAxes[1]}`)?.toFixed(2)
-        ),
-      });
-      return gradientColor.toString({ format: "hex" });
-    });
-
-    const linearGradient = `linear-gradient(to right, ${gradientColors.join(
-      ", "
-    )})`;
+    const gradient = getGradient({ pickerAxe: axe, space, color })
 
     return {
       value: color.get(`${space}.${name}`),
-      gradient: linearGradient,
+      gradient: gradient,
       max,
       min,
       steps,
@@ -112,6 +96,29 @@ export function getPickerData({
         AXES_LABELS.find((axe) => axe.axeName === name)?.label ?? "Not found",
     };
   });
+}
+
+export function getGradient({ pickerAxe, color, space }: { pickerAxe: PickerAxe, color: ColorIO, space: PickerSpace }): string {
+  const { min, max, name, otherAxes, gradientSteps } = pickerAxe;
+
+  const gradientColors = Array.from({ length: gradientSteps }, (_, i) => {
+    const gradientColor = new ColorIO(color);
+    gradientColor.set({
+      [`${space}.${name}`]: linearInterpolation(i, gradientSteps, min, max),
+      [`${space}.${otherAxes[0]}`]: Number(
+        color.get(`${space}.${otherAxes[0]}`)?.toFixed(2)
+      ),
+      [`${space}.${otherAxes[1]}`]: Number(
+        color.get(`${space}.${otherAxes[1]}`)?.toFixed(2)
+      ),
+    });
+    return gradientColor.toString({ format: "hex" });
+  });
+
+  return `linear-gradient(to right, ${gradientColors.join(
+    ", "
+  )})`;
+
 }
 
 export function updateColor({
@@ -134,18 +141,18 @@ export function updateColor({
     axe === axes[0].name
       ? Number(value.toFixed(2))
       : color.get(`${space}.${axes[0].name}`) ??
-        fallbacks.find((fallback) => fallback.axe === axes[0].name)?.value ??
-        0,
+      fallbacks.find((fallback) => fallback.axe === axes[0].name)?.value ??
+      0,
     axe === axes[1].name
       ? Number(value.toFixed(2))
       : (color.get(`${space}.${axes[1].name}`) ||
-          fallbacks.find((fallback) => fallback.axe === axes[1].name)?.value) ??
-        0,
+        fallbacks.find((fallback) => fallback.axe === axes[1].name)?.value) ??
+      0,
     axe === axes[2].name
       ? Number(value.toFixed(2))
       : (color.get(`${space}.${axes[2].name}`) ||
-          fallbacks.find((fallback) => fallback.axe === axes[2].name)?.value) ??
-        0,
+        fallbacks.find((fallback) => fallback.axe === axes[2].name)?.value) ??
+      0,
   ];
 
   newColor.setAll(space, computedValues);

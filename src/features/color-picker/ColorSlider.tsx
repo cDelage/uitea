@@ -18,6 +18,7 @@ function ColorSlider({
   reverse,
   onChangeComplete,
   axe,
+  disabled
 }: {
   gradient: string;
   value: number;
@@ -29,6 +30,7 @@ function ColorSlider({
   reverse?: boolean;
   onChangeComplete?: () => void;
   axe?: PickerAxeName;
+  disabled?: boolean
 }) {
   const { pickerFallbacks } = useColorPickerStore();
 
@@ -47,6 +49,7 @@ function ColorSlider({
       included={false}
       value={getValue()}
       reverse={reverse}
+      disabled={disabled}
       onChangeComplete={onChangeComplete}
       onChange={(value) => {
         if (typeof value === "number") {

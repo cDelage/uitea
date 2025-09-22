@@ -1,7 +1,7 @@
-import { FC } from "react";
-import { TintsNamingMode } from "../util/TintsNaming";
-import ColorIO from "colorjs.io";
-export type InterpolationColorSpace = "oklch" | "lch" | "hsl";
+import { FC } from 'react';
+import { TintsNamingMode } from '../util/TintsNaming';
+import ColorIO from 'colorjs.io';
+export type InterpolationColorSpace = 'oklch' | 'lch' | 'hsl' | 'okhsl';
 
 type InterpolationColorSpaceWithLabel = {
   label: string;
@@ -10,26 +10,26 @@ type InterpolationColorSpaceWithLabel = {
 
 export const INTERPOLATIONS_COLOR_SPACES: InterpolationColorSpaceWithLabel[] = [
   {
-    label: "oklch (recommanded)",
-    interpolationColorSpace: "oklch",
+    label: 'oklch (recommanded)',
+    interpolationColorSpace: 'oklch',
   },
   {
-    label: "lch",
-    interpolationColorSpace: "lch",
+    label: 'lch',
+    interpolationColorSpace: 'lch',
   },
   {
-    label: "hsl (to avoid)",
-    interpolationColorSpace: "hsl",
+    label: 'hsl (to avoid)',
+    interpolationColorSpace: 'hsl',
   },
 ];
 
 export type PaletteAxeSetting =
-  | "lightnessMax"
-  | "lightnessMin"
-  | "satChromaGapLeft"
-  | "satChromaGapRight"
-  | "hueGapLeft"
-  | "hueGapRight";
+  | 'lightnessLeft'
+  | 'lightnessRight'
+  | 'satChromaGapLeft'
+  | 'satChromaGapRight'
+  | 'hueGapLeft'
+  | 'hueGapRight';
 
 export interface PaletteBuild {
   id: string;
@@ -60,8 +60,8 @@ export interface TintBuildFile {
 }
 
 export interface PaletteSettings {
-  lightnessMax: number;
-  lightnessMin: number;
+  lightnessLeft: number;
+  lightnessRight: number;
   satChromaGapLeft: number;
   satChromaGapRight: number;
   hueGapLeft: number;
@@ -106,23 +106,19 @@ export interface PaletteBuilderRenameMetadata {
   newName: string;
 }
 
-export function paletteBuildToFile(
-  paletteBuild: PaletteBuild
-): PaletteBuildFile {
+export function paletteBuildToFile(paletteBuild: PaletteBuild): PaletteBuildFile {
   return {
     ...paletteBuild,
     tints: paletteBuild.tints.map((tint) => {
       return {
         ...tint,
-        color: tint.color.toString({ format: "hex" }),
+        color: tint.color.toString({ format: 'hex' }),
       } as TintBuildFile;
     }),
   };
 }
 
-export function paletteBuilderFromFile(
-  file: PaletteBuilderPayload
-): PaletteBuilderLoad {
+export function paletteBuilderFromFile(file: PaletteBuilderPayload): PaletteBuilderLoad {
   return {
     ...file,
     palettes: file.palettes.map((palette) => {
@@ -139,11 +135,11 @@ export function paletteBuilderFromFile(
   };
 }
 
-export type Aligner = "HWB" | "OKLCH" | "LCH" | "CONTRAST_COLOR" | "NONE";
+export type Aligner = 'HWB' | 'OKLCH' | 'LCH' | 'CONTRAST_COLOR' | 'NONE';
 
-export type AlignerDisplayMode = "SELECTED_COLOR" | "ALL_COLORS";
+export type AlignerDisplayMode = 'SELECTED_COLOR' | 'ALL_COLORS';
 
-export type AlignerContrastMode = "PALETTE_STEP" | "CUSTOM_COLOR";
+export type AlignerContrastMode = 'PALETTE_STEP' | 'CUSTOM_COLOR';
 
 export type AlignerSettings = {
   aligner: Aligner;
@@ -160,24 +156,24 @@ type AlignerOption = {
 
 export const ALIGNER_OPTIONS: AlignerOption[] = [
   {
-    label: "Whiteness-Blackness from HWB",
-    value: "HWB",
+    label: 'Whiteness-Blackness from HWB',
+    value: 'HWB',
   },
   {
-    label: "Lightness-Chroma from OKLCH",
-    value: "OKLCH",
+    label: 'Lightness-Chroma from OKLCH',
+    value: 'OKLCH',
   },
   {
-    label: "Lightness-Chroma from LCH",
-    value: "LCH",
+    label: 'Lightness-Chroma from LCH',
+    value: 'LCH',
   },
   {
-    label: "Contrast with other color",
-    value: "CONTRAST_COLOR",
+    label: 'Contrast with other color',
+    value: 'CONTRAST_COLOR',
   },
   {
-    label: "none",
-    value: "NONE",
+    label: 'none',
+    value: 'NONE',
   },
 ];
 
@@ -188,12 +184,12 @@ type AlignerDisplayModeOption = {
 
 export const ALIGNER_DISPLAY_MODE_OPTIONS: AlignerDisplayModeOption[] = [
   {
-    label: "Selected color",
-    value: "SELECTED_COLOR",
+    label: 'Selected color',
+    value: 'SELECTED_COLOR',
   },
   {
-    label: "All colors",
-    value: "ALL_COLORS",
+    label: 'All colors',
+    value: 'ALL_COLORS',
   },
 ];
 
@@ -204,18 +200,17 @@ type AlignerContrastModeOption = {
 
 export const ALIGNER_CONTRAST_MODE_OPTIONS: AlignerContrastModeOption[] = [
   {
-    label: "Contrast with palette step",
-    value: "PALETTE_STEP",
+    label: 'Contrast with palette step',
+    value: 'PALETTE_STEP',
   },
   {
-    label: "Contrast with a custom color",
-    value: "CUSTOM_COLOR",
+    label: 'Contrast with a custom color',
+    value: 'CUSTOM_COLOR',
   },
 ];
-
 
 export type AlignerValue = {
   aligner: string;
   icon: FC;
   value: string;
-}
+};

@@ -14,7 +14,7 @@ export function generateTokenStudioFile(
     const recolorTokensResults = recolorTokens({
       palettes: designSystem.palettes,
       defaultBackground: designSystem.themes.mainTheme?.background ?? "#DDDDDD",
-      newBackground: theme.background ?? "#DDDDDD",
+      theme: theme,
       independantColors: designSystem.independantColors
     });
 
@@ -94,7 +94,7 @@ export function getComplementaryThemeCss(designSystem: DesignSystem): string {
       palettes: designSystem.palettes,
       defaultBackground:
         designSystem.themes.mainTheme?.background ?? "#DDDDDD",
-      newBackground: theme.background ?? "#DDDDDD",
+      theme: theme,
       independantColors: designSystem.independantColors
     })
         .palettes

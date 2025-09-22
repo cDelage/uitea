@@ -2,7 +2,7 @@ export function linearInterpolation(
   index: number,
   length: number,
   min: number,
-  max: number
+  max: number,
 ): number {
   if (length <= 1) return max; // Cas particulier pour un tableau d'un seul élément.
 
@@ -97,7 +97,6 @@ export function computeValueByCenter({
   return Math.min(Math.max(newValue, min), max);
 }
 
-
 /**
  * Calcule la hue de colorD en appliquant à hueC
  * le décalage de hue entre hueA et hueB.
@@ -126,4 +125,80 @@ export function interpolateHueRelative({
   newValue = ((newValue % 360) + 360) % 360;
 
   return newValue;
+}
+
+export function midpoint(a: number, b: number): number {
+  // Utilise "a + (b - a) / 2" pour éviter un éventuel dépassement avec (a + b) / 2
+  return a + (b - a) / 2;
+}
+
+type RangeMapParams = {
+  min: number;
+  max: number;
+  value: number;
+  newMin: number;
+  newMax: number;
+};
+
+type RangeMapOptions = {
+  /** Force la valeur dans [0,1] avant re-mapping */
+  clamp?: boolean;
+  /** Arrondi à n décimales (si défini) */
+  decimals?: number;
+};
+
+/**
+ * Re-map linéaire de value depuis [min,max] vers [newMin,newMax].
+ */
+export function mapRange(
+  { min, max, value, newMin, newMax }: RangeMapParams,
+  { clamp = false, decimals }: RangeMapOptions = {},
+): number {
+  if (!Number.isFinite(min + max + value + newMin + newMax)) {
+    throw new Error('Tous les paramètres doivent être des nombres finis.');
+  }
+  if (min === max) {
+    // Intervalle source nul : on renvoie le milieu de la nouvelle plage
+    return (newMin + newMax) / 2;
+  }
+
+  // Normalisation dans [0,1] (fonctionne aussi si min > max)
+  let t = (value - min) / (max - min);
+  if (clamp) t = Math.max(0, Math.min(1, t));
+
+  const mapped = newMin + t * (newMax - newMin);
+
+  if (typeof decimals === 'number') {
+    const p = Math.pow(10, decimals);
+    return Math.round(mapped * p) / p;
+  }
+  return mapped;
+}
+
+/**
+ * Interpole une valeur entre 0 et 1 à partir d'un index.
+ * - value(centerIndex) = 0
+ * - value(endIndex)    = 1
+ * - linéaire entre les deux
+ * - clampée à 0 avant le center et à 1 après la fin
+ * Gère aussi le cas endIndex < centerIndex.
+ */
+export function interpolateBetweenIndices({
+  centerIndex,
+  index,
+  endIndex,
+}: {
+  index: number;
+  centerIndex: number;
+  endIndex: number;
+}): number {
+  if (centerIndex === endIndex) {
+    // Dégénéré : tout ce qui est du côté "end" vaut 1, l'autre côté 0.
+    return index >= endIndex ? 1 : 0;
+  }
+
+  const t = (index - centerIndex) / (endIndex - centerIndex);
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return t; // linéaire dans (0,1)
 }

@@ -894,8 +894,8 @@ pub struct PaletteThemeSetting {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum PaletteSettingAttribute {
-    LightnessMax,
-    LightnessMin,
+    LightnessLeft,
+    LightnessRight,
     SatChromaGapLeft,
     SatChromaGapRight,
     HueGapLeft,

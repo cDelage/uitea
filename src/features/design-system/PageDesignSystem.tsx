@@ -53,7 +53,7 @@ function PageDesignSystem() {
           palettes: designSystem?.palettes,
           defaultBackground:
             designSystem?.themes.mainTheme?.background ?? "#DDDDDD",
-          newBackground: theme?.background ?? "#DDDDDD",
+          theme,
           independantColors: designSystem.independantColors
         }),
       })

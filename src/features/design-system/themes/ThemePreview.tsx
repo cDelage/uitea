@@ -25,7 +25,7 @@ function ThemePreview({
         : recolorPalettes({
             palettes: designSystem.palettes,
             defaultBackground: mainTheme.background,
-            newBackground: theme.background,
+            theme,
             independantColors: designSystem.independantColors
           }).palettes;
     } else {
