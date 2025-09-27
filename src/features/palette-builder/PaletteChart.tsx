@@ -24,8 +24,40 @@ function PaletteChart({
   return (
     <FormComponent label={axeLabel} className="w-full">
       <>
+        <div className="row justify-between">
+          <input
+            type="number"
+            className="uidt-input"
+            min={leftAxeData.min}
+            max={leftAxeData.max}
+            value={Number(leftAxeData.value.toFixed(2))}
+            onChange={(e) => {
+              leftAxeData.update(Number(e.target.value));
+              leftAxeData.onComplete?.();
+            }}
+            step={0.01}
+            style={{
+              width: '60px',
+            }}
+          />
+          <input
+            type="number"
+            className="uidt-input"
+            min={rightAxeData.min}
+            max={rightAxeData.max}
+            value={Number(rightAxeData.value.toFixed(2))}
+            onChange={(e) => {
+              rightAxeData.update(Number(e.target.value));
+              rightAxeData.onComplete?.();
+            }}
+            step={0.01}
+            style={{
+              width: '6px',
+            }}
+          />
+        </div>
         <div className="row align-center w-full justify-between">
-          <div className="column h-full gap-2 justify-center">
+          <div className="column h-full gap-3 justify-center">
             <Slider
               value={leftAxeData.value}
               min={leftAxeData.min}

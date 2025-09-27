@@ -3,11 +3,10 @@ import { useFindDesignSystem, useSaveDesignSystem } from '../design-system/Desig
 import ThemeCustomizerComponent from './ThemeCustomizerComponent';
 import { useMemo, useState } from 'react';
 import { ThemeCustomizerContext } from './ThemeCustomizerContext';
-import { Palette, PaletteThemeSetting, Theme, Tint } from '../../domain/DesignSystemDomain';
+import { PaletteThemeSetting, Theme, Tint } from '../../domain/DesignSystemDomain';
 import { recolorPalettes } from '../../util/ThemeGenerator';
 import SidePanel from '../../ui/kit/SidePanel';
-import { isPaletteThemeSettingEqual, paletteToPaletteBuild } from './PaletteChartsThemeUtil';
-import { PaletteBuild } from '../../domain/PaletteBuilderDomain';
+import { isPaletteThemeSettingEqual, usePalettesBuildForContext } from './PaletteChartsThemeUtil';
 import ColorIO from 'colorjs.io';
 
 function PageThemeCustomizer() {
@@ -54,43 +53,8 @@ function PageThemeCustomizer() {
     return new ColorIO(centerTint.color);
   }, [palettes, activePaletteIndex, activeThemeIndex]);
 
-  const activePalette: PaletteBuild | undefined = useMemo(() => {
-    if (!designSystem || activeTheme === undefined || activePaletteIndex === undefined)
-      return undefined;
-    const {
-      themes: { mainTheme },
-    } = designSystem;
-    const activePaletteToConvert: Palette =
-      isMain || !mainTheme
-        ? designSystem.palettes[activePaletteIndex]
-        : recolorPalettes({
-            palettes: [designSystem.palettes[activePaletteIndex]],
-            defaultBackground: mainTheme.background,
-            theme: activeTheme,
-            independantColors: designSystem.independantColors,
-            clearCenterSettings: true,
-          }).palettes[0];
-    return paletteToPaletteBuild(activePaletteToConvert, activeTheme);
-  }, [activePaletteIndex, activeTheme, designSystem]);
-
-  const activePaletteWithoutEndSettings: PaletteBuild | undefined = useMemo(() => {
-    if (!designSystem || activeTheme === undefined || activePaletteIndex === undefined)
-      return undefined;
-    const {
-      themes: { mainTheme },
-    } = designSystem;
-    const activePaletteToConvert: Palette =
-      isMain || !mainTheme
-        ? designSystem.palettes[activePaletteIndex]
-        : recolorPalettes({
-            palettes: [designSystem.palettes[activePaletteIndex]],
-            defaultBackground: mainTheme.background,
-            theme: activeTheme,
-            independantColors: designSystem.independantColors,
-            clearEndsSettings: true,
-          }).palettes[0];
-    return paletteToPaletteBuild(activePaletteToConvert, activeTheme);
-  }, [activePaletteIndex, activeTheme, designSystem]);
+  const { activePalette, activePaletteWithoutEndSettings, activePaletteWithoutSettings } =
+    usePalettesBuildForContext({ designSystem, activePaletteIndex, activeTheme, isMain });
 
   function applyThemePaletteSetting({
     paletteThemeSetting,
@@ -100,7 +64,6 @@ function PageThemeCustomizer() {
     themeName: string;
   }) {
     if (designSystem) {
-      console.log('save themes', paletteThemeSetting);
       saveDesignSystem({
         designSystem: {
           ...designSystem,
@@ -145,6 +108,7 @@ function PageThemeCustomizer() {
         applyThemePaletteSetting,
         centerColor,
         activePaletteWithoutEndSettings,
+        activePaletteWithoutSettings,
       }}
     >
       <div className="h-full w-full">

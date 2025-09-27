@@ -8,8 +8,13 @@ import ThemePaletteSidepanel from './ThemePaletteSidepanel';
 import { useSidepanelContext } from '../../ui/kit/SidepanelContext';
 
 function ThemeCustomizerComponent() {
-  const { activePalette, activeTheme, centerColor, activePaletteWithoutEndSettings } =
-    useThemeCustomizerContext();
+  const {
+    activePaletteWithoutSettings,
+    activePalette,
+    activeTheme,
+    centerColor,
+    activePaletteWithoutEndSettings,
+  } = useThemeCustomizerContext();
   const [isSidepanelOpen, setIsSidepanelOpen] = useState(false);
 
   const { closeModal } = useSidepanelContext();
@@ -32,14 +37,19 @@ function ThemeCustomizerComponent() {
         isOpenToSync={isSidepanelOpen}
         setIsOpenToSync={setIsSidepanelOpen}
       >
-        {activePalette && activeTheme && centerColor && activePaletteWithoutEndSettings && (
-          <ThemePaletteSidepanel
-            activePalette={activePalette}
-            activeTheme={activeTheme}
-            centerColor={centerColor}
-            activePaletteWithoutEndSettings={activePaletteWithoutEndSettings}
-          />
-        )}
+        {activePalette &&
+          activeTheme &&
+          centerColor &&
+          activePaletteWithoutEndSettings &&
+          activePaletteWithoutSettings && (
+            <ThemePaletteSidepanel
+              activePalette={activePalette}
+              activeTheme={activeTheme}
+              centerColor={centerColor}
+              activePaletteWithoutEndSettings={activePaletteWithoutEndSettings}
+              activePaletteWithoutSettings={activePaletteWithoutSettings}
+            />
+          )}
       </SidePanel.BodyRelative>
     </>
   );

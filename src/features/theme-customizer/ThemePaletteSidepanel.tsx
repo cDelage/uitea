@@ -16,19 +16,25 @@ function ThemePaletteSidepanel({
   activeTheme,
   centerColor,
   activePaletteWithoutEndSettings,
+  activePaletteWithoutSettings,
 }: {
   activePalette: PaletteBuild;
   activeTheme: Theme;
   centerColor: ColorIO;
+  activePaletteWithoutSettings: PaletteBuild;
   activePaletteWithoutEndSettings: PaletteBuild;
 }) {
   const { setActivePaletteIndex, activeThemeIndex } = useThemeCustomizerContext();
   const { paletteBuild, centerAxesOkhsl } = useThemeCenterAxes({
-    palette: activePalette,
+    palette: activePaletteWithoutSettings,
     theme: activeTheme,
     centerColor,
   });
-  const charts = useThemeCharts({ palette: activePaletteWithoutEndSettings, theme: activeTheme });
+  const charts = useThemeCharts({
+    palette: activePalette,
+    activePaletteWithoutEndSettings,
+    theme: activeTheme,
+  });
   //Active Theme 0 : main theme (do not update main theme)
   const disablePaletteUpdate: boolean = activeThemeIndex === 0;
 
@@ -95,7 +101,7 @@ function ThemePaletteSidepanel({
               chartAxeData={chart}
               key={chart.axeName}
               interpolationColorSpace="okhsl"
-              palette={activePaletteWithoutEndSettings}
+              palette={activePalette}
             />
           ))}
         </div>

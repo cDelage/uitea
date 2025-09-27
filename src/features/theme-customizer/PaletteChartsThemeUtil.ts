@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  DesignSystem,
   EndSettingAttribute,
   Palette,
   PaletteThemeSetting,
@@ -10,7 +11,8 @@ import { getGradient, OKHSL, PickerAxe } from '../../util/PickerUtil';
 import { AxeData, ChartAxeData } from '../palette-builder/PaletteChartsUtil';
 import ColorIO from 'colorjs.io';
 import { useThemeCustomizerContext } from './ThemeCustomizerContext';
-import { mapRange, midpoint } from '../../util/Interpolation';
+import { midpoint } from '../../util/Interpolation';
+import { recolorPalettes } from '../../util/ThemeGenerator';
 
 export interface ThemeAxesPayload {
   centerAxesOkhsl: CenterAxeData[];
@@ -208,20 +210,23 @@ export function useThemeCenterAxes({
 }
 
 export function useThemeCharts({
+  activePaletteWithoutEndSettings,
   palette,
   theme,
 }: {
+  activePaletteWithoutEndSettings: PaletteBuild;
   palette: PaletteBuild;
   theme: Theme;
 }): [ChartAxeData, ChartAxeData, ChartAxeData] {
-  const [paletteBuild, setPaletteBuild] = useState(palette);
-  const { name } = palette;
-
-  const { applyThemePaletteSetting } = useThemeCustomizerContext();
+  const [paletteBuild, setPaletteBuild] = useState(activePaletteWithoutEndSettings);
+  const { name } = activePaletteWithoutEndSettings;
 
   const leftColor: ColorIO = paletteBuild.tints[0].color;
   const centerColor: ColorIO = paletteBuild.tints[Math.floor(paletteBuild.tints.length / 2)].color;
   const rightColor: ColorIO = paletteBuild.tints[paletteBuild.tints.length - 1].color;
+
+  const finalLeftColor: ColorIO = palette.tints[0].color;
+  const finalRightColor: ColorIO = palette.tints[paletteBuild.tints.length - 1].color;
 
   const leftLightestColor: boolean = leftColor.okhsl[2] >= rightColor.okhsl[2];
 
@@ -240,39 +245,47 @@ export function useThemeCharts({
     direction: leftLightestColor ? 'min' : 'max',
   });
 
-  const leftSatChromaGradient = computeChartThemeAxeGradient({
-    paletteCenterColor: centerColor,
-    axe: saturationAxe,
-    direction: leftLightestColor ? 'max' : 'min',
+  const leftSatChromaGradient = getGradient({
+    color: finalLeftColor,
+    space: 'okhsl',
+    pickerAxe: OKHSL.axes[1],
+    skipLinearGradient: true,
+    reverse: true,
   });
 
-  const rightSatChromaGradient = computeChartThemeAxeGradient({
-    paletteCenterColor: centerColor,
-    axe: saturationAxe,
-    direction: leftLightestColor ? 'min' : 'max',
+  const rightSatChromaGradient = getGradient({
+    color: finalRightColor,
+    space: 'okhsl',
+    pickerAxe: OKHSL.axes[1],
+    skipLinearGradient: true,
+    reverse: true,
   });
 
-  const leftHueGradient = computeChartThemeAxeHueGradient({ centerColor: leftColor });
+  const leftHueGradient = getGradient({
+    color: finalLeftColor,
+    space: 'okhsl',
+    pickerAxe: OKHSL.axes[0],
+    skipLinearGradient: true,
+    reverse: true,
+  });
 
-  const rightHueGradient = computeChartThemeAxeHueGradient({ centerColor: rightColor });
+  const rightHueGradient = getGradient({
+    color: finalRightColor,
+    space: 'okhsl',
+    pickerAxe: OKHSL.axes[0],
+    skipLinearGradient: true,
+    reverse: true,
+  });
 
   //On chart, the value between 0 & 1 of the lightest color
-  const lightestColorValue: number = mapRange({
-    min: lightnessAxe.max,
-    max: centerColor.get('okhsl.l'),
-    value: leftLightestColor ? leftColor.get('okhsl.l') : rightColor.get('okhsl.l'),
-    newMin: 0,
-    newMax: 1,
-  });
+  const lightestColorValue: number = leftLightestColor
+    ? leftColor.get('okhsl.l')
+    : rightColor.get('okhsl.l');
 
   //On chart, the value between 0 & 1 of the darkest color
-  const darkestColorValue: number = mapRange({
-    min: centerColor.get('okhsl.l'),
-    max: lightnessAxe.min,
-    value: leftLightestColor ? rightColor.get('okhsl.l') : leftColor.get('okhsl.l'),
-    newMin: 1,
-    newMax: 0,
-  });
+  const darkestColorValue: number = leftLightestColor
+    ? rightColor.get('okhsl.l')
+    : leftColor.get('okhsl.l');
 
   const leftLightnessValue: number = leftLightestColor ? lightestColorValue : darkestColorValue;
 
@@ -282,84 +295,79 @@ export function useThemeCharts({
     attribute: 'lightnessLeft',
     gradient: leftLightnessGradient,
     paletteBuild,
-    reverse: leftLightestColor,
+    reverse: false,
     setPaletteBuild,
     theme,
     value: leftLightnessValue,
+    attributeMin: leftLightestColor ? centerColor.get('okhsl.l') : lightnessAxe.min,
+    attributeMax: leftLightestColor ? lightnessAxe.max : centerColor.get('okhsl.l'),
   });
 
   const rightLightnessAxe: AxeData = getChartAxeData({
     attribute: 'lightnessRight',
     gradient: rightLightnessGradient,
     paletteBuild,
-    reverse: !leftLightestColor,
+    reverse: false,
     setPaletteBuild,
     theme,
     value: rightLightnessValue,
+    attributeMin: !leftLightestColor ? centerColor.get('okhsl.l') : lightnessAxe.min,
+    attributeMax: !leftLightestColor ? lightnessAxe.max : centerColor.get('okhsl.l'),
   });
 
-  const leftChromaAxe: AxeData = {
-    value: 0.5,
-    update: (value: number | number[]) => {
-      //TO COMPLETE
-    },
-    reset: () => {
-      //TO COMPLETE
-    },
-    min: 0,
-    max: 1,
+  const leftChromaAxe: AxeData = getChartAxeData({
+    attribute: 'satChromaGapLeft',
     gradient: leftSatChromaGradient,
-    step: 0.01,
-  };
+    paletteBuild,
+    reverse: false,
+    setPaletteBuild,
+    theme,
+    value: leftColor.get('okhsl.s'),
+    attributeMin: 0,
+    attributeMax: 1,
+  });
 
-  const rightChromaAxe: AxeData = {
-    value: 0.5,
-    update: (value: number | number[]) => {
-      //TO COMPLETE
-    },
-    reset: () => {
-      //TO COMPLETE
-    },
-    min: 0,
-    max: 1,
+  const rightChromaAxe: AxeData = getChartAxeData({
+    attribute: 'satChromaGapRight',
     gradient: rightSatChromaGradient,
+    paletteBuild,
+    reverse: false,
+    setPaletteBuild,
+    theme,
+    value: rightColor.get('okhsl.s'),
+    attributeMin: 0,
+    attributeMax: 1,
+  });
 
-    step: 0.01,
-  };
-
-  const leftHueAxe: AxeData = {
-    value: 0.5,
-    update: (value: number | number[]) => {
-      //TO COMPLETE
-    },
-    reset: () => {
-      //TO COMPLETE
-    },
-    min: 0,
-    max: 1,
+  const leftHueAxe: AxeData = getChartAxeData({
+    attribute: 'hueGapLeft',
     gradient: leftHueGradient,
-    step: 0.01,
-  };
+    paletteBuild,
+    reverse: false,
+    setPaletteBuild,
+    theme,
+    value: leftColor.get('okhsl.h'),
+    attributeMin: 0,
+    attributeMax: 360,
+  });
 
-  const rightHueAxe: AxeData = {
-    value: 0.5,
-    update: (value: number | number[]) => {
-      //TO COMPLETE
-    },
-    reset: () => {
-      //TO COMPLETE
-    },
-    min: 0,
-    max: 1,
+  const rightHueAxe: AxeData = getChartAxeData({
+    attribute: 'hueGapRight',
     gradient: rightHueGradient,
-    step: 0.01,
-  };
+    paletteBuild,
+    reverse: false,
+    setPaletteBuild,
+    theme,
+    value: rightColor.get('okhsl.h'),
+    attributeMin: 0,
+    attributeMax: 360,
+  });
 
   useEffect(() => {
     if (paletteBuild.name !== name) {
-      setPaletteBuild(palette);
+      setPaletteBuild(activePaletteWithoutEndSettings);
     }
-  }, [name, paletteBuild, palette]);
+  }, [name, paletteBuild, activePaletteWithoutEndSettings]);
 
   return [
     {
@@ -407,19 +415,6 @@ function computeChartThemeAxeGradient({
   })},${centerColor.toString({
     format: 'hex',
   })},${(direction === 'min' ? endColor : startColor).toString({ format: 'hex' })}`;
-}
-
-function computeChartThemeAxeHueGradient({ centerColor }: { centerColor: ColorIO }): string {
-  const centerColorHue: number = centerColor.get('okhsl.h');
-  const startColor = new ColorIO(centerColor);
-  const endColor = new ColorIO(centerColor);
-  endColor.set('okhsl.h', centerColorHue - 20);
-  startColor.set('okhsl.h', centerColorHue + 20);
-  return `${startColor.toString({
-    format: 'hex',
-  })},${centerColor.toString({
-    format: 'hex',
-  })},${endColor.toString({ format: 'hex' })}`;
 }
 
 export function paletteToPaletteBuild(palette: Palette, theme: Theme): PaletteBuild {
@@ -483,6 +478,8 @@ function getChartAxeData({
   theme,
   gradient,
   reverse,
+  attributeMin,
+  attributeMax,
 }: {
   paletteBuild: PaletteBuild;
   attribute: EndSettingAttribute;
@@ -491,11 +488,13 @@ function getChartAxeData({
   theme: Theme;
   gradient: string;
   reverse: boolean;
+  attributeMin: number;
+  attributeMax: number;
 }): AxeData {
   const { applyThemePaletteSetting } = useThemeCustomizerContext();
 
   return {
-    value: value + (paletteBuild.settings[attribute] ?? 0),
+    value: value + paletteBuild.settings[attribute],
     update: (additionalValue: number | number[]) => {
       setPaletteBuild((pal) => {
         return {
@@ -532,14 +531,79 @@ function getChartAxeData({
         paletteThemeSetting: {
           attribute,
           paletteName: paletteBuild.name,
-          value: paletteBuild.settings[attribute] ?? 0,
+          value: paletteBuild.settings[attribute],
         },
       });
     },
-    min: 0,
-    max: 1,
+    min: attributeMin,
+    max: attributeMax,
     gradient,
     step: 0.01,
     reverse,
+  };
+}
+
+export function usePalettesBuildForContext({
+  designSystem,
+  activeTheme,
+  activePaletteIndex,
+  isMain,
+}: {
+  designSystem: DesignSystem | undefined;
+  activeTheme: Theme | undefined;
+  activePaletteIndex: number | undefined;
+  isMain: boolean;
+}): {
+  activePalette?: PaletteBuild;
+  activePaletteWithoutSettings?: PaletteBuild;
+  activePaletteWithoutEndSettings?: PaletteBuild;
+} {
+  if (!designSystem || activeTheme === undefined || activePaletteIndex === undefined) {
+    return {};
+  }
+  const {
+    themes: { mainTheme },
+  } = designSystem;
+
+  if (isMain || !mainTheme) {
+    const palette = paletteToPaletteBuild(designSystem.palettes[activePaletteIndex], activeTheme);
+    return {
+      activePalette: palette,
+      activePaletteWithoutEndSettings: palette,
+      activePaletteWithoutSettings: palette,
+    };
+  }
+
+  const activePalette = recolorPalettes({
+    palettes: [designSystem.palettes[activePaletteIndex]],
+    defaultBackground: mainTheme.background,
+    theme: activeTheme,
+    independantColors: designSystem.independantColors,
+  }).palettes[0];
+
+  const activePaletteWithoutEndsSettings = recolorPalettes({
+    palettes: [designSystem.palettes[activePaletteIndex]],
+    defaultBackground: mainTheme.background,
+    theme: activeTheme,
+    independantColors: designSystem.independantColors,
+    clearEndsSettings: true,
+  }).palettes[0];
+
+  const activePaletteWithoutSettings = recolorPalettes({
+    palettes: [designSystem.palettes[activePaletteIndex]],
+    defaultBackground: mainTheme.background,
+    theme: activeTheme,
+    independantColors: designSystem.independantColors,
+    clearEndsSettings: true,
+    clearCenterSettings: true,
+  }).palettes[0];
+
+  return {
+    activePalette: paletteToPaletteBuild(activePalette, activeTheme),
+    activePaletteWithoutEndSettings: paletteToPaletteBuild(
+      activePaletteWithoutEndsSettings,
+      activeTheme,
+    ),
+    activePaletteWithoutSettings: paletteToPaletteBuild(activePaletteWithoutSettings, activeTheme),
   };
 }

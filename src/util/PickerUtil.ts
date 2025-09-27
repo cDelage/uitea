@@ -1,5 +1,5 @@
-import ColorIO from "colorjs.io";
-import { linearInterpolation } from "./Interpolation";
+import ColorIO from 'colorjs.io';
+import { linearInterpolation } from './Interpolation';
 
 export interface PickerData {
   name: PickerAxeName;
@@ -18,38 +18,38 @@ export interface AxeLabel {
 
 const AXES_LABELS: AxeLabel[] = [
   {
-    axeName: "h",
-    label: "Hue",
+    axeName: 'h',
+    label: 'Hue',
   },
   {
-    axeName: "s",
-    label: "Saturation",
+    axeName: 's',
+    label: 'Saturation',
   },
   {
-    axeName: "l",
-    label: "Lightness",
+    axeName: 'l',
+    label: 'Lightness',
   },
   {
-    axeName: "c",
-    label: "Chroma",
+    axeName: 'c',
+    label: 'Chroma',
   },
   {
-    axeName: "w",
-    label: "Whiteness",
+    axeName: 'w',
+    label: 'Whiteness',
   },
   {
-    axeName: "b",
-    label: "Blackness",
+    axeName: 'b',
+    label: 'Blackness',
   },
   {
-    axeName: "v",
-    label: "Value",
+    axeName: 'v',
+    label: 'Value',
   },
 ];
 
-export type PickerSpace = "hsl" | "oklch" | "lch" | "okhsl" | "hwb" | "hsv";
+export type PickerSpace = 'hsl' | 'oklch' | 'lch' | 'okhsl' | 'hwb' | 'hsv';
 
-export type PickerAxeName = "h" | "s" | "l" | "c" | "w" | "b" | "v";
+export type PickerAxeName = 'h' | 's' | 'l' | 'c' | 'w' | 'b' | 'v';
 
 export interface PickerFallback {
   axe: PickerAxeName;
@@ -83,7 +83,7 @@ export function getPickerData({
   return axes.map((axe) => {
     const { min, max, steps, name } = axe;
 
-    const gradient = getGradient({ pickerAxe: axe, space, color })
+    const gradient = getGradient({ pickerAxe: axe, space, color });
 
     return {
       value: color.get(`${space}.${name}`),
@@ -92,33 +92,41 @@ export function getPickerData({
       min,
       steps,
       name: name,
-      label:
-        AXES_LABELS.find((axe) => axe.axeName === name)?.label ?? "Not found",
+      label: AXES_LABELS.find((axe) => axe.axeName === name)?.label ?? 'Not found',
     };
   });
 }
 
-export function getGradient({ pickerAxe, color, space }: { pickerAxe: PickerAxe, color: ColorIO, space: PickerSpace }): string {
+export function getGradient({
+  pickerAxe,
+  color,
+  space,
+  skipLinearGradient,
+  reverse,
+}: {
+  pickerAxe: PickerAxe;
+  color: ColorIO;
+  space: PickerSpace;
+  skipLinearGradient?: boolean;
+  reverse?: boolean;
+}): string {
   const { min, max, name, otherAxes, gradientSteps } = pickerAxe;
 
   const gradientColors = Array.from({ length: gradientSteps }, (_, i) => {
     const gradientColor = new ColorIO(color);
     gradientColor.set({
       [`${space}.${name}`]: linearInterpolation(i, gradientSteps, min, max),
-      [`${space}.${otherAxes[0]}`]: Number(
-        color.get(`${space}.${otherAxes[0]}`)?.toFixed(2)
-      ),
-      [`${space}.${otherAxes[1]}`]: Number(
-        color.get(`${space}.${otherAxes[1]}`)?.toFixed(2)
-      ),
+      [`${space}.${otherAxes[0]}`]: Number(color.get(`${space}.${otherAxes[0]}`)?.toFixed(2)),
+      [`${space}.${otherAxes[1]}`]: Number(color.get(`${space}.${otherAxes[1]}`)?.toFixed(2)),
     });
-    return gradientColor.toString({ format: "hex" });
+    return gradientColor.toString({ format: 'hex' });
   });
 
-  return `linear-gradient(to right, ${gradientColors.join(
-    ", "
-  )})`;
+  const orderedColors = reverse ? [...gradientColors].reverse() : gradientColors;
 
+  return `${skipLinearGradient ? '' : 'linear-gradient(to right, '}${orderedColors.join(
+    ', ',
+  )}${skipLinearGradient ? '' : ')'}`;
 }
 
 export function updateColor({
@@ -140,19 +148,19 @@ export function updateColor({
   const computedValues: [number, number, number] = [
     axe === axes[0].name
       ? Number(value.toFixed(2))
-      : color.get(`${space}.${axes[0].name}`) ??
-      fallbacks.find((fallback) => fallback.axe === axes[0].name)?.value ??
-      0,
+      : (color.get(`${space}.${axes[0].name}`) ??
+        fallbacks.find((fallback) => fallback.axe === axes[0].name)?.value ??
+        0),
     axe === axes[1].name
       ? Number(value.toFixed(2))
-      : (color.get(`${space}.${axes[1].name}`) ||
-        fallbacks.find((fallback) => fallback.axe === axes[1].name)?.value) ??
-      0,
+      : ((color.get(`${space}.${axes[1].name}`) ||
+          fallbacks.find((fallback) => fallback.axe === axes[1].name)?.value) ??
+        0),
     axe === axes[2].name
       ? Number(value.toFixed(2))
-      : (color.get(`${space}.${axes[2].name}`) ||
-        fallbacks.find((fallback) => fallback.axe === axes[2].name)?.value) ??
-      0,
+      : ((color.get(`${space}.${axes[2].name}`) ||
+          fallbacks.find((fallback) => fallback.axe === axes[2].name)?.value) ??
+        0),
   ];
 
   newColor.setAll(space, computedValues);
@@ -187,258 +195,250 @@ export function updateColorFromString({
 }
 
 export const DEFAULT_PICKER_MODE: ColorSpace = {
-  space: "hsl",
+  space: 'hsl',
   axes: [
     {
-      name: "h",
-      label: "hue",
+      name: 'h',
+      label: 'hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["s", "l"],
+      otherAxes: ['s', 'l'],
     },
     {
-      name: "s",
-      label: "saturation",
+      name: 's',
+      label: 'saturation',
       min: 0,
       max: 100,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["h", "l"],
+      otherAxes: ['h', 'l'],
     },
     {
-      name: "l",
-      label: "lightness",
+      name: 'l',
+      label: 'lightness',
       min: 0,
       max: 100,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["h", "s"],
+      otherAxes: ['h', 's'],
     },
   ],
 };
 export const HSL: ColorSpace = {
-  space: "hsl",
+  space: 'hsl',
   axes: [
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["s", "l"],
+      otherAxes: ['s', 'l'],
     },
     {
-      name: "s",
-      label: "Saturation",
+      name: 's',
+      label: 'Saturation',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "l"],
+      otherAxes: ['h', 'l'],
     },
     {
-      name: "l",
-      label: "Lightness",
+      name: 'l',
+      label: 'Lightness',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "s"],
+      otherAxes: ['h', 's'],
     },
   ],
 };
 
 export const HSV: ColorSpace = {
-  space: "hsv",
+  space: 'hsv',
   axes: [
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["s", "v"],
+      otherAxes: ['s', 'v'],
     },
     {
-      name: "s",
-      label: "Saturation",
+      name: 's',
+      label: 'Saturation',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "v"],
+      otherAxes: ['h', 'v'],
     },
     {
-      name: "v",
-      label: "Value",
+      name: 'v',
+      label: 'Value',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "s"],
+      otherAxes: ['h', 's'],
     },
   ],
 };
 
 export const HWB: ColorSpace = {
-  space: "hwb",
+  space: 'hwb',
   axes: [
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["w", "b"],
+      otherAxes: ['w', 'b'],
     },
     {
-      name: "w",
-      label: "Whiteness",
+      name: 'w',
+      label: 'Whiteness',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "b"],
+      otherAxes: ['h', 'b'],
     },
     {
-      name: "b",
-      label: "Blackness",
+      name: 'b',
+      label: 'Blackness',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["h", "w"],
+      otherAxes: ['h', 'w'],
     },
   ],
 };
 
 export const LCH: ColorSpace = {
-  space: "lch",
+  space: 'lch',
   axes: [
     {
-      name: "l",
-      label: "Lightness",
+      name: 'l',
+      label: 'Lightness',
       min: 0,
       max: 100,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["c", "h"],
+      otherAxes: ['c', 'h'],
     },
     {
-      name: "c",
-      label: "Chroma",
+      name: 'c',
+      label: 'Chroma',
       min: 0,
       max: 150,
       steps: 0.5,
       gradientSteps: 5,
-      otherAxes: ["l", "h"],
+      otherAxes: ['l', 'h'],
     },
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["l", "c"],
+      otherAxes: ['l', 'c'],
     },
   ],
 };
 
 export const OKLCH: ColorSpace = {
-  space: "oklch",
+  space: 'oklch',
   axes: [
     {
-      name: "l",
-      label: "Lightness",
+      name: 'l',
+      label: 'Lightness',
       min: 0,
       max: 1,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["c", "h"],
+      otherAxes: ['c', 'h'],
     },
     {
-      name: "c",
-      label: "Chroma",
+      name: 'c',
+      label: 'Chroma',
       min: 0,
       max: 0.4,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["l", "h"],
+      otherAxes: ['l', 'h'],
     },
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["l", "c"],
+      otherAxes: ['l', 'c'],
     },
   ],
 };
 
 export const OKHSL: ColorSpace = {
-  space: "okhsl",
+  space: 'okhsl',
   axes: [
     {
-      name: "h",
-      label: "Hue",
+      name: 'h',
+      label: 'Hue',
       min: 0,
       max: 360,
       steps: 0.5,
       gradientSteps: 12,
-      otherAxes: ["s", "l"],
+      otherAxes: ['s', 'l'],
     },
     {
-      name: "s",
-      label: "Saturation",
+      name: 's',
+      label: 'Saturation',
       min: 0,
       max: 1,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["h", "l"],
+      otherAxes: ['h', 'l'],
     },
     {
-      name: "l",
-      label: "Lightness",
+      name: 'l',
+      label: 'Lightness',
       min: 0,
       max: 1,
       steps: 0.01,
       gradientSteps: 5,
-      otherAxes: ["h", "s"],
+      otherAxes: ['h', 's'],
     },
   ],
 };
 
 // Reconstruction du tableau complet
-export const PICKER_MODES: ColorSpace[] = [
-  HSL,
-  HSV,
-  HWB,
-  LCH,
-  OKLCH,
-  OKHSL,
-];
+export const PICKER_MODES: ColorSpace[] = [HSL, HSV, HWB, LCH, OKLCH, OKHSL];
 
-
-export const WHITE = new ColorIO("#ffffff");
-export const BLACK = new ColorIO("#000000");
+export const WHITE = new ColorIO('#ffffff');
+export const BLACK = new ColorIO('#000000');
 
 export function getContrastColor(hex?: string) {
-  if (!hex) return "#000000";
+  if (!hex) return '#000000';
   try {
     const baseColor = new ColorIO(hex);
     const whiteContrast = baseColor.contrastWCAG21(WHITE);
     const blackContrast = baseColor.contrastWCAG21(BLACK);
-    return whiteContrast > blackContrast ? "#ffffff" : "#000000";
+    return whiteContrast > blackContrast ? '#ffffff' : '#000000';
   } catch {
-    return "#000000";
+    return '#000000';
   }
 }
 
@@ -450,12 +450,7 @@ export function isValidColor(color: string) {
   return hexRegex.test(color) || rgbRegex.test(color) || hslRegex.test(color);
 }
 
-export type ContrastQuality =
-  | "Very poor"
-  | "Poor"
-  | "Good"
-  | "Very good"
-  | "Super";
+export type ContrastQuality = 'Very poor' | 'Poor' | 'Good' | 'Very good' | 'Super';
 
 export interface ContrastInfo {
   contrast: string;
@@ -470,15 +465,15 @@ function getContrastQuality(contrast: number): {
   palette: string;
 } {
   if (contrast > 12) {
-    return { quality: "Super", starCount: 5, palette: "positive" };
+    return { quality: 'Super', starCount: 5, palette: 'positive' };
   } else if (contrast > 7) {
-    return { quality: "Very good", starCount: 4, palette: "positive" };
+    return { quality: 'Very good', starCount: 4, palette: 'positive' };
   } else if (contrast > 4.5) {
-    return { quality: "Good", starCount: 3, palette: "warning" };
+    return { quality: 'Good', starCount: 3, palette: 'warning' };
   } else if (contrast > 3) {
-    return { quality: "Poor", starCount: 2, palette: "negative" };
+    return { quality: 'Poor', starCount: 2, palette: 'negative' };
   } else {
-    return { quality: "Very poor", starCount: 1, palette: "negative" };
+    return { quality: 'Very poor', starCount: 1, palette: 'negative' };
   }
 }
 
@@ -492,9 +487,9 @@ export function getContrastInfo(colors: ColorIO[]): ContrastInfo {
     };
   } else {
     return {
-      contrast: "1",
-      palette: "undefined",
-      quality: "Good",
+      contrast: '1',
+      palette: 'undefined',
+      quality: 'Good',
       starCount: 3,
     };
   }

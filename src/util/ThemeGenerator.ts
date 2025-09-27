@@ -13,13 +13,14 @@ import {
   computeValueByCenter,
   interpolateBetweenIndices,
   interpolateHueRelative,
-  mapRange,
 } from './Interpolation';
 
 interface EndsSettingsUtil {
   centerIndex: number;
   maxIndexPalette: number;
   index: number;
+  centerColor: ColorIO;
+  palette: Palette;
 }
 
 function recolorPaletteColor({
@@ -67,7 +68,6 @@ function recolorPaletteColor({
         color: acc,
         endSetting: cur,
         endSettingsUtils,
-        centerColor,
       });
     }, recolor);
   }
@@ -162,22 +162,10 @@ export function recolorPalettes({
   }
 
   const palettesRecolor: Palette[] = palettesToUpdate.map((palette) => {
-    const paletteSettingsPayload = getPaletteSettings({
+    const paletteCenterSettingsPayload = getPaletteCenterSettings({
       palette,
       theme,
       clearCenterSettings,
-    });
-
-    const endSettingsUtils: EndsSettingsUtil = {
-      centerIndex: Math.floor(palette.tints.length / 2),
-      maxIndexPalette: palette.tints.length - 1,
-      index: 0,
-    };
-
-    const endPaletteSettings: PaletteThemeSetting[] = getPaletteEndsSettings({
-      palette,
-      theme,
-      clearEndsSettings,
     });
 
     let newTints = [...palette.tints];
@@ -190,6 +178,23 @@ export function recolorPalettes({
         };
       });
     }
+
+    const endPaletteSettings: PaletteThemeSetting[] = getPaletteEndsSettings({
+      palette,
+      theme,
+      clearEndsSettings,
+    });
+
+    const endSettingsUtils: EndsSettingsUtil | undefined = getEndsSettingsUtils({
+      palette: {
+        ...palette,
+        tints: newTints,
+      },
+      endPaletteSettings,
+      defaultBgColor,
+      newBgColor,
+    });
+
     return {
       ...palette,
       tints: newTints.map((tint, index) => {
@@ -199,8 +204,8 @@ export function recolorPalettes({
             defaultCenter: defaultBgColor,
             defaultColor: new ColorIO(tint.color),
             newCenter: newBgColor,
-            paletteSettingsPayload,
-            endSettingsUtils: {
+            paletteSettingsPayload: paletteCenterSettingsPayload,
+            endSettingsUtils: endSettingsUtils && {
               ...endSettingsUtils,
               index,
             },
@@ -237,10 +242,9 @@ interface PaletteCenterSettingsPayload {
   hueGapCenter?: number;
   satChromaCenter?: number;
   lightnessCenter?: number;
-  centerColor: string;
 }
 
-export function getPaletteSettings({
+export function getPaletteCenterSettings({
   palette,
   theme,
   clearCenterSettings,
@@ -254,7 +258,6 @@ export function getPaletteSettings({
     .filter((_x) => !clearCenterSettings)
     .filter((setting) => !END_SETTINGS_ATTRIBUTES.includes(setting.attribute));
   if (!paletteSettingsArray.length) return undefined;
-  const centerColor = palette.tints[Math.floor(palette.tints.length / 2)].color;
   return {
     hueGapCenter: paletteSettingsArray.find((setting) => setting.attribute === 'hueGapCenter')
       ?.value,
@@ -262,7 +265,6 @@ export function getPaletteSettings({
       ?.value,
     lightnessCenter: paletteSettingsArray.find((setting) => setting.attribute === 'lightnessCenter')
       ?.value,
-    centerColor,
   };
 }
 
@@ -297,19 +299,22 @@ const ATTRIBUTE_AXE = {
 export function applyPaletteEndsSetting({
   endSetting,
   color,
-  endSettingsUtils: { index, maxIndexPalette, centerIndex },
-  centerColor,
+  endSettingsUtils: { centerIndex, index, maxIndexPalette },
 }: {
   endSetting: PaletteThemeSetting;
   color: ColorIO;
   endSettingsUtils: EndsSettingsUtil;
-  centerColor: ColorIO;
 }): ColorIO {
   const result = new ColorIO(color);
   const { attribute, value } = endSetting;
   if (!isEndSettingAttribute(attribute)) return result;
 
-  const endIndex = LeftEndSettingsAttributes.includes(attribute) ? 0 : maxIndexPalette;
+  const axe: string = ATTRIBUTE_AXE[attribute];
+
+  const initialValue = result.get(`okhsl.${axe}`);
+
+  const isLeftSetting: boolean = LeftEndSettingsAttributes.includes(attribute);
+  const endIndex = isLeftSetting ? 0 : maxIndexPalette;
 
   const coefficient = interpolateBetweenIndices({
     centerIndex,
@@ -317,30 +322,91 @@ export function applyPaletteEndsSetting({
     index,
   });
 
-  const axe = ATTRIBUTE_AXE[attribute];
+  const colorGap = value * coefficient;
 
-  const initialValue = result.get(`okhsl.${axe}`);
-
-  const newValue = mapRange({
-    min: 0,
-    max: 1,
-    value: value * coefficient,
-    newMax: 1,
-    newMin: centerColor.get(`okhsl.${axe}`),
-  });
-
-  console.log({
-    result: initialValue + newValue,
-    index,
-    min: 0,
-    max: 1,
-    value: value * coefficient,
-    newMax: 1,
-    newMin: centerColor.get(`okhsl.${axe}`),
-    newValue,
-  });
-
-  result.set(`okhsl.${axe}`, initialValue + newValue);
+  result.set(`okhsl.${axe}`, initialValue + colorGap);
 
   return result;
+}
+
+/*
+function computeEndSettingAxeGap({
+  endSetting: { attribute },
+  endSettingUtils: { centerIndex, maxIndexPalette, index, centerColor, palette },
+  axe,
+}: {
+  endSetting: PaletteThemeSetting;
+  palette: Palette;
+  axe: string;
+  endSettingUtils: EndsSettingsUtil;
+}): number {
+  const isLeftSetting: boolean = LeftEndSettingsAttributes.includes(attribute);
+  const endIndex = isLeftSetting ? 0 : maxIndexPalette;
+  const currentTint = new ColorIO(palette.tints[endIndex].color);
+
+  const coefficient = interpolateBetweenIndices({
+    centerIndex,
+    endIndex,
+    index,
+  });
+
+  //Lightness gap treatment
+  if (axe === 'l') {
+    const lightnessAxe = { ...OKHSL.axes[2] };
+
+    const isLightest = centerColor.get('okhsl.l') < currentTint.get('okhsl.l');
+
+    const initialValue = mapRange({
+      min: isLightest ? lightnessAxe.max : lightnessAxe.min,
+      max: centerColor.get('okhsl.l'),
+      value: currentTint.get('okhsl.l'),
+      newMin: 0,
+      newMax: 1,
+    });
+  }
+
+  return 0;
+}*/
+
+function getEndsSettingsUtils({
+  endPaletteSettings,
+  palette,
+  paletteCenterSettingsPayload,
+  defaultBgColor,
+  newBgColor,
+}: {
+  endPaletteSettings: PaletteThemeSetting[];
+  palette: Palette;
+  paletteCenterSettingsPayload?: PaletteCenterSettingsPayload;
+  defaultBgColor: ColorIO;
+  newBgColor: ColorIO;
+}): EndsSettingsUtil | undefined {
+  if (!endPaletteSettings.length) return undefined;
+  const centerIndex = Math.floor(palette.tints.length / 2);
+
+  //Recolor a first time to get the palette after
+  const recoloredPalette: Palette = paletteCenterSettingsPayload
+    ? {
+        ...palette,
+        tints: palette.tints.map((tint) => {
+          return {
+            ...tint,
+            color: recolorPaletteColor({
+              defaultCenter: defaultBgColor,
+              defaultColor: new ColorIO(tint.color),
+              newCenter: newBgColor,
+              paletteSettingsPayload: paletteCenterSettingsPayload,
+            }).toString({ format: 'hex' }),
+          };
+        }),
+      }
+    : palette;
+
+  return {
+    centerIndex,
+    maxIndexPalette: palette.tints.length - 1,
+    index: 0,
+    palette: recoloredPalette,
+    centerColor: new ColorIO(recoloredPalette.tints[centerIndex].color),
+  };
 }

@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   :root {
@@ -930,10 +930,6 @@ export const GlobalStyle = createGlobalStyle`
     /* chiffre collé à droite */
   }
   
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-  }
   
   .select-no-arrow {
     -webkit-appearance: none;
