@@ -27,7 +27,7 @@ function TokenSelector({
                 className="palette-color"
                 style={{
                   background: `var(--${tokenValue})`,
-                  ...getRectSize({ height: "var(--uidt-space-5)" }),
+                  ...getRectSize({ height: "var(--uit-space-5)" }),
                   border: "none",
                 }}
               />
@@ -57,7 +57,7 @@ function TokenSelector({
                         <div
                           className="palette-color"
                           style={{
-                            ...getRectSize({ height: "var(--uidt-space-5)" }),
+                            ...getRectSize({ height: "var(--uit-space-5)" }),
                             background: `var(--${token.label})`,
                           }}
                         ></div>
@@ -72,7 +72,7 @@ function TokenSelector({
                 <div
                   className="palette-color"
                   style={{
-                    ...getRectSize({ height: "var(--uidt-space-5)" }),
+                    ...getRectSize({ height: "var(--uit-space-5)" }),
                     background: `var(--${
                       family.tokens[Math.floor(family.tokens.length / 2)].label
                     })`,

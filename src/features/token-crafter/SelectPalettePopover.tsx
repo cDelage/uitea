@@ -47,7 +47,7 @@ function SelectPalettePopover({
                   <div
                     className="palette-color"
                     style={{
-                      ...getRectSize({ height: "var(--uidt-space-5)" }),
+                      ...getRectSize({ height: "var(--uit-space-5)" }),
                       background: selectedPalette.mainColor.toString({
                         format: "hex",
                       }),
@@ -86,7 +86,7 @@ function SelectPalettePopover({
                 <div
                   className="palette-color"
                   style={{
-                    ...getRectSize({ height: "var(--uidt-space-5)" }),
+                    ...getRectSize({ height: "var(--uit-space-5)" }),
                     background: palette.mainColor.toString({ format: "hex" }),
                   }}
                 ></div>

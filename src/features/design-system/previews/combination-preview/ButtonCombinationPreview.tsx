@@ -6,13 +6,13 @@ import styled from "styled-components";
 const ButtonPreview = styled.button<{
   $combination: ColorCombinationCollection;
 }>`
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   width: 120px;
   height: 40px;
-  box-shadow: var(--uidt-shadow-md);
+  box-shadow: var(--uit-shadow-md);
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-3);
+  gap: var(--uit-space-3);
   justify-content: center;
   background-color: var(--${(props) => props.$combination.default?.background});
   color: var(--${(props) => props.$combination.default?.text});

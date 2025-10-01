@@ -29,8 +29,8 @@ function TintAddRemove({
   );
 
   const background = !draggableTools.dragIndex
-    ? "var(--uidt-add-bg)"
-    : "var(--uidt-remove-bg)";
+    ? "var(--uit-add-bg)"
+    : "var(--uit-remove-bg)";
 
   function handleMouseEnter() {
     if (draggableTools.dragIndex !== undefined) {

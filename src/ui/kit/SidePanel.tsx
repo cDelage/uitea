@@ -55,11 +55,11 @@ function SidePanel({
   }, [openId, isOpenToSync, setIsOpenToSync]);
 
   useEffect(() => {
-    if(triggerOpen && setTriggerOpen){
+    if (triggerOpen && setTriggerOpen) {
       open(triggerOpen)
       setTriggerOpen(undefined);
     }
-  },[triggerOpen, setTriggerOpen])
+  }, [triggerOpen, setTriggerOpen])
 
   return (
     <SidepanelContext.Provider
@@ -159,16 +159,30 @@ function SidePanelBodyRelative({
   children,
   id,
   width,
+  isOpenToSync,
+  setIsOpenToSync
 }: {
   children: ReactNode;
   id: string;
   width?: string;
+  isOpenToSync?: boolean;
+  setIsOpenToSync?: (isOpen: boolean) => void;
 }) {
   const { openModalId, closeModal } = useSidepanelContext();
   const refModalBody = useDivClickOutside(() => {
     if (openModalId === id) setTimeout(() => closeModal(id), 0);
   });
   const isOpen: boolean = openModalId === id;
+
+  useEffect(() => {
+    if (!isOpen && isOpenToSync) {
+      setIsOpenToSync?.(false);
+    }
+    if (isOpen && !isOpenToSync) {
+      setIsOpenToSync?.(true)
+    }
+  }, [isOpen, isOpenToSync, setIsOpenToSync])
+
   return (
     <>
       <CSSTransition

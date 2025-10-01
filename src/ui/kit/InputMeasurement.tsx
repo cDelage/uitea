@@ -56,8 +56,8 @@ function InputMeasurement({
         style={{
           padding: "2px",
           borderRadius: "0px",
-          borderLeft: "1px solid var(--uidt-base-border)",
-          fontWeight: "var(--uidt-font-weight-bold)",
+          borderLeft: "1px solid var(--uit-base-border)",
+          fontWeight: "var(--uit-font-weight-bold)",
         }}
         onChange={(e) => {
           setMeasurement?.({
@@ -69,7 +69,7 @@ function InputMeasurement({
         <option
           value="PX"
           style={{
-            fontWeight: "var(--uidt-font-weight-bold)",
+            fontWeight: "var(--uit-font-weight-bold)",
           }}
         >
           px
@@ -77,7 +77,7 @@ function InputMeasurement({
         <option
           value="REM"
           style={{
-            fontWeight: "var(--uidt-font-weight-bold)",
+            fontWeight: "var(--uit-font-weight-bold)",
           }}
         >
           rem

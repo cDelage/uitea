@@ -240,7 +240,7 @@ function TypographyPopover({
                                     style={{
                                       background: `var(--${selectedColor})`,
                                       ...getRectSize({
-                                        height: "var(--uidt-space-5)",
+                                        height: "var(--uit-space-5)",
                                       }),
                                     }}
                                   ></div>
@@ -279,7 +279,7 @@ function TypographyPopover({
                                     style={{
                                       background: `var(--${color})`,
                                       ...getRectSize({
-                                        height: "var(--uidt-space-5)",
+                                        height: "var(--uit-space-5)",
                                       }),
                                     }}
                                   ></div>

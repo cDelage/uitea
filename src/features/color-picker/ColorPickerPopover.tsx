@@ -48,8 +48,8 @@ function ColorPickerPopover() {
           <div
             className="row gap-4 justify-between align-center rounded-md shadow-md py-2 px-4 border-box"
             style={{
-              backgroundColor: `var(--uidt-palette-${contrastInfo.palette}-100)`,
-              color: `var(--uidt-palette-${contrastInfo.palette}-900)`,
+              backgroundColor: `var(--uit-palette-${contrastInfo.palette}-100)`,
+              color: `var(--uit-palette-${contrastInfo.palette}-900)`,
             }}
           >
             <div className="row align-center gap-2">

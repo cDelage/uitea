@@ -16,26 +16,26 @@ const Table = styled.table<{ $combination: ColorCombinationCollection }>`
   }
 
   .td-top-first {
-    border-top-left-radius: var(--uidt-rounded-md);
+    border-top-left-radius: var(--uit-rounded-md);
   }
 
   .td-top-last {
-    border-top-right-radius: var(--uidt-rounded-md);
+    border-top-right-radius: var(--uit-rounded-md);
   }
 
   .td-first {
-    border-bottom-left-radius: var(--uidt-rounded-md);
+    border-bottom-left-radius: var(--uit-rounded-md);
   }
 
   .td-last {
-    border-bottom-right-radius: var(--uidt-rounded-md);
+    border-bottom-right-radius: var(--uit-rounded-md);
   }
 
   tbody {
     background-color: transparent;
     border-radius: var(--radius-md);
-    box-shadow: var(--uidt-shadow-md);
-    color: var(--uidt-base-text-light);
+    box-shadow: var(--uit-shadow-md);
+    color: var(--uit-base-text-light);
     .row-color {
       td {
         background-color: var(

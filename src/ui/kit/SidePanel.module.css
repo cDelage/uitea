@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--uidt-modal-bg);
+  background-color: var(--uit-modal-bg);
   z-index: 100;
 }
 
@@ -12,10 +12,10 @@
   position: absolute;
   right: 0;
   top: 0;
-  background-color: var(--uidt-component-bg);
+  background-color: var(--uit-component-bg);
   width: 700px;
   height: 100%;
-  border-left: 1px solid var(--uidt-component-border);
+  border-left: 1px solid var(--uit-component-border);
   display: flex;
   flex-direction: column;
   z-index: 50;

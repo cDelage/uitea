@@ -12,21 +12,7 @@ export type ComponentMode =
 
 export type EffectsPopoverMode = "default" | "drag" | "remove";
 
-export const ModificationsMode: ComponentMode[] = [
-  "edit",
-  "add",
-  "remove",
-  "drag",
-];
-
-export type ActiveComponent = {
-  componentId: string;
-  mode: ComponentMode;
-};
-
 export type DesignSystemContextType = {
-  activeComponent?: ActiveComponent;
-  setActiveComponent: (activeComponent: ActiveComponent) => void;
   designSystem: DesignSystem;
   editMode: boolean;
   colorTokens?: DesignToken[];

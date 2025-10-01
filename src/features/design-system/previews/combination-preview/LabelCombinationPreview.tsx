@@ -3,15 +3,15 @@ import { ColorCombinationCollection } from "../../../../domain/DesignSystemDomai
 import styles from "./CombinationPreview.module.css";
 
 const LabelPreview = styled.div<{ $combination: ColorCombinationCollection }>`
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   cursor:default;
-  padding: var(--uidt-space-2) var(--uidt-space-3);
+  padding: var(--uit-space-2) var(--uit-space-3);
   font-size: 14px;
   line-height: 20px;
-  box-shadow: var(--uidt-shadow-md);
+  box-shadow: var(--uit-shadow-md);
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-3);
+  gap: var(--uit-space-3);
   justify-content: center;
   background-color: var(--${(props) => props.$combination.default?.background});
   color: var(--${(props) => props.$combination.default?.text});

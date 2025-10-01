@@ -1,13 +1,13 @@
 .picker {
     display: flex;
     flex-direction: column;
-    gap: var(--uidt-space-4);
+    gap: var(--uit-space-4);
 }
 
 .sliderContainer {
     display: flex;
     align-items: center;
-    gap: var(--uidt-space-4);
+    gap: var(--uit-space-4);
 }
 
 .sliderLabel {
@@ -17,7 +17,7 @@
 .settingsContainer {
     display: flex;
     justify-content: space-between;
-    padding: var(--uidt-space-4) var(--uidt-space-0);
+    padding: var(--uit-space-4) var(--uit-space-0);
 }
 
 .colorSpaceMode {

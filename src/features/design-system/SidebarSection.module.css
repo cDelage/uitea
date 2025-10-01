@@ -1,7 +1,7 @@
 .sidebarSection {
   display: flex;
-  padding: var(--uidt-space-3) var(--uidt-space-5);
-  gap: var(--uidt-space-3);
+  padding: var(--uit-space-3) var(--uit-space-5);
+  gap: var(--uit-space-3);
   box-sizing: border-box;
   align-items: center;
   user-select: none;
@@ -10,25 +10,25 @@
 }
 
 .sidebarSection:hover {
-  background-color: var(--uidt-base-button-hover-bg);
+  background-color: var(--uit-base-button-hover-bg);
 }
 
 .sidebarSection[data-visible="true"]:hover {
-  background: var(--uidt-base-button-active-bg);
+  background: var(--uit-base-button-active-bg);
 }
 
 .sidebarSectionVisible {
-  background: var(--uidt-base-button-active-bg);
+  background: var(--uit-base-button-active-bg);
 }
 
 
 .fileUnderFolder {
-  padding-left: var(--uidt-space-8);
+  padding-left: var(--uit-space-8);
 }
 
 .iconChevronContainer {
   display: flex;
   align-items: center;
-  gap: var(--uidt-space-1);
+  gap: var(--uit-space-1);
   transition: transform 300ms linear;
 }

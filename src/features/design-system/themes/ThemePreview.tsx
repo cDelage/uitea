@@ -25,7 +25,7 @@ function ThemePreview({
         : recolorPalettes({
             palettes: designSystem.palettes,
             defaultBackground: mainTheme.background,
-            newBackground: theme.background,
+            theme,
             independantColors: designSystem.independantColors
           }).palettes;
     } else {
@@ -62,7 +62,7 @@ function ThemePreview({
                           background: tint.color,
                           border: "none",
                           ...getRectSize({
-                            height: "var(--uidt-space-9)",
+                            height: "var(--uit-space-9)",
                             flex: true,
                           }),
                         }}

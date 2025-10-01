@@ -5,16 +5,16 @@ import styles from "./CombinationPreview.module.css";
 import styled from "styled-components";
 
 const QuotePreview = styled.div<{ $combination: ColorCombinationCollection }>`
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   cursor: default;
   user-select: none;  
   -webkit-user-select: none;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: var(--uidt-space-3);
+  gap: var(--uit-space-3);
   height: 100%;
   width: 100%;
   box-sizing: border-box;

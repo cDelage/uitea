@@ -12,6 +12,7 @@ import PagePaletteBuilder from "./features/palette-builder/PagePaletteBuilder";
 import PageColorPicker from "./features/color-picker/PageColorPicker";
 import PageTokenCrafter from "./features/token-crafter/PageTokenCrafter";
 import { GlobalStyle } from "./GlobalStyle";
+import PageThemeCustomizer from "./features/theme-customizer/PageThemeCustomizer";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loader />}>
             <PageTokenCrafter />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/theme-customizer/:designSystemPath",
+        element: (
+          <Suspense fallback={<Loader />}>
+            <PageThemeCustomizer />
           </Suspense>
         ),
       },
@@ -108,8 +117,8 @@ function App() {
             fontSize: "16px",
             maxWidth: "500px",
             padding: "16px 24px",
-            backgroundColor: "var(--uidt-component-bg)",
-            color: "--uidt-base-text",
+            backgroundColor: "var(--uit-component-bg)",
+            color: "--uit-base-text",
           },
         }}
       />

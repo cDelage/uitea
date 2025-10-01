@@ -11,7 +11,7 @@ export const RecommandationStyled = styled.div<{
   justify-content: space-between;
   transition: transform 200ms;
   z-index: 0;
-  padding: var(--uidt-space-2);
+  padding: var(--uit-space-2);
   box-sizing: border-box;
   user-select: none;
   -webkit-user-select: none;
@@ -31,7 +31,7 @@ export const RecommandationStyled = styled.div<{
   max-width: 200px;
   height: 112px;
   user-select: none;
-  border-radius: var(--uidt-rounded-md);
+  border-radius: var(--uit-rounded-md);
   &:hover {
     transform: scale(1.09);
     z-index: 1;

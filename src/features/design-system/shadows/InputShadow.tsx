@@ -51,7 +51,7 @@ function InputShadow({
                 className="palette-color"
                 style={{
                   background: color.toString({ format: "hex" }),
-                  ...getRectSize({ height: "var(--uidt-space-5)" }),
+                  ...getRectSize({ height: "var(--uit-space-5)" }),
                 }}
               ></div>
               {shadow.color}
@@ -68,7 +68,7 @@ function InputShadow({
             <div
               className="p-2 row gap-3 align-center"
               style={{
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <ArrowRange size={ICON_SIZE_SM} /> {shadow.shadowX}
@@ -76,7 +76,7 @@ function InputShadow({
             <div
               className="p-2 row gap-3 align-center"
               style={{
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <MdHeight size={ICON_SIZE_SM} />
@@ -86,7 +86,7 @@ function InputShadow({
             <div
               className="p-2 row gap-3 align-center"
               style={{
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <MdBlurOn size={ICON_SIZE_SM} />
@@ -95,7 +95,7 @@ function InputShadow({
             <div
               className="p-2 row gap-3 align-center"
               style={{
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <MdSunny size={ICON_SIZE_SM} />
@@ -104,7 +104,7 @@ function InputShadow({
             <div
               className="p-2 row gap-1 align-center"
               style={{
-                borderLeft: "1px solid var(--uidt-base-border)",
+                borderLeft: "1px solid var(--uit-base-border)",
               }}
             >
               <input type="checkbox" checked={shadowForm.inset} />

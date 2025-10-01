@@ -4,37 +4,27 @@ import {
   getHueName,
   huesName,
   usePaletteBuilderStore,
-} from "./PaletteBuilderStore";
-import styles from "./PaletteBuilder.module.css";
-import { useEffect, useMemo, useState } from "react";
-import "rc-slider/assets/index.css";
-import ColorPickerLinear from "../color-picker/ColorPickerLinear";
-import FormComponent from "../../ui/kit/FormComponent";
-import {
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-} from "chart.js";
-import { Chart } from "chart.js";
-import { getRectSize, ICON_SIZE_MD, ICON_SIZE_XL } from "../../ui/UiConstants";
-import ColorIO from "colorjs.io";
-import {
-  MdArrowForward,
-  MdClose,
-  MdDelete,
-  MdLocationPin,
-} from "react-icons/md";
-import { ButtonAlert, ButtonPrimary } from "../../ui/kit/Buttons";
-import { BiCross, BiArrowToLeft, BiArrowToRight } from "react-icons/bi";
-import Popover from "../../ui/kit/Popover";
-import { useSidepanelContext } from "../../ui/kit/SidepanelContext";
-import ColorSlider from "../color-picker/ColorSlider";
-import { useChartAxeData } from "./PaletteChartsUtil";
-import PaletteChart from "./PaletteChart";
-import { PaletteBuild, TintBuild } from "../../domain/PaletteBuilderDomain";
-import { getContrastColor } from "../../util/PickerUtil";
-import Anchor from "./Anchor";
+} from './PaletteBuilderStore';
+import styles from './PaletteBuilder.module.css';
+import { useEffect, useMemo, useState } from 'react';
+import 'rc-slider/assets/index.css';
+import ColorPickerLinear from '../color-picker/ColorPickerLinear';
+import FormComponent from '../../ui/kit/FormComponent';
+import { CategoryScale, LinearScale, LineElement, PointElement } from 'chart.js';
+import { Chart } from 'chart.js';
+import { getRectSize, ICON_SIZE_MD, ICON_SIZE_XL } from '../../ui/UiConstants';
+import ColorIO from 'colorjs.io';
+import { MdArrowForward, MdClose, MdDelete, MdLocationPin } from 'react-icons/md';
+import { ButtonAlert, ButtonPrimary } from '../../ui/kit/Buttons';
+import { BiCross, BiArrowToLeft, BiArrowToRight } from 'react-icons/bi';
+import Popover from '../../ui/kit/Popover';
+import { useSidepanelContext } from '../../ui/kit/SidepanelContext';
+import ColorSlider from '../color-picker/ColorSlider';
+import { usePaletteBuilderChartAxeData } from './PaletteChartsUtil';
+import PaletteChart from './PaletteChart';
+import { PaletteBuild, TintBuild } from '../../domain/PaletteBuilderDomain';
+import { getContrastColor } from '../../util/PickerUtil';
+import Anchor from './Anchor';
 
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -62,26 +52,24 @@ function PaletteSidePanel({
   const { closeModal } = useSidepanelContext();
   const centerTint = useMemo<TintBuild | undefined>(
     () => (palette ? palette.tints.find((color) => color.isCenter) : undefined),
-    [palette]
+    [palette],
   );
 
   const otherPalettes: PaletteBuild[] = useMemo(
     () => palettes.filter((other) => other.id !== palette?.id),
-    [palettes, palette]
+    [palettes, palette],
   );
 
   const [isCompare, setIsCompare] = useState(false);
 
-  const [paletteComparatorId, setPaletteComparatorId] = useState<
-    string | undefined
-  >(undefined);
+  const [paletteComparatorId, setPaletteComparatorId] = useState<string | undefined>(undefined);
 
   const comparatorPalette = useMemo<PaletteBuild | undefined>(
     () =>
       paletteComparatorId
         ? palettes.find((palette) => palette.id === paletteComparatorId)
         : undefined,
-    [paletteComparatorId, palettes]
+    [paletteComparatorId, palettes],
   );
 
   const selectedTint = useMemo<TintBuild | undefined>(() => {
@@ -92,10 +80,10 @@ function PaletteSidePanel({
 
   const colorsRecommanded = useMemo(
     () => getColorsRecommanded(palettes, centerTint?.color),
-    [centerTint, palettes]
+    [centerTint, palettes],
   );
 
-  const chartsAxeData = useChartAxeData({
+  const chartsAxeData = usePaletteBuilderChartAxeData({
     interpolationColorSpace,
     palette,
     index,
@@ -127,15 +115,11 @@ function PaletteSidePanel({
       };
       const newPalette: PaletteBuild = {
         ...palette,
-        tints: palette.tints.map((tint) =>
-          tint.name === newTint.name ? newTintUpdated : tint
-        ),
+        tints: palette.tints.map((tint) => (tint.name === newTint.name ? newTintUpdated : tint)),
       };
       const newCenter = newPalette.tints.find((tint) => tint.isCenter)?.color;
       newPalette.name =
-        newCenter && huesName.includes(newPalette.name)
-          ? getHueName(newCenter)
-          : newPalette.name;
+        newCenter && huesName.includes(newPalette.name) ? getHueName(newCenter) : newPalette.name;
       if (newTintUpdated.isCenter && centerTint) {
         const [startColor, endColor] = getEndsTints({
           color: centerTint.color,
@@ -169,8 +153,7 @@ function PaletteSidePanel({
         tints: palette.tints.map((tint, i) => {
           return {
             ...tint,
-            isAnchor:
-              i === tintIndex ? (!tint.isAnchor ? true : false) : tint.isAnchor,
+            isAnchor: i === tintIndex ? (!tint.isAnchor ? true : false) : tint.isAnchor,
           };
         }),
       });
@@ -188,12 +171,10 @@ function PaletteSidePanel({
       (!comparatorPalette && palettes.length > 1) ||
       (comparatorPalette && comparatorPalette.id === palette?.id)
     ) {
-      setPaletteComparatorId(
-        palettes.find((comparator) => comparator.id !== palette?.id)?.id
-      );
+      setPaletteComparatorId(palettes.find((comparator) => comparator.id !== palette?.id)?.id);
     }
     if (!palette) {
-      closeModal("palette");
+      closeModal('palette');
     }
   }, [comparatorPalette, palettes, palette, closeModal]);
 
@@ -208,8 +189,8 @@ function PaletteSidePanel({
                 <div
                   className="palette-color"
                   style={{
-                    background: centerTint?.color.toString({ format: "hex" }),
-                    ...getRectSize({ height: "var(--uidt-space-10)" }),
+                    background: centerTint?.color.toString({ format: 'hex' }),
+                    ...getRectSize({ height: 'var(--uit-space-10)' }),
                   }}
                 ></div>
                 <h2 className="text-color-dark">
@@ -221,10 +202,7 @@ function PaletteSidePanel({
                 </h2>
                 <div className="row align-center gap-2">
                   <Popover>
-                    <Popover.Toggle
-                      id="delete-palette"
-                      positionPayload="bottom-right"
-                    >
+                    <Popover.Toggle id="delete-palette" positionPayload="bottom-right">
                       <button className="action-ghost-button">
                         <MdDelete size={ICON_SIZE_MD} />
                       </button>
@@ -238,7 +216,7 @@ function PaletteSidePanel({
                           clickEvent={() => {
                             deletePalette(palette.id);
                             setSelectedPaletteIndex(undefined);
-                            closeModal("palette");
+                            closeModal('palette');
                           }}
                           theme="alert"
                         >
@@ -247,10 +225,7 @@ function PaletteSidePanel({
                       </Popover.Actions>
                     </Popover.Body>
                   </Popover>
-                  <button
-                    className="action-ghost-button"
-                    onClick={() => closeModal("palette")}
-                  >
+                  <button className="action-ghost-button" onClick={() => closeModal('palette')}>
                     <MdArrowForward size={ICON_SIZE_MD} />
                   </button>
                 </div>
@@ -262,15 +237,15 @@ function PaletteSidePanel({
                     className="row align-center justify-center cursor-pointer"
                     onClick={() => setSelectedTintIndex(tintIndex)}
                     style={{
-                      background: tint.color.toString({ format: "hex" }),
-                      boxSizing: "border-box",
-                      position: "relative",
+                      background: tint.color.toString({ format: 'hex' }),
+                      boxSizing: 'border-box',
+                      position: 'relative',
                       border:
                         selectedTint?.name === tint.name
-                          ? `2px solid var(--uidt-primary-border)`
+                          ? `2px solid var(--uit-primary-border)`
                           : undefined,
                       ...getRectSize({
-                        height: "var(--uidt-space-9)",
+                        height: 'var(--uit-space-9)',
                         flex: true,
                       }),
                     }}
@@ -278,43 +253,35 @@ function PaletteSidePanel({
                     {selectedTint?.name === tint.name && (
                       <MdLocationPin
                         size={ICON_SIZE_XL}
-                        color="var(--uidt-primary-bg)"
+                        color="var(--uit-primary-bg)"
                         style={{
-                          position: "absolute",
+                          position: 'absolute',
                           top: 0,
-                          left: "50%",
-                          transform: "translate(-50%, -100%)",
+                          left: '50%',
+                          transform: 'translate(-50%, -100%)',
                         }}
                       />
                     )}
                     {tint.isAnchor &&
                       !tint.isCenter &&
                       tintIndex !== 0 &&
-                      tintIndex !== palette.tints.length && (
-                        <Anchor background={tint.color} />
-                      )}
+                      tintIndex !== palette.tints.length && <Anchor background={tint.color} />}
                     {tint.isCenter && (
                       <BiCross
-                        color={getContrastColor(
-                          tint.color.toString({ format: "hex" })
-                        )}
-                        size={"24"}
+                        color={getContrastColor(tint.color.toString({ format: 'hex' }))}
+                        size={'24'}
                       />
                     )}
                     {tintIndex === 0 && (
                       <BiArrowToLeft
-                        color={getContrastColor(
-                          tint.color.toString({ format: "hex" })
-                        )}
-                        size={"16"}
+                        color={getContrastColor(tint.color.toString({ format: 'hex' }))}
+                        size={'16'}
                       />
                     )}
                     {tintIndex === palette.tints.length - 1 && (
                       <BiArrowToRight
-                        color={getContrastColor(
-                          tint.color.toString({ format: "hex" })
-                        )}
-                        size={"16"}
+                        color={getContrastColor(tint.color.toString({ format: 'hex' }))}
+                        size={'16'}
                       />
                     )}
                   </div>
@@ -327,25 +294,24 @@ function PaletteSidePanel({
               <h5 className="text-color-dark">Colors</h5>
               {selectedTint && selectedTintIndex !== undefined ? (
                 <>
-                  {selectedTintIndex !== 0 &&
-                    selectedTintIndex !== palette.tints.length - 1 && (
-                      <ColorPickerLinear
-                        color={selectedTint.color}
-                        onChange={(color: ColorIO) => {
-                          updateColor({
-                            newTint: selectedTint,
-                            value: color,
-                            applyAnchor: !selectedTint.isCenter,
-                          });
-                        }}
-                        onChangeComplete={doPaletteBuilder}
-                      />
-                    )}
+                  {selectedTintIndex !== 0 && selectedTintIndex !== palette.tints.length - 1 && (
+                    <ColorPickerLinear
+                      color={selectedTint.color}
+                      onChange={(color: ColorIO) => {
+                        updateColor({
+                          newTint: selectedTint,
+                          value: color,
+                          applyAnchor: !selectedTint.isCenter,
+                        });
+                      }}
+                      onChangeComplete={doPaletteBuilder}
+                    />
+                  )}
                   {selectedTintIndex === 0 && (
                     <>
                       <FormComponent label="Whiteness mix percentage">
                         <ColorSlider
-                          value={palette.settings.lightnessMax}
+                          value={palette.settings.lightnessLeft}
                           min={0}
                           max={1}
                           step={0.01}
@@ -388,7 +354,7 @@ function PaletteSidePanel({
                     <>
                       <FormComponent label="Blackness mix percentage">
                         <ColorSlider
-                          value={palette.settings.lightnessMin}
+                          value={palette.settings.lightnessRight}
                           min={0}
                           max={1}
                           step={0.01}
@@ -433,17 +399,15 @@ function PaletteSidePanel({
                         className="palette-color"
                         style={{
                           background: selectedTint.color.toString({
-                            format: "hex",
+                            format: 'hex',
                           }),
-                          ...getRectSize({ height: "var(--uidt-space-10)" }),
+                          ...getRectSize({ height: 'var(--uit-space-10)' }),
                         }}
                       ></div>
                       <div className="column gap-2">
-                        <strong className="text-color-dark">
-                          {selectedTint.name}
-                        </strong>
+                        <strong className="text-color-dark">{selectedTint.name}</strong>
                         <div className="text-color-light">
-                          {selectedTint.color.toString({ format: "hex" })}
+                          {selectedTint.color.toString({ format: 'hex' })}
                         </div>
                       </div>
                     </div>
@@ -452,15 +416,11 @@ function PaletteSidePanel({
                         !selectedTint.isCenter &&
                         selectedTintIndex !== palette.tints.length - 1 &&
                         (!selectedTint.isAnchor ? (
-                          <ButtonPrimary
-                            onClick={() => toggleAnchorTint(selectedTintIndex)}
-                          >
+                          <ButtonPrimary onClick={() => toggleAnchorTint(selectedTintIndex)}>
                             Anchor tint
                           </ButtonPrimary>
                         ) : (
-                          <ButtonAlert
-                            onClick={() => toggleAnchorTint(selectedTintIndex)}
-                          >
+                          <ButtonAlert onClick={() => toggleAnchorTint(selectedTintIndex)}>
                             Remove anchor
                           </ButtonAlert>
                         ))}
@@ -472,23 +432,21 @@ function PaletteSidePanel({
                         <div
                           className="palette-color"
                           style={{
-                            background: comparatorPalette.tints[
-                              selectedTintIndex
-                            ].color.toString({
-                              format: "hex",
+                            background: comparatorPalette.tints[selectedTintIndex].color.toString({
+                              format: 'hex',
                             }),
-                            ...getRectSize({ height: "var(--uidt-space-10)" }),
+                            ...getRectSize({ height: 'var(--uit-space-10)' }),
                           }}
                         ></div>
                         <div className="column gap-2">
                           <strong className="text-color-dark">
-                            {comparatorPalette.tints[selectedTintIndex].name}{" "}
+                            {comparatorPalette.tints[selectedTintIndex].name}{' '}
                             {comparatorPalette.name}
                           </strong>
                           <div className="text-color-light">
-                            {comparatorPalette.tints[
-                              selectedTintIndex
-                            ].color.toString({ format: "hex" })}
+                            {comparatorPalette.tints[selectedTintIndex].color.toString({
+                              format: 'hex',
+                            })}
                           </div>
                         </div>
                       </div>
@@ -505,23 +463,16 @@ function PaletteSidePanel({
                       </div>
                       <div className="row align-center gap-3">
                         <label>Comparaison palette</label>
-                        <select
-                          onChange={(e) =>
-                            setPaletteComparatorId(e.target.value)
-                          }
-                        >
+                        <select onChange={(e) => setPaletteComparatorId(e.target.value)}>
                           {otherPalettes.map((paletteToCompare) => (
-                            <option
-                              key={paletteToCompare.id}
-                              value={paletteToCompare.id}
-                            >
+                            <option key={paletteToCompare.id} value={paletteToCompare.id}>
                               <div
                                 className="palette-color"
                                 style={{
                                   background: centerTint?.color.toString({
-                                    format: "hex",
+                                    format: 'hex',
                                   }),
-                                  ...getRectSize({ height: "var(--uidt-space-5)" }),
+                                  ...getRectSize({ height: 'var(--uit-space-5)' }),
                                 }}
                               ></div>
                               {paletteToCompare.name}
@@ -550,19 +501,17 @@ function PaletteSidePanel({
                         <div
                           className={styles.recommandedHueButton}
                           key={`${color.name}${color.color.toString({
-                            format: "hex",
+                            format: 'hex',
                           })}${colorIndex}`}
-                          onClick={() =>
-                            createPaletteFromExisting(palette, color)
-                          }
+                          onClick={() => createPaletteFromExisting(palette, color)}
                         >
                           <div
                             className="palette-color"
                             style={{
                               background: color.color.toString({
-                                format: "hex",
+                                format: 'hex',
                               }),
-                              ...getRectSize({ height: "var(--uidt-space-7)" }),
+                              ...getRectSize({ height: 'var(--uit-space-7)' }),
                             }}
                           ></div>
                           {color.name}

@@ -7,8 +7,8 @@ const CombinationPreview = styled.button<{
 }>`
   flex: 1;
   height: 100%;
-  border-radius: var(--uidt-rounded-md);
-  box-shadow: var(--uidt-shadow-md);
+  border-radius: var(--uit-rounded-md);
+  box-shadow: var(--uit-shadow-md);
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -24,7 +24,7 @@ const CombinationPreview = styled.button<{
     border-bottom: var(--${(props) => props.$combination.default?.border}) 1px
       solid;
     width: 100%;
-    padding: var(--uidt-space-3);
+    padding: var(--uit-space-3);
   }
 
   .header-circle {
@@ -104,7 +104,7 @@ function CombinationComponentPlaceholder({
           style={{
             transform: "translateY(-1px)",
             ...getRectSize({
-              height: "var(--uidt-space-4)",
+              height: "var(--uit-space-4)",
             }),
           }}
         />

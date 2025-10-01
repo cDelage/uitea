@@ -9,7 +9,7 @@
   position: relative;
   z-index: 2;
   transform: scale(70%);
-  fill: var(--uidt-anchor-bg);
+  fill: var(--uit-anchor-bg);
 }
 
 .iconBorder {

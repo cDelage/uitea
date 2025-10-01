@@ -81,7 +81,7 @@ function ShadowPresetSidepanel() {
                     background: "#eff6ff",
                     boxShadow: buildBoxShadows(shadowSelect.shadow, undefined),
                     ...getRectSize({
-                      height: "var(--uidt-space-10)",
+                      height: "var(--uit-space-10)",
                       width: "100px",
                     }),
                   }}

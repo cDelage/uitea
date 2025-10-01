@@ -1,19 +1,19 @@
-import { ComponentType } from "react";
-import { IconType } from "react-icons/lib";
+import { ComponentType } from 'react';
+import { IconType } from 'react-icons/lib';
 import {
   MdFormatQuote,
   MdLabelOutline,
   MdOutlinePlayArrow,
   MdOutlineTableRows,
   MdOutlineViewList,
-} from "react-icons/md";
-import QuoteCombinationPreview from "../features/design-system/previews/combination-preview/QuoteCombinationPreview";
-import ButtonCombinationPreview from "../features/design-system/previews/combination-preview/ButtonCombinationPreview";
-import LabelCombinationPreview from "../features/design-system/previews/combination-preview/LabelCombinationPreview";
-import ArrayRowCombinationPreview from "../features/design-system/previews/combination-preview/ArrayRowCombinationPreview";
-import ArrayHeaderCombinationPreview from "../features/design-system/previews/combination-preview/ArrayHeaderCombinationPreview";
-import ColorIO from "colorjs.io";
-import { ImageLocal } from "./ImageDomain";
+} from 'react-icons/md';
+import QuoteCombinationPreview from '../features/design-system/previews/combination-preview/QuoteCombinationPreview';
+import ButtonCombinationPreview from '../features/design-system/previews/combination-preview/ButtonCombinationPreview';
+import LabelCombinationPreview from '../features/design-system/previews/combination-preview/LabelCombinationPreview';
+import ArrayRowCombinationPreview from '../features/design-system/previews/combination-preview/ArrayRowCombinationPreview';
+import ArrayHeaderCombinationPreview from '../features/design-system/previews/combination-preview/ArrayHeaderCombinationPreview';
+import ColorIO from 'colorjs.io';
+import { ImageLocal } from './ImageDomain';
 
 export interface DesignSystem {
   metadata: DesignSystemMetadata;
@@ -84,7 +84,7 @@ export interface TokenFamily {
   label: string;
   tokens: DesignToken[];
   colorPreview?: string;
-  category: "color" | "semantic";
+  category: 'color' | 'semantic';
 }
 
 export interface Themes {
@@ -95,11 +95,51 @@ export interface Themes {
 export interface Theme {
   name: string;
   background: string;
+  paletteThemeSettings: PaletteThemeSetting[];
 }
 
-export type ThemeStateCategory = "default" | "hover" | "active" | "focus";
+export interface PaletteThemeSetting {
+  paletteName: string;
+  attribute: PaletteSettingAttribute;
+  value: number;
+}
 
-export type ThemeItem = "background" | "border" | "text";
+export type PaletteSettingAttribute = EndSettingAttribute | CenterSettingAttribute;
+
+export type CenterSettingAttribute = 'lightnessCenter' | 'satChromaCenter' | 'hueGapCenter';
+
+export type EndSettingAttribute =
+  | 'lightnessLeft'
+  | 'lightnessRight'
+  | 'satChromaGapLeft'
+  | 'satChromaGapRight'
+  | 'hueGapLeft'
+  | 'hueGapRight';
+
+export const EndSettingAttributes: PaletteSettingAttribute[] = [
+  'hueGapLeft',
+  'hueGapRight',
+  'lightnessLeft',
+  'lightnessRight',
+  'satChromaGapLeft',
+  'satChromaGapRight',
+];
+
+export const LeftEndSettingsAttributes: PaletteSettingAttribute[] = [
+  'hueGapLeft',
+  'lightnessLeft',
+  'satChromaGapLeft',
+];
+
+export const RightEndSettingsAttributes: PaletteSettingAttribute[] = [
+  'hueGapRight',
+  'lightnessRight',
+  'satChromaGapRight',
+];
+
+export type ThemeStateCategory = 'default' | 'hover' | 'active' | 'focus';
+
+export type ThemeItem = 'background' | 'border' | 'text';
 
 export interface ColorDarkable {
   default?: string;
@@ -151,69 +191,58 @@ export interface TypographyScale {
 }
 
 export type DefaultTypography =
-  | "root"
-  | "paragraph"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "small"
-  | "strong";
+  | 'root'
+  | 'paragraph'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'small'
+  | 'strong';
 
-export type TypographyScaleFieldPath =
-  | DefaultTypography
-  | `customScales.${number}.scale`;
+export type TypographyScaleFieldPath = DefaultTypography | `customScales.${number}.scale`;
 
-export type FontStyle = "normal" | "italic" | "oblique";
-export type TextTransform = "none" | "uppercase" | "lowercase" | "capitalize";
-export type TextDecoration = "none" | "underline" | "overline" | "line-through";
-export type FontWeight =
-  | "100"
-  | "200"
-  | "300"
-  | "400"
-  | "500"
-  | "600"
-  | "700"
-  | "800"
-  | "900";
+export type FontStyle = 'normal' | 'italic' | 'oblique';
+export type TextTransform = 'none' | 'uppercase' | 'lowercase' | 'capitalize';
+export type TextDecoration = 'none' | 'underline' | 'overline' | 'line-through';
+export type FontWeight = '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 
 export type TypographySpacing =
-  | "-1em"
-  | "-0.9em"
-  | "-0.8em"
-  | "-0.7em"
-  | "-0.6em"
-  | "-0.5em"
-  | "-0.4em"
-  | "-0.3em"
-  | "-0.2em"
-  | "-0.1em"
-  | "-0.09em"
-  | "-0.08em"
-  | "-0.07em"
-  | "-0.06em"
-  | "-0.05em"
-  | "-0.02em"
-  | "0em"
-  | "0.02em"
-  | "0.05em"
-  | "0.06em"
-  | "0.07em"
-  | "0.08em"
-  | "0.09em"
-  | "0.1em"
-  | "0.2em"
-  | "0.3em"
-  | "0.4em"
-  | "0.5em"
-  | "0.6em"
-  | "0.7em"
-  | "0.8em"
-  | "0.9em"
-  | "1em";
+  | '-1em'
+  | '-0.9em'
+  | '-0.8em'
+  | '-0.7em'
+  | '-0.6em'
+  | '-0.5em'
+  | '-0.4em'
+  | '-0.3em'
+  | '-0.2em'
+  | '-0.1em'
+  | '-0.09em'
+  | '-0.08em'
+  | '-0.07em'
+  | '-0.06em'
+  | '-0.05em'
+  | '-0.02em'
+  | '0em'
+  | '0.02em'
+  | '0.05em'
+  | '0.06em'
+  | '0.07em'
+  | '0.08em'
+  | '0.09em'
+  | '0.1em'
+  | '0.2em'
+  | '0.3em'
+  | '0.4em'
+  | '0.5em'
+  | '0.6em'
+  | '0.7em'
+  | '0.8em'
+  | '0.9em'
+  | '1em';
 
 export interface PresetSpaces {
   presetName: string;
@@ -263,14 +292,9 @@ export interface SemanticColorTokens {
   colorCombinationCollections: ColorCombinationCollection[];
 }
 
-export type ColorCombinationState = "default" | "hover" | "active" | "focus";
+export type ColorCombinationState = 'default' | 'hover' | 'active' | 'focus';
 
-export type PreviewComponent =
-  | "quote"
-  | "button"
-  | "label"
-  | "array-header"
-  | "array-row";
+export type PreviewComponent = 'quote' | 'button' | 'label' | 'array-header' | 'array-row';
 
 export type PreviewComponentIcon = {
   icon: IconType;
@@ -280,27 +304,27 @@ export type PreviewComponentIcon = {
 
 export const PREVIEW_COMPONENT_ICONS: PreviewComponentIcon[] = [
   {
-    previewComponent: "button",
+    previewComponent: 'button',
     icon: MdOutlinePlayArrow,
     component: ButtonCombinationPreview,
   },
   {
-    previewComponent: "label",
+    previewComponent: 'label',
     icon: MdLabelOutline,
     component: LabelCombinationPreview,
   },
   {
-    previewComponent: "array-header",
+    previewComponent: 'array-header',
     icon: MdOutlineViewList,
     component: ArrayHeaderCombinationPreview,
   },
   {
-    previewComponent: "array-row",
+    previewComponent: 'array-row',
     icon: MdOutlineTableRows,
     component: ArrayRowCombinationPreview,
   },
   {
-    previewComponent: "quote",
+    previewComponent: 'quote',
     icon: MdFormatQuote,
     component: QuoteCombinationPreview,
   },
@@ -331,7 +355,7 @@ export interface ColorCombinationCollectionAndGroup {
   group?: ColorCombination;
 }
 
-export type TokenColorUsage = "background" | "border" | "text";
+export type TokenColorUsage = 'background' | 'border' | 'text';
 
 export interface ColorCombination {
   background?: string;
@@ -364,7 +388,7 @@ export interface RecommandationContrastPayload {
 export type PaletteOrTint = Palette | Tint;
 
 export function isPalette(p: PaletteOrTint): p is Palette {
-  return "paletteName" in p;
+  return 'paletteName' in p;
 }
 
 export interface PaletteAndColor {
@@ -385,7 +409,7 @@ export interface GenerateExportPayload {
   extension: string;
 }
 
-export type UnitOfMeasurement = "REM" | "PX";
+export type UnitOfMeasurement = 'REM' | 'PX';
 
 export interface Measurement {
   unit: UnitOfMeasurement;
@@ -442,4 +466,4 @@ export interface ExportsMetadata {
   readme?: FileMetadata;
 }
 
-export type EXPORT_CATEGORY = "css" | "figma" | "readme";
+export type EXPORT_CATEGORY = 'css' | 'figma' | 'readme';

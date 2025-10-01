@@ -43,8 +43,8 @@ function ShadowPresetPreview({
           <div
             style={{
               position: "absolute",
-              bottom: "var(--uidt-space-2)",
-              right: "var(--uidt-space-2)",
+              bottom: "var(--uit-space-2)",
+              right: "var(--uit-space-2)",
             }}
           >
             {effect.author}
