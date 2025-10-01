@@ -5,6 +5,7 @@ import {
   PaletteThemeSetting,
   Theme,
   Tint,
+  TokenFamily,
 } from '../../domain/DesignSystemDomain';
 import { PaletteBuild } from '../../domain/PaletteBuilderDomain';
 import ColorIO from 'colorjs.io';
@@ -27,6 +28,10 @@ type ThemeCustomizerContextType = {
   }) => void;
   centerColor?: ColorIO;
   activePaletteWithoutEndSettings: PaletteBuild | undefined;
+  removeTheme: (index: number) => void;
+  createTheme: (color: string) => void;
+  tokenFamilies: TokenFamily[];
+  updateTheme: (theme: Theme, index: number) => void;
 };
 
 export const ThemeCustomizerContext = createContext<ThemeCustomizerContextType | undefined>(

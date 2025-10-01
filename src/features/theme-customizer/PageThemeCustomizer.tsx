@@ -1,13 +1,14 @@
 import { useParams } from 'react-router-dom';
 import { useFindDesignSystem, useSaveDesignSystem } from '../design-system/DesignSystemQueries';
 import ThemeCustomizerComponent from './ThemeCustomizerComponent';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ThemeCustomizerContext } from './ThemeCustomizerContext';
-import { PaletteThemeSetting, Theme, Tint } from '../../domain/DesignSystemDomain';
+import { PaletteThemeSetting, Theme, Tint, TokenFamily } from '../../domain/DesignSystemDomain';
 import { recolorPalettes } from '../../util/ThemeGenerator';
 import SidePanel from '../../ui/kit/SidePanel';
 import { isPaletteThemeSettingEqual, usePalettesBuildForContext } from './PaletteChartsThemeUtil';
 import ColorIO from 'colorjs.io';
+import { getDesignSystemTokens } from '../../util/DesignSystemUtils';
 
 function PageThemeCustomizer() {
   const { designSystemPath } = useParams();
@@ -15,6 +16,11 @@ function PageThemeCustomizer() {
   const [activeThemeIndex, setActiveThemeIndex] = useState<number | undefined>(undefined);
   const [activePaletteIndex, setActivePaletteIndex] = useState<number | undefined>(undefined);
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPath);
+
+  const tokenFamilies: TokenFamily[] = useMemo(
+    () => getDesignSystemTokens(designSystem, true),
+    [designSystem],
+  );
 
   const activeTheme: Theme | undefined =
     designSystem && activeThemeIndex !== undefined
@@ -90,6 +96,75 @@ function PageThemeCustomizer() {
     }
   }
 
+  function createTheme(color: string) {
+    if (!designSystem) return;
+
+    saveDesignSystem(
+      {
+        designSystem: {
+          ...designSystem,
+          themes: {
+            ...designSystem.themes,
+            otherThemes: [
+              ...designSystem.themes.otherThemes,
+              {
+                name: `theme-${designSystem.themes.otherThemes.length + 1}`,
+                background: color,
+                paletteThemeSettings: [],
+              },
+            ],
+          },
+        },
+        isTmp: true,
+      },
+      {
+        onSuccess: () => {
+          setActiveThemeIndex(designSystem.themes.otherThemes.length + 1);
+          setActivePaletteIndex(undefined);
+        },
+      },
+    );
+  }
+
+  function removeTheme(index: number) {
+    if (!designSystem) return;
+
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        themes: {
+          ...designSystem.themes,
+          otherThemes: designSystem.themes.otherThemes.filter((_theme, i) => i + 1 !== index),
+        },
+      },
+      isTmp: true,
+    });
+    setActiveThemeIndex(undefined);
+    setActivePaletteIndex(undefined);
+  }
+
+  function updateTheme(updatedTheme: Theme, index: number) {
+    if (!designSystem) return;
+    saveDesignSystem({
+      designSystem: {
+        ...designSystem,
+        themes: {
+          ...designSystem.themes,
+          otherThemes: designSystem.themes.otherThemes.map((theme, i) => {
+            return i + 1 !== index ? theme : updatedTheme;
+          }),
+        },
+      },
+      isTmp: true,
+    });
+  }
+
+  useEffect(() => {
+    if (activeThemeIndex === undefined && designSystem?.themes.mainTheme) {
+      setActiveThemeIndex(0);
+    }
+  }, [designSystem, activeThemeIndex]);
+
   if (!designSystem) return null;
 
   return (
@@ -109,9 +184,13 @@ function PageThemeCustomizer() {
         centerColor,
         activePaletteWithoutEndSettings,
         activePaletteWithoutSettings,
+        removeTheme,
+        createTheme,
+        tokenFamilies,
+        updateTheme,
       }}
     >
-      <div className="h-full w-full">
+      <div className="h-full w-full relative">
         <SidePanel>
           <ThemeCustomizerComponent />
         </SidePanel>

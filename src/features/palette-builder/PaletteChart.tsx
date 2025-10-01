@@ -2,8 +2,8 @@ import Slider from 'rc-slider';
 import FormComponent from '../../ui/kit/FormComponent';
 import { HANDLE_SLIDER_VERTICAL, ICON_SIZE_MD, RAIL_SLIDER_VERTICAL } from '../../ui/UiConstants';
 import { Line } from 'react-chartjs-2';
-import { useMemo } from 'react';
-import { ChartAxeData, getPaletteChart } from './PaletteChartsUtil';
+import { ChangeEvent, useMemo } from 'react';
+import { AxeData, ChartAxeData, getPaletteChart } from './PaletteChartsUtil';
 import { MdRestartAlt } from 'react-icons/md';
 import { InterpolationColorSpace, PaletteBuild } from '../../domain/PaletteBuilderDomain';
 
@@ -21,6 +21,18 @@ function PaletteChart({
     [axeName, interpolationColorSpace, palette],
   );
 
+  function updateValue(e: ChangeEvent<HTMLInputElement>, axeData: AxeData) {
+    let value = e.target.valueAsNumber;
+    if (Number.isNaN(value)) {
+      console.error('Fail to convert number');
+    } else {
+      value = Math.min(axeData.max, value);
+      value = Math.max(axeData.min, value);
+      axeData.update(value);
+      axeData.onComplete?.();
+    }
+  }
+
   return (
     <FormComponent label={axeLabel} className="w-full">
       <>
@@ -30,10 +42,9 @@ function PaletteChart({
             className="uidt-input"
             min={leftAxeData.min}
             max={leftAxeData.max}
-            value={Number(leftAxeData.value.toFixed(2))}
+            value={leftAxeData.value}
             onChange={(e) => {
-              leftAxeData.update(Number(e.target.value));
-              leftAxeData.onComplete?.();
+              updateValue(e, leftAxeData);
             }}
             step={0.01}
             style={{
@@ -45,14 +56,13 @@ function PaletteChart({
             className="uidt-input"
             min={rightAxeData.min}
             max={rightAxeData.max}
-            value={Number(rightAxeData.value.toFixed(2))}
+            value={rightAxeData.value}
             onChange={(e) => {
-              rightAxeData.update(Number(e.target.value));
-              rightAxeData.onComplete?.();
+              updateValue(e, leftAxeData);
             }}
             step={0.01}
             style={{
-              width: '6px',
+              width: '60px',
             }}
           />
         </div>

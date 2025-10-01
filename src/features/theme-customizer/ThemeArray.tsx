@@ -31,6 +31,7 @@ function ThemeArray({ activeTheme }: { activeTheme: Theme }) {
             <SidePanel.Button
               id="palette-customizer"
               stopClose={true}
+              key={palette.paletteName}
               callback={() => setActivePaletteIndex(paletteIndex)}
             >
               <tr className={styles.paletteRow}>
@@ -63,9 +64,7 @@ function ThemeArray({ activeTheme }: { activeTheme: Theme }) {
                       background: tint.color,
                     }}
                     data-drag-hover={false}
-                  >
-                    {tint.color}
-                  </td>
+                  ></td>
                 ))}
               </tr>
             </SidePanel.Button>
