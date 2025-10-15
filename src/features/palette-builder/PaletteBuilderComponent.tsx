@@ -1,68 +1,59 @@
 import {
   MdAdd,
   MdChevronLeft,
+  MdClose,
   MdDelete,
   MdDone,
   MdDragIndicator,
+  MdEdit,
   MdLocationPin,
   MdRemove,
   MdSave,
   MdSettings,
   MdVisibility,
   MdVisibilityOff,
-} from "react-icons/md";
-import styles from "./PaletteBuilder.module.css";
-import {
-  getRectSize,
-  ICON_SIZE_MD,
-  ICON_SIZE_SM,
-  ICON_SIZE_XL,
-} from "../../ui/UiConstants";
+} from 'react-icons/md';
+import styles from './PaletteBuilder.module.css';
+import { getRectSize, ICON_SIZE_MD, ICON_SIZE_SM, ICON_SIZE_XL } from '../../ui/UiConstants';
 import {
   paletteBuildToDesignSystemPalette,
+  PaletteRecommandationPosition,
+  recommandColorPlacement,
   usePaletteBuilderStore,
-} from "./PaletteBuilderStore";
-import SidePanel from "../../ui/kit/SidePanel";
-import { useMemo, useState } from "react";
-import PaletteSidePanel from "./PaletteSidePanel";
-import FormComponent from "../../ui/kit/FormComponent";
+} from './PaletteBuilderStore';
+import SidePanel from '../../ui/kit/SidePanel';
+import { useEffect, useMemo, useState } from 'react';
+import PaletteSidePanel from './PaletteSidePanel';
+import FormComponent from '../../ui/kit/FormComponent';
 import {
   getTintName,
   isTintsNamingMode,
   TINTS_NAMING_MODE,
   TintsNamingMode,
-} from "../../util/TintsNaming";
-import classNames from "classnames";
-import { ButtonPrimary, ButtonTertiary } from "../../ui/kit/Buttons";
-import Popover from "../../ui/kit/Popover";
-import ColorPickerLinear from "../color-picker/ColorPickerLinear";
-import ColorIO from "colorjs.io";
-import {
-  RemovableIndex,
-  useDraggableFeatures,
-} from "../../util/DraggableContext";
-import PaletteBuilderSettingsSidePanel from "./PaletteBuilderSettingsSidePanel";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {
-  useFindDesignSystem,
-  useSaveDesignSystem,
-} from "../design-system/DesignSystemQueries";
+} from '../../util/TintsNaming';
+import classNames from 'classnames';
+import { ButtonPrimary, ButtonTertiary } from '../../ui/kit/Buttons';
+import Popover from '../../ui/kit/Popover';
+import ColorPickerLinear from '../color-picker/ColorPickerLinear';
+import ColorIO from 'colorjs.io';
+import { RemovableIndex, useDraggableFeatures } from '../../util/DraggableContext';
+import PaletteBuilderSettingsSidePanel from './PaletteBuilderSettingsSidePanel';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useFindDesignSystem, useSaveDesignSystem } from '../design-system/DesignSystemQueries';
 import {
   generateUniquePaletteBuilder,
   generateUniquePaletteKey,
-} from "../../util/DesignSystemUtils";
+} from '../../util/DesignSystemUtils';
 import {
   useFetchDesignSystemPaletteBuilder,
   useSavePaletteBuilder,
   useSavePaletteBuilderIntoDesignSystem,
-} from "./PaletteBuilderQueries";
-import {
-  ALIGNER_OPTIONS,
-  paletteBuildToFile,
-} from "../../domain/PaletteBuilderDomain";
-import { save } from "@tauri-apps/plugin-dialog";
-import { getFilenameDate } from "../../util/DateUtil";
-import ColorPreviewBody from "./ColorPreviewBody";
+} from './PaletteBuilderQueries';
+import { ALIGNER_OPTIONS, paletteBuildToFile } from '../../domain/PaletteBuilderDomain';
+import { save } from '@tauri-apps/plugin-dialog';
+import { getFilenameDate } from '../../util/DateUtil';
+import ColorPreviewBody from './ColorPreviewBody';
+import { OPEN_COLOR_PALETTES } from '../../util/PaletteRecommandationLayerConstants';
 
 function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   const {
@@ -77,26 +68,31 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
     setAlignerSettings,
   } = usePaletteBuilderStore();
   const { steps, tintNamingMode } = settings;
-  const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<
-    number | undefined
-  >(undefined);
+  const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<number | undefined>(undefined);
   const [isSidepanelOpen, setIsSidepanelOpen] = useState(false);
   const [triggerMemo, setTriggerMemo] = useState(1);
   const { designSystemPath } = useParams();
   const [searchParams] = useSearchParams();
   const [triggerOpen, setTriggerOpen] = useState<string | undefined>(undefined);
-  const currentDesignSystem = searchParams.get("currentDesignSystem");
+  const currentDesignSystem = searchParams.get('currentDesignSystem');
   const designSystemPathComputed: string | undefined =
     designSystemPath ?? currentDesignSystem ?? undefined;
   const { saveDesignSystem } = useSaveDesignSystem(designSystemPathComputed);
   const { savePaletteBuilderIntoDesignSystem } =
     useSavePaletteBuilderIntoDesignSystem(designSystemPathComputed);
-  const { designSystemPaletteBuilder } = useFetchDesignSystemPaletteBuilder(
-    designSystemPathComputed
-  );
-  const [colorCreatePalette, setColorCreatePalette] = useState(
-    new ColorIO("blue")
-  );
+  const { designSystemPaletteBuilder } =
+    useFetchDesignSystemPaletteBuilder(designSystemPathComputed);
+  const [colorCreatePalette, setColorCreatePalette] = useState(new ColorIO('blue'));
+  const [indexRecommanded, setIndexRecommanded] = useState<
+    PaletteRecommandationPosition | undefined
+  >(undefined);
+  const [indexSelected, setIndexSelected] = useState<number>(Math.round(steps / 2));
+  const [editPositionMode, setEditPositionMode] = useState(false);
+
+  function togglePositionMode() {
+    setEditPositionMode((val) => !val);
+  }
+
   const stepsArray = useMemo<string[]>(
     () =>
       Array.from({ length: steps }, (_, i) =>
@@ -104,9 +100,9 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
           index: i,
           length: steps,
           mode: tintNamingMode,
-        })
+        }),
       ),
-    [steps, tintNamingMode]
+    [steps, tintNamingMode],
   );
 
   const navigate = useNavigate();
@@ -116,7 +112,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
         dragIndex !== undefined &&
         hoverIndex !== undefined &&
         dragIndex !== hoverIndex &&
-        hoverIndex !== "remove"
+        hoverIndex !== 'remove'
       ) {
         if (selectedPaletteIndex === dragIndex) {
           setSelectedPaletteIndex(hoverIndex);
@@ -124,17 +120,15 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
         movePalette(dragIndex, hoverIndex);
         setTriggerMemo((v) => v + 1);
       }
-      if (dragIndex !== undefined && hoverIndex === "remove") {
+      if (dragIndex !== undefined && hoverIndex === 'remove') {
         deletePalette(palettes[dragIndex].id);
         setTriggerMemo((v) => v + 1);
       }
-    }
+    },
   );
   const { savePaletteBuilder } = useSavePaletteBuilder();
   const { designSystem } = useFindDesignSystem(designSystemPathComputed);
-  const [selectedTintIndex, setSelectedTintIndex] = useState<
-    number | undefined
-  >(undefined);
+  const [selectedTintIndex, setSelectedTintIndex] = useState<number | undefined>(undefined);
 
   function handlePaletteBuilderConfirm(isSave?: boolean) {
     if (designSystem && designSystemPathComputed) {
@@ -145,7 +139,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
           paletteBuilder: {
             metadata: {
               paletteBuilderName: name,
-              path: "",
+              path: '',
               mainColors: [],
             },
             palettes: palettes.map(paletteBuildToFile),
@@ -154,17 +148,12 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
         });
       }
       const newPalettes = [...designSystem.palettes];
-      const palettesBuilderPalettes = palettes.map(
-        paletteBuildToDesignSystemPalette
-      );
+      const palettesBuilderPalettes = palettes.map(paletteBuildToDesignSystemPalette);
       for (const id in palettesBuilderPalettes) {
         const palette = palettesBuilderPalettes[id];
         newPalettes.push({
           ...palette,
-          paletteName: generateUniquePaletteKey(
-            newPalettes,
-            palette.paletteName
-          ),
+          paletteName: generateUniquePaletteKey(newPalettes, palette.paletteName),
         });
       }
       saveDesignSystem({
@@ -178,16 +167,19 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
       reset();
       navigate(
         `/design-system/${encodeURIComponent(
-          designSystemPathComputed
-        )}?editMode=true&scrollComponent=Palettes`
+          designSystemPathComputed,
+        )}?editMode=true&scrollComponent=Palettes`,
       );
     }
   }
 
   function handleCreatePalette() {
-    const palette = createPalette(colorCreatePalette);
+    const palette = createPalette({
+      tint: colorCreatePalette,
+      paletteRecommandationPositon: indexRecommanded,
+    });
     setSelectedPaletteIndex(palettes.length);
-    setTriggerOpen("palette");
+    setTriggerOpen('palette');
     const centerIndex = palette.tints.findIndex((tint) => tint.isCenter);
     setSelectedTintIndex(centerIndex);
   }
@@ -225,19 +217,19 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
 
   async function saveOnComputer() {
     const filePath = await save({
-      title: "Save the palette builder file",
+      title: 'Save the palette builder file',
       defaultPath: `palette-builder-${getFilenameDate()}`,
       filters: [
         {
-          name: "Fichiers YAML",
-          extensions: ["yaml"],
+          name: 'Fichiers YAML',
+          extensions: ['yaml'],
         },
       ],
     });
     if (!filePath) return;
     savePaletteBuilder({
       metadata: {
-        paletteBuilderName: "",
+        paletteBuilderName: '',
         path: filePath,
         mainColors: [],
       },
@@ -251,18 +243,26 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
       selectedPaletteIndex !== undefined && triggerMemo
         ? palettes[selectedPaletteIndex]
         : undefined,
-    [selectedPaletteIndex, palettes, triggerMemo]
+    [selectedPaletteIndex, palettes, triggerMemo],
   );
 
   const alignerLabel = useMemo<string | undefined>(() => {
-    return ALIGNER_OPTIONS.find(
-      (aligner) => aligner.value === alignerSettings.aligner
-    )?.label;
+    return ALIGNER_OPTIONS.find((aligner) => aligner.value === alignerSettings.aligner)?.label;
   }, [alignerSettings]);
 
-  const builderBodyContainerChild = classNames("column gap-3 overflow-hidden", {
+  const builderBodyContainerChild = classNames('column gap-3 overflow-hidden', {
     [styles.rightSidepanelSpace]: isSidepanelOpen,
   });
+
+  useEffect(() => {
+    const recommandation = recommandColorPlacement({
+      color: colorCreatePalette,
+      palettesRecommandationLayout: OPEN_COLOR_PALETTES,
+      steps,
+    });
+    setIndexRecommanded(recommandation);
+    setIndexSelected(recommandation.index);
+  }, [colorCreatePalette, steps]);
 
   return (
     <SidePanel
@@ -282,13 +282,12 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                       onClick={() =>
                         navigate(
                           `/design-system/${encodeURIComponent(
-                            currentDesignSystem
-                          )}?editMode=true&scrollComponent=Palettes`
+                            currentDesignSystem,
+                          )}?editMode=true&scrollComponent=Palettes`,
                         )
                       }
                     >
-                      <MdChevronLeft size={ICON_SIZE_MD} /> Back to design
-                      system
+                      <MdChevronLeft size={ICON_SIZE_MD} /> Back to design system
                     </ButtonTertiary>
                   )}
                   <SidePanel.Button id="settings">
@@ -319,17 +318,11 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                   </div>
                   <FormComponent label="Tints length">
                     <div className="row align-center gap-3">
-                      <button
-                        className="menu-button"
-                        onClick={() => setSteps(steps - 1)}
-                      >
+                      <button className="menu-button" onClick={() => setSteps(steps - 1)}>
                         <MdRemove size={ICON_SIZE_MD} />
                       </button>
                       <strong className="text-color-light">{steps}</strong>
-                      <button
-                        className="menu-button"
-                        onClick={() => setSteps(steps + 1)}
-                      >
+                      <button className="menu-button" onClick={() => setSteps(steps + 1)}>
                         <MdAdd size={ICON_SIZE_MD} />
                       </button>
                     </div>
@@ -372,22 +365,16 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                       >
                         <tr
                           className={styles.paletteRow}
-                          onMouseEnter={() =>
-                            handleDragMouseEnter(paletteIndex)
-                          }
+                          onMouseEnter={() => handleDragMouseEnter(paletteIndex)}
                         >
                           <td
                             className={styles.columnPalette}
                             data-open={selectedPaletteIndex === paletteIndex}
-                            data-drag-hover={
-                              draggableTools.hoverIndex === paletteIndex
-                            }
-                            data-dragged={
-                              draggableTools.dragIndex === paletteIndex
-                            }
+                            data-drag-hover={draggableTools.hoverIndex === paletteIndex}
+                            data-dragged={draggableTools.dragIndex === paletteIndex}
                             data-remove={
                               draggableTools.dragIndex === paletteIndex &&
-                              draggableTools.hoverIndex === "remove"
+                              draggableTools.hoverIndex === 'remove'
                             }
                           >
                             <div className="row align-center gap-2">
@@ -396,9 +383,9 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                 style={{
                                   background: palette.tints
                                     .find((palette) => palette.isCenter)
-                                    ?.color.toString({ format: "hex" }),
+                                    ?.color.toString({ format: 'hex' }),
                                   ...getRectSize({
-                                    height: "var(--uit-space-5)",
+                                    height: 'var(--uit-space-5)',
                                   }),
                                 }}
                               ></div>
@@ -406,9 +393,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                               <div className={styles.dragActionContainer}>
                                 <button
                                   className="action-button"
-                                  onMouseDown={() =>
-                                    handleDragStart(paletteIndex)
-                                  }
+                                  onMouseDown={() => handleDragStart(paletteIndex)}
                                 >
                                   <MdDragIndicator size={ICON_SIZE_SM} />
                                 </button>
@@ -419,12 +404,10 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                             <td
                               key={tint.name}
                               className={styles.columnTint}
-                              data-drag-hover={
-                                draggableTools.hoverIndex === paletteIndex
-                              }
+                              data-drag-hover={draggableTools.hoverIndex === paletteIndex}
                               style={{
                                 background: tint.color.toString({
-                                  format: "hex",
+                                  format: 'hex',
                                 }),
                               }}
                               onClick={() => setSelectedTintIndex(tintIndex)}
@@ -439,12 +422,9 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                 isAnchor={tint.isAnchor}
                                 tints={palette.tints}
                                 isComparedContrastTint={
-                                  tintIndex ===
-                                    alignerSettings.alignerContrastPaletteStep &&
-                                  alignerSettings.aligner ===
-                                    "CONTRAST_COLOR" &&
-                                  alignerSettings.alignerContrastMode ===
-                                    "PALETTE_STEP"
+                                  tintIndex === alignerSettings.alignerContrastPaletteStep &&
+                                  alignerSettings.aligner === 'CONTRAST_COLOR' &&
+                                  alignerSettings.alignerContrastMode === 'PALETTE_STEP'
                                 }
                                 selectedTintIndex={selectedTintIndex}
                               />
@@ -456,23 +436,22 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                       size={ICON_SIZE_XL}
                                       color="var(--uit-palette-primary-200)"
                                       style={{
-                                        position: "absolute",
+                                        position: 'absolute',
                                         top: 0,
-                                        left: "50%",
-                                        transform:
-                                          "translate(-50%, -95%) scale(130%)",
-                                        zIndex:1000
+                                        left: '50%',
+                                        transform: 'translate(-50%, -95%) scale(130%)',
+                                        zIndex: 1000,
                                       }}
                                     />
                                     <MdLocationPin
                                       size={ICON_SIZE_XL}
                                       color="var(--uit-primary-bg)"
                                       style={{
-                                        position: "absolute",
+                                        position: 'absolute',
                                         top: 0,
-                                        left: "50%",
-                                        transform: "translate(-50%, -100%)",
-                                        zIndex:1000
+                                        left: '50%',
+                                        transform: 'translate(-50%, -100%)',
+                                        zIndex: 1000,
                                       }}
                                     />
                                   </>
@@ -499,35 +478,77 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                         className="popover-body"
                         data-disableoutside={true}
                         style={{
-                          width: "280px",
+                          width: '300px',
                         }}
                       >
                         <ColorPickerLinear
                           color={colorCreatePalette}
-                          onChange={(value: ColorIO) =>
-                            setColorCreatePalette(value)
-                          }
+                          onChange={(value: ColorIO) => setColorCreatePalette(value)}
                         />
-                        <div className="row justify-center align-center gap-2">
-                          <div
-                            className="palette-color"
-                            style={{
-                              background: colorCreatePalette.toString({
-                                format: "hex",
-                              }),
-                              ...getRectSize({ height: "var(--uit-space-9)" }),
-                            }}
-                          ></div>
-                          <strong>
-                            {colorCreatePalette.toString({
-                              format: "hex",
-                            })}
-                          </strong>
-                        </div>
-                        <div className="row justify-end">
-                          <Popover.Close closeCallback={handleCreatePalette}>
-                            <ButtonPrimary>Confirm</ButtonPrimary>
-                          </Popover.Close>
+                        <div className="column flex-1 gap-6">
+                          <div className="row align-center justify-center flex-1">
+                            <div className="column gap-2 align-center">
+                              <h5>{indexRecommanded?.paletteRecommandationLayout.paletteName}</h5>
+                              <div
+                                className="palette-color"
+                                style={{
+                                  background: colorCreatePalette.toString({
+                                    format: 'hex',
+                                  }),
+                                  ...getRectSize({ height: 'var(--uit-space-10)' }),
+                                }}
+                              ></div>
+                              <div>
+                                {colorCreatePalette.toString({
+                                  format: 'hex',
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="row align-center justify-between">
+                            <div className="column gap-2 justify-between">
+                              <div className="column gap-2">
+                                <FormComponent label="Color position">
+                                  <div className="row align-center gap-2">
+                                    {editPositionMode ? (
+                                      <select
+                                        value={indexSelected}
+                                        onChange={(e) => setIndexSelected(Number(e.target.value))}
+                                      >
+                                        {stepsArray.map((step, index) => (
+                                          <option value={index}>
+                                            {step}
+                                            {index === indexRecommanded?.index && ' (recommanded)'}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    ) : (
+                                      <div className="column">
+                                        <strong>{stepsArray[indexRecommanded?.index ?? 0]}</strong>
+                                        <small>(recommanded)</small>
+                                      </div>
+                                    )}
+
+                                    <button
+                                      className="action-ghost-button"
+                                      onClick={togglePositionMode}
+                                    >
+                                      {editPositionMode ? (
+                                        <MdClose size={ICON_SIZE_SM} />
+                                      ) : (
+                                        <MdEdit size={ICON_SIZE_SM} />
+                                      )}
+                                    </button>
+                                  </div>
+                                </FormComponent>
+                              </div>
+                            </div>
+                            <div>
+                              <Popover.Close closeCallback={handleCreatePalette}>
+                                <ButtonPrimary>Create palette</ButtonPrimary>
+                              </Popover.Close>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </Popover.Body>
@@ -535,7 +556,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                 ) : (
                   <button
                     className="remove-button w-full table-builder-row-placeholder"
-                    onMouseEnter={() => draggableTools.setHoverIndex("remove")}
+                    onMouseEnter={() => draggableTools.setHoverIndex('remove')}
                   >
                     <MdDelete size={ICON_SIZE_MD} />
                     Remove palette
@@ -560,24 +581,17 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                 </SidePanel.BodyRelative>
                 {palettes.length !== 0 && designSystemPathComputed && (
                   <>
-                    <Popover.Toggle
-                      id="confirm-palette-builder"
-                      positionPayload="bottom-right"
-                    >
+                    <Popover.Toggle id="confirm-palette-builder" positionPayload="bottom-right">
                       <ButtonPrimary>
                         <MdDone size={ICON_SIZE_MD} /> Confirm creation
                       </ButtonPrimary>
                     </Popover.Toggle>
                     <Popover.Body id="confirm-palette-builder" zIndex={100}>
                       <Popover.Actions>
-                        <Popover.Tab
-                          clickEvent={() => handlePaletteBuilderConfirm(true)}
-                        >
+                        <Popover.Tab clickEvent={() => handlePaletteBuilderConfirm(true)}>
                           Confirm + save into design system
                         </Popover.Tab>
-                        <Popover.Tab clickEvent={saveOnComputer}>
-                          Save only
-                        </Popover.Tab>
+                        <Popover.Tab clickEvent={saveOnComputer}>Save only</Popover.Tab>
                         <Popover.Tab clickEvent={handlePaletteBuilderConfirm}>
                           Confirm and clear
                         </Popover.Tab>

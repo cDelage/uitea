@@ -6,7 +6,11 @@ import { v4 } from 'uuid';
 import { Palette } from '../../domain/DesignSystemDomain';
 import { PICKER_MODES, ColorSpace, PickerAxe } from '../../util/PickerUtil';
 import { moveItem } from '../../util/ArrayMove';
-import { linearPieceInterpolation } from '../../util/Interpolation';
+import {
+  linearCenterWeight,
+  linearInterpolationBetweenPoints,
+  linearPieceInterpolation,
+} from '../../util/Interpolation';
 import {
   PalettesStoreSettings,
   TintBuild,
@@ -20,10 +24,16 @@ import {
 } from '../../domain/PaletteBuilderDomain';
 import { invoke } from '@tauri-apps/api/core';
 import { CanUndoRedo } from '../../util/UndoRedo';
+import { recolorWithNewBackground } from '../../util/ThemeGenerator';
 
 export interface Point {
   x: number;
   y: number;
+}
+
+export interface PaletteRecommandationPosition {
+  paletteRecommandationLayout: Palette;
+  index: number;
 }
 
 interface PaletteBuilderStore {
@@ -31,7 +41,10 @@ interface PaletteBuilderStore {
   settings: PalettesStoreSettings;
   alignerSettings: AlignerSettings;
   canUndoRedo: CanUndoRedo;
-  createPalette: (tint?: ColorIO) => PaletteBuild;
+  createPalette: (params: {
+    tint: ColorIO;
+    paletteRecommandationPositon?: PaletteRecommandationPosition;
+  }) => PaletteBuild;
   createPaletteFromExisting: (palette: PaletteBuild, color: ColorRecommanded) => void;
   updatePalettes: () => void;
   updatePalette: (index: number, palette: PaletteBuild, stopUndoRedo?: boolean) => void;
@@ -72,15 +85,24 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
     canUndo: false,
     canRedo: false,
   },
-  createPalette(tint?: ColorIO) {
+  createPalette({
+    tint,
+    paletteRecommandationPositon,
+  }: {
+    tint: ColorIO;
+    paletteRecommandationPositon?: PaletteRecommandationPosition;
+  }) {
     const { settings, doPaletteBuilder } = get();
-    const paletteTint = new ColorIO(tint ?? '#DDDDDD');
-    const [startColor, endColor] = getEndsTints({
-      color: paletteTint,
+    const paletteTint: ColorIO = new ColorIO(tint);
+
+    const centerTint: ColorIO = getPaletteCenterColor({ tint, paletteRecommandationPositon });
+
+    const [startColor, endColor]: [ColorIO, ColorIO] = getEndsTints({
+      color: centerTint,
       settings: settings.paletteSettings,
       interpolationColorSpace: settings.interpolationColorSpace,
     });
-    const tintPrebuild: TintBuild[] = [startColor, paletteTint, endColor].map((color, index) => {
+    const tintPrebuild: TintBuild[] = [startColor, centerTint, endColor].map((color, index) => {
       return {
         name: getTintName({
           index,
@@ -522,25 +544,48 @@ interface ReduceColors {
 
 function constructTints(originalTints: TintBuild[], settings: PalettesStoreSettings): TintBuild[] {
   const { interpolationColorSpace, tintNamingMode, steps } = settings;
+
+  //Center & ends tints
+  const centerEndsTints = originalTints.filter((tint, index) => {
+    return tint.isCenter || index === 0 || index === originalTints.length - 1;
+  });
+
+  //Anchor tints
+  const anchorIndexedTints = originalTints.filter((tint, index) => {
+    return (
+      !tint.isCenter ||
+      index !== 0 ||
+      (index !== originalTints.length - 1 && tint.indexPosition !== undefined)
+    );
+  });
+
   //Step 1 : construct an array with the fixed colors : [Color, undefined, undefined, Color...]
   const anchorTints: (TintBuild | undefined)[] = Array.from({ length: steps }, (_, i) => {
-    if (i === 0) {
-      return originalTints[0];
+    const indexedTint = anchorIndexedTints.find((tint) => tint.indexPosition === i);
+    if (indexedTint) {
+      return indexedTint;
     }
+
+    if (i === 0) {
+      return centerEndsTints[0];
+    }
+
     if (i === Math.floor(steps / 2)) {
       return (
         originalTints.find((tint) => tint.isCenter) ?? {
-          ...originalTints[Math.floor(originalTints.length / 2)],
+          ...centerEndsTints[Math.floor(centerEndsTints.length / 2)],
           isCenter: true,
         }
       );
     }
     if (i === steps - 1) {
-      return originalTints[originalTints.length - 1];
+      return centerEndsTints[centerEndsTints.length - 1];
     }
+
+    /*
     if (originalTints[i]?.isAnchor && i !== steps - 1 && !originalTints[i]?.isCenter) {
       return originalTints[i];
-    }
+    }*/
     return undefined;
   });
 
@@ -548,6 +593,7 @@ function constructTints(originalTints: TintBuild[], settings: PalettesStoreSetti
   const reducedTints = anchorTints.reduce<ReduceColors>(
     (acc, tint, index) => {
       if (acc.colors[index]) {
+        //Case 1 : The tint already exist into array
         return {
           ...acc,
           previousColor: tint
@@ -558,12 +604,14 @@ function constructTints(originalTints: TintBuild[], settings: PalettesStoreSetti
             : acc.previousColor,
         };
       } else if (tint) {
+        //Case 2 : the tint exist but not push into array
         return {
           ...acc,
           previousColor: { color: tint.color, index },
           colors: [...acc.colors, tint.color],
         };
       } else {
+        //Case 3 : calculate next undefined tints by get the next & the previous
         const nextColor: ColorPositionIndex = anchorTints
           .map((e, i) => {
             return {
@@ -759,4 +807,146 @@ export function paletteBuildToDesignSystemPalette(palette: PaletteBuild): Palett
       };
     }),
   };
+}
+
+export function recommandColorPlacement({
+  steps,
+  palettesRecommandationLayout,
+  color,
+}: {
+  steps: number;
+  palettesRecommandationLayout: Palette[];
+  color: ColorIO;
+}): PaletteRecommandationPosition {
+  const paletteRecommandation: Palette = chooseClosestPalette({
+    color,
+    palettesRecommandationLayout,
+  });
+
+  const indexClosestColor: number = findClosestColor(color, paletteRecommandation).index;
+
+  return {
+    index: Math.round((indexClosestColor / (paletteRecommandation.tints.length - 1)) * (steps - 1)),
+    paletteRecommandationLayout: paletteRecommandation,
+  };
+}
+
+// choose the color palette that is visually closest
+export function chooseClosestPalette({
+  palettesRecommandationLayout,
+  color,
+}: {
+  palettesRecommandationLayout: Palette[];
+  color: ColorIO;
+}): Palette {
+  return palettesRecommandationLayout.reduce((resultPalette, currentPalette) => {
+    const currentCenterTint: ColorIO = findClosestColor(color, currentPalette).color;
+    const resultCenterTint: ColorIO = findClosestColor(color, resultPalette).color;
+
+    const distCurrent = currentCenterTint.deltaE76(color);
+    const distResult = resultCenterTint.deltaE76(color);
+
+    return distCurrent < distResult ? currentPalette : resultPalette;
+  }, palettesRecommandationLayout[0]);
+}
+
+function findClosestColor(
+  color: ColorIO,
+  palette: Palette,
+): {
+  index: number;
+  color: ColorIO;
+} {
+  return palette.tints.reduce(
+    (acc, cur, curIndex) => {
+      const accDelta = acc.color.deltaE76(color);
+      const curColor = new ColorIO(cur.color);
+      const curDelta = curColor.deltaE76(color);
+
+      return accDelta < curDelta
+        ? acc
+        : {
+            index: curIndex,
+            color: curColor,
+          };
+    },
+    {
+      index: 0,
+      color: new ColorIO(palette.tints[0].color),
+    },
+  );
+}
+
+function getPaletteCenterColor({
+  tint,
+  paletteRecommandationPositon,
+}: {
+  tint: ColorIO;
+  paletteRecommandationPositon?: PaletteRecommandationPosition;
+}): ColorIO {
+  if (!paletteRecommandationPositon) return tint;
+
+  const { index, paletteRecommandationLayout } = paletteRecommandationPositon;
+
+  if (index === Math.round(paletteRecommandationLayout.tints.length / 2)) return tint;
+
+  const centerColor = new ColorIO(
+    paletteRecommandationLayout.tints[
+      Math.round(paletteRecommandationLayout.tints.length / 2)
+    ].color,
+  );
+
+  const defaultCenter = new ColorIO(paletteRecommandationLayout.tints[index].color);
+
+  const newCenter = recalcNewCenter({
+    tint,
+    index,
+    length: paletteRecommandationLayout.tints.length - 1,
+    originalTint: defaultCenter,
+  });
+
+  return recolorWithNewBackground({
+    defaultCenter,
+    defaultColor: centerColor,
+    newCenter,
+  });
+}
+
+/**
+ * Calculate the new center tint to create the palette center color
+ * (to spread the effect of new lightness & new saturation, but keep the changes of hue)
+ */
+function recalcNewCenter({
+  tint,
+  index,
+  length,
+  originalTint,
+}: {
+  tint: ColorIO;
+  index: number;
+  length: number;
+  originalTint: ColorIO;
+}): ColorIO {
+  const indice = linearCenterWeight(index, length);
+
+  const originalSaturation = originalTint.get('okhsl.s');
+  const originalLight = originalTint.get('okhsl.l');
+
+  const newSaturation = tint.get('okhsl.s');
+  const newLight = tint.get('okhsl.l');
+  const newHue = tint.get('okhsl.h');
+
+  const l = linearInterpolationBetweenPoints({
+    pointA: originalLight,
+    pointB: newLight,
+    positionX: indice,
+  });
+
+  const s = linearInterpolationBetweenPoints({
+    pointA: originalSaturation,
+    pointB: newSaturation,
+    positionX: indice,
+  });
+
+  return new ColorIO('okhsl', [newHue, s, l]);
 }

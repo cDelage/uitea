@@ -202,3 +202,44 @@ export function interpolateBetweenIndices({
   if (t >= 1) return 1;
   return t; // linéaire dans (0,1)
 }
+
+/**
+ * Calcule une pondération linéaire centrée.
+ *
+ * La valeur renvoyée est 1 au centre du tableau et diminue linéairement vers 0 aux extrémités.
+ * Exemple : pour une longueur de 9, le centre est à l'index 4 (Math.round(9 / 2) = 5 - 1 = 4)
+ * Les extrémités (index 0 et 8) valent 0, et les valeurs intermédiaires décroissent linéairement.
+ *
+ * @param index - L'index actuel (0 à length - 1)
+ * @param length - La longueur totale du tableau
+ * @returns Une valeur comprise entre 0 et 1
+ */
+export function linearCenterWeight(index: number, length: number): number {
+  if (length <= 1) return 1;
+
+  const center = (length - 1) / 2;
+  const maxDistance = center; // distance max entre le centre et un bord
+  const distance = Math.abs(index - center);
+
+  // Valeur linéaire entre 1 (au centre) et 0 (aux extrémités)
+  return 1 - distance / maxDistance;
+}
+
+/**
+ * Interpolation linéaire entre deux points.
+ * @param pointA - Valeur de départ (quand positionX = 0)
+ * @param pointB - Valeur d'arrivée (quand positionX = 1)
+ * @param positionX - Position entre 0 et 1 (0 → pointA, 1 → pointB)
+ * @returns Valeur interpolée entre pointA et pointB
+ */
+export function linearInterpolationBetweenPoints({
+  pointA,
+  pointB,
+  positionX,
+}: {
+  pointA: number;
+  pointB: number;
+  positionX: number;
+}): number {
+  return pointA + (pointB - pointA) * positionX;
+}

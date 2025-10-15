@@ -177,7 +177,7 @@ export const GlobalStyle = createGlobalStyle`
     --uit-tertiary-text: var(--uit-palette-gray-600);
     --uit-tertiary-border: var(--uit-palette-gray-300);
     --uit-tertiary-hover-bg: var(--uit-palette-gray-200);
-    --uit-tertiary-hover-text: var(--uit-palette-gray-700);
+    --uit-tertiary-hover-text: var(--uit-palette-gray-800);
     --uit-tertiary-hover-border: var(--uit-palette-gray-400);
   
     --uit-base-button-hover-bg: rgb(212, 212, 216, 0.3);
@@ -1553,4 +1553,17 @@ export const GlobalStyle = createGlobalStyle`
     background-color: var(--uit-base-border);
     box-sizing: border-box;
     }
+
+  .action-text {
+    color: var(--uit-tertiary-text);
+    text-decoration-line: underline;
+    text-decoration-color: var(--uit-tertiary-border);
+    background-color: transparent;
+    padding: 0px;
+  }
+
+  .action-text:hover {
+    color: var(--uit-tertiary-hover-text);
+    text-decoration-color: var(--uit-tertiary-hover-border);  
+  }
 `;

@@ -65,14 +65,14 @@ export interface Palette {
   tints: Tint[];
 }
 
-export interface IndependantColors {
-  white: string;
-  independantColors: Tint[];
-}
-
 export interface Tint {
   label: string;
   color: string;
+}
+
+export interface IndependantColors {
+  white: string;
+  independantColors: Tint[];
 }
 
 export interface DesignToken {

@@ -23,7 +23,7 @@ interface EndsSettingsUtil {
   palette: Palette;
 }
 
-function recolorPaletteColor({
+export function recolorPaletteColor({
   defaultColor,
   newCenter,
   defaultCenter,
@@ -75,7 +75,7 @@ function recolorPaletteColor({
   return recolor;
 }
 
-function recolorWithNewBackground({
+export function recolorWithNewBackground({
   defaultColor,
   newCenter,
   defaultCenter,
@@ -328,45 +328,6 @@ export function applyPaletteEndsSetting({
 
   return result;
 }
-
-/*
-function computeEndSettingAxeGap({
-  endSetting: { attribute },
-  endSettingUtils: { centerIndex, maxIndexPalette, index, centerColor, palette },
-  axe,
-}: {
-  endSetting: PaletteThemeSetting;
-  palette: Palette;
-  axe: string;
-  endSettingUtils: EndsSettingsUtil;
-}): number {
-  const isLeftSetting: boolean = LeftEndSettingsAttributes.includes(attribute);
-  const endIndex = isLeftSetting ? 0 : maxIndexPalette;
-  const currentTint = new ColorIO(palette.tints[endIndex].color);
-
-  const coefficient = interpolateBetweenIndices({
-    centerIndex,
-    endIndex,
-    index,
-  });
-
-  //Lightness gap treatment
-  if (axe === 'l') {
-    const lightnessAxe = { ...OKHSL.axes[2] };
-
-    const isLightest = centerColor.get('okhsl.l') < currentTint.get('okhsl.l');
-
-    const initialValue = mapRange({
-      min: isLightest ? lightnessAxe.max : lightnessAxe.min,
-      max: centerColor.get('okhsl.l'),
-      value: currentTint.get('okhsl.l'),
-      newMin: 0,
-      newMax: 1,
-    });
-  }
-
-  return 0;
-}*/
 
 function getEndsSettingsUtils({
   endPaletteSettings,

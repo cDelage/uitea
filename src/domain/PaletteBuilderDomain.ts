@@ -42,6 +42,7 @@ export interface TintBuild {
   name: string;
   isAnchor?: boolean;
   isCenter?: boolean;
+  indexPosition?: number;
   color: ColorIO;
 }
 
