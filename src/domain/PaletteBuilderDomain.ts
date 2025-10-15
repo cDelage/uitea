@@ -75,7 +75,6 @@ export interface PaletteSettings {
 export interface PalettesStoreSettings {
   steps: number;
   tintNamingMode: TintsNamingMode;
-  interpolationColorSpace: InterpolationColorSpace;
   paletteSettings: PaletteSettings;
 }
 

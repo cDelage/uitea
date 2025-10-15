@@ -41,14 +41,8 @@ function PaletteSidePanel({
   selectedTintIndex: number | undefined;
   setSelectedTintIndex: (value: number | undefined) => void;
 }) {
-  const {
-    updatePalette,
-    createPaletteFromExisting,
-    deletePalette,
-    settings: { interpolationColorSpace },
-    palettes,
-    doPaletteBuilder,
-  } = usePaletteBuilderStore();
+  const { updatePalette, createPaletteFromExisting, deletePalette, palettes, doPaletteBuilder } =
+    usePaletteBuilderStore();
   const { closeModal } = useSidepanelContext();
   const centerTint = useMemo<TintBuild | undefined>(
     () => (palette ? palette.tints.find((color) => color.isCenter) : undefined),
@@ -84,7 +78,6 @@ function PaletteSidePanel({
   );
 
   const chartsAxeData = usePaletteBuilderChartAxeData({
-    interpolationColorSpace,
     palette,
     index,
   });
@@ -125,7 +118,6 @@ function PaletteSidePanel({
           color: centerTint.color,
           settings: palette.settings,
           existingTints: newPalette.tints,
-          interpolationColorSpace: interpolationColorSpace,
         });
         newPalette.tints[0] = {
           ...newPalette.tints[0],
@@ -527,7 +519,7 @@ function PaletteSidePanel({
               {chartsAxeData.map((axeData) => (
                 <PaletteChart
                   key={axeData.axeName}
-                  interpolationColorSpace={interpolationColorSpace}
+                  interpolationColorSpace="okhsl"
                   chartAxeData={axeData}
                   palette={palette}
                 />

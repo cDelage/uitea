@@ -2,6 +2,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import {
   ColorSpace,
   DEFAULT_PICKER_MODE,
+  OKHSL,
   PICKER_MODES,
   PickerAxe,
   PickerAxeName,
@@ -39,11 +40,9 @@ export interface ChartAxeData {
 }
 
 export function usePaletteBuilderChartAxeData({
-  interpolationColorSpace,
   palette,
   index,
 }: {
-  interpolationColorSpace: InterpolationColorSpace;
   palette?: PaletteBuild;
   index?: number;
 }): [ChartAxeData, ChartAxeData, ChartAxeData] | undefined {
@@ -70,11 +69,8 @@ export function usePaletteBuilderChartAxeData({
 
   if (!palette || index === undefined) return undefined;
 
-  const pickerMode =
-    PICKER_MODES.find((picker) => picker.space === interpolationColorSpace) ?? DEFAULT_PICKER_MODE;
-  const satChromaAxe =
-    pickerMode.axes.find((axe) => axe.name === 'c' || axe.name === 's') ?? pickerMode.axes[1];
-  const hueAxe = pickerMode.axes.find((axe) => axe.name === 'h') ?? pickerMode.axes[2];
+  const saturationAxe = OKHSL.axes[1];
+  const hueAxe = OKHSL.axes[0];
 
   const leftColor: ColorIO = palette.tints[0].color;
   const centerColor: ColorIO =
@@ -84,50 +80,42 @@ export function usePaletteBuilderChartAxeData({
 
   const colorCenterLeft = centerColor
     .mix('#ffffff', palette.settings.lightnessLeft, {
-      space: 'oklch',
+      space: 'okhsl',
     })
-    .set({
-      [`${interpolationColorSpace}.h`]: leftColor.get(`${interpolationColorSpace}.h`),
-    });
+    .set('okhsl.h', leftColor.get(`okhsl.h`));
 
   const colorCenterRight = centerColor
     .mix('#000000', 1 - palette.settings.lightnessRight, {
-      space: 'oklch',
+      space: 'okhsl',
     })
-    .set({
-      [`${interpolationColorSpace}.h`]: rightColor.get(`${interpolationColorSpace}.h`),
-    });
+    .set('okhsl.h', rightColor.get(`okhsl.h`));
 
   const leftSatChromaGradient = computeChartAxeGradient({
     centerColor: colorCenterLeft,
-    axe: satChromaAxe,
-    interpolationColorSpace,
+    axe: saturationAxe,
   });
 
   const rightSatChromaGradient = computeChartAxeGradient({
     centerColor: colorCenterRight,
-    axe: satChromaAxe,
-    interpolationColorSpace,
+    axe: saturationAxe,
   });
 
   const leftHueGradient = computeChartAxeGradient({
     centerColor: colorCenterLeft,
     axe: {
       ...hueAxe,
-      min: colorCenterRight.get(`${interpolationColorSpace}.h`) - 20,
-      max: colorCenterRight.get(`${interpolationColorSpace}.h`) + 20,
+      min: colorCenterRight.get('okhsl.h') - 20,
+      max: colorCenterRight.get('okhsl.h') + 20,
     },
-    interpolationColorSpace,
   });
 
   const rightHueGradient = computeChartAxeGradient({
     centerColor: colorCenterRight,
     axe: {
       ...hueAxe,
-      min: colorCenterRight.get(`${interpolationColorSpace}.h`) - 20,
-      max: colorCenterRight.get(`${interpolationColorSpace}.h`) + 20,
+      min: colorCenterRight.get('okhsl.h') - 20,
+      max: colorCenterRight.get('okhsl.h') + 20,
     },
-    interpolationColorSpace,
   });
 
   const leftLightnessAxe: AxeData = {
@@ -228,8 +216,8 @@ export function usePaletteBuilderChartAxeData({
       rightAxeData: rightLightnessAxe,
     },
     {
-      axeName: satChromaAxe.name,
-      axeLabel: satChromaAxe.label,
+      axeName: saturationAxe.name,
+      axeLabel: saturationAxe.label,
       leftAxeData: leftSatChromaAxe,
       rightAxeData: rightSatChromaAxe,
     },
@@ -244,19 +232,17 @@ export function usePaletteBuilderChartAxeData({
 
 export function computeChartAxeGradient({
   centerColor,
-  interpolationColorSpace,
   axe,
 }: {
   centerColor: ColorIO;
-  interpolationColorSpace: InterpolationColorSpace;
   axe: PickerAxe;
 }): string {
   const startColor = centerColor.clone().set({
-    [`${interpolationColorSpace}.${axe.name}`]: axe.max,
+    [`okhsl.${axe.name}`]: axe.max,
   });
 
   const endColor = centerColor.clone().set({
-    [`${interpolationColorSpace}.${axe.name}`]: axe.min,
+    [`okhsl.${axe.name}`]: axe.min,
   });
 
   return `${startColor.toString({

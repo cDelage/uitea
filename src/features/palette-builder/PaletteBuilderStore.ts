@@ -4,7 +4,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import ColorIO from 'colorjs.io';
 import { v4 } from 'uuid';
 import { Palette } from '../../domain/DesignSystemDomain';
-import { PICKER_MODES, ColorSpace, PickerAxe } from '../../util/PickerUtil';
+import { PickerAxe, OKHSL } from '../../util/PickerUtil';
 import { moveItem } from '../../util/ArrayMove';
 import {
   linearCenterWeight,
@@ -64,7 +64,6 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
   settings: {
     steps: 11,
     tintNamingMode: '50,100,200...900,950',
-    interpolationColorSpace: 'oklch',
     paletteSettings: {
       lightnessLeft: 0.9,
       lightnessRight: 0.3,
@@ -100,7 +99,6 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
     const [startColor, endColor]: [ColorIO, ColorIO] = getEndsTints({
       color: centerTint,
       settings: settings.paletteSettings,
-      interpolationColorSpace: settings.interpolationColorSpace,
     });
     const tintPrebuild: TintBuild[] = [startColor, centerTint, endColor].map((color, index) => {
       return {
@@ -135,7 +133,6 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
     const [startColor, endColor] = getEndsTints({
       color: colorRecommanded.color,
       settings: palette.settings,
-      interpolationColorSpace: settings.interpolationColorSpace,
     });
     const tints: TintBuild[] = palette.tints.map((tint, index) => {
       let color = tint.color;
@@ -149,10 +146,10 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
         color = colorRecommanded.color;
       }
       if (tint.isAnchor) {
-        const newColor = new ColorIO('oklch', [
-          tint.color.oklch[0],
-          tint.color.oklch[1],
-          colorRecommanded.color.oklch[2],
+        const newColor = new ColorIO('okhsl', [
+          tint.color.okhsl[0],
+          tint.color.okhsl[1],
+          colorRecommanded.color.okhsl[2],
         ]);
         color = hwbHueAligner({
           newColor: newColor,
@@ -204,7 +201,6 @@ export const usePaletteBuilderStore = create<PaletteBuilderStore>((set, get) => 
         color: centerTint.color,
         settings: newPalette.settings,
         existingTints: newPalette.tints,
-        interpolationColorSpace: settings.interpolationColorSpace,
       });
       const tints = constructTints(
         newPalette.tints.map((tint, index) => {
@@ -393,72 +389,65 @@ export function getEndsTints({
   color,
   existingTints,
   settings,
-  interpolationColorSpace,
 }: {
   color: ColorIO;
   settings: PaletteSettings;
   existingTints?: TintBuild[];
-  interpolationColorSpace: InterpolationColorSpace;
 }): [ColorIO, ColorIO] {
   const startColor = color.mix('#ffffff', settings.lightnessLeft, {
-    space: 'oklch',
+    space: 'okhsl',
   });
   const endColor = color.mix('#000000', 1 - settings.lightnessRight, {
-    space: 'oklch',
+    space: 'okhsl',
   });
   const centerTintIndex = existingTints?.findIndex((tint) => tint.isCenter);
   if (centerTintIndex !== undefined && centerTintIndex !== -1) {
+    //Find anchor between ends and center, to align hue
     const leftAnchor = existingTints?.find(
       (tint, index) => tint.isAnchor && index < centerTintIndex,
     );
+    if (leftAnchor) {
+      startColor.set({
+        'okhsl.h': leftAnchor.color.get('okhsl.h'),
+      });
+    }
+
     const rightAnchor = existingTints
       ? [...existingTints]
           ?.reverse()
           .find((tint, index) => tint.isAnchor && index < centerTintIndex)
       : undefined;
-    if (leftAnchor) {
-      startColor.set({
-        'oklch.h': leftAnchor.color.get('oklch.h'),
-      });
-    }
     if (rightAnchor) {
       endColor.set({
-        'oklch.h': rightAnchor.color.get('oklch.h'),
+        'okhsl.h': rightAnchor.color.get('okhsl.h'),
       });
     }
 
-    const picker: ColorSpace | undefined = PICKER_MODES.find(
-      (mode) => mode.space === interpolationColorSpace,
-    );
-    const satChromaAxe: PickerAxe | undefined = picker?.axes.find(
-      (axe) => axe.name === 's' || axe.name === 'c',
-    );
-    const hueAxe: PickerAxe | undefined = picker?.axes.find((axe) => axe.name === 'h');
+    const satChromaAxe: PickerAxe = OKHSL.axes[1];
+    const hueAxe: PickerAxe = OKHSL.axes[0];
 
     if (settings.satChromaGapLeft !== 0.5 && satChromaAxe) {
       const colorPoints = getColorAxeToPoints({
         axe: satChromaAxe,
         centerColor: startColor,
-        interpolationColorSpace,
         positionX: settings.satChromaGapLeft,
       });
       const newSatChroma = linearPieceInterpolation(colorPoints);
-      startColor.set(`${interpolationColorSpace}.${satChromaAxe.name}`, newSatChroma);
+      startColor.set(`okhsl.${satChromaAxe.name}`, newSatChroma);
     }
 
     if (settings.satChromaGapRight !== 0.5 && satChromaAxe) {
       const colorPoints = getColorAxeToPoints({
         axe: satChromaAxe,
         centerColor: endColor,
-        interpolationColorSpace,
         positionX: settings.satChromaGapRight,
       });
       const newSatChroma = linearPieceInterpolation(colorPoints);
-      endColor.set(`${interpolationColorSpace}.${satChromaAxe.name}`, newSatChroma);
+      endColor.set(`okhsl.${satChromaAxe.name}`, newSatChroma);
     }
 
     if (settings.hueGapLeft !== 0.5 && hueAxe) {
-      const startHue = startColor.get(`${interpolationColorSpace}.h`);
+      const startHue = startColor.get('okhsl.h');
       const colorPoints = getColorAxeToPoints({
         axe: {
           ...hueAxe,
@@ -466,15 +455,14 @@ export function getEndsTints({
           max: startHue + 30,
         },
         centerColor: startColor,
-        interpolationColorSpace,
         positionX: settings.hueGapLeft,
       });
       const newHue = linearPieceInterpolation(colorPoints);
-      startColor.set(`${interpolationColorSpace}.${hueAxe.name}`, newHue);
+      startColor.set('okhsl.h', newHue);
     }
 
     if (settings.hueGapRight !== 0.5 && hueAxe) {
-      const endHue = endColor.get(`${interpolationColorSpace}.h`);
+      const endHue = endColor.get('okhsl.h');
       const colorPoints = getColorAxeToPoints({
         axe: {
           ...hueAxe,
@@ -482,11 +470,10 @@ export function getEndsTints({
           max: endHue + 20,
         },
         centerColor: endColor,
-        interpolationColorSpace,
         positionX: settings.hueGapRight,
       });
       const newHue = linearPieceInterpolation(colorPoints);
-      endColor.set(`${interpolationColorSpace}.${hueAxe.name}`, newHue);
+      endColor.set('okhsl.h', newHue);
     }
   }
   return [startColor, endColor];
@@ -496,12 +483,10 @@ function getColorAxeToPoints({
   axe,
   positionX,
   centerColor,
-  interpolationColorSpace,
 }: {
   axe: PickerAxe;
   positionX: number;
   centerColor: ColorIO;
-  interpolationColorSpace: InterpolationColorSpace;
 }): {
   min: Point;
   max: Point;
@@ -515,7 +500,7 @@ function getColorAxeToPoints({
     },
     center: {
       x: 0.5,
-      y: centerColor.get(`${interpolationColorSpace}.${axe.name}`),
+      y: centerColor.get(`okhsl.${axe.name}`),
     },
     max: {
       x: 1,
@@ -543,7 +528,7 @@ interface ReduceColors {
 }
 
 function constructTints(originalTints: TintBuild[], settings: PalettesStoreSettings): TintBuild[] {
-  const { interpolationColorSpace, tintNamingMode, steps } = settings;
+  const { tintNamingMode, steps } = settings;
 
   //Center & ends tints
   const centerEndsTints = originalTints.filter((tint, index) => {
@@ -626,7 +611,7 @@ function constructTints(originalTints: TintBuild[], settings: PalettesStoreSetti
           return acc;
         }
         const colors = acc.previousColor.color.steps(nextColor.color, {
-          space: interpolationColorSpace,
+          space: 'okhsl',
           steps: subSteps,
         });
         colors.shift();
@@ -728,9 +713,9 @@ export function getColorRecommanded({
 }): ColorRecommanded {
   const colorRecommanded = new ColorIO(color);
   colorRecommanded.set({
-    'oklch.l': colorRecommanded.oklch[0],
-    'oklch.c': colorRecommanded.oklch[1],
-    'oklch.h': (colorRecommanded.oklch[2] + gap) % 360,
+    'okhsl.l': colorRecommanded.okhsl[2],
+    'okhsl.s': colorRecommanded.okhsl[1],
+    'okhsl.h': (colorRecommanded.okhsl[0] + gap) % 360,
   });
   colorRecommanded.set({
     'hwb.h': colorRecommanded.hwb[0],
@@ -752,7 +737,7 @@ export function getColorRecommanded({
 }
 
 export function getColorsRecommanded(palettes: PaletteBuild[], color?: ColorIO): FlagColors[] {
-  const hue = color?.get('oklch.h');
+  const hue = color?.get('okhsl.h');
   if (color && hue && !Number.isNaN(hue)) {
     const existingTints: string[] = palettes.map((palette) => {
       const tint = palette.tints.find(
