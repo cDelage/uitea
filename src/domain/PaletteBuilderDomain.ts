@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { TintsNamingMode } from '../util/TintsNaming';
 import ColorIO from 'colorjs.io';
+import { Palette } from './DesignSystemDomain';
 export type InterpolationColorSpace = 'oklch' | 'lch' | 'hsl' | 'okhsl';
 
 type InterpolationColorSpaceWithLabel = {
@@ -26,8 +27,8 @@ export const INTERPOLATIONS_COLOR_SPACES: InterpolationColorSpaceWithLabel[] = [
 export type PaletteAxeSetting =
   | 'lightnessLeft'
   | 'lightnessRight'
-  | 'satChromaGapLeft'
-  | 'satChromaGapRight'
+  | 'saturationGapLeft'
+  | 'saturationGapRight'
   | 'hueGapLeft'
   | 'hueGapRight';
 
@@ -36,6 +37,7 @@ export interface PaletteBuild {
   name: string;
   tints: TintBuild[];
   settings: PaletteSettings;
+  referentialPalette?: Palette;
 }
 
 export interface TintBuild {
@@ -63,12 +65,12 @@ export interface TintBuildFile {
 export interface PaletteSettings {
   lightnessLeft: number;
   lightnessRight: number;
-  satChromaGapLeft: number;
-  satChromaGapRight: number;
+  saturationGapLeft: number;
+  saturationGapRight: number;
   hueGapLeft: number;
   hueGapRight: number;
   lightnessCenter?: number;
-  satChromaCenter?: number;
+  saturationCenter?: number;
   hueGapCenter?: number;
 }
 
@@ -76,6 +78,7 @@ export interface PalettesStoreSettings {
   steps: number;
   tintNamingMode: TintsNamingMode;
   paletteSettings: PaletteSettings;
+  referentialPalettes: Palette[];
 }
 
 export interface PaletteBuilderMetadata {
@@ -214,3 +217,44 @@ export type AlignerValue = {
   icon: FC;
   value: string;
 };
+
+export type ColorRecommandedFlag = 'complementary' | 'square' | 'triad' | 'others' | 'gray';
+
+export const COLOR_FLAGS: ColorRecommandedFlag[] = [
+  'complementary',
+  'square',
+  'triad',
+  'others',
+  'gray',
+];
+
+export interface ColorRecommanded {
+  name: string;
+  color: ColorIO;
+}
+
+export interface FlagColorsPayload {
+  colorRecommanded: ColorIO;
+  defaultColorRecommanded: ColorIO;
+  referentialPalette: Palette;
+}
+
+export interface FlagColors {
+  flag: ColorRecommandedFlag;
+  colors: FlagColorsPayload[];
+}
+
+export interface FlagPalettes {
+  flag: ColorRecommandedFlag;
+  palettes: PaletteBuild[];
+}
+
+export interface FlagColorsToRecommand {
+  flag: ColorRecommandedFlag;
+  gap: number[];
+}
+
+export interface ColorSettings {
+  lightness: number;
+  saturation: number;
+}

@@ -50,7 +50,7 @@ export function recolorPaletteColor({
     const [h, s, l] = centerColor.okhsl;
     centerColor = new ColorIO('okhsl', [
       h + (paletteSettingsPayload.hueGapCenter ?? 0),
-      s + (paletteSettingsPayload.satChromaCenter ?? 0),
+      s + (paletteSettingsPayload.saturationCenter ?? 0),
       l + (paletteSettingsPayload.lightnessCenter ?? 0),
     ]);
 
@@ -145,7 +145,10 @@ export function recolorPalettes({
   if (isReversed) {
     const [paletteMin, paletteMax] = palettes.reduce<ColorIO[]>((acc, current) => {
       const paletteMin = new ColorIO(current.tints[0].color);
-      if (!acc.length || defaultBgColor.deltaE76(acc[0]) > defaultBgColor.deltaE76(paletteMin)) {
+      if (
+        !acc.length ||
+        defaultBgColor.deltaE2000(acc[0]) > defaultBgColor.deltaE2000(paletteMin)
+      ) {
         return [
           new ColorIO(current.tints[0].color),
           new ColorIO(current.tints[current.tints.length - 1].color),
@@ -240,7 +243,7 @@ export function recolorPalettes({
 
 interface PaletteCenterSettingsPayload {
   hueGapCenter?: number;
-  satChromaCenter?: number;
+  saturationCenter?: number;
   lightnessCenter?: number;
 }
 
@@ -261,8 +264,9 @@ export function getPaletteCenterSettings({
   return {
     hueGapCenter: paletteSettingsArray.find((setting) => setting.attribute === 'hueGapCenter')
       ?.value,
-    satChromaCenter: paletteSettingsArray.find((setting) => setting.attribute === 'satChromaCenter')
-      ?.value,
+    saturationCenter: paletteSettingsArray.find(
+      (setting) => setting.attribute === 'saturationCenter',
+    )?.value,
     lightnessCenter: paletteSettingsArray.find((setting) => setting.attribute === 'lightnessCenter')
       ?.value,
   };
@@ -290,8 +294,8 @@ export function getPaletteEndsSettings({
 const ATTRIBUTE_AXE = {
   lightnessLeft: 'l',
   lightnessRight: 'l',
-  satChromaGapLeft: 's',
-  satChromaGapRight: 's',
+  saturationGapLeft: 's',
+  saturationGapRight: 's',
   hueGapLeft: 'h',
   hueGapRight: 'h',
 };

@@ -204,25 +204,39 @@ export function interpolateBetweenIndices({
 }
 
 /**
- * Calcule une pondération linéaire centrée.
- *
- * La valeur renvoyée est 1 au centre du tableau et diminue linéairement vers 0 aux extrémités.
- * Exemple : pour une longueur de 9, le centre est à l'index 4 (Math.round(9 / 2) = 5 - 1 = 4)
- * Les extrémités (index 0 et 8) valent 0, et les valeurs intermédiaires décroissent linéairement.
- *
- * @param index - L'index actuel (0 à length - 1)
- * @param length - La longueur totale du tableau
- * @returns Une valeur comprise entre 0 et 1
+ * Pondération linéaire centrée avec plateau de 3 indices :
+ * center = Math.floor(length / 2) et [center-1, center, center+1] = 1.
+ * La décroissance vers 0 est calculée linéairement et indépendamment
+ * pour chaque côté jusqu'à l'extrémité la plus proche.
  */
 export function linearCenterWeight(index: number, length: number): number {
   if (length <= 1) return 1;
 
-  const center = (length - 1) / 2;
-  const maxDistance = center; // distance max entre le centre et un bord
-  const distance = Math.abs(index - center);
+  const center = Math.floor(length / 2);
+  const plateauRadius = 1;
 
-  // Valeur linéaire entre 1 (au centre) et 0 (aux extrémités)
-  return 1 - distance / maxDistance;
+  const leftEdge = center - plateauRadius; // bord gauche du plateau
+  const rightEdge = center + plateauRadius; // bord droit du plateau
+  const leftLen = leftEdge - 0; // distance du bord gauche du plateau à l'index 0
+  const rightLen = length - 1 - rightEdge; // distance du bord droit du plateau à l'index length-1
+
+  // Zone plate
+  if (Math.abs(index - center) <= plateauRadius) return 1;
+
+  // Côté gauche : décroît linéairement de leftEdge -> 0
+  if (index < leftEdge) {
+    const dist = leftEdge - index; // 1 à leftLen
+    return leftLen === 0 ? 0 : Math.max(0, 1 - dist / leftLen);
+  }
+
+  // Côté droit : décroît linéairement de rightEdge -> (length-1)
+  if (index > rightEdge) {
+    const dist = index - rightEdge; // 1 à rightLen
+    return rightLen === 0 ? 0 : Math.max(0, 1 - dist / rightLen);
+  }
+
+  // Entre leftEdge et rightEdge (devrait déjà être traité par le plateau)
+  return 1;
 }
 
 /**
@@ -242,4 +256,28 @@ export function linearInterpolationBetweenPoints({
   positionX: number;
 }): number {
   return pointA + (pointB - pointA) * positionX;
+}
+
+export function isBetween({
+  min,
+  max,
+  value,
+}: {
+  min: number;
+  max: number;
+  value: number;
+}): boolean {
+  return min <= value && max >= value;
+}
+
+export function reindexPosition({
+  index,
+  defaultLength,
+  newLength,
+}: {
+  index: number;
+  defaultLength: number;
+  newLength: number;
+}) {
+  return Math.round((index / (defaultLength - 1)) * (newLength - 1));
 }

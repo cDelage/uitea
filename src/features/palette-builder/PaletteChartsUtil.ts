@@ -90,12 +90,12 @@ export function usePaletteBuilderChartAxeData({
     })
     .set('okhsl.h', rightColor.get(`okhsl.h`));
 
-  const leftSatChromaGradient = computeChartAxeGradient({
+  const leftSaturationGradient = computeChartAxeGradient({
     centerColor: colorCenterLeft,
     axe: saturationAxe,
   });
 
-  const rightSatChromaGradient = computeChartAxeGradient({
+  const rightSaturationGradient = computeChartAxeGradient({
     centerColor: colorCenterRight,
     axe: saturationAxe,
   });
@@ -151,31 +151,31 @@ export function usePaletteBuilderChartAxeData({
     step: 0.01,
   };
 
-  const leftSatChromaAxe: AxeData = {
-    value: palette.settings.satChromaGapLeft,
+  const leftSaturationAxe: AxeData = {
+    value: palette.settings.saturationGapLeft,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, 'satChromaGapLeft');
+      handleUpdateAxe(value, 'saturationGapLeft');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.satChromaGapLeft, 'satChromaGapLeft');
+      handleUpdateAxe(paletteSettings.saturationGapLeft, 'saturationGapLeft');
     },
     min: 0,
     max: 1,
-    gradient: leftSatChromaGradient,
+    gradient: leftSaturationGradient,
     step: 0.01,
   };
 
-  const rightSatChromaAxe: AxeData = {
-    value: palette.settings.satChromaGapRight,
+  const rightSaturationAxe: AxeData = {
+    value: palette.settings.saturationGapRight,
     update: (value: number | number[]) => {
-      handleUpdateAxe(value, 'satChromaGapRight');
+      handleUpdateAxe(value, 'saturationGapRight');
     },
     reset: () => {
-      handleUpdateAxe(paletteSettings.satChromaGapRight, 'satChromaGapRight');
+      handleUpdateAxe(paletteSettings.saturationGapRight, 'saturationGapRight');
     },
     min: 0,
     max: 1,
-    gradient: rightSatChromaGradient,
+    gradient: rightSaturationGradient,
 
     step: 0.01,
   };
@@ -218,8 +218,8 @@ export function usePaletteBuilderChartAxeData({
     {
       axeName: saturationAxe.name,
       axeLabel: saturationAxe.label,
-      leftAxeData: leftSatChromaAxe,
-      rightAxeData: rightSatChromaAxe,
+      leftAxeData: leftSaturationAxe,
+      rightAxeData: rightSaturationAxe,
     },
     {
       axeName: 'h',

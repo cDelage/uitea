@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import styles from "./FormComponent.module.css";
+import { ReactNode } from 'react';
+import styles from './FormComponent.module.css';
 function FormComponent({
   children,
   label,
@@ -14,8 +14,8 @@ function FormComponent({
   rightElement?: ReactNode;
 }) {
   return (
-    <div className={"column gap-4 " + className}>
-      <div className="row justify-between">
+    <div className={'column gap-5 ' + className}>
+      <div className="row justify-between align-center">
         <label>{label}</label>
         <div>{rightElement}</div>
       </div>

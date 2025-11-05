@@ -16,6 +16,7 @@ import {
 import styles from './PaletteBuilder.module.css';
 import { getRectSize, ICON_SIZE_MD, ICON_SIZE_SM, ICON_SIZE_XL } from '../../ui/UiConstants';
 import {
+  createPalette,
   paletteBuildToDesignSystemPalette,
   PaletteRecommandationPosition,
   recommandColorPlacement,
@@ -53,13 +54,13 @@ import { ALIGNER_OPTIONS, paletteBuildToFile } from '../../domain/PaletteBuilder
 import { save } from '@tauri-apps/plugin-dialog';
 import { getFilenameDate } from '../../util/DateUtil';
 import ColorPreviewBody from './ColorPreviewBody';
-import { OPEN_COLOR_PALETTES } from '../../util/PaletteRecommandationLayerConstants';
+import PalettePreview from '../../ui/kit/PalettePreview';
 
 function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   const {
     palettes,
-    createPalette,
     settings,
+    insertPalette,
     setSettings,
     reset,
     movePalette,
@@ -82,11 +83,26 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
     useSavePaletteBuilderIntoDesignSystem(designSystemPathComputed);
   const { designSystemPaletteBuilder } =
     useFetchDesignSystemPaletteBuilder(designSystemPathComputed);
-  const [colorCreatePalette, setColorCreatePalette] = useState(new ColorIO('blue'));
-  const [indexRecommanded, setIndexRecommanded] = useState<
-    PaletteRecommandationPosition | undefined
-  >(undefined);
-  const [indexSelected, setIndexSelected] = useState<number>(Math.round(steps / 2));
+  const [colorCreatePalette, setColorCreatePalette] = useState<ColorIO>(new ColorIO('blue'));
+
+  const [paletteRecommandationPosition, setPaletteRecommandationPosition] =
+    useState<PaletteRecommandationPosition>(
+      recommandColorPlacement({
+        color: colorCreatePalette,
+        referentialPalettes: settings.referentialPalettes,
+        steps,
+      }),
+    );
+
+  const [paletteBuild, setPaletteBuild] = useState(
+    createPalette({
+      settings,
+      paletteRecommandationPosition,
+      tint: colorCreatePalette,
+    }),
+  );
+
+  const [editPositionIndex, setEditPositionIndex] = useState<number>(Math.round(steps / 2));
   const [editPositionMode, setEditPositionMode] = useState(false);
 
   function togglePositionMode() {
@@ -174,13 +190,10 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   }
 
   function handleCreatePalette() {
-    const palette = createPalette({
-      tint: colorCreatePalette,
-      paletteRecommandationPositon: indexRecommanded,
-    });
+    insertPalette(paletteBuild);
     setSelectedPaletteIndex(palettes.length);
     setTriggerOpen('palette');
-    const centerIndex = palette.tints.findIndex((tint) => tint.isCenter);
+    const centerIndex = paletteBuild.tints.findIndex((tint) => tint.isCenter);
     setSelectedTintIndex(centerIndex);
   }
 
@@ -257,12 +270,33 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
   useEffect(() => {
     const recommandation = recommandColorPlacement({
       color: colorCreatePalette,
-      palettesRecommandationLayout: OPEN_COLOR_PALETTES,
+      referentialPalettes: settings.referentialPalettes,
       steps,
     });
-    setIndexRecommanded(recommandation);
-    setIndexSelected(recommandation.index);
+    setPaletteRecommandationPosition(recommandation);
+    setEditPositionIndex(recommandation.index);
   }, [colorCreatePalette, steps]);
+
+  useEffect(() => {
+    setPaletteBuild(
+      createPalette({
+        tint: colorCreatePalette,
+        paletteRecommandationPosition: editPositionMode
+          ? {
+              ...paletteRecommandationPosition,
+              index: editPositionIndex,
+            }
+          : paletteRecommandationPosition,
+        settings,
+      }),
+    );
+  }, [
+    settings,
+    editPositionMode,
+    editPositionIndex,
+    paletteRecommandationPosition,
+    colorCreatePalette,
+  ]);
 
   return (
     <SidePanel
@@ -478,7 +512,7 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                         className="popover-body"
                         data-disableoutside={true}
                         style={{
-                          width: '300px',
+                          width: '400px',
                         }}
                       >
                         <ColorPickerLinear
@@ -486,25 +520,12 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                           onChange={(value: ColorIO) => setColorCreatePalette(value)}
                         />
                         <div className="column flex-1 gap-6">
-                          <div className="row align-center justify-center flex-1">
-                            <div className="column gap-2 align-center">
-                              <h5>{indexRecommanded?.paletteRecommandationLayout.paletteName}</h5>
-                              <div
-                                className="palette-color"
-                                style={{
-                                  background: colorCreatePalette.toString({
-                                    format: 'hex',
-                                  }),
-                                  ...getRectSize({ height: 'var(--uit-space-10)' }),
-                                }}
-                              ></div>
-                              <div>
-                                {colorCreatePalette.toString({
-                                  format: 'hex',
-                                })}
-                              </div>
-                            </div>
-                          </div>
+                          <FormComponent label="Palette">
+                            <PalettePreview
+                              paletteBuild={paletteBuild}
+                              growIndex={paletteRecommandationPosition.index}
+                            />
+                          </FormComponent>
                           <div className="row align-center justify-between">
                             <div className="column gap-2 justify-between">
                               <div className="column gap-2">
@@ -512,19 +533,24 @@ function PaletteBuilderComponent({ closeModal }: { closeModal?: () => void }) {
                                   <div className="row align-center gap-2">
                                     {editPositionMode ? (
                                       <select
-                                        value={indexSelected}
-                                        onChange={(e) => setIndexSelected(Number(e.target.value))}
+                                        value={editPositionIndex}
+                                        onChange={(e) =>
+                                          setEditPositionIndex(Number(e.target.value))
+                                        }
                                       >
                                         {stepsArray.map((step, index) => (
                                           <option value={index}>
                                             {step}
-                                            {index === indexRecommanded?.index && ' (recommanded)'}
+                                            {index === paletteRecommandationPosition?.index &&
+                                              ' (recommanded)'}
                                           </option>
                                         ))}
                                       </select>
                                     ) : (
                                       <div className="column">
-                                        <strong>{stepsArray[indexRecommanded?.index ?? 0]}</strong>
+                                        <strong>
+                                          {stepsArray[paletteRecommandationPosition?.index ?? 0]}
+                                        </strong>
                                         <small>(recommanded)</small>
                                       </div>
                                     )}

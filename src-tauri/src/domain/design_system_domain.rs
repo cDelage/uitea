@@ -896,12 +896,12 @@ pub struct PaletteThemeSetting {
 pub enum PaletteSettingAttribute {
     LightnessLeft,
     LightnessRight,
-    SatChromaGapLeft,
-    SatChromaGapRight,
+    SaturationGapLeft,
+    SaturationGapRight,
     HueGapLeft,
     HueGapRight,
     LightnessCenter,
-    SatChromaCenter,
+    SaturationCenter,
     HueGapCenter,
 }
 

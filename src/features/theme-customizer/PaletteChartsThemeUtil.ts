@@ -116,7 +116,7 @@ export function useThemeCenterAxes({
       },
       {
         axeName: 'saturation',
-        value: (paletteBuild.settings.satChromaCenter ?? 0) + paletteBuildCenterColor.okhsl[1],
+        value: (paletteBuild.settings.saturationCenter ?? 0) + paletteBuildCenterColor.okhsl[1],
         min: 0,
         max: 1,
         step: 0.01,
@@ -125,7 +125,7 @@ export function useThemeCenterAxes({
             ...paletteBuild,
             settings: {
               ...paletteBuild.settings,
-              satChromaCenter: (value as number) - paletteBuildCenterColor.okhsl[1],
+              saturationCenter: (value as number) - paletteBuildCenterColor.okhsl[1],
             },
           }),
         reset: () => {
@@ -133,26 +133,26 @@ export function useThemeCenterAxes({
             ...paletteBuild,
             settings: {
               ...paletteBuild.settings,
-              satChromaCenter: 0,
+              saturationCenter: 0,
             },
           });
           applyThemePaletteSetting({
             themeName: theme.name,
             paletteThemeSetting: {
-              attribute: 'satChromaCenter',
+              attribute: 'saturationCenter',
               paletteName: palette.name,
               value: 0,
             },
           });
         },
         onComplete: () => {
-          if (paletteBuild.settings.satChromaCenter !== undefined) {
+          if (paletteBuild.settings.saturationCenter !== undefined) {
             applyThemePaletteSetting({
               themeName: theme.name,
               paletteThemeSetting: {
-                attribute: 'satChromaCenter',
+                attribute: 'saturationCenter',
                 paletteName: palette.name,
-                value: paletteBuild.settings.satChromaCenter,
+                value: paletteBuild.settings.saturationCenter,
               },
             });
           }
@@ -245,7 +245,7 @@ export function useThemeCharts({
     direction: leftLightestColor ? 'min' : 'max',
   });
 
-  const leftSatChromaGradient = getGradient({
+  const leftSaturationGradient = getGradient({
     color: finalLeftColor,
     space: 'okhsl',
     pickerAxe: OKHSL.axes[1],
@@ -253,7 +253,7 @@ export function useThemeCharts({
     reverse: true,
   });
 
-  const rightSatChromaGradient = getGradient({
+  const rightSaturationGradient = getGradient({
     color: finalRightColor,
     space: 'okhsl',
     pickerAxe: OKHSL.axes[1],
@@ -316,8 +316,8 @@ export function useThemeCharts({
   });
 
   const leftChromaAxe: AxeData = getChartAxeData({
-    attribute: 'satChromaGapLeft',
-    gradient: leftSatChromaGradient,
+    attribute: 'saturationGapLeft',
+    gradient: leftSaturationGradient,
     paletteBuild,
     reverse: false,
     setPaletteBuild,
@@ -328,8 +328,8 @@ export function useThemeCharts({
   });
 
   const rightChromaAxe: AxeData = getChartAxeData({
-    attribute: 'satChromaGapRight',
-    gradient: rightSatChromaGradient,
+    attribute: 'saturationGapRight',
+    gradient: rightSaturationGradient,
     paletteBuild,
     reverse: false,
     setPaletteBuild,
@@ -442,9 +442,9 @@ export const DEFAULT_PALETTE_THEME_SETTINGS: PaletteSettings = {
   lightnessCenter: 0,
   lightnessLeft: 0,
   lightnessRight: 0,
-  satChromaCenter: 0,
-  satChromaGapLeft: 0,
-  satChromaGapRight: 0,
+  saturationCenter: 0,
+  saturationGapLeft: 0,
+  saturationGapRight: 0,
 };
 
 export function buildPaletteSettings({

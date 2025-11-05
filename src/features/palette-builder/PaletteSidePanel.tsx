@@ -1,7 +1,7 @@
 import {
-  getColorsRecommanded,
   getEndsTints,
   getHueName,
+  getPalettesRecommanded,
   huesName,
   usePaletteBuilderStore,
 } from './PaletteBuilderStore';
@@ -25,6 +25,8 @@ import PaletteChart from './PaletteChart';
 import { PaletteBuild, TintBuild } from '../../domain/PaletteBuilderDomain';
 import { getContrastColor } from '../../util/PickerUtil';
 import Anchor from './Anchor';
+import InputNumber from '../color-picker/InputNumber';
+import PalettePreview from '../../ui/kit/PalettePreview';
 
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -41,7 +43,7 @@ function PaletteSidePanel({
   selectedTintIndex: number | undefined;
   setSelectedTintIndex: (value: number | undefined) => void;
 }) {
-  const { updatePalette, createPaletteFromExisting, deletePalette, palettes, doPaletteBuilder } =
+  const { updatePalette, deletePalette, palettes, doPaletteBuilder, settings, insertPalette } =
     usePaletteBuilderStore();
   const { closeModal } = useSidepanelContext();
   const centerTint = useMemo<TintBuild | undefined>(
@@ -66,16 +68,23 @@ function PaletteSidePanel({
     [paletteComparatorId, palettes],
   );
 
+  const palettesRecommanded = useMemo<PaletteBuild[]>(
+    () =>
+      palette
+        ? getPalettesRecommanded({
+            basePalette: palette,
+            existingPalettes: palettes,
+            settings,
+          })
+        : [],
+    [palette, settings, palettes],
+  );
+
   const selectedTint = useMemo<TintBuild | undefined>(() => {
     return selectedTintIndex !== undefined && palette
       ? palette?.tints[selectedTintIndex]
       : undefined;
   }, [selectedTintIndex, palette]);
-
-  const colorsRecommanded = useMemo(
-    () => getColorsRecommanded(palettes, centerTint?.color),
-    [centerTint, palettes],
-  );
 
   const chartsAxeData = usePaletteBuilderChartAxeData({
     palette,
@@ -283,6 +292,19 @@ function PaletteSidePanel({
           </div>
           <div className={styles.sidePanelBodyContainer}>
             <div className={styles.sidePanelContainer}>
+              <h5 className="text-color-dark">Recommandations</h5>
+              {palettesRecommanded.map((palette) => (
+                <FormComponent key={palette.name} label={palette.name}>
+                  <div
+                    className={styles.palettePreviewClickable}
+                    onClick={() => insertPalette(palette)}
+                  >
+                    <PalettePreview paletteBuild={palette} />
+                  </div>
+                </FormComponent>
+              ))}
+            </div>
+            <div className={styles.sidePanelContainer}>
               <h5 className="text-color-dark">Colors</h5>
               {selectedTint && selectedTintIndex !== undefined ? (
                 <>
@@ -301,7 +323,20 @@ function PaletteSidePanel({
                   )}
                   {selectedTintIndex === 0 && (
                     <>
-                      <FormComponent label="Whiteness mix percentage">
+                      <FormComponent
+                        label="Whiteness mix percentage"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.lightnessLeft}
+                              setValue={chartsAxeData[0].leftAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
                           value={palette.settings.lightnessLeft}
                           min={0}
@@ -314,9 +349,22 @@ function PaletteSidePanel({
                           gradient={`linear-gradient(to right, ${chartsAxeData[0].leftAxeData.gradient})`}
                         />
                       </FormComponent>
-                      <FormComponent label={`${chartsAxeData[1].axeLabel} gap`}>
+                      <FormComponent
+                        label="Saturation gap"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.saturationGapLeft}
+                              setValue={chartsAxeData[1].leftAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
-                          value={palette.settings.satChromaGapLeft}
+                          value={palette.settings.saturationGapLeft}
                           min={0}
                           max={1}
                           step={0.01}
@@ -327,7 +375,20 @@ function PaletteSidePanel({
                           gradient={`linear-gradient(to right, ${chartsAxeData[1].leftAxeData.gradient})`}
                         />
                       </FormComponent>
-                      <FormComponent label="Hue gap">
+                      <FormComponent
+                        label="Hue gap"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.hueGapLeft}
+                              setValue={chartsAxeData[2].leftAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
                           value={palette.settings.hueGapLeft}
                           min={0}
@@ -344,7 +405,20 @@ function PaletteSidePanel({
                   )}
                   {selectedTintIndex === palette.tints.length - 1 && (
                     <>
-                      <FormComponent label="Blackness mix percentage">
+                      <FormComponent
+                        label="Blackness mix percentage"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.lightnessRight}
+                              setValue={chartsAxeData[1].rightAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
                           value={palette.settings.lightnessRight}
                           min={0}
@@ -357,9 +431,22 @@ function PaletteSidePanel({
                           onChangeComplete={doPaletteBuilder}
                         />
                       </FormComponent>
-                      <FormComponent label={`${chartsAxeData[1].axeLabel} gap`}>
+                      <FormComponent
+                        label="saturation gap"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.saturationGapRight}
+                              setValue={chartsAxeData[1].rightAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
-                          value={palette.settings.satChromaGapRight}
+                          value={palette.settings.saturationGapRight}
                           min={0}
                           max={1}
                           step={0.01}
@@ -370,7 +457,20 @@ function PaletteSidePanel({
                           onChangeComplete={doPaletteBuilder}
                         />
                       </FormComponent>
-                      <FormComponent label="Hue gap">
+                      <FormComponent
+                        label="Hue gap"
+                        rightElement={
+                          <div>
+                            <InputNumber
+                              value={palette.settings.lightnessRight}
+                              setValue={chartsAxeData[1].rightAxeData.update}
+                              min={0}
+                              max={1}
+                              step={0.01}
+                            />
+                          </div>
+                        }
+                      >
                         <ColorSlider
                           value={palette.settings.hueGapRight}
                           min={0}
@@ -481,38 +581,6 @@ function PaletteSidePanel({
                 <div className="row justify-center">No tints selected</div>
               )}
             </div>
-            <div className={styles.separator} />
-            <h5 className="text-color-dark">Recommanded colors</h5>
-            {colorsRecommanded
-              .filter((colorSet) => colorSet.colors.length)
-              .map((colorSet) => (
-                <div key={colorSet.flag}>
-                  <FormComponent label={colorSet.flag}>
-                    <div className={styles.complementaryColorsRow}>
-                      {colorSet.colors.map((color, colorIndex) => (
-                        <div
-                          className={styles.recommandedHueButton}
-                          key={`${color.name}${color.color.toString({
-                            format: 'hex',
-                          })}${colorIndex}`}
-                          onClick={() => createPaletteFromExisting(palette, color)}
-                        >
-                          <div
-                            className="palette-color"
-                            style={{
-                              background: color.color.toString({
-                                format: 'hex',
-                              }),
-                              ...getRectSize({ height: 'var(--uit-space-7)' }),
-                            }}
-                          ></div>
-                          {color.name}
-                        </div>
-                      ))}
-                    </div>
-                  </FormComponent>
-                </div>
-              ))}
             <div className={styles.separator} />
             <h5 className="text-color-dark">Charts</h5>
             <div className={styles.chartContainer}>

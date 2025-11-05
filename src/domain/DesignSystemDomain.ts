@@ -106,13 +106,13 @@ export interface PaletteThemeSetting {
 
 export type PaletteSettingAttribute = EndSettingAttribute | CenterSettingAttribute;
 
-export type CenterSettingAttribute = 'lightnessCenter' | 'satChromaCenter' | 'hueGapCenter';
+export type CenterSettingAttribute = 'lightnessCenter' | 'saturationCenter' | 'hueGapCenter';
 
 export type EndSettingAttribute =
   | 'lightnessLeft'
   | 'lightnessRight'
-  | 'satChromaGapLeft'
-  | 'satChromaGapRight'
+  | 'saturationGapLeft'
+  | 'saturationGapRight'
   | 'hueGapLeft'
   | 'hueGapRight';
 
@@ -121,20 +121,20 @@ export const EndSettingAttributes: PaletteSettingAttribute[] = [
   'hueGapRight',
   'lightnessLeft',
   'lightnessRight',
-  'satChromaGapLeft',
-  'satChromaGapRight',
+  'saturationGapLeft',
+  'saturationGapRight',
 ];
 
 export const LeftEndSettingsAttributes: PaletteSettingAttribute[] = [
   'hueGapLeft',
   'lightnessLeft',
-  'satChromaGapLeft',
+  'saturationGapLeft',
 ];
 
 export const RightEndSettingsAttributes: PaletteSettingAttribute[] = [
   'hueGapRight',
   'lightnessRight',
-  'satChromaGapRight',
+  'saturationGapRight',
 ];
 
 export type ThemeStateCategory = 'default' | 'hover' | 'active' | 'focus';
